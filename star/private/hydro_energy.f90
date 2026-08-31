@@ -87,8 +87,7 @@
          call setup_eps_grav(ierr); if (ierr /= 0) return  ! do this first - it sets eps_grav_form
          ! Only total-energy forms need work from momentum sources.
          include_dke_dt = .not. eps_grav_form .and. &
-            .not. (s% using_velocity_time_centering .and. &
-               s% use_P_d_1_div_rho_form_of_work_when_time_centering_velocity)
+            .not. s% use_P_d_1_div_rho_form_of_work
          call setup_de_dt_and_friends(ierr); if (ierr /= 0) return
          call setup_dwork_dm(ierr); if (ierr /= 0) return
          call setup_dL_dm(ierr); if (ierr /= 0) return
@@ -110,8 +109,7 @@
             esum_ad = esum_ad - d_turbulent_energy_dt_ad
             esum_ad = esum_ad - dwork_dm_ad
             esum_ad = esum_ad + eps_grav_ad
-         else if (s% using_velocity_time_centering .and. &
-                s% use_P_d_1_div_rho_form_of_work_when_time_centering_velocity) then
+         else if (s% use_P_d_1_div_rho_form_of_work) then
             esum_ad = -dL_dm_ad
             esum_ad = esum_ad + sources_ad
             esum_ad = esum_ad + others_ad
@@ -185,8 +183,7 @@
             include 'formats'
             ierr = 0
             skip_P = eps_grav_form
-            if (s% using_velocity_time_centering .and. &
-                s% use_P_d_1_div_rho_form_of_work_when_time_centering_velocity) then
+            if (s% use_P_d_1_div_rho_form_of_work) then
                call eval_simple_PdV_work(s, k, skip_P, dwork_dm_ad, dwork, &
                   d_dwork_dxa00, ierr)
                d_dwork_dxam1 = 0
@@ -236,11 +233,12 @@
             use hydro_rsp2, only: compute_Eq_cell, compute_Uq_face
             use hydro_riemann, only: get_RTI_momentum_diffusion
             use tdc_hydro, only: &
-               compute_tdc_Eq_div_w_face, compute_tdc_Uq_face, compute_tdc_Uq_dm_cell
-            real(dp) :: alfa, beta
+               compute_tdc_Eq_cell, compute_tdc_Eq_div_w_face, &
+               compute_tdc_Eq_div_w_inner_boundary, compute_tdc_Uq_dm_cell
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: &
-               eps_nuc_ad, non_nuc_neu_ad, extra_heat_ad, Eq_ad, viscous_work_ad, &
+               eps_nuc_ad, non_nuc_neu_ad, extra_heat_ad, Eq_ad, Eq_00, Eq_p1, &
+               viscous_work_ad, &
                Uq_00, Uq_p1, RTI_diffusion_ad, RTI_momentum_energy_ad, &
                RTI_force_ad, RTI_dissipation_ad, v_00, v_p1, drag_force, drag_energy
             type(accurate_auto_diff_real_star_order1) :: sources_sum_ad
@@ -304,29 +302,33 @@
                end if
             else if (s% TDC_alpha_M >0d0 .and. s% MLT_option == 'TDC' .and. &
                s% TDC_include_eturb_in_energy_equation .and. (s% v_flag .or. s% u_flag)) then
-                if (k < s% nz) then
-                  Eq_ad = 0.5d0*(compute_tdc_Eq_div_w_face(s, k, ierr)*s% mlt_vc_ad(k) + &
-                     shift_p1(compute_tdc_Eq_div_w_face(s, k+1, ierr))*shift_p1(s% mlt_vc_ad(k+1)))/sqrt_2_div_3
-                else ! center cell is 0 at inner face
-                     Eq_ad = 0.5d0*compute_tdc_Eq_div_w_face(s, k, ierr)*s% mlt_vc_ad(k)/sqrt_2_div_3
-                end if
-                if (ierr /= 0) return
-                if (include_dke_dt) then
-                   if (s% u_flag) then
-                      Uq_00 = compute_tdc_Uq_dm_cell(s, k, ierr)/s% dm(k)
-                      if (ierr /= 0) return
-                      v_00 = 0.5d0*(wrap_u_00(s,k) + s% u_start(k))
-                      viscous_work_ad = v_00*Uq_00
-                   else if (s% v_flag) then
-                      Uq_00 = compute_tdc_Uq_face(s, k, ierr)
-                      if (ierr /= 0) return
-                      if (k < s% nz) then
-                         Uq_p1 = shift_p1(compute_tdc_Uq_face(s, k+1, ierr))
-                         if (ierr /= 0) return
-                      end if
-                      have_v_viscous_work = .true.
-                   end if
-                end if
+               if (s% v_flag) then
+                  Eq_ad = compute_tdc_Eq_cell(s, k, ierr)
+                  ! Symmetric v*Uq work requires zone k+2 derivatives.
+               else
+                  Eq_00 = compute_tdc_Eq_div_w_face(s, k, ierr)
+                  if (ierr /= 0) return
+                  Eq_ad = 0.5d0*Eq_00*s%mlt_vc_ad(k)/sqrt_2_div_3
+                  if (k < s%nz) then
+                     Eq_p1 = shift_p1(compute_tdc_Eq_div_w_face(s, k+1, ierr))
+                     if (ierr /= 0) return
+                     Eq_ad = Eq_ad + 0.5d0*Eq_p1* &
+                        shift_p1(s%mlt_vc_ad(k+1))/sqrt_2_div_3
+                  else if (s%TDC_include_inner_boundary_eddy_viscosity .and. &
+                        s%R_center > 0d0) then
+                     Eq_p1 = compute_tdc_Eq_div_w_inner_boundary(s, ierr)
+                     if (ierr /= 0) return
+                     Eq_ad = Eq_ad + 0.5d0*Eq_p1* &
+                        s%mlt_vc_ad(k)/sqrt_2_div_3
+                  end if
+               end if
+               if (ierr /= 0) return
+               if (include_dke_dt .and. s% u_flag) then
+                  Uq_00 = compute_tdc_Uq_dm_cell(s, k, ierr)/s%dm(k)
+                  if (ierr /= 0) return
+                  v_00 = 0.5d0*(wrap_u_00(s,k) + s%u_start(k))
+                  viscous_work_ad = v_00*Uq_00
+               end if
             end if
 
             if (have_v_viscous_work) then

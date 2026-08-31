@@ -131,7 +131,7 @@ module turb
       type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face, gradT, D
       integer, intent(out) :: tdc_num_iters, mixing_type, ierr
       type(tdc_info) :: info
-      type(auto_diff_real_star_order1) :: L, Gamma, h
+      type(auto_diff_real_star_order1) :: L, L0, Gamma, h
       real(dp), parameter :: alpha_c = (1d0/2d0)*sqrt_2_div_3
       real(dp), parameter :: lower_bound_Z = -1d2
       real(dp), parameter :: upper_bound_Z = 1d2
@@ -171,7 +171,8 @@ module turb
       info%gradL = convert(gradL)
       info%grada = convert(grada)
       info%c0 = convert(TDC_alpha_C * mixing_length_alpha * alpha_c * rho * T * Cp * 4d0 * pi * pow2(r))
-      info%L0 = convert((16d0*pi*crad*clight/3d0)*cgrav*m*pow4(T)/(P*opacity))  ! assumes QHSE for dP/dm
+      L0 = (16d0*pi*crad*clight/3d0)*cgrav*m*pow4(T)/(P*opacity)  ! assumes QHSE for dP/dm
+      info%L0 = convert(L0)
       info%A0 = conv_vel_start/sqrt_2_div_3
       info%h = energy + P/rho ! actual enthalpy
       info%T = T
@@ -207,7 +208,14 @@ module turb
       end if
 
       ! Unpack output
-      gradT = Y_face + gradL
+      if (conv_vel == 0d0) then
+         ! Avoid cancellation when a stabilizing composition gradient makes
+         ! Y_face and gradL large compared with the radiative gradient.
+         gradT = L/L0
+         Y_face = gradT - gradL
+      else
+         gradT = Y_face + gradL
+      end if
       D = conv_vel*Lambda/3d0     ! diffusion coefficient [cm^2/sec]
       if (conv_vel > 0d0) then
          mixing_type = convective_mixing

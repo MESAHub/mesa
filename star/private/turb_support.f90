@@ -20,7 +20,7 @@
 module turb_support
 
 use star_private_def
-use const_def, only: dp, crad, ln10, no_mixing
+use const_def, only: dp, crad, ln10, pi4, no_mixing
 use num_lib
 use utils_lib
 use auto_diff_support
@@ -33,6 +33,7 @@ private
 public :: get_gradT
 public :: do1_mlt_eval
 public :: Get_results
+public :: get_TDC_dynamical_gradL
 
 contains
 
@@ -55,6 +56,62 @@ contains
          fallback = .true.
       end if
    end function check_if_must_fall_back_to_MLT
+
+
+   subroutine get_TDC_dynamical_gradL(s, k, gradL, tdc_gradL, ierr)
+      type(star_info), pointer :: s
+      integer, intent(in) :: k
+      type(auto_diff_real_star_order1), intent(in) :: gradL
+      type(auto_diff_real_star_order1), intent(out) :: tdc_gradL
+      integer, intent(out) :: ierr
+
+      real(dp) :: dm_face
+      type(auto_diff_real_star_order1) :: r_00, inv_R2, area, grav, P00, Pm1, &
+         Ptrb00, Ptrbm1, delta_P_qhse, pressure_gradient_factor
+
+      ierr = 0
+      tdc_gradL = gradL
+      if (k <= 1 .or. .not. (s% u_flag .or. s% v_flag)) return
+
+      ! The RSP pressure-gradient factor is an instantaneous spatial quantity.
+      r_00 = wrap_r_00(s, k)
+      inv_R2 = 1d0/pow2(r_00)
+      area = pi4*pow2(r_00)
+      grav = -s% cgrav(k)*s% m_grav(k)*inv_R2
+      if (s% rotation_flag .and. s% use_gravity_rotation_correction) &
+         grav = grav*s% fp_rot(k)
+
+      if (s% use_mass_corrections) then
+         dm_face = 0.5d0*(s% dm(k)*s% mass_correction(k) + &
+            s% dm(k - 1)*s% mass_correction(k - 1))
+      else
+         dm_face = 0.5d0*(s% dm(k) + s% dm(k - 1))
+      end if
+
+      P00 = wrap_Peos_00(s, k)
+      Pm1 = wrap_Peos_m1(s, k)
+
+      if (s% have_mlt_vc .and. s% okay_to_set_mlt_vc .and. &
+            s% include_mlt_Pturb_in_thermodynamic_gradients .and. &
+            s% mlt_Pturb_factor > 0d0) then
+         Ptrb00 = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*wrap_d_00(s, k)/3d0
+         Ptrbm1 = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*wrap_d_m1(s, k)/3d0
+         P00 = P00 + Ptrb00
+         Pm1 = Pm1 + Ptrbm1
+      end if
+
+      delta_P_qhse = grav*dm_face/area
+      if (delta_P_qhse% val == 0d0 .or. is_bad_num(delta_P_qhse% val)) return
+
+      ! Convert the neutral gradient to the gravity-normalized TDC coordinate.
+      pressure_gradient_factor = (Pm1 - P00)/delta_P_qhse
+      if (is_bad_num(pressure_gradient_factor% val)) return
+      ! Do not reverse the neutral gradient at the innermost resolved face
+      ! next to an excised center.
+      if (s% R_center > 0d0 .and. k == s% nz .and. &
+            pressure_gradient_factor% val <= 0d0) return
+      tdc_gradL = pressure_gradient_factor*gradL
+   end subroutine get_TDC_dynamical_gradL
 
    subroutine get_gradT(s, MLT_option, &  ! used to create models
          r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
@@ -234,7 +291,7 @@ contains
       type(auto_diff_real_star_order1), intent(out), optional :: mixing_length
 
       type(auto_diff_real_star_order1) :: &
-         Pr, Pg, grav, Hp_for_mlt, Lambda, legacy_Lambda, mixing_length_alpha_ad, gradL, beta
+         Pr, Pg, grav, Hp_for_mlt, Lambda, legacy_Lambda, mixing_length_alpha_ad, gradL, tdc_gradL, beta
       real(dp) :: conv_vel_start, scale, max_conv_vel, Y_face_guess
 
       ! these are used by use_superad_reduction
@@ -303,6 +360,11 @@ contains
       else
          gradL = grada
       end if
+      tdc_gradL = gradL
+      if (using_TDC .and. s% TDC_use_dynamical_gradL) then
+         call get_TDC_dynamical_gradL(s, k, gradL, tdc_gradL, ierr)
+         if (ierr /= 0) return
+      end if
 
       ! maximum convection velocity.
       if (k > 0) then
@@ -323,7 +385,7 @@ contains
       ! Initialize with no mixing
       mixing_type = no_mixing
       gradT = gradr
-      Y_face = gradT - gradL
+      Y_face = gradT - tdc_gradL
       conv_vel = 0d0
       D = 0d0
       Gamma = 0d0
@@ -387,7 +449,7 @@ contains
             conv_vel_start, mixing_length_alpha_ad, Lambda, s%TDC_alpha_D, s%TDC_alpha_R, s%TDC_alpha_Pt, &
             s%dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, Ptot, T, rho, dV, Cp, opacity, &
-            Hp_for_mlt, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
+            Hp_for_mlt, tdc_gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
             Eq_div_w, grav, &
             s% include_mlt_corr_to_TDC, s% TDC_alpha_C, s% TDC_alpha_S, s% use_TDC_enthalpy_flux_limiter, energy, &
             Y_face_guess, ierr)
@@ -409,7 +471,7 @@ contains
                   conv_vel_start, mixing_length_alpha_ad, Lambda, s%TDC_alpha_D, s%TDC_alpha_R, s%TDC_alpha_Pt, &
                   s%dt, cgrav, m, report, &
                   mixing_type, scale, chiT, chiRho, gradr_scaled, r, Ptot, T, rho, dV, Cp, opacity, &
-                  Hp_for_mlt, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
+                  Hp_for_mlt, tdc_gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
                   Eq_div_w, grav, &
                   s% include_mlt_corr_to_TDC, s% TDC_alpha_C, s% TDC_alpha_S, s% use_TDC_enthalpy_flux_limiter, energy, &
                   Y_face_guess, ierr)

@@ -4,6 +4,7 @@
          character(32) :: hydro_matrix_solver
 
          logical :: TDC_adjust_mass_fallback_to_mlt
+         logical :: TDC_use_dynamical_gradL
          logical :: include_mlt_Pturb_in_thermodynamic_gradients
          logical :: use_TDC_enthalpy_flux_limiter
          real(dp) :: Riemann_shock_D_mix_reduction_on, &
@@ -28,18 +29,16 @@
          real(dp) :: RSP2_min_Lt_div_L_for_overshooting_mixing_type
          real(dp) :: RSP2_min_Lc_div_L_for_convective_mixing_type
 
-         real(dp) :: RSP2_w_fix_if_neg, RSP2_w_min_for_damping, RSP2_source_seed
+         real(dp) :: RSP2_w_fix_if_neg, RSP2_source_seed
 
          logical :: RSP2_use_L_eqn_at_surface, RSP2_assume_HSE, RSP2_report_adjust_w
-         logical :: RSP2_use_RSP_eqn_for_Y_face
          logical :: RSP2_use_mass_interp_face_values
          logical :: RSP2_use_Stellingwerf_Lr
          integer :: RSP2_num_outermost_cells_forced_nonturbulent, &
             RSP2_num_innermost_cells_forced_nonturbulent
 
          logical :: RSP2_remesh_when_load
-         integer :: RSP2_nz, RSP2_nz_outer, RSP2_nz_div_IBOTOM
-         real(dp) :: RSP2_T_anchor, RSP2_dq_1_factor
+         integer :: RSP2_nz_div_IBOTOM
 
          integer :: RSP2_target_steps_per_cycle, RSP2_max_num_periods, RSP2_work_period, &
             RSP2_map_first_period, RSP2_map_last_period, RSP2_map_zone_interval
@@ -58,6 +57,7 @@
          real(dp) :: star_LNA_min_first_mode_eta
          real(dp) :: star_LNA_min_mode_eta
          real(dp) :: star_LNA_max_abs_mode_eta
+         real(dp) :: star_LNA_max_eigenvector_residual
          character(256) :: star_LNA_output_directory
          character(256) :: star_LNA_output_file_prefix
          logical :: star_LNA_write_matrix_summary

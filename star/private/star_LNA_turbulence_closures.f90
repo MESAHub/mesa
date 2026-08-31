@@ -29,12 +29,15 @@
          wrap_chiT_00, wrap_d_00, wrap_d_m1, wrap_etrb_00, wrap_Hp_00, &
          wrap_Hp_p1, wrap_kap_00, wrap_L_00, wrap_lnPeos_00, &
          wrap_lnPeos_m1, wrap_lnT_00, wrap_lnT_m1, wrap_Peos_00, &
-         wrap_Peos_m1, wrap_r_00, wrap_r_p1, wrap_T_00, wrap_T_m1, wrap_v_00, &
-         wrap_v_p1, wrap_w_00, wrap_w_m1
+         wrap_Peos_m1, wrap_r_00, wrap_r_p1, wrap_T_00, wrap_T_m1, wrap_u_00, &
+         wrap_u_m1, wrap_v_00, wrap_v_p1, wrap_w_00, wrap_w_m1
       use hydro_rsp2, only: get_RSP2_alfa_beta_face_weights
-      use reconstructed_face_support, only: get_reconstructed_face_state_ad
+      use reconstructed_face_support, only: &
+         get_reconstructed_face_eos_kap_ad, get_reconstructed_face_state_ad
       use star_utils, only: get_mlt_mixing_length, get_rho_face_val
+      use tdc_hydro, only: get_TDC_mixing_length_face
       use turb, only: set_TDC_LNA
+      use turb_support, only: get_TDC_dynamical_gradL
 
       implicit none
 
@@ -43,7 +46,6 @@
       public :: star_LNA_eval_dlnPdm_qhse
       public :: star_LNA_perturb_convective_luminosity
       public :: rsp2_Ptrb_for_star_LNA
-      public :: rsp2_luminosity_resid_for_star_LNA
       public :: rsp2_luminosity_terms_for_star_LNA
       public :: tdc_luminosity_resid_for_star_LNA
       public :: tdc_luminosity_terms_for_star_LNA
@@ -84,7 +86,7 @@
          perturb_luminosity = s% star_LNA_perturb_convective_flux .and. &
             trim(s% star_LNA_convection_treatment) == 'perturbed'
 
-         if (s% MLT_option == 'TDC') then
+         if (.not. s% RSP2_flag .and. s% MLT_option == 'TDC') then
             perturb_luminosity = perturb_luminosity .and. s% star_LNA_include_tdc
          end if
       end function star_LNA_perturb_convective_luminosity
@@ -128,11 +130,33 @@
          integer, intent(out) :: ierr
          real(dp) :: alfa
          type(auto_diff_real_star_order1) :: conv_vel_ad, grav, area, P00, Pm1, &
-            mlt_Ptrb00, mlt_Ptrbm1
+            mlt_Ptrb00, mlt_Ptrbm1, mlt_Ptrb_face, &
+            T_face, rho_face, Cp_face, ChiRho_face, ChiT_face, grada_face, opacity_face
 
          ierr = 0
          call star_LNA_HSE_grav_term(s, k, grav, area, ierr)
          if (ierr /= 0) return
+
+         ! Use the reconstructed pressure from hydro_temperature.
+         if (s% use_face_reconstruction) then
+            call get_reconstructed_face_eos_kap_ad( &
+               s, k, T_face, rho_face, Ppoint, Cp_face, &
+               ChiRho_face, ChiT_face, grada_face, opacity_face, ierr)
+            if (ierr /= 0) return
+            if ((s% have_mlt_vc .and. s% okay_to_set_mlt_vc) .and. &
+                  s% include_mlt_Pturb_in_thermodynamic_gradients .and. &
+                  s% mlt_Pturb_factor > 0d0) then
+               if (tdc_lna_active(s)) then
+                  call tdc_conv_vel_for_star_LNA(s, k, conv_vel_ad)
+               else
+                  conv_vel_ad = s% mlt_vc_old(k)
+               end if
+               mlt_Ptrb_face = s% mlt_Pturb_factor*pow2(conv_vel_ad)*rho_face/3d0
+               Ppoint = Ppoint + mlt_Ptrb_face
+            end if
+            dlnPdm_qhse = grav/(area*Ppoint)
+            return
+         end if
 
          if ((s% have_mlt_vc .and. s% okay_to_set_mlt_vc) .and. &
                s% include_mlt_Pturb_in_thermodynamic_gradients .and. &
@@ -177,13 +201,18 @@
       end subroutine star_LNA_eval_dlnPdm_qhse
 
 
-      subroutine actual_gradT_for_star_LNA(s, k, gradT_actual_ad, ierr)
+      subroutine actual_gradT_for_star_LNA( &
+            s, k, T_face_ad, P_face_ad, opacity_face_ad, gradT_actual_ad, ierr)
          type(star_info), pointer :: s
          integer, intent(in) :: k
+         type(auto_diff_real_star_order1), intent(in) :: &
+            T_face_ad, P_face_ad, opacity_face_ad
          type(auto_diff_real_star_order1), intent(out) :: gradT_actual_ad
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: dlnPdm_ad, Ppoint_ad, &
-            Tm1_ad, T00_ad, dT_ad, Tpoint_ad, lnTdiff_ad
+            Tm1_ad, T00_ad, dT_ad, Tpoint_ad, lnTdiff_ad, &
+            r_ad, area_ad, kap_face_ad, T4m1_ad, T400_ad, &
+            dPrad_ad, Lrad_ad, L0_ad, flxR_ad, flxLambda_ad
          real(dp) :: delm, alfa
 
          ierr = 0
@@ -195,6 +224,33 @@
          if (s% use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn) then
             gradT_actual_ad = (wrap_lnT_m1(s, k) - wrap_lnT_00(s, k))/ &
                (wrap_lnPeos_m1(s, k) - wrap_lnPeos_00(s, k))
+            return
+         end if
+
+         if (s% use_dPrad_dm_form_of_T_gradient_eqn) then
+            delm = s% dm_bar(k)
+            r_ad = wrap_r_00(s, k)
+            area_ad = 4d0*pi*pow2(r_ad)
+            kap_face_ad = opacity_face_ad
+            if (kap_face_ad%val < s% min_kap_for_dPrad_dm_eqn) &
+               kap_face_ad = s% min_kap_for_dPrad_dm_eqn
+
+            T4m1_ad = pow4(wrap_T_m1(s, k))
+            T400_ad = pow4(wrap_T_00(s, k))
+            dPrad_ad = (crad/3d0)*(T4m1_ad - T400_ad)
+            flxLambda_ad = 1d0
+            if (s% use_flux_limiting_with_dPrad_dm_form) then
+               flxR_ad = area_ad*abs(T4m1_ad - T400_ad)/delm/ &
+                  (kap_face_ad*0.5d0*(T4m1_ad + T400_ad))
+               flxLambda_ad = (6d0 + 3d0*flxR_ad)/ &
+                  (6d0 + (3d0 + flxR_ad)*flxR_ad)
+            end if
+
+            Lrad_ad = -clight*pow2(area_ad)*flxLambda_ad*dPrad_ad/ &
+               (delm*kap_face_ad)
+            L0_ad = (16d0*pi*crad*clight/3d0)*s% cgrav(k)*s% m_grav(k)* &
+               pow4(T_face_ad)/(P_face_ad*opacity_face_ad)
+            gradT_actual_ad = Lrad_ad/L0_ad
             return
          end if
 
@@ -334,17 +390,6 @@
       end subroutine static_face_pressure_for_star_LNA
 
 
-      subroutine rsp2_luminosity_resid_for_star_LNA(s, k, luminosity_resid_ad)
-         type(star_info), pointer :: s
-         integer, intent(in) :: k
-         type(auto_diff_real_star_order1), intent(out) :: luminosity_resid_ad
-         type(auto_diff_real_star_order1) :: Lr_ad, Lc_ad, Lt_ad
-
-         call rsp2_luminosity_terms_for_star_LNA(s, k, Lr_ad, Lc_ad, Lt_ad)
-         luminosity_resid_ad = Lr_ad + Lc_ad + Lt_ad - wrap_L_00(s, k)
-      end subroutine rsp2_luminosity_resid_for_star_LNA
-
-
       subroutine rsp2_luminosity_terms_for_star_LNA(s, k, Lr_ad, Lc_ad, Lt_ad)
          type(star_info), pointer :: s
          integer, intent(in) :: k
@@ -380,7 +425,7 @@
          area_ad = 4d0*pi*pow2(r_ad)
          T_rho_face_ad = alfa*wrap_T_00(s, k)*wrap_d_00(s, k) + &
             beta*wrap_T_m1(s, k)*wrap_d_m1(s, k)
-         call rsp2_PII_face_for_star_LNA(s, k, PII_face_ad)
+         PII_face_ad = s% PII_ad(k)
          w_face_ad = alfa*wrap_w_00(s, k) + beta*wrap_w_m1(s, k)
          Lc_ad = w_face_ad*area_ad*(x_ALFAC/x_ALFAS)*T_rho_face_ad*PII_face_ad
       end subroutine rsp2_convective_luminosity_for_star_LNA
@@ -390,19 +435,10 @@
          type(star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(out) :: PII_face_ad
-         real(dp), parameter :: x_ALFAS = 0.5d0*sqrt_2_div_3
-         real(dp) :: alfa, beta
-         type(auto_diff_real_star_order1) :: Cp_face_ad
 
          PII_face_ad = 0d0
          if (k <= 1 .or. k >= s% nz) return
-
-         ! LNA uses the unsaturated convective response.  The nonlinear
-         ! enthalpy-flux limiter is a hydro safeguard and is intentionally
-         ! excluded from the linear operator.
-         call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
-         Cp_face_ad = alfa*wrap_Cp_00(s, k) + beta*wrap_Cp_m1(s, k)
-         PII_face_ad = x_ALFAS*s% mixing_length_alpha*Cp_face_ad*s% Y_face_ad(k)
+         PII_face_ad = s% PII_ad(k)
       end subroutine rsp2_PII_face_for_star_LNA
 
       ! -----------
@@ -488,7 +524,7 @@
          type(auto_diff_real_star_order1), intent(out) :: luminosity_resid_ad, &
             velocity_rhs_ad, velocity_inertia_ad, L_rad_ad, L_conv_ad
          integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: A_ad, Eq_div_w_ad, gradT_actual_ad, &
+         type(auto_diff_real_star_order1) :: A_ad, Eq_div_w_ad, gradT_actual_ad, tdc_gradL_ad, &
             r_ad, grav_ad, T_face_ad, rho_face_ad, Peos_face_ad, energy_face_ad, &
             Cp_face_ad, chiRho_face_ad, chiT_face_ad, grada_face_ad, &
             opacity_face_ad, scale_height_face_ad, gradr_face_ad, Hp_for_mlt_ad, &
@@ -510,8 +546,14 @@
             chiRho_face_ad, chiT_face_ad, grada_face_ad, opacity_face_ad, &
             scale_height_face_ad, gradr_face_ad, ierr)
          if (ierr /= 0) return
-         call actual_gradT_for_star_LNA(s, k, gradT_actual_ad, ierr)
+         call actual_gradT_for_star_LNA( &
+            s, k, T_face_ad, Peos_face_ad, opacity_face_ad, gradT_actual_ad, ierr)
          if (ierr /= 0) return
+         tdc_gradL_ad = s% gradL_ad(k)
+         if (s% TDC_use_dynamical_gradL) then
+            call get_TDC_dynamical_gradL(s, k, s% gradL_ad(k), tdc_gradL_ad, ierr)
+            if (ierr /= 0) return
+         end if
          call tdc_A_for_star_LNA(s, k, A_ad)
          call tdc_Eq_div_w_for_star_LNA(s, k, Eq_div_w_ad, ierr)
          if (ierr /= 0) return
@@ -529,7 +571,7 @@
             chiT_face_ad, chiRho_face_ad, wrap_L_00(s, k), &
             gradT_actual_ad, r_ad, Peos_face_ad, T_face_ad, &
             rho_face_ad, Cp_face_ad, opacity_face_ad, &
-            Hp_for_mlt_ad, s% gradL_ad(k), grada_face_ad, &
+            Hp_for_mlt_ad, tdc_gradL_ad, grada_face_ad, &
             A_ad, Eq_div_w_ad, grav_ad, s% include_mlt_corr_to_TDC, &
             s% TDC_alpha_C, s% TDC_alpha_S, .false., &
             energy_face_ad, luminosity_resid_ad, velocity_rhs_ad, &
@@ -566,7 +608,8 @@
             chiRho_face_ad, chiT_face_ad, grada_face_ad, opacity_face_ad, &
             scale_height_face_ad, gradr_face_ad, ierr)
          if (ierr /= 0) return
-         call actual_gradT_for_star_LNA(s, k, gradT_actual_ad, ierr)
+         call actual_gradT_for_star_LNA( &
+            s, k, T_face_ad, Peos_face_ad, opacity_face_ad, gradT_actual_ad, ierr)
          if (ierr /= 0) return
          L0_ad = (16d0*pi*crad*clight/3d0)*s% cgrav(k)*s% m_grav(k)* &
             pow4(T_face_ad)/(Peos_face_ad*opacity_face_ad)
@@ -811,7 +854,7 @@
          Hp_cell_ad = rsp2_Hp_cell_for_star_LNA(s, k)
          w_00_ad = wrap_w_00(s, k)
          damping_ad = (s% RSP2_alfad*x_CEDE/s% mixing_length_alpha)* &
-            (pow3(w_00_ad) - pow3(s% RSP2_w_min_for_damping))/Hp_cell_ad
+            pow3(w_00_ad)/Hp_cell_ad
       end subroutine rsp2_damping_for_star_LNA
 
 
@@ -989,14 +1032,15 @@
          Uq_ad = 0d0
          if (.not. s% star_LNA_perturb_eddy_viscosity) return
 
-         call static_eddy_Chi_cell_for_star_LNA(s, k, Chi_00, ierr)
+         call static_eddy_Chi_face_for_star_LNA(s, k, Chi_00, ierr)
          if (ierr /= 0) return
          if (k < s% nz) then
-            call static_eddy_Chi_cell_for_star_LNA(s, k + 1, Chi_p1, ierr)
+            call static_eddy_Chi_face_for_star_LNA(s, k + 1, Chi_p1, ierr)
             if (ierr /= 0) return
             Chi_p1 = shift_p1(Chi_p1)
          else
-            Chi_p1 = 0d0
+            call static_eddy_Chi_inner_boundary_for_star_LNA(s, Chi_p1, ierr)
+            if (ierr /= 0) return
          end if
 
          r_cell = s% rmid(k)
@@ -1015,6 +1059,7 @@
          type(auto_diff_real_star_order1), intent(out) :: Uq_ad
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: Chi_00, Chi_m1, r_ad
+         real(dp) :: dm_face
 
          ierr = 0
          call static_eddy_Chi_cell_for_star_LNA(s, k, Chi_00, ierr)
@@ -1028,8 +1073,71 @@
          end if
 
          r_ad = wrap_r_00(s, k)
-         Uq_ad = 4d0*pi*(Chi_m1 - Chi_00)/(r_ad*s% dm_bar(k))
+         dm_face = 0.5d0*s%dm(k)
+         if (k > 1) dm_face = dm_face + 0.5d0*s%dm(k-1)
+         Uq_ad = 4d0*pi*(Chi_m1 - Chi_00)/(r_ad*dm_face)
       end subroutine static_eddy_Uq_face_for_star_LNA
+
+
+      subroutine static_eddy_Chi_face_for_star_LNA(s, k, Chi_ad, ierr)
+         type(star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1), intent(out) :: Chi_ad
+         integer, intent(out) :: ierr
+         real(dp) :: chi_coeff, dm_face, r00, rmid00, rmidm1
+         type(auto_diff_real_star_order1) :: d_u_div_r_ad, Lambda_ad
+
+         ierr = 0
+         Chi_ad = 0d0
+         if (s%mixing_length_alpha == 0d0 .or. s%TDC_alpha_M == 0d0 .or. &
+               k <= s%TDC_num_outermost_cells_forced_nonturbulent + 1 .or. &
+               k > s%nz - s%TDC_num_innermost_cells_forced_nonturbulent) return
+
+         Lambda_ad = get_TDC_mixing_length_face(s, k, ierr)
+         if (ierr /= 0) return
+
+         dm_face = 0.5d0*(s%dm(k) + s%dm(k-1))
+         r00 = s%r(k)
+         rmid00 = s%rmid(k)
+         rmidm1 = s%rmid(k-1)
+         d_u_div_r_ad = wrap_u_m1(s, k)/rmidm1 - wrap_u_00(s, k)/rmid00
+         chi_coeff = (16d0/3d0)*pi*s%TDC_alpha_M*pow2(get_rho_face_val(s, k))* &
+            r00**6*Lambda_ad%val*s%mlt_vc(k)/sqrt_2_div_3/dm_face
+         Chi_ad = chi_coeff*d_u_div_r_ad
+      end subroutine static_eddy_Chi_face_for_star_LNA
+
+
+      subroutine static_eddy_Chi_inner_boundary_for_star_LNA(s, Chi_ad, ierr)
+         type(star_info), pointer :: s
+         type(auto_diff_real_star_order1), intent(out) :: Chi_ad
+         integer, intent(out) :: ierr
+         real(dp) :: chi_coeff, dm_boundary, rmid_inner
+         type(auto_diff_real_star_order1) :: d_u_div_r_ad, Lambda_ad
+
+         ierr = 0
+         Chi_ad = 0d0
+         if (.not. s%TDC_include_inner_boundary_eddy_viscosity .or. &
+               s%R_center <= 0d0 .or. .not. s%u_flag .or. &
+               s%MLT_option /= 'TDC' .or. s%RSP2_flag .or. &
+               s%TDC_num_innermost_cells_forced_nonturbulent > 0d0 .or. &
+               s%mixing_length_alpha == 0d0 .or. s%TDC_alpha_M == 0d0) return
+
+         Lambda_ad = get_TDC_mixing_length_face(s, s%nz, ierr)
+         if (ierr /= 0) return
+
+         rmid_inner = s%rmid(s%nz)
+         if (rmid_inner <= 0d0) then
+            write(*,'(a)') 'star_LNA found nonpositive cell radius at the inner boundary.'
+            ierr = -1
+            return
+         end if
+         dm_boundary = 0.5d0*s%dm(s%nz)
+         d_u_div_r_ad = wrap_u_00(s, s%nz)/rmid_inner - &
+            s%v_center/s%R_center
+         chi_coeff = (16d0/3d0)*pi*s%TDC_alpha_M*pow2(s%rho(s%nz))* &
+            s%R_center**6*Lambda_ad%val*s%mlt_vc(s%nz)/sqrt_2_div_3/dm_boundary
+         Chi_ad = chi_coeff*d_u_div_r_ad
+      end subroutine static_eddy_Chi_inner_boundary_for_star_LNA
 
 
       subroutine static_eddy_Chi_cell_for_star_LNA(s, k, Chi_ad, ierr)
@@ -1177,36 +1285,16 @@
          integer, intent(in) :: k
          real(dp), intent(out) :: Lambda_cell
          integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: &
-            T_face_ad, rho_face_ad, Peos_face_ad, energy_face_ad, Cp_face_ad, &
-            chiRho_face_ad, chiT_face_ad, grada_face_ad, opacity_face_ad, &
-            scale_height_face_ad, gradr_face_ad, r_ad, grav_ad, Hp_for_mlt_ad, &
-            mixing_length_alpha_ad, Lambda_ad
+         type(auto_diff_real_star_order1) :: Lambda_ad
 
          ierr = 0
-         call tdc_face_state_for_star_LNA(s, k, &
-            T_face_ad, rho_face_ad, Peos_face_ad, energy_face_ad, Cp_face_ad, &
-            chiRho_face_ad, chiT_face_ad, grada_face_ad, opacity_face_ad, &
-            scale_height_face_ad, gradr_face_ad, ierr)
+         Lambda_ad = get_TDC_mixing_length_face(s, k, ierr)
          if (ierr /= 0) return
-         r_ad = wrap_r_00(s, k)
-         grav_ad = s% cgrav(k)*s% m_grav(k)/pow2(r_ad)
-         call tdc_mixing_length_for_star_LNA(s, r_ad, Peos_face_ad, &
-            rho_face_ad, grav_ad, scale_height_face_ad, Hp_for_mlt_ad, &
-            mixing_length_alpha_ad, Lambda_ad)
          Lambda_cell = 0.5d0*Lambda_ad% val
 
-         if (k + 1 < s% nz) then
-            call tdc_face_state_for_star_LNA(s, k + 1, &
-               T_face_ad, rho_face_ad, Peos_face_ad, energy_face_ad, Cp_face_ad, &
-               chiRho_face_ad, chiT_face_ad, grada_face_ad, opacity_face_ad, &
-               scale_height_face_ad, gradr_face_ad, ierr)
+         if (k < s% nz) then
+            Lambda_ad = get_TDC_mixing_length_face(s, k + 1, ierr)
             if (ierr /= 0) return
-            r_ad = wrap_r_00(s, k + 1)
-            grav_ad = s% cgrav(k + 1)*s% m_grav(k + 1)/pow2(r_ad)
-            call tdc_mixing_length_for_star_LNA(s, r_ad, Peos_face_ad, &
-               rho_face_ad, grav_ad, scale_height_face_ad, Hp_for_mlt_ad, &
-               mixing_length_alpha_ad, Lambda_ad)
             Lambda_cell = Lambda_cell + 0.5d0*Lambda_ad% val
          end if
       end subroutine Lambda_cell_for_tdc_chi_for_star_LNA

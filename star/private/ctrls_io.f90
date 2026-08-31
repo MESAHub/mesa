@@ -109,7 +109,8 @@
     TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, TDC_alpha_M, &
     TDC_alpha_C, TDC_alpha_S, &
     TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation, &
-    TDC_adjust_mass_fallback_to_mlt, &
+    TDC_include_inner_boundary_eddy_viscosity, &
+    TDC_adjust_mass_fallback_to_mlt, TDC_use_dynamical_gradL, &
     TDC_num_innermost_cells_forced_nonturbulent, TDC_num_outermost_cells_forced_nonturbulent, &
     include_mlt_Pturb_in_thermodynamic_gradients, &
     include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter, &
@@ -271,7 +272,9 @@
     merge_amr_ignore_core_cells, merge_amr_logT_for_ignore_core_cells, &
     split_amr_ignore_core_cells, split_amr_logT_for_ignore_core_cells, &
     merge_amr_du_div_cs_limit_only_for_compression, split_merge_amr_avoid_repeated_remesh, split_merge_amr_r_core_cm, &
-    split_merge_amr_dq_min, split_merge_amr_dq_max, split_merge_amr_max_iters, &
+    split_merge_amr_dq_min, split_merge_amr_dq_max, &
+    split_merge_amr_max_center_cell_dq, split_merge_amr_center_dq_ratio, split_merge_amr_max_iters, &
+    split_merge_amr_keep_R_center_fixed, &
     trace_split_merge_amr, equal_split_density_amr, use_hydro_merge_limits_in_mesh_plan, &
     split_merge_amr_use_metric_zoning_for_u_flag, &
     split_merge_amr_metric_logR_weight, split_merge_amr_metric_logtau_weight, &
@@ -374,7 +377,7 @@
     include_P_in_velocity_time_centering, include_L_in_velocity_time_centering, &
     P_theta_for_velocity_time_centering, L_theta_for_velocity_time_centering, &
     max_logT_for_include_P_and_L_in_velocity_time_centering, &
-    steps_before_use_TDC, use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, compare_TDC_to_MLT, &
+    steps_before_use_TDC, use_P_d_1_div_rho_form_of_work, compare_TDC_to_MLT, &
     use_TDC_Y_face_seeded_newton, &
     hydro_matrix_solver, &
     steps_before_remesh_for_TDC_pulsations, remesh_for_TDC_pulsations_log_core_zoning, &
@@ -424,7 +427,7 @@
     max_tries_after_10_retries, max_tries_after_20_retries, retry_limit, redo_limit, use_Pvsc_art_visc, Pvsc_cq, Pvsc_zsh, &
     min_xa_hard_limit, min_xa_hard_limit_for_highT, logT_max_for_min_xa_hard_limit, logT_min_for_min_xa_hard_limit_for_highT, &
     sum_xa_hard_limit, sum_xa_hard_limit_for_highT, logT_max_for_sum_xa_hard_limit, logT_min_for_sum_xa_hard_limit_for_highT, &
-    xa_clip_limit, report_solver_progress, solver_test_partials_k_high, RSP2_use_L_eqn_at_surface, RSP2_use_RSP_eqn_for_Y_face, &
+    xa_clip_limit, report_solver_progress, solver_test_partials_k_high, RSP2_use_L_eqn_at_surface, &
     solver_epsder_chem, solver_epsder_struct, solver_numerical_jacobian, energy_conservation_dump_model_number, &
     solver_jacobian_nzlo, solver_jacobian_nzhi, solver_check_everything, solver_inspect_soln_flag, RSP2_assume_HSE, &
     solver_test_partials_dx_0, solver_test_partials_k, solver_show_correction_info, eps_mdot_leak_frac_factor, &
@@ -439,13 +442,13 @@
     RSP2_target_steps_per_cycle, RSP2_max_num_periods, RSP2_work_period, RSP2_map_first_period, RSP2_map_last_period, &
     RSP2_min_max_R_for_periods, RSP2_GREKM_avg_abs_frac_new, RSP2_GREKM_avg_abs_limit, RSP2_map_zone_interval, &
     RSP2_work_filename, RSP2_map_columns_filename, RSP2_map_filename, RSP2_map_history_filename, RSP2_write_map, &
-    RSP2_T_anchor, RSP2_dq_1_factor, RSP2_nz, RSP2_nz_outer, RSP2_nz_div_IBOTOM, RSP2_report_adjust_w, &
-    RSP2_w_min_for_damping, RSP2_source_seed, RSP2_w_fix_if_neg, &
+    RSP2_nz_div_IBOTOM, RSP2_report_adjust_w, &
+    RSP2_source_seed, RSP2_w_fix_if_neg, &
     star_LNA_flag, star_LNA_model_number, star_LNA_stop_after_run, star_LNA_T_inner, &
     star_LNA_num_modes, &
     star_LNA_min_mode_frequency_uHz, &
     star_LNA_min_first_mode_eta, star_LNA_min_mode_eta, &
-    star_LNA_max_abs_mode_eta, &
+    star_LNA_max_abs_mode_eta, star_LNA_max_eigenvector_residual, &
     star_LNA_output_directory, star_LNA_output_file_prefix, &
     star_LNA_write_matrix_summary, star_LNA_write_period_growth, &
     star_LNA_write_eigenfunctions, star_LNA_write_work_integrals, &
@@ -536,7 +539,8 @@
 
     use_compression_outer_BC, use_momentum_outer_BC, floor_momentum_outer_BC_at_Prad, &
     use_zero_Pgas_outer_BC, &
-    fixed_Psurf, use_fixed_Psurf_outer_BC, fixed_vsurf, use_fixed_vsurf_outer_BC, use_RSP_L_eqn_outer_BC, &
+    fixed_Psurf, use_fixed_Psurf_outer_BC, &
+    fixed_vsurf, use_fixed_vsurf_outer_BC, use_RSP_L_eqn_outer_BC, &
 
     atm_build_tau_outer, atm_build_dlogtau, atm_build_errtol, &
 
@@ -680,6 +684,20 @@
        write(*,'(a)') 'WARNING: split/merge AMR metric zoning has no positive weights.'
        write(*,'(a)') 'Falling back to the legacy split/merge AMR zoning controls.'
        have_warned_about_zero_split_merge_amr_metric_weights = .true.
+    end if
+
+    if (s% split_merge_amr_max_center_cell_dq > 0d0 .and. &
+          s% split_merge_amr_center_dq_ratio <= 1d0) then
+       write(*,'(a)') 'split_merge_amr_center_dq_ratio must exceed one'
+       ierr = -1
+       return
+    end if
+
+    if (s% split_merge_amr_max_center_cell_dq > 0d0 .and. &
+          s% split_merge_amr_max_center_cell_dq < s% split_merge_amr_dq_min) then
+       write(*,'(a)') 'split_merge_amr_max_center_cell_dq must be at least split_merge_amr_dq_min'
+       ierr = -1
+       return
     end if
 
     if (s% min_logRho_for_eos < -30d0) then
@@ -1646,6 +1664,9 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% split_amr_logT_for_ignore_core_cells = split_amr_logT_for_ignore_core_cells
  s% split_merge_amr_dq_min = split_merge_amr_dq_min
  s% split_merge_amr_dq_max = split_merge_amr_dq_max
+ s% split_merge_amr_max_center_cell_dq = split_merge_amr_max_center_cell_dq
+ s% split_merge_amr_center_dq_ratio = split_merge_amr_center_dq_ratio
+ s% split_merge_amr_keep_R_center_fixed = split_merge_amr_keep_R_center_fixed
  s% split_merge_amr_r_core_cm = split_merge_amr_r_core_cm
  s% split_merge_amr_max_iters = split_merge_amr_max_iters
  s% trace_split_merge_amr = trace_split_merge_amr
@@ -1916,7 +1937,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% constant_L = constant_L
  s% include_P_in_velocity_time_centering = include_P_in_velocity_time_centering
  s% include_L_in_velocity_time_centering = include_L_in_velocity_time_centering
- s% use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = use_P_d_1_div_rho_form_of_work_when_time_centering_velocity
+ s% use_P_d_1_div_rho_form_of_work = use_P_d_1_div_rho_form_of_work
  s% steps_before_use_velocity_time_centering = steps_before_use_velocity_time_centering
  s% P_theta_for_velocity_time_centering = P_theta_for_velocity_time_centering
  s% L_theta_for_velocity_time_centering = L_theta_for_velocity_time_centering
@@ -2135,7 +2156,9 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% TDC_alpha_C = TDC_alpha_C
  s% TDC_alpha_S = TDC_alpha_S
  s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation
+ s% TDC_include_inner_boundary_eddy_viscosity = TDC_include_inner_boundary_eddy_viscosity
  s% TDC_adjust_mass_fallback_to_mlt = TDC_adjust_mass_fallback_to_mlt
+ s% TDC_use_dynamical_gradL = TDC_use_dynamical_gradL
  s% TDC_num_innermost_cells_forced_nonturbulent = TDC_num_innermost_cells_forced_nonturbulent
  s% TDC_num_outermost_cells_forced_nonturbulent = TDC_num_outermost_cells_forced_nonturbulent
  s% include_mlt_Pturb_in_thermodynamic_gradients = include_mlt_Pturb_in_thermodynamic_gradients
@@ -2174,14 +2197,9 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% RSP2_use_L_eqn_at_surface = RSP2_use_L_eqn_at_surface
  s% RSP2_report_adjust_w = RSP2_report_adjust_w
  s% RSP2_assume_HSE = RSP2_assume_HSE
- s% RSP2_use_RSP_eqn_for_Y_face = RSP2_use_RSP_eqn_for_Y_face
  s% RSP2_use_mass_interp_face_values = RSP2_use_mass_interp_face_values
  s% RSP2_num_outermost_cells_forced_nonturbulent = RSP2_num_outermost_cells_forced_nonturbulent
  s% RSP2_num_innermost_cells_forced_nonturbulent = RSP2_num_innermost_cells_forced_nonturbulent
- s% RSP2_T_anchor = RSP2_T_anchor
- s% RSP2_dq_1_factor = RSP2_dq_1_factor
- s% RSP2_nz = RSP2_nz
- s% RSP2_nz_outer = RSP2_nz_outer
  s% RSP2_nz_div_IBOTOM = RSP2_nz_div_IBOTOM
  s% RSP2_target_steps_per_cycle = RSP2_target_steps_per_cycle
  s% RSP2_max_num_periods = RSP2_max_num_periods
@@ -2197,7 +2215,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% RSP2_map_filename = RSP2_map_filename
  s% RSP2_map_history_filename = RSP2_map_history_filename
  s% RSP2_write_map = RSP2_write_map
- s% RSP2_w_min_for_damping = RSP2_w_min_for_damping
  s% RSP2_source_seed = RSP2_source_seed
  s% RSP2_w_fix_if_neg = RSP2_w_fix_if_neg
 
@@ -2210,6 +2227,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% star_LNA_min_first_mode_eta = star_LNA_min_first_mode_eta
  s% star_LNA_min_mode_eta = star_LNA_min_mode_eta
  s% star_LNA_max_abs_mode_eta = star_LNA_max_abs_mode_eta
+ s% star_LNA_max_eigenvector_residual = star_LNA_max_eigenvector_residual
  s% star_LNA_output_directory = star_LNA_output_directory
  s% star_LNA_output_file_prefix = star_LNA_output_file_prefix
  s% star_LNA_write_matrix_summary = star_LNA_write_matrix_summary
@@ -3418,6 +3436,9 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  split_amr_logT_for_ignore_core_cells = s% split_amr_logT_for_ignore_core_cells
  split_merge_amr_dq_min = s% split_merge_amr_dq_min
  split_merge_amr_dq_max = s% split_merge_amr_dq_max
+ split_merge_amr_max_center_cell_dq = s% split_merge_amr_max_center_cell_dq
+ split_merge_amr_center_dq_ratio = s% split_merge_amr_center_dq_ratio
+ split_merge_amr_keep_R_center_fixed = s% split_merge_amr_keep_R_center_fixed
  split_merge_amr_r_core_cm = s% split_merge_amr_r_core_cm
  split_merge_amr_max_iters = s% split_merge_amr_max_iters
  trace_split_merge_amr = s% trace_split_merge_amr
@@ -3689,7 +3710,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  P_theta_for_velocity_time_centering = s% P_theta_for_velocity_time_centering
  L_theta_for_velocity_time_centering = s% L_theta_for_velocity_time_centering
  max_logT_for_include_P_and_L_in_velocity_time_centering = s% max_logT_for_include_P_and_L_in_velocity_time_centering
- use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = s% use_P_d_1_div_rho_form_of_work_when_time_centering_velocity
+ use_P_d_1_div_rho_form_of_work = s% use_P_d_1_div_rho_form_of_work
 
  RTI_A = s% RTI_A
  RTI_B = s% RTI_B
@@ -3903,7 +3924,9 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  TDC_alpha_C = s% TDC_alpha_C
  TDC_alpha_S = s% TDC_alpha_S
  TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation
+ TDC_include_inner_boundary_eddy_viscosity = s% TDC_include_inner_boundary_eddy_viscosity
  TDC_adjust_mass_fallback_to_mlt = s% TDC_adjust_mass_fallback_to_mlt
+ TDC_use_dynamical_gradL = s% TDC_use_dynamical_gradL
  TDC_num_innermost_cells_forced_nonturbulent = s% TDC_num_innermost_cells_forced_nonturbulent
  TDC_num_outermost_cells_forced_nonturbulent = s% TDC_num_outermost_cells_forced_nonturbulent
  include_mlt_Pturb_in_thermodynamic_gradients = s% include_mlt_Pturb_in_thermodynamic_gradients
@@ -3942,14 +3965,9 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  RSP2_use_L_eqn_at_surface = s% RSP2_use_L_eqn_at_surface
  RSP2_report_adjust_w = s% RSP2_report_adjust_w
  RSP2_assume_HSE = s% RSP2_assume_HSE
- RSP2_use_RSP_eqn_for_Y_face = s% RSP2_use_RSP_eqn_for_Y_face
  RSP2_use_mass_interp_face_values = s% RSP2_use_mass_interp_face_values
  RSP2_num_outermost_cells_forced_nonturbulent = s% RSP2_num_outermost_cells_forced_nonturbulent
  RSP2_num_innermost_cells_forced_nonturbulent = s% RSP2_num_innermost_cells_forced_nonturbulent
- RSP2_T_anchor = s% RSP2_T_anchor
- RSP2_dq_1_factor = s% RSP2_dq_1_factor
- RSP2_nz = s% RSP2_nz
- RSP2_nz_outer = s% RSP2_nz_outer
  RSP2_nz_div_IBOTOM = s% RSP2_nz_div_IBOTOM
  RSP2_target_steps_per_cycle = s% RSP2_target_steps_per_cycle
  RSP2_max_num_periods = s% RSP2_max_num_periods
@@ -3965,7 +3983,6 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  RSP2_map_filename = s% RSP2_map_filename
  RSP2_map_history_filename = s% RSP2_map_history_filename
  RSP2_write_map = s% RSP2_write_map
- RSP2_w_min_for_damping = s% RSP2_w_min_for_damping
  RSP2_source_seed = s% RSP2_source_seed
  RSP2_w_fix_if_neg = s% RSP2_w_fix_if_neg
 
@@ -3978,6 +3995,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  star_LNA_min_first_mode_eta = s% star_LNA_min_first_mode_eta
  star_LNA_min_mode_eta = s% star_LNA_min_mode_eta
  star_LNA_max_abs_mode_eta = s% star_LNA_max_abs_mode_eta
+ star_LNA_max_eigenvector_residual = s% star_LNA_max_eigenvector_residual
  star_LNA_output_directory = s% star_LNA_output_directory
  star_LNA_output_file_prefix = s% star_LNA_output_file_prefix
  star_LNA_write_matrix_summary = s% star_LNA_write_matrix_summary

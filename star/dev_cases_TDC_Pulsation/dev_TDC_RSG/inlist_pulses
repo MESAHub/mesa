@@ -1,0 +1,312 @@
+&kap
+   cubic_interpolation_in_X = .false.
+   cubic_interpolation_in_Z = .false.
+
+   ! Match these opacity tables and Zbase to the supplied saved model.
+   kap_file_prefix = 'a09'
+   kap_CO_prefix = 'a09_co'
+   kap_lowT_prefix = 'lowT_fa05_a09p'
+   use_Type2_opacities = .false.
+   Zbase = 0.003d0
+
+   ! For model_00000800.mod, comment the active values above and use these.
+   !kap_file_prefix = 'gs98'
+   !kap_CO_prefix = 'gs98_co'
+   !kap_lowT_prefix = 'lowT_fa05_gs98'
+   !Zbase = 0.02d0
+/
+
+&eos
+/
+
+&star_job
+   load_saved_model = .true.
+   load_model_filename = 'standard_after_core_he_burn.mod'
+!'standard_he_dep.mod'!'standard_after_core_he_burn.mod' !'standard_he_dep.mod'
+   !load_model_filename = 'model_00000800.mod' ! 80 M star-top model
+
+   save_model_when_terminate = .true.
+   save_model_filename = 'final.mod'
+
+   ! Select one hydrodynamic velocity variable.
+   change_v_flag = .true.
+   new_v_flag = .false.
+   change_u_flag = .true.
+   new_u_flag = .true.
+
+   set_initial_dt = .true.
+   years_for_initial_dt = -1
+   seconds_for_initial_dt = 1d9
+
+   set_initial_cumulative_energy_error = .true.
+   new_cumulative_energy_error = 0d0
+   set_initial_age = .true.
+   initial_age = 0d0
+   set_initial_model_number = .true.
+   initial_model_number = 0
+
+   ! Remove the core when loading a full evolutionary model.
+   !remove_initial_center_by_temperature = 2d6
+   remove_initial_center_by_temperature = 7d6 ! model_00000800.mod
+   remove_center_set_zero_v_center = .true.
+
+   !initial_zfracs = 6
+   pgstar_flag = .true.
+
+relax_to_this_tau_factor = 1d-3
+dlogtau_factor = 0.1d0
+relax_tau_factor = .false.
+relax_initial_tau_factor = .true.
+
+/
+
+&controls
+   ! This flag enables the pulse-only logic in run_star_extras.
+   x_logical_ctrl(22) = .true.
+   max_model_number = -1
+
+   ! Star LNA
+   star_LNA_flag = .true.
+   star_LNA_model_number = 200
+   star_LNA_stop_after_run = .false.
+   star_LNA_T_inner = 0d0 ! inner envelope temperature in K; <= 0 uses the complete model
+   star_LNA_num_modes = 15
+   star_LNA_solver = 'dense'
+
+   ! Heuristics used to build the selected mode list. The dense solve still
+   ! computes all roots, which remain available in star_LNA_raw_modes.data.
+   star_LNA_min_mode_frequency_uHz = 2.314814814814815d-3 ! 5000-day maximum period
+   star_LNA_min_first_mode_eta = -3d0 ! minimum logKE per cycle for the first mode
+   star_LNA_min_mode_eta = -5d0 ! minimum logKE per cycle for later modes
+   star_LNA_max_abs_mode_eta = 100d0 ! 0 disables the absolute logKE guard
+   star_LNA_max_eigenvector_residual = 1d0 !1d-8
+
+   star_LNA_output_file_prefix = 'star_LNA'
+   star_LNA_output_directory = 'LNA'
+   star_LNA_write_matrix_summary = .true.
+   star_LNA_write_period_growth = .true.
+   star_LNA_write_eigenfunctions = .true.
+   star_LNA_write_work_integrals = .true.
+
+   star_LNA_set_initial_velocity = .true.
+   star_LNA_mode_for_period = 0 ! zero-based terminal-table mode used for the reported period
+   star_LNA_kick_vsurf_km_per_sec = 5d0
+   star_LNA_kick_mode_1 = 1 ! one-based index in the selected mode list
+   star_LNA_kick_fraction_1 = 1d0
+   star_LNA_kick_mode_2 = 0
+   star_LNA_kick_fraction_2 = 0d0
+   star_LNA_kick_mode_3 = 0
+   star_LNA_kick_fraction_3 = 0d0
+
+   star_LNA_include_tdc = .true.
+   star_LNA_include_rsp2 = .false.
+   star_LNA_perturb_convective_flux = .true.
+   star_LNA_perturb_turbulent_pressure = .true.
+   star_LNA_perturb_eddy_viscosity = .true.
+   star_LNA_perturb_turbulent_energy = .true.
+   star_LNA_convection_treatment = 'perturbed'
+
+   ! Pulsation diagnostics
+   x_logical_ctrl(7) = .true. ! measure nonlinear pulsation cycles
+   x_integer_ctrl(7) = -1 ! number of cycles before stopping; <= 0 disables
+   x_ctrl(7) = -1d0 ! expected period in days; <= 0 uses dynamical time until a period is measured
+   x_ctrl(8) = -1d0 ! minimum radius excursion in Rsun; <= 0 disables
+   x_ctrl(9) = 1d0 ! new-cycle weight in the running growth average
+   x_ctrl(10) = 0.1d0 ! minimum period as a fraction of the target period
+
+   ! TDC Pulsation timestepping.
+   x_ctrl(13) = 190 ! model number to drop timestep
+   x_ctrl(17) = 1d9 ! 1d5 ! dt before pulse, seconds
+   x_ctrl(18) = 1d6 ! fallback timestep ceiling after pulsations begin, seconds
+   x_integer_ctrl(8) = 600 ! requested timesteps per pulsation period
+
+   dt_div_min_dr_div_cs_limit = 1000d0 !4d0
+   dt_div_min_dr_div_cs_hard_limit = -1d0 !100d0
+   min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit = 0.8d0
+   min_q_for_dt_div_min_dr_div_cs_limit = 0d0
+   max_q_for_dt_div_min_dr_div_cs_limit = 1d0
+   min_k_for_dt_div_min_dr_div_cs_limit = 1
+   min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 0.001d0
+
+   ! One-time TDC envelope remesh; -1 disables, 0 is before the first step,
+   ! and a positive value waits for that many accepted steps.
+   steps_before_remesh_for_TDC_pulsations = -1 !100
+   TDC_hydro_use_mass_interp_face_values = .true.
+   TDC_hydro_nz = 1200 !350 !190 ! 150-zone base grid + 20 inner + 20 T-gradient
+   TDC_hydro_nz_outer = 400 !120 !40
+   TDC_hydro_nz_inner = 100 !50 !20
+   TDC_hydro_nz_T_gradient = 300 ! 50
+   TDC_hydro_T_anchor = 11d3
+   TDC_hydro_dq_1_factor = 2d0
+   max_center_cell_dq = 1d-7
+   remesh_for_TDC_pulsations_log_core_zoning = .false.
+   mesh_adjust_get_T_from_E = .false. ! can interact poorly with adjust_mass.
+   !max_rel_delta_IE_for_mesh_total_energy_balance = 0d0 ! when above is false.
+
+   okay_to_remesh = .true. ! enable standard mesh adjustment
+   x_logical_ctrl(24) = .false. ! turn off standard remeshing at x_ctrl(12)
+   x_ctrl(12) = 100 ! model number to turn off standard remeshing
+
+   mesh_delta_coeff = 1d0
+   max_num_merge_surface_cells = 20
+   max_surface_cell_dq= 1d0
+   min_surface_cell_dq = 1d-8
+   log_tau_function_weight = 30
+   T_function1_weight = 110
+   P_function_weight = 0 ! must be set 0 if doing remesh, when using Pvsc, or risk resolving single zone art visc P.
+
+   ! Optionally restore the old mesh on retry and hold it for later steps.
+   restore_mesh_on_retry = .false.
+   num_steps_to_hold_mesh_after_retry = 0
+
+   ! Time-dependent convection
+   MLT_option = 'TDC'
+   steps_before_use_TDC = 0
+   use_ledoux_criterion = .false.
+   include_mlt_corr_to_TDC = .false.
+   TDC_use_dynamical_gradL = .true. ! Ledoux pressure-inversion fallback is not fully supported.
+   TDC_include_eturb_in_energy_equation = .true.
+
+   num_cells_for_smooth_gradL_composition_term = 0
+   mixing_length_alpha = 3d0
+   harmonic_dissipation_length_beta = 1d0 ! radial limiting length is beta*r
+   TDC_alpha_C = 1d0
+   TDC_alpha_S = 1d0
+   TDC_alpha_D = 1d0
+   TDC_alpha_R = 0d0
+   TDC_alpha_Pt = 0d0
+   TDC_alpha_M = 0.8d0
+   TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .true.
+
+   use_rsp_form_of_scale_height = .false.
+   alt_scale_height_flag = .false.
+   use_TDC_enthalpy_flux_limiter = .false.
+   mlt_Pturb_factor = 0d0
+   include_mlt_Pturb_in_thermodynamic_gradients = .false.
+   TDC_num_innermost_cells_forced_nonturbulent = 2
+
+   ! Temperature-gradient equation
+   use_dPrad_dm_form_of_T_gradient_eqn = .false.
+   min_kap_for_dPrad_dm_eqn = 1d-4 ! opacity floor for the dPrad/dm equation
+   use_flux_limiting_with_dPrad_dm_form = .false.
+   x_logical_ctrl(25) = .true. ! ignore equL residuals for the first 10 models
+   !convergence_ignore_equL_residuals = .true. ! include T-gradient equation in Newton solve
+   make_gradr_sticky_in_solver_iters = .false.
+
+   ! Hydrodynamics
+   use_TDC_Y_face_seeded_newton = .true.
+   use_face_reconstruction = .false. ! incompatible with use_rsp_form_of_scale_height
+   hydro_matrix_solver = 'banded' ! 'banded'
+   no_dedt_form_during_relax = .false.
+   set_rho_to_dm_div_dV = .false.
+
+   ! Velocity time centering applies only to v_flag hydrodynamics.
+   steps_before_use_velocity_time_centering = -1 !300
+   use_P_d_1_div_rho_form_of_work = .true.
+   include_P_in_velocity_time_centering = .true.
+   P_theta_for_velocity_time_centering = 0.5d0
+   include_L_in_velocity_time_centering = .true.
+   L_theta_for_velocity_time_centering = 0.5d0
+   include_mlt_in_velocity_time_centering = .false.
+
+   ! Artificial viscosity applies only to v_flag hydrodynamics.
+   use_Pvsc_art_visc = .true.
+   Pvsc_cq = 100d0 ! bigger for RSGs
+   Pvsc_zsh = 0.1d0
+
+   ! Surface boundary conditions
+   use_RSP_L_eqn_outer_BC = .false.
+   use_zero_Pgas_outer_BC = .false.
+   use_compression_outer_BC = .false.
+   use_momentum_outer_BC = .true.
+   floor_momentum_outer_BC_at_Prad = .true. ! require P_bc >= Prad(T_bc)
+
+   ! Suppress convection in shocks.
+   max_abs_du_div_cs_for_convection = 10d0 ! relaxed
+   max_v_div_cs_for_convection = 1d2 ! relaxed
+   max_v_for_convection = 1d4
+
+   ! Turn off burning and mixing while evolving the envelope.
+   eps_nuc_factor = 0d0
+   non_nuc_neu_factor = 0d0
+   dxdt_nuc_factor = 0d0
+   mix_factor = 0d0
+
+
+   ! solver
+   use_gold2_tolerances = .true.
+   !gold_tol_max_residual3 = 1d-3
+   !gold_tol_residual_norm3 = 1d-5
+   !gold_tol_residual_norm3 = 1d-4
+   !gold_tol_max_residual3 = 1d-2
+
+    gold_solver_iters_timestep_limit = 30
+    solver_iters_timestep_limit = 50
+
+   ! Output
+   log_directory = 'LOGS'
+   photo_digits = 8
+   photo_interval = 1000
+   profile_interval = 1000 !10000
+   history_interval = 1
+   terminal_interval = 10
+   max_num_profile_models = 1000000
+
+   num_trace_history_values = 2
+   trace_history_value_name(1) = 'log_rel_run_E_err'
+   trace_history_value_name(2) = 'rel_E_err'
+   warn_when_large_rel_run_E_err = 1d99
+
+limit_for_rel_error_in_energy_conservation = 1d99 !1d-4
+hard_limit_for_rel_error_in_energy_conservation = 1d99 !1d-3
+
+   terminal_show_age_units = 'days'
+   terminal_show_timestep_units = 'secs'
+   terminal_show_log_dt = .false.
+   terminal_show_log_age = .false.
+
+   report_solver_progress = .true.
+   report_ierr = .false.
+
+   ! u_flag
+   ! Set this and okay_to_remesh above to .true. to use the PPISN mesh scheme.
+   use_split_merge_amr = .true.
+   !max_dq = 5d-3
+   !mesh_delta_coeff = 0.8d0
+   mesh_min_dlnR = 1d-9
+   merge_if_dlnR_too_small = .true.
+   !min_surface_cell_dq = 1d-14
+   !split_merge_amr_dq_min = 1d-16
+
+   ! fine zoning near center of QS
+   split_merge_amr_max_center_cell_dq = 1d-7
+   split_merge_amr_center_dq_ratio = 1.2d0
+   split_merge_amr_keep_R_center_fixed = .true.
+
+   split_merge_amr_use_metric_zoning_for_u_flag = .true.
+   split_merge_amr_reconstruct_pressure_for_u_flag = .false.
+   split_merge_amr_metric_logR_weight = 1d0
+   split_merge_amr_metric_logtau_weight = 1d0
+   split_merge_amr_nz_baseline = 500 ! use 6000 for logR zoning
+   split_merge_amr_MaxLong = 1.25d0
+   split_merge_amr_MaxShort = 2.5d0
+   split_merge_amr_max_iters = 1000
+   split_merge_amr_okay_to_split_nz = .false.
+
+   merge_amr_ignore_surface_cells = .true.
+   merge_amr_k_for_ignore_surface_cells = 2
+
+   merge_amr_max_abs_du_div_cs = 0.05d0
+   merge_amr_du_div_cs_limit_only_for_compression = .false.
+   split_merge_amr_avoid_repeated_remesh = .true.
+/
+
+&pgstar
+   Grid1_file_dir = 'png'
+   pgstar_interval = 100 !100
+
+    History_Panels1_xaxis_name = 'day'!'model_number'
+    History_Panels1_max_width = 2000! 10000
+
+
+/

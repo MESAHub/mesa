@@ -288,7 +288,7 @@
       end subroutine set_RTI_flag
 
 
-      subroutine set_TDC_to_RSP2_mesh(id, ierr) ! this is the remeshing function called from starlib
+      subroutine set_pulsation_envelope_mesh(id, ierr)
          use tdc_hydro_support, only: remesh_for_TDC_pulsations
          use hydro_vars, only: set_vars
          integer, intent(in) :: id
@@ -299,20 +299,22 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
 
-         write(*,*) 'doing automatic remesh for TDC pulsations'
+         if (s% RSP2_flag) then
+            write(*,*) 'doing automatic remesh for RSP2'
+         else
+            write(*,*) 'doing automatic remesh for TDC pulsations'
+         end if
          call remesh_for_TDC_pulsations(s,ierr)
          if (ierr /= 0) return
          call set_vars(s, s% dt, ierr)
          if (ierr /= 0) return
 
-      end subroutine set_TDC_to_RSP2_mesh
+      end subroutine set_pulsation_envelope_mesh
 
       subroutine set_RSP2_flag(id, RSP2_flag, ierr)
          use const_def, only: sqrt_2_div_3
          use hydro_vars, only: set_vars
          use hydro_rsp2, only: set_RSP2_vars
-         use hydro_rsp2_support, only: remesh_for_RSP2
-         use star_utils, only: set_m_and_dm, set_dm_bar, set_qs
          integer, intent(in) :: id
          logical, intent(in) :: RSP2_flag
          integer, intent(out) :: ierr
@@ -393,15 +395,8 @@
          call set_RSP2_vars(s,ierr)
          if (ierr /= 0) return
 
-         if (s% RSP2_remesh_when_load) then
-            write(*,*) 'doing automatic remesh for RSP2'
-            call remesh_for_RSP2(s,ierr)
-            if (ierr /= 0) return
-            call set_qs(s, nz, s% q, s% dq, ierr)
-            if (ierr /= 0) return
-            call set_m_and_dm(s)
-            call set_dm_bar(s, nz, s% dm, s% dm_bar)
-            call set_vars(s, s% dt, ierr)  ! redo after remesh_for_RSP2
+         if (s% RSP2_remesh_when_load .and. s% nz /= s% TDC_hydro_nz) then
+            call set_pulsation_envelope_mesh(id, ierr)
             if (ierr /= 0) return
          end if
 
