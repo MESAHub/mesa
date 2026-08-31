@@ -601,8 +601,15 @@ contains
       type(auto_diff_real_star_order1) :: v_00, v_p1, r_00, r_p1
       include 'formats'
       ierr = 0
-      v_00 = wrap_opt_time_center_v_00(s, k)
-      v_p1 = wrap_opt_time_center_v_p1(s, k)
+      v_00 = wrap_v_00(s, k)
+      v_p1 = wrap_v_p1(s, k)
+      if (s% using_velocity_time_centering .or. &
+            .not. s% use_P_d_1_div_rho_form_of_work) then
+         ! Match the exact finite-step kinetic-energy work, which uses
+         ! (v + v_start)/2 even when optional velocity time centering is off.
+         v_00 = 0.5d0*(v_00 + s%v_start(k))
+         if (k < s%nz) v_p1 = 0.5d0*(v_p1 + s%v_start(k+1))
+      end if
       r_00 = wrap_opt_time_center_r_00(s, k)
       r_p1 = wrap_opt_time_center_r_p1(s, k)
       if (r_p1%val == 0d0) r_p1 = 1d0
