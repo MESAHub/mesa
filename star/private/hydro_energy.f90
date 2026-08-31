@@ -234,7 +234,8 @@
             use hydro_riemann, only: get_RTI_momentum_diffusion
             use tdc_hydro, only: &
                compute_tdc_Eq_cell, compute_tdc_Eq_div_w_face, &
-               compute_tdc_Eq_div_w_inner_boundary, compute_tdc_Uq_dm_cell
+               compute_tdc_Eq_div_w_inner_boundary, &
+               compute_tdc_Uq_face, compute_tdc_Uq_dm_cell
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: &
                eps_nuc_ad, non_nuc_neu_ad, extra_heat_ad, Eq_ad, Eq_00, Eq_p1, &
@@ -304,7 +305,18 @@
                s% TDC_include_eturb_in_energy_equation .and. (s% v_flag .or. s% u_flag)) then
                if (s% v_flag) then
                   Eq_ad = compute_tdc_Eq_cell(s, k, ierr)
-                  ! Symmetric v*Uq work requires zone k+2 derivatives.
+                  if (ierr /= 0) return
+                  if (include_dke_dt) then
+                     Uq_00 = compute_tdc_Uq_face(s, k, ierr)
+                     if (ierr /= 0) return
+                     if (k < s% nz) then
+                        ! Drop the zone k+2 partial to retain the block-tridiagonal
+                        ! Jacobian. The current residual value remains conservative.
+                        Uq_p1 = shift_p1(compute_tdc_Uq_face(s, k+1, ierr))
+                        if (ierr /= 0) return
+                     end if
+                     have_v_viscous_work = .true.
+                  end if
                else
                   Eq_00 = compute_tdc_Eq_div_w_face(s, k, ierr)
                   if (ierr /= 0) return
