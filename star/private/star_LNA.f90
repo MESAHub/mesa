@@ -56,8 +56,7 @@
 
          if (s% u_flag) then
             ! Use the continuous Riemann face state without the RSP2 Uq shift.
-            call do_uface_and_Pface( &
-               s, ierr, include_rsp2_Uq=.false., use_time_centering=.false.)
+            call do_uface_and_Pface(s, ierr, include_rsp2_Uq=.false.)
             if (ierr /= 0) return
          end if
 

@@ -2886,8 +2886,7 @@
          end do
 
          if (s% u_flag) then
-            call do_uface_and_Pface( &
-               s, ierr, use_time_centering=.false.)
+            call do_uface_and_Pface(s, ierr)
             if (ierr /= 0) return
             s% u_face_start(1:s% nz) = s% u_face_val(1:s% nz)
             s% P_face_start(1:s% nz) = s% P_face_ad(1:s% nz)% val
