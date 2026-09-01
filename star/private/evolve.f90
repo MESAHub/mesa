@@ -376,6 +376,11 @@
 
          if (first_try) then  ! i.e., not a redo or retry
             s% have_new_generation = .false.
+            ! Remesh the start state with the same time centering as the solve.
+            if ((s% steps_before_use_velocity_time_centering == 0) .or. &
+                (s% steps_before_use_velocity_time_centering > 0 .and. &
+                   s% model_number >= s% steps_before_use_velocity_time_centering)) &
+               s% using_velocity_time_centering = .true.
             do_step_part1 = prepare_for_new_step(s)
             if (do_step_part1 /= keep_going) then
                if (s% report_ierr) &
@@ -384,10 +389,6 @@
             end if
             s% have_new_generation = .true.
             s% have_new_cz_bdy_info = .false.
-            if ((s% steps_before_use_velocity_time_centering == 0) .or. &
-                (s% steps_before_use_velocity_time_centering > 0 .and. &
-                   s% model_number >= s% steps_before_use_velocity_time_centering)) &
-               s% using_velocity_time_centering = .true.
             if (.not. s% doing_relax .and. s% steps_before_use_TDC > 0) then
                if (s% model_number >= s% steps_before_use_TDC) then
                   s% MLT_option = 'TDC'

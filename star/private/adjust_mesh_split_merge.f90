@@ -184,7 +184,9 @@
 
          subroutine enforce_surface_dq_min
             include 'formats'
-            do while (s% nz > 1 .and. s% dq(1) < s% min_surface_cell_dq)
+            do while (s% nz > 1 .and. &
+                  s% dq(1) < s% split_merge_amr_min_surface_cell_dq)
+               if (.not. merge_respects_surface_dq_max(s, 1)) exit
                if (s% trace_split_merge_amr) &
                   write(*,2) 'surface dq merge', 1, s% dq(1)
                call do_merge(s, 1, species, new_xa, .true., ierr)
@@ -206,10 +208,10 @@
                min_dlnR = huge(1d0)
                do j = 1, s% nz
                   dlnR = cell_dlnR(s, j)
-                  if (dlnR < s% mesh_min_dlnR .and. dlnR < min_dlnR) then
-                     j_merge = j
-                     min_dlnR = dlnR
-                  end if
+                  if (dlnR >= s% mesh_min_dlnR .or. dlnR >= min_dlnR) cycle
+                  if (.not. merge_respects_surface_dq_max(s, j)) cycle
+                  j_merge = j
+                  min_dlnR = dlnR
                end do
                if (j_merge == 0) exit
                if (s% trace_split_merge_amr) &
@@ -296,32 +298,56 @@
       end function split_respects_dlnR_min
 
 
-      real(dp) function center_dq_limit(s, k, nz) result(dq_limit)
+      real(dp) function cell_dq_limit(s, k, nz) result(dq_limit)
          type (star_info), pointer :: s
          integer, intent(in) :: k, nz
          real(dp) :: log_center_limit
 
          dq_limit = s% split_merge_amr_dq_max
-         if (s% split_merge_amr_max_center_cell_dq <= 0d0) return
+         if (s% split_merge_amr_max_center_cell_dq > 0d0 .and. &
+               s% split_merge_amr_max_center_cell_dq < dq_limit) then
+            log_center_limit = log(s% split_merge_amr_max_center_cell_dq) + &
+               real(nz-k, dp)*log(s% split_merge_amr_center_dq_ratio)
+            if (log_center_limit < log(dq_limit)) dq_limit = exp(log_center_limit)
+         end if
+         if (k == 1 .and. s% split_merge_amr_max_surface_cell_dq > 0d0) &
+            dq_limit = min(dq_limit, s% split_merge_amr_max_surface_cell_dq)
+      end function cell_dq_limit
 
-         if (s% split_merge_amr_max_center_cell_dq >= dq_limit) return
-         log_center_limit = log(s% split_merge_amr_max_center_cell_dq) + &
-            real(nz-k, dp)*log(s% split_merge_amr_center_dq_ratio)
-         if (log_center_limit < log(dq_limit)) dq_limit = exp(log_center_limit)
-      end function center_dq_limit
+
+      logical function merge_respects_surface_dq_max(s, i_merge)
+         type (star_info), pointer :: s
+         integer, intent(in) :: i_merge
+         integer :: i, ip
+
+         merge_respects_surface_dq_max = .true.
+         if (s% split_merge_amr_max_surface_cell_dq <= 0d0) return
+         if (s% nz <= 1) then
+            merge_respects_surface_dq_max = .false.
+            return
+         end if
+         call select_merge_pair(s, i_merge, i, ip)
+         if (i /= 1) return
+         merge_respects_surface_dq_max = &
+            s% dq(i) + s% dq(ip) <= cell_dq_limit(s, i, s% nz-1)
+      end function merge_respects_surface_dq_max
 
 
       subroutine emergency_merge(s, iTooSmall)
          type (star_info), pointer :: s
          integer, intent(out) :: iTooSmall
-         integer :: k_min_dq
+         integer :: k
+         real(dp) :: min_dq
          include 'formats'
-         k_min_dq = minloc(s% dq(1:s% nz),dim=1)
-         if (s% dq(k_min_dq) < s% split_merge_amr_dq_min) then
-            iTooSmall = k_min_dq
-         else
-            iTooSmall = 0
-         end if
+         iTooSmall = 0
+         min_dq = huge(1d0)
+         do k = 1, s% nz
+            if (s% dq(k) >= s% split_merge_amr_dq_min) cycle
+            if (s% dq(k) >= min_dq) cycle
+            if (.not. merge_respects_surface_dq_max(s, k)) cycle
+            iTooSmall = k
+            min_dq = s% dq(k)
+         end do
       end subroutine emergency_merge
 
 
@@ -334,7 +360,7 @@
          iTooBig = 0
          max_oversize_ratio = 0d0
          do k = 1, s% nz
-            dq_limit = center_dq_limit(s, k, s% nz)
+            dq_limit = cell_dq_limit(s, k, s% nz)
             if (s% dq(k) <= dq_limit) cycle
             if (.not. split_respects_dlnR_min(s, k)) cycle
             oversize_ratio = s% dq(k)/dq_limit
@@ -362,7 +388,7 @@
             guarded_undersize_ratio
          real(dp) :: cell_metric(2), pair_metric(2), guarded_pair_metric(2)
          logical :: hydrid_zoning, flipped_hydrid_zoning, log_zoning, logtau_zoning, &
-            du_div_cs_limit_flag, metric_zoning, metric_merge_guard, center_dq_merge_guard
+            du_div_cs_limit_flag, metric_zoning, metric_merge_guard, dq_merge_guard
          integer :: nz, nz_baseline, k, nz_r_core, i_merge, ip_merge, &
             num_metric_guard_rejections, guarded_i_merge, guarded_ip_merge
          real(dp), pointer :: v(:), r_for_v(:)
@@ -486,8 +512,9 @@
             xL = xR
             dx_baseline = inner_dx_baseline
             dq_min_k = dq_min
-            dq_max_k = center_dq_limit(s, k, nz)
-            if (k == 1) dq_min_k = max(dq_min_k, s% min_surface_cell_dq)
+            dq_max_k = cell_dq_limit(s, k, nz)
+            if (k == 1) dq_min_k = &
+               max(dq_min_k, s% split_merge_amr_min_surface_cell_dq)
             if (metric_zoning .and. s% split_merge_amr_MaxLong > 0d0) then
                call metric_cell(k, cell_metric)
                dx_actual = sum(cell_metric)
@@ -551,7 +578,8 @@
 
             ! first check for cells that are too big and need to be split
             oversize_ratio = dx_actual/dx_baseline
-            if (s% split_merge_amr_max_center_cell_dq > 0d0) &
+            if (s% split_merge_amr_max_center_cell_dq > 0d0 .or. &
+                  (k == 1 .and. s% split_merge_amr_max_surface_cell_dq > 0d0)) &
                oversize_ratio = max(oversize_ratio, s% dq(k)/dq_max_k)
             if (TooBig < oversize_ratio .and. s% dq(k) > 5d0*dq_min_k .and. &
                   split_respects_dlnR_min(s, k)) then
@@ -578,12 +606,12 @@
                undersize_ratio = dq_min_k/s% dq(k)
             end if
 
-            center_dq_merge_guard = .false.
-            if (s% split_merge_amr_max_center_cell_dq > 0d0) then
-               call select_merge_pair(s, k, i_merge, ip_merge)
-               center_dq_merge_guard = s% dq(i_merge) + s% dq(ip_merge) > &
-                  center_dq_limit(s, i_merge, nz-1)
-            end if
+            call select_merge_pair(s, k, i_merge, ip_merge)
+            dq_merge_guard = .false.
+            if (s% split_merge_amr_max_center_cell_dq > 0d0 .or. &
+                  (i_merge == 1 .and. s% split_merge_amr_max_surface_cell_dq > 0d0)) &
+               dq_merge_guard = s% dq(i_merge) + s% dq(ip_merge) > &
+                  cell_dq_limit(s, i_merge, nz-1)
 
             metric_merge_guard = .false.
             ! Do not merge a pair that the split criterion would immediately reject.
@@ -604,7 +632,7 @@
                end if
             end if
 
-            if (.not. metric_merge_guard .and. .not. center_dq_merge_guard) then
+            if (.not. metric_merge_guard .and. .not. dq_merge_guard) then
                if (s% merge_amr_max_abs_du_div_cs >= 0d0) then
                   call check_merge_limits
                else if (TooSmall < undersize_ratio .and. s% dq(k) < dq_max/5d0) then

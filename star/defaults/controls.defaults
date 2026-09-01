@@ -6157,7 +6157,6 @@
       ! ~~~~~~~~~~~~~~~~~~~
 
       ! Largest and smallest allowed dq at the surface.
-      ! ``min_surface_cell_dq`` also applies to split/merge AMR.
 
       ! ::
 
@@ -6880,11 +6879,23 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~
       ! split_merge_amr_dq_max
       ! ~~~~~~~~~~~~~~~~~~~~~~
+      ! split_merge_amr_min_surface_cell_dq
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! split_merge_amr_max_surface_cell_dq
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! split_merge_amr_max_center_cell_dq
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! split_merge_amr_center_dq_ratio
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+      ! ``split_merge_amr_min_surface_cell_dq`` sets the minimum allowed
+      ! ``dq`` of the surface cell. If ``split_merge_amr_max_surface_cell_dq``
+      ! is positive, it sets the maximum allowed ``dq`` of the surface cell.
+      ! These are combined with ``split_merge_amr_dq_min`` and
+      ! ``split_merge_amr_dq_max``, respectively.
+      ! The maximum takes precedence if a whole cell merge cannot satisfy both
+      ! surface limits.
+      !
       ! If ``split_merge_amr_max_center_cell_dq`` is positive, limit the
       ! innermost cell to this ``dq`` and increase the maximum allowed ``dq``
       ! geometrically outward by ``split_merge_amr_center_dq_ratio``. The
@@ -6897,6 +6908,8 @@
 
     split_merge_amr_dq_min = 1d-14
     split_merge_amr_dq_max = 1d0
+    split_merge_amr_min_surface_cell_dq = 1d-99
+    split_merge_amr_max_surface_cell_dq = -1d0
     split_merge_amr_max_center_cell_dq = -1d0
     split_merge_amr_center_dq_ratio = 1.2d0
 

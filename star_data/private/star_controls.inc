@@ -698,6 +698,7 @@
          real(dp) :: split_merge_amr_MaxLong, split_merge_amr_MaxShort, &
             split_merge_amr_nz_r_core_fraction, &
             merge_amr_max_abs_du_div_cs, split_merge_amr_dq_min, split_merge_amr_dq_max, &
+            split_merge_amr_min_surface_cell_dq, split_merge_amr_max_surface_cell_dq, &
             split_merge_amr_max_center_cell_dq, split_merge_amr_center_dq_ratio, &
             split_merge_amr_r_core_cm, split_merge_amr_mesh_delta_coeff, &
             merge_amr_logT_for_ignore_core_cells, split_amr_logT_for_ignore_core_cells

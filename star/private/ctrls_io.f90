@@ -273,6 +273,7 @@
     split_amr_ignore_core_cells, split_amr_logT_for_ignore_core_cells, &
     merge_amr_du_div_cs_limit_only_for_compression, split_merge_amr_avoid_repeated_remesh, split_merge_amr_r_core_cm, &
     split_merge_amr_dq_min, split_merge_amr_dq_max, &
+    split_merge_amr_min_surface_cell_dq, split_merge_amr_max_surface_cell_dq, &
     split_merge_amr_max_center_cell_dq, split_merge_amr_center_dq_ratio, split_merge_amr_max_iters, &
     split_merge_amr_keep_R_center_fixed, &
     trace_split_merge_amr, equal_split_density_amr, use_hydro_merge_limits_in_mesh_plan, &
@@ -696,6 +697,26 @@
     if (s% split_merge_amr_max_center_cell_dq > 0d0 .and. &
           s% split_merge_amr_max_center_cell_dq < s% split_merge_amr_dq_min) then
        write(*,'(a)') 'split_merge_amr_max_center_cell_dq must be at least split_merge_amr_dq_min'
+       ierr = -1
+       return
+    end if
+
+    if (s% split_merge_amr_min_surface_cell_dq > s% split_merge_amr_dq_max) then
+       write(*,'(a)') 'split_merge_amr_min_surface_cell_dq must not exceed split_merge_amr_dq_max'
+       ierr = -1
+       return
+    end if
+
+    if (s% split_merge_amr_max_surface_cell_dq > 0d0 .and. &
+          s% split_merge_amr_max_surface_cell_dq < s% split_merge_amr_dq_min) then
+       write(*,'(a)') 'split_merge_amr_max_surface_cell_dq must be at least split_merge_amr_dq_min'
+       ierr = -1
+       return
+    end if
+
+    if (s% split_merge_amr_max_surface_cell_dq > 0d0 .and. &
+          s% split_merge_amr_min_surface_cell_dq > s% split_merge_amr_max_surface_cell_dq) then
+       write(*,'(a)') 'split_merge_amr_max_surface_cell_dq must be at least split_merge_amr_min_surface_cell_dq'
        ierr = -1
        return
     end if
@@ -1664,6 +1685,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% split_amr_logT_for_ignore_core_cells = split_amr_logT_for_ignore_core_cells
  s% split_merge_amr_dq_min = split_merge_amr_dq_min
  s% split_merge_amr_dq_max = split_merge_amr_dq_max
+ s% split_merge_amr_min_surface_cell_dq = split_merge_amr_min_surface_cell_dq
+ s% split_merge_amr_max_surface_cell_dq = split_merge_amr_max_surface_cell_dq
  s% split_merge_amr_max_center_cell_dq = split_merge_amr_max_center_cell_dq
  s% split_merge_amr_center_dq_ratio = split_merge_amr_center_dq_ratio
  s% split_merge_amr_keep_R_center_fixed = split_merge_amr_keep_R_center_fixed
@@ -3436,6 +3459,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  split_amr_logT_for_ignore_core_cells = s% split_amr_logT_for_ignore_core_cells
  split_merge_amr_dq_min = s% split_merge_amr_dq_min
  split_merge_amr_dq_max = s% split_merge_amr_dq_max
+ split_merge_amr_min_surface_cell_dq = s% split_merge_amr_min_surface_cell_dq
+ split_merge_amr_max_surface_cell_dq = s% split_merge_amr_max_surface_cell_dq
  split_merge_amr_max_center_cell_dq = s% split_merge_amr_max_center_cell_dq
  split_merge_amr_center_dq_ratio = s% split_merge_amr_center_dq_ratio
  split_merge_amr_keep_R_center_fixed = s% split_merge_amr_keep_R_center_fixed

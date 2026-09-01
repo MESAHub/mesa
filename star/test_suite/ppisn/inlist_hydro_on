@@ -18,7 +18,7 @@
    merge_if_dlnR_too_small = .true.
 
    ! applies to u and v flag
-   min_surface_cell_dq = 1d-14
+   split_merge_amr_min_surface_cell_dq = 1d-14
    split_merge_amr_dq_min = 1d-16
 
    max_mdot_redo_cnt = 0

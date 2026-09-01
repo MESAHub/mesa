@@ -53,10 +53,10 @@
    !initial_zfracs = 6
    pgstar_flag = .true.
 
-relax_to_this_tau_factor = 1d-3
-dlogtau_factor = 0.1d0
-relax_tau_factor = .false.
-relax_initial_tau_factor = .true.
+   relax_to_this_tau_factor = 1d-3
+   dlogtau_factor = 0.1d0
+   relax_tau_factor = .false.
+   relax_initial_tau_factor = .true.
 
 /
 
@@ -90,7 +90,7 @@ relax_initial_tau_factor = .true.
 
    star_LNA_set_initial_velocity = .true.
    star_LNA_mode_for_period = 0 ! zero-based terminal-table mode used for the reported period
-   star_LNA_kick_vsurf_km_per_sec = 5d0
+   star_LNA_kick_vsurf_km_per_sec = 10d0
    star_LNA_kick_mode_1 = 1 ! one-based index in the selected mode list
    star_LNA_kick_fraction_1 = 1d0
    star_LNA_kick_mode_2 = 0
@@ -118,7 +118,7 @@ relax_initial_tau_factor = .true.
    x_ctrl(13) = 190 ! model number to drop timestep
    x_ctrl(17) = 1d9 ! 1d5 ! dt before pulse, seconds
    x_ctrl(18) = 1d6 ! fallback timestep ceiling after pulsations begin, seconds
-   x_integer_ctrl(8) = 600 ! requested timesteps per pulsation period
+   x_integer_ctrl(8) = 1800 ! requested timesteps per pulsation period
 
    dt_div_min_dr_div_cs_limit = 1000d0 !4d0
    dt_div_min_dr_div_cs_hard_limit = -1d0 !100d0
@@ -145,7 +145,7 @@ relax_initial_tau_factor = .true.
 
    okay_to_remesh = .true. ! enable standard mesh adjustment
    x_logical_ctrl(24) = .false. ! turn off standard remeshing at x_ctrl(12)
-   x_ctrl(12) = 100 ! model number to turn off standard remeshing
+   x_ctrl(12) = 190 ! model number to turn off standard remeshing
 
    mesh_delta_coeff = 1d0
    max_num_merge_surface_cells = 20
@@ -176,7 +176,7 @@ relax_initial_tau_factor = .true.
    TDC_alpha_R = 0d0
    TDC_alpha_Pt = 0d0
    TDC_alpha_M = 0.8d0
-   TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .true.
+   TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .false.
 
    use_rsp_form_of_scale_height = .false.
    alt_scale_height_flag = .false.
@@ -201,12 +201,12 @@ relax_initial_tau_factor = .true.
    set_rho_to_dm_div_dV = .false.
 
    ! Velocity time centering applies only to v_flag hydrodynamics.
-   steps_before_use_velocity_time_centering = -1 !300
-   use_P_d_1_div_rho_form_of_work = .true.
+   steps_before_use_velocity_time_centering = 300
+   use_P_d_1_div_rho_form_of_work = .false. ! needed for v flag
    include_P_in_velocity_time_centering = .true.
-   P_theta_for_velocity_time_centering = 0.5d0
+   P_theta_for_velocity_time_centering = 0.75d0 !0.5d0
    include_L_in_velocity_time_centering = .true.
-   L_theta_for_velocity_time_centering = 0.5d0
+   L_theta_for_velocity_time_centering = 0.75d0 !0.5d0
    include_mlt_in_velocity_time_centering = .false.
 
    ! Artificial viscosity applies only to v_flag hydrodynamics.
@@ -247,7 +247,7 @@ relax_initial_tau_factor = .true.
    log_directory = 'LOGS'
    photo_digits = 8
    photo_interval = 1000
-   profile_interval = 1000 !10000
+   profile_interval = 10000
    history_interval = 1
    terminal_interval = 10
    max_num_profile_models = 1000000
@@ -272,10 +272,6 @@ hard_limit_for_rel_error_in_energy_conservation = 1d99 !1d-3
    ! Set this and okay_to_remesh above to .true. to use the PPISN mesh scheme.
    use_split_merge_amr = .true.
    !max_dq = 5d-3
-   !mesh_delta_coeff = 0.8d0
-   mesh_min_dlnR = 1d-9
-   merge_if_dlnR_too_small = .true.
-   !min_surface_cell_dq = 1d-14
    !split_merge_amr_dq_min = 1d-16
 
    ! fine zoning near center of QS
@@ -284,7 +280,7 @@ hard_limit_for_rel_error_in_energy_conservation = 1d99 !1d-3
    split_merge_amr_keep_R_center_fixed = .true.
 
    split_merge_amr_use_metric_zoning_for_u_flag = .true.
-   split_merge_amr_reconstruct_pressure_for_u_flag = .false.
+   split_merge_amr_reconstruct_pressure_for_u_flag = .true.
    split_merge_amr_metric_logR_weight = 1d0
    split_merge_amr_metric_logtau_weight = 1d0
    split_merge_amr_nz_baseline = 500 ! use 6000 for logR zoning
@@ -293,12 +289,20 @@ hard_limit_for_rel_error_in_energy_conservation = 1d99 !1d-3
    split_merge_amr_max_iters = 1000
    split_merge_amr_okay_to_split_nz = .false.
 
-   merge_amr_ignore_surface_cells = .true.
+   split_merge_amr_okay_to_split_1 = .true. ! this is important for pulsations.
+   merge_amr_ignore_surface_cells = .false.
    merge_amr_k_for_ignore_surface_cells = 2
+   split_merge_amr_okay_to_split_nz = .true.
+   mesh_min_dlnR = 1d-9
+   merge_if_dlnR_too_small = .true.
+   split_merge_amr_min_surface_cell_dq = 1d-8
+   split_merge_amr_max_surface_cell_dq = 1d-4
 
    merge_amr_max_abs_du_div_cs = 0.05d0
-   merge_amr_du_div_cs_limit_only_for_compression = .false.
+   merge_amr_du_div_cs_limit_only_for_compression = .true.
    split_merge_amr_avoid_repeated_remesh = .true.
+   merge_amr_inhibit_at_jumps = .true. ! badly named control.
+
 /
 
 &pgstar
