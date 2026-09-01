@@ -1367,6 +1367,9 @@
 
          ierr = 0
          dm_bar = s% dm_bar(k)
+         ! Use ordinary cell-center spacing next to an excised inner boundary.
+         if (s% R_center > 0d0 .and. k == s% nz) &
+            dm_bar = 0.5d0*(s% dm(k - 1) + s% dm(k))
          scale = s% energy_start(k)*s% rho_start(k)
          L_ad = wrap_L_00(s, k)
          r_ad = wrap_r_00(s, k)
