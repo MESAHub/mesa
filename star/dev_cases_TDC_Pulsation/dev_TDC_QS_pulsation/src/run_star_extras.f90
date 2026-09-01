@@ -30,7 +30,7 @@ module run_star_extras
 
    logical :: in_inlist_pulses, turn_off_remesh
    integer :: steps_per_period, timestep_drop_model_number, &
-      turn_off_remesh_model_number
+      turn_off_remesh_model_number, freeze_surface_cell_remesh_model_number
    real(dp) :: max_dt_before_pulse, max_dt_during_pulse
 
 contains
@@ -62,6 +62,7 @@ contains
       in_inlist_pulses = s% x_logical_ctrl(22)
       turn_off_remesh = s% x_logical_ctrl(24)
       steps_per_period = s% x_integer_ctrl(8)
+      freeze_surface_cell_remesh_model_number = s% x_integer_ctrl(9)
       timestep_drop_model_number = int(s% x_ctrl(13))
       turn_off_remesh_model_number = int(s% x_ctrl(12))
       max_dt_before_pulse = s% x_ctrl(17)
@@ -128,6 +129,12 @@ contains
 
          if (s% model_number > turn_off_remesh_model_number .and. &
                turn_off_remesh) s% okay_to_remesh = .false.
+
+         if (freeze_surface_cell_remesh_model_number >= 0 .and. &
+               s% model_number >= freeze_surface_cell_remesh_model_number) then
+            s% split_merge_amr_okay_to_split_1 = .false.
+            s% merge_amr_ignore_surface_cells = .true.
+         end if
       end if
 
       extras_start_step = keep_going
