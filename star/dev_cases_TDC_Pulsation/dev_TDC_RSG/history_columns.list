@@ -765,7 +765,7 @@
 !# energy information
 
       !total_energy ! at end of step
-      !log_total_energy ! log(abs(total_energy))
+      log_total_energy ! log(abs(total_energy))
       !total_energy_after_adjust_mass ! after mass adjustments
 
       ! shorter versions of above
@@ -774,15 +774,15 @@
 
 
       !total_gravitational_energy
-      !log_total_gravitational_energy ! log(abs(total_gravitational_energy))
+      log_total_gravitational_energy ! log(abs(total_gravitational_energy))
       !total_gravitational_energy_after_adjust_mass
 
       ! shorter versions of above
       !tot_PE
-      !log_tot_PE
+      log_tot_PE
 
       !total_internal_energy
-      !log_total_internal_energy
+      log_total_internal_energy
       !total_internal_energy_after_adjust_mass
 
       ! shorter versions of above
@@ -790,7 +790,7 @@
       !log_tot_IE
 
       !total_radial_kinetic_energy
-      !log_total_radial_kinetic_energy
+      log_total_radial_kinetic_energy
       !total_radial_kinetic_energy_after_adjust_mass
 
       ! shorter versions of above (does not include rot KE)
@@ -798,7 +798,7 @@
       !log_tot_KE
 
       !total_turbulent_energy
-      !log_total_turbulent_energy
+      log_total_turbulent_energy
       !total_turbulent_energy_after_adjust_mass
       !tot_Et
       !log_tot_Et
@@ -808,7 +808,7 @@
       !tot_IE_div_IE_plus_KE
       !total_IE_div_IE_plus_KE
 
-      !total_entropy
+      total_entropy
       !total_eps_grav
 
       !total_energy_sources_and_sinks ! for this step
@@ -820,7 +820,7 @@
 
       !rel_run_E_err
 
-      !rel_E_err
+      rel_E_err
       !abs_rel_E_err
       !log_rel_E_err
 

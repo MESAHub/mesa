@@ -667,6 +667,7 @@
       real(dp) :: photosphere_m ! Msun units
       real(dp) :: photosphere_black_body_T ! black body with R and L at photosphere
       real(dp) :: photosphere_v ! cm/s
+      real(dp) :: photosphere_v_start ! cm/s at current photosphere location
       real(dp) :: photosphere_csound ! cm/s
       real(dp) :: photosphere_opacity
       real(dp) :: photosphere_column_density ! g/cm^2

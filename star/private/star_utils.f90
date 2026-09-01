@@ -1101,7 +1101,8 @@
             s% photosphere_r, s% photosphere_m, s% photosphere_v, &
             s% photosphere_L, s% photosphere_T, s% photosphere_csound, &
             s% photosphere_opacity, s% photosphere_logg, &
-            s% photosphere_column_density, s% photosphere_cell_k)
+            s% photosphere_column_density, s% photosphere_cell_k, &
+            s% photosphere_v_start)
          s% photosphere_black_body_T = &
             atm_black_body_T(s% photosphere_L, s% photosphere_r)
          s% Teff = s% photosphere_black_body_T
@@ -1126,14 +1127,15 @@
       end subroutine set_phot_info
 
 
-      subroutine get_phot_info(s,r,m,v,L,T_phot,cs,kap,logg,ysum,k_phot)
+      subroutine get_phot_info(s,r,m,v,L,T_phot,cs,kap,logg,ysum,k_phot,v_start)
          type (star_info), pointer :: s
          real(dp), intent(out) :: r, m, v, L, T_phot, cs, kap, logg, ysum
          integer, intent(out) :: k_phot
+         real(dp), intent(out), optional :: v_start
 
          integer :: k
          real(dp) :: tau00, taup1, dtau, r003, rp13, r3, tau_phot, &
-            Tface_0, Tface_1
+            Tface_0, Tface_1, frac
 
          include 'formats'
 
@@ -1142,10 +1144,13 @@
          m = s% m(1)
          if (s% u_flag) then
             v = s% u(1)
+            if (present(v_start)) v_start = s% u_start(1)
          else if (s% v_flag) then
             v = s% v(1)
+            if (present(v_start)) v_start = s% v_start(1)
          else
             v = 0d0
+            if (present(v_start)) v_start = 0d0
          end if
          L = max(1d0, s% L(1))  ! don't use negative L(1)
          T_phot = s% T(1)
@@ -1166,25 +1171,30 @@
             taup1 = tau00 + dtau
             ysum = ysum + s% rho(k)*(s% r(k) - s% r(k+1))
             if (taup1 >= tau_phot .and. dtau > 0d0) then
+               frac = (tau_phot - tau00)/dtau
                if (k == 1) then
                   Tface_0 = s% T_surf
                else
                   Tface_0 = 0.5d0*(s% T(k) + s% T(k-1))
                end if
                Tface_1 = 0.5d0*(s% T(k) + s% T(k+1))
-               T_phot = Tface_0 + (Tface_1 - Tface_0)*(tau_phot - tau00)/dtau
+               T_phot = Tface_0 + (Tface_1 - Tface_0)*frac
                r003 = s% r(k)*s% r(k)*s% r(k)
                rp13 = s% r(k+1)*s% r(k+1)*s% r(k+1)
-               r3 = r003 + (rp13 - r003)*(tau_phot - tau00)/dtau
+               r3 = r003 + (rp13 - r003)*frac
                r = pow(r3,one_third)
-               m = s% m(k) - s% dm(k)*(tau_phot - tau00)/dtau
+               m = s% m(k) - s% dm(k)*frac
                if (s% u_flag) then
-                  v = s% v_center
-                  ! skip it since get_phot_info can be called before u_face has been set
+                  v = interp_phot_u(s, s% u, k, frac)
+                  if (present(v_start)) &
+                     v_start = interp_phot_u(s, s% u_start, k, frac)
                else if (s% v_flag) then
-                  v = s% v(k) + (s% v(k+1) - s% v(k))*(tau_phot - tau00)/dtau
+                  v = s% v(k) + (s% v(k+1) - s% v(k))*frac
+                  if (present(v_start)) &
+                     v_start = s% v_start(k) + &
+                        (s% v_start(k+1) - s% v_start(k))*frac
                end if
-               L = s% L(k) + (s% L(k+1) - s% L(k))*(tau_phot - tau00)/dtau
+               L = s% L(k) + (s% L(k+1) - s% L(k))*frac
                L = max(1d0, L)  ! blackbody temperature requires positive luminosity
                logg = safe_log10(s% cgrav(k_phot)*m/(r*r))
                k_phot = k
@@ -1200,12 +1210,31 @@
          r = s% R_center
          m = s% m_center
          v = s% v_center
+         if (present(v_start)) v_start = s% v_center
          T_phot = s% T(k_phot)
          L = max(1d0, s% L_center)
          cs = s% csound(k_phot)
          kap = s% opacity(k_phot)
          logg = safe_log10(s% cgrav(k_phot)*m/(r*r))
       end subroutine get_phot_info
+
+
+      real(dp) function interp_phot_u(s, u, k, frac) result(v)
+         type (star_info), pointer :: s
+         real(dp), intent(in) :: u(:), frac
+         integer, intent(in) :: k
+         real(dp) :: alfa, beta, v_outer, v_inner
+
+         if (k == 1) then
+            v_outer = u(1)
+         else
+            call get_face_weights(s, k, alfa, beta)
+            v_outer = alfa*u(k) + beta*u(k-1)
+         end if
+         call get_face_weights(s, k+1, alfa, beta)
+         v_inner = alfa*u(k+1) + beta*u(k)
+         v = v_outer + (v_inner - v_outer)*frac
+      end function interp_phot_u
 
 
       real(dp) function center_value(s, p)
