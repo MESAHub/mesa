@@ -193,7 +193,7 @@ Profile_Panels1_other_yaxis_log(2) = .false.
 !Profile_Panels1_ymax(2) = 210
 !Profile_Panels1_ymin(2) = 160
 
-Profile_Panels1_yaxis_name(3) = 'Lc_div_L'!'gradT'
+Profile_Panels1_yaxis_name(3) = 'logdq'!'gradT'
 Profile_Panels1_other_yaxis_name(3) = 'conv_vel'!'lum_div_Ledd'!'grada'
 Profile_Panels1_same_yaxis_range(3) = .false.
 Profile_Panels1_other_dymin(3) = 0.08

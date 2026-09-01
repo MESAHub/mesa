@@ -20,7 +20,7 @@
       module hydro_riemann
 
       use star_private_def
-      use const_def, only: dp, pi
+      use const_def, only: dp, pi, ln10
       use star_utils, only: em1, e00, ep1
       use utils_lib
       use auto_diff
@@ -235,14 +235,26 @@
             inv_R2_ad = 1d0/r2_ad
          end subroutine get_area_info
 
+         function get_Pface(kk) result(Pface)
+            integer, intent(in) :: kk
+            type(auto_diff_real_star_order1) :: Pface
+
+            Pface = s% P_face_ad(kk)
+            if (use_time_centering .and. s% using_velocity_time_centering .and. &
+                  s% include_P_in_velocity_time_centering .and. &
+                  s% lnT(kk)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) &
+               Pface = s% P_theta_for_velocity_time_centering*Pface + &
+                  (1d0 - s% P_theta_for_velocity_time_centering)*s% P_face_start(kk)
+         end function get_Pface
+
          subroutine setup_momentum_flux
             if (k == 1) then
                flux_out_ad = P_surf_ad*area_00
             else
-               flux_out_ad = s% P_face_ad(k)*area_00
+               flux_out_ad = get_Pface(k)*area_00
             end if
             if (k < nz) then
-               flux_in_ad = shift_p1(s% P_face_ad(k+1))*area_p1
+               flux_in_ad = shift_p1(get_Pface(k+1))*area_p1
             else
                flux_in_ad = 0d0
             end if
@@ -346,24 +358,20 @@
       end subroutine get_RTI_momentum_diffusion
 
 
-      subroutine do_uface_and_Pface( &
-            s, ierr, include_rsp2_Uq, use_time_centering)
+      subroutine do_uface_and_Pface(s, ierr, include_rsp2_Uq)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          logical, intent(in), optional :: include_rsp2_Uq
-         logical, intent(in), optional :: use_time_centering
          integer :: k, op_err
-         logical :: include_Uq, time_center
+         logical :: include_Uq
          include 'formats'
          ierr = 0
          include_Uq = .true.
          if (present(include_rsp2_Uq)) include_Uq = include_rsp2_Uq
-         time_center = .true.
-         if (present(use_time_centering)) time_center = use_time_centering
 !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
          do k = 1, s% nz
             op_err = 0
-            call do1_uface_and_Pface(s, k, include_Uq, time_center, op_err)
+            call do1_uface_and_Pface(s, k, include_Uq, op_err)
             if (op_err /= 0) ierr = op_err
          end do
 !$OMP END PARALLEL DO
@@ -467,14 +475,13 @@
       end subroutine get_Riemann_shock_diagnostics
 
 
-      subroutine do1_uface_and_Pface( &
-            s, k, include_rsp2_Uq, use_time_centering, ierr)
+      subroutine do1_uface_and_Pface(s, k, include_rsp2_Uq, ierr)
          use eos_def, only: i_gamma1, i_lnfree_e, i_lnPgas
          use star_utils, only: calc_Ptot_ad_tw, get_face_weights
          use hydro_rsp2, only: compute_Uq_face
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         logical, intent(in) :: include_rsp2_Uq, use_time_centering
+         logical, intent(in) :: include_rsp2_Uq
          integer, intent(out) :: ierr
          logical :: test_partials
 
@@ -497,21 +504,28 @@
          s% d_uface_domega(k) = 0
 
          if (k == 1) then
+            ! Surface energy work uses the cell pressure, not the momentum BC pressure.
             s% u_face_ad(k) = wrap_u_00(s,k)
             s% P_face_ad(k) = wrap_Peos_00(s,k)
+            s% u_face_val(k) = s% u_face_ad(k)%val
+            if (s% P_face_start(k) < 0d0) then
+               s% u_face_start(k) = s% u_start(k)
+               s% P_face_start(k) = s% Peos_start(k)
+            end if
             return
          end if
 
          r_ad = wrap_r_00(s,k)
          A_ad = 4d0*pi*pow2(r_ad)
 
+         ! The equations time center the reconstructed endpoint face state.
          call calc_Ptot_ad_tw( &
             s, k, skip_Peos, skip_mlt_Pturb, PL_ad, d_Ptot_dxa, ierr, &
-            use_time_centering)
+            .false.)
          if (ierr /= 0) return
          call calc_Ptot_ad_tw( &
             s, k - 1, skip_Peos, skip_mlt_Pturb, PR_ad, d_Ptot_dxa, ierr, &
-            use_time_centering)
+            .false.)
          if (ierr /= 0) return
          PR_ad = shift_m1(PR_ad)
 

@@ -21,8 +21,7 @@
 
 &star_job
    load_saved_model = .true.
-   load_model_filename = 'standard_after_core_he_burn.mod'
-!'standard_he_dep.mod'!'standard_after_core_he_burn.mod' !'standard_he_dep.mod'
+   load_model_filename = 'standard_he_dep.mod'
    !load_model_filename = 'model_00000800.mod' ! 80 M star-top model
 
    save_model_when_terminate = .true.
@@ -50,16 +49,13 @@
    remove_initial_center_by_temperature = 7d6 ! model_00000800.mod
    remove_center_set_zero_v_center = .true.
 
-change_rsp2_flag = .true.
-new_rsp2_flag = .false.
-
    !initial_zfracs = 6
    pgstar_flag = .true.
 
-relax_to_this_tau_factor = 1d-3
-dlogtau_factor = 0.1d0
-relax_tau_factor = .false.
-relax_initial_tau_factor = .true.
+   relax_to_this_tau_factor = 1d-3
+   dlogtau_factor = 0.1d0
+   relax_tau_factor = .false.
+   relax_initial_tau_factor = .false.
 
 /
 
@@ -67,13 +63,6 @@ relax_initial_tau_factor = .true.
    ! This flag enables the pulse-only logic in run_star_extras.
    x_logical_ctrl(22) = .true.
    max_model_number = -1
-   tol_max_correction = 1d99
-   rsp2_remesh_when_load=.false.
-   rsp2_alfam= 4.5d0
-   !min_dq_for_xa = 1d-4
-   RSP2_use_L_eqn_at_surface = .false.
-   !rsp2_alfat = 0.1d0
-   !RSP2_num_outermost_cells_forced_nonturbulent = 1
 
    ! Star LNA
    star_LNA_flag = .true.
@@ -126,7 +115,7 @@ relax_initial_tau_factor = .true.
 
    ! TDC Pulsation timestepping.
    x_ctrl(13) = 190 ! model number to drop timestep
-   x_ctrl(17) = 1d9 ! 1d5 ! dt before pulse, seconds
+   x_ctrl(17) = 1d7 ! 1d5 ! dt before pulse, seconds
    x_ctrl(18) = 1d6 ! fallback timestep ceiling after pulsations begin, seconds
    x_integer_ctrl(8) = 600 ! requested timesteps per pulsation period
 
@@ -140,12 +129,12 @@ relax_initial_tau_factor = .true.
 
    ! One-time TDC envelope remesh; -1 disables, 0 is before the first step,
    ! and a positive value waits for that many accepted steps.
-   steps_before_remesh_for_TDC_pulsations = -1 !100
+   steps_before_remesh_for_TDC_pulsations = 100
    TDC_hydro_use_mass_interp_face_values = .true.
-   TDC_hydro_nz = 1200 !350 !190 ! 150-zone base grid + 20 inner + 20 T-gradient
-   TDC_hydro_nz_outer = 400 !120 !40
-   TDC_hydro_nz_inner = 100 !50 !20
-   TDC_hydro_nz_T_gradient = 300 ! 50
+   TDC_hydro_nz = 350 !190 ! 150-zone base grid + 20 inner + 20 T-gradient
+   TDC_hydro_nz_outer = 100 !40
+   TDC_hydro_nz_inner = 50 !20
+   TDC_hydro_nz_T_gradient = 50
    TDC_hydro_T_anchor = 11d3
    TDC_hydro_dq_1_factor = 2d0
    max_center_cell_dq = 1d-7
@@ -154,15 +143,15 @@ relax_initial_tau_factor = .true.
    !max_rel_delta_IE_for_mesh_total_energy_balance = 0d0 ! when above is false.
 
    okay_to_remesh = .true. ! enable standard mesh adjustment
-   x_logical_ctrl(24) = .false. ! turn off standard remeshing at x_ctrl(12)
+   x_logical_ctrl(24) = .true. ! turn off standard remeshing at x_ctrl(12)
    x_ctrl(12) = 100 ! model number to turn off standard remeshing
 
    mesh_delta_coeff = 1d0
    max_num_merge_surface_cells = 20
    max_surface_cell_dq= 1d0
    min_surface_cell_dq = 1d-8
-   log_tau_function_weight = 30
-   T_function1_weight = 80
+   !log_tau_function_weight = 30
+   T_function1_weight = 110
    P_function_weight = 0 ! must be set 0 if doing remesh, when using Pvsc, or risk resolving single zone art visc P.
 
    ! Optionally restore the old mesh on retry and hold it for later steps.
@@ -172,21 +161,21 @@ relax_initial_tau_factor = .true.
    ! Time-dependent convection
    MLT_option = 'TDC'
    steps_before_use_TDC = 0
-   use_ledoux_criterion = .false.
+   use_ledoux_criterion = .true.
    include_mlt_corr_to_TDC = .false.
    TDC_use_dynamical_gradL = .true. ! Ledoux pressure-inversion fallback is not fully supported.
    TDC_include_eturb_in_energy_equation = .true.
 
    num_cells_for_smooth_gradL_composition_term = 0
-   mixing_length_alpha = 3d0
+   mixing_length_alpha = 1.5d0
    harmonic_dissipation_length_beta = 1d0 ! radial limiting length is beta*r
    TDC_alpha_C = 1d0
    TDC_alpha_S = 1d0
    TDC_alpha_D = 1d0
    TDC_alpha_R = 0d0
    TDC_alpha_Pt = 0d0
-   TDC_alpha_M = 0.5d0
-   TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .true.
+   TDC_alpha_M = 0.25d0
+   TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .false.
 
    use_rsp_form_of_scale_height = .false.
    alt_scale_height_flag = .false.
@@ -201,17 +190,17 @@ relax_initial_tau_factor = .true.
    use_flux_limiting_with_dPrad_dm_form = .false.
    x_logical_ctrl(25) = .true. ! ignore equL residuals for the first 10 models
    !convergence_ignore_equL_residuals = .true. ! include T-gradient equation in Newton solve
-   make_gradr_sticky_in_solver_iters = .true.
+   make_gradr_sticky_in_solver_iters = .false.
 
    ! Hydrodynamics
    use_TDC_Y_face_seeded_newton = .true.
    use_face_reconstruction = .true. ! incompatible with use_rsp_form_of_scale_height
-   hydro_matrix_solver = 'banded' ! 'banded'
+   hydro_matrix_solver = 'banded' ! 'bcyclic'
    no_dedt_form_during_relax = .false.
    set_rho_to_dm_div_dV = .false.
 
    ! Velocity time centering applies only to v_flag hydrodynamics.
-   steps_before_use_velocity_time_centering = -1 !300
+   steps_before_use_velocity_time_centering = 300
    use_P_d_1_div_rho_form_of_work = .true.
    include_P_in_velocity_time_centering = .true.
    P_theta_for_velocity_time_centering = 0.5d0
@@ -221,7 +210,7 @@ relax_initial_tau_factor = .true.
 
    ! Artificial viscosity applies only to v_flag hydrodynamics.
    use_Pvsc_art_visc = .true.
-   Pvsc_cq = 100d0 ! bigger for RSGs
+   Pvsc_cq = 4d0
    Pvsc_zsh = 0.1d0
 
    ! Surface boundary conditions

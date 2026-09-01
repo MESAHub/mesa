@@ -52,24 +52,21 @@
    set_initial_v_center = .true.
    new_v_center = 0d0
 
-   change_rsp2_flag = .true.
-   new_rsp2_flag = .false.
-
    !initial_zfracs = 6
    pgstar_flag = .true.
+
+   relax_to_this_tau_factor = 1d-3
+   dlogtau_factor = 0.1d0
+   relax_tau_factor = .false.
+   relax_initial_tau_factor = .false.
+
+
 /
 
 &controls
    ! This flag enables the pulse-only logic in run_star_extras.
    x_logical_ctrl(22) = .true.
    max_model_number = -1
-   !tol_max_correction = 1d99
-   rsp2_remesh_when_load=.false.
-   rsp2_alfam= 4.5d0
-   !min_dq_for_xa = 1d-4
-   !RSP2_use_L_eqn_at_surface = .true.
-   !rsp2_alfat = 0.1d0
-   !RSP2_num_outermost_cells_forced_nonturbulent = 1
 
    ! Star LNA
    star_LNA_flag = .true.
@@ -124,7 +121,9 @@
    x_ctrl(13) = 100 ! model number to drop timestep
    x_ctrl(17) = 1d7 ! 1d5 ! dt before pulse, seconds
    x_ctrl(18) = 1d7 ! fallback timestep ceiling after pulsations begin, seconds
-   x_integer_ctrl(8) = 600 ! requested timesteps per pulsation period
+   x_integer_ctrl(8) = 1800 ! requested timesteps per pulsation period
+
+   ! 1800 steps per period with L and P theta set to 0.75 gives < 1% integration error.
 
    dt_div_min_dr_div_cs_limit = 5000d0 !4d0
    dt_div_min_dr_div_cs_hard_limit = -1d0 !100d0
@@ -187,7 +186,7 @@
    TDC_alpha_D = 1d0
    TDC_alpha_R = 0d0
    TDC_alpha_Pt = 0d0
-   TDC_alpha_M = 1d0
+   TDC_alpha_M = 3d0
    TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .false.
    TDC_include_inner_boundary_eddy_viscosity = .true. ! for QS convective inner BC and u flag only.
 
@@ -214,12 +213,12 @@
    set_rho_to_dm_div_dV = .false.
 
    ! Velocity time centering applies only to v_flag hydrodynamics.
-   steps_before_use_velocity_time_centering = -1 !300
-   use_P_d_1_div_rho_form_of_work = .true.
+   steps_before_use_velocity_time_centering = 300
+   use_P_d_1_div_rho_form_of_work = .false.
    include_P_in_velocity_time_centering = .true.
-   P_theta_for_velocity_time_centering = 0.5d0
+   P_theta_for_velocity_time_centering = 0.75d0 !0.5d0
    include_L_in_velocity_time_centering = .true.
-   L_theta_for_velocity_time_centering = 0.5d0
+   L_theta_for_velocity_time_centering = 0.75d0 !0.5d0
    include_mlt_in_velocity_time_centering = .false.
 
    ! Artificial viscosity applies only to v_flag hydrodynamics.
@@ -285,9 +284,6 @@ hard_limit_for_rel_error_in_energy_conservation = 1d99 !1d-3
    ! Set this and okay_to_remesh above to .true. to use the PPISN mesh scheme.
    use_split_merge_amr = .true.
    !max_dq = 5d-3
-   mesh_min_dlnR = 1d-9
-   merge_if_dlnR_too_small = .true.
-   !min_surface_cell_dq = 1d-14
    !split_merge_amr_dq_min = 1d-16
 
    ! fine zoning near center of QS
@@ -305,13 +301,19 @@ hard_limit_for_rel_error_in_energy_conservation = 1d99 !1d-3
    split_merge_amr_max_iters = 1000
    split_merge_amr_okay_to_split_nz = .false.
 
+   split_merge_amr_okay_to_split_1 = .true. ! this is important for pulsations.
    merge_amr_ignore_surface_cells = .true.
    merge_amr_k_for_ignore_surface_cells = 2
    split_merge_amr_okay_to_split_nz = .true.
+   mesh_min_dlnR = 1d-9
+   merge_if_dlnR_too_small = .true.
+   split_merge_amr_min_surface_cell_dq = 1d-6
+   split_merge_amr_max_surface_cell_dq = 1d-4
 
    merge_amr_max_abs_du_div_cs = 0.05d0
-   merge_amr_du_div_cs_limit_only_for_compression = .false.
+   merge_amr_du_div_cs_limit_only_for_compression = .true.
    split_merge_amr_avoid_repeated_remesh = .true.
+   merge_amr_inhibit_at_jumps = .true. ! badly named control.
 
    ! Correct the ideal-EOS contribution to lnfree_e and floor opacity below
    ! logT=2.7001 with blending to logT=2.8001.
@@ -323,7 +325,7 @@ hard_limit_for_rel_error_in_energy_conservation = 1d99 !1d-3
    pgstar_interval = 100 !100
 
     History_Panels1_xaxis_name = 'day'!'model_number'
-    History_Panels1_max_width = 100000 !2000! 10000
+    History_Panels1_max_width = 400000 !2000! 10000
 
 
 /

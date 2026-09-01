@@ -83,7 +83,8 @@
             call mesa_error(__FILE__,__LINE__,'use_mass_corrections dP not supported with u_flag true')
 
          if (s% u_flag) then
-            call do_uface_and_Pface(s,ierr)
+            ! Reconstruct endpoint face states; the equations time center them once.
+            call do_uface_and_Pface(s, ierr)
             if (ierr /= 0) then
                if (len_trim(s% retry_message) == 0) s% retry_message = 'do_uface_and_Pface failed'
                if (s% report_ierr) write(*,*) 'ierr from do_uface_and_Pface'

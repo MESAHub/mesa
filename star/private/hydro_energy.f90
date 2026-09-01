@@ -771,6 +771,7 @@
          end if
 
          if (s% u_flag) then
+            ! Time center the endpoint Riemann pressure once.
             P_face_ad = P_theta*s% P_face_ad(k) + (1d0-P_theta)*s% P_face_start(k)
             d_Pface_dxa00 = 0d0
             d_Pface_dxam1 = 0d0
@@ -804,7 +805,7 @@
                end if
             end if
 
-            ! set Pvsc_ad
+            ! Use current Pvsc to match the momentum equation.
             if (.not. s% use_Pvsc_art_visc) then
                Pvsc_ad = 0d0
             else
@@ -812,17 +813,11 @@
                   call get_Pvsc_ad(s, k-1, PvscR_ad, ierr)
                   if (ierr /= 0) return
                   PvscR_ad = shift_m1(PvscR_ad)
-                  if (s% include_P_in_velocity_time_centering .and. &
-                      s% lnT(k)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) &
-                     PvscR_ad = 0.5d0*(PvscR_ad + s% Pvsc_start(k-1))
                else
                   PvscR_ad = 0d0
                end if
                call get_Pvsc_ad(s, k, PvscL_ad, ierr)
                if (ierr /= 0) return
-               if (s% include_P_in_velocity_time_centering .and. &
-                   s% lnT(k)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) &
-                  PvscL_ad = 0.5d0*(PvscL_ad + s% Pvsc_start(k))
                Pvsc_ad = alfa*PvscL_ad + beta*PvscR_ad
             end if
 
