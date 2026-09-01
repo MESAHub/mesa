@@ -61,7 +61,18 @@ x_character_ctrl(2) = 'nowind' ! accretor mass in Msun
 
 
 hard_limit_for_rel_error_in_energy_conservation = -1d0
+
+! convection enhancement in superadiabatic layers
 use_superad_reduction = .true.
+superad_reduction_max_logT = 7d0
+superad_reduction_diff_grads_limit = 1d-4
+superad_reduction_use_turnover_limit = .true.
+superad_reduction_Gamma_limit = 0.5d0
+superad_reduction_Gamma_limit_scale = 5d0
+superad_reduction_Gamma_inv_scale = 5d0
+
+! for debugging
+report_solver_progress = .false. 
 
 ! to stop at C depletion
 ! x_logical_ctrl(2) = .true.
@@ -85,7 +96,7 @@ use_ledoux_criterion = .true.
 mixing_length_alpha = 2d0
 MLT_option = "TDC"
 include_mlt_corr_to_TDC = .false.
-TDC_include_eturb_in_energy_equation = .true.
+TDC_include_eturb_in_energy_equation = .false.
 harmonic_dissipation_length_beta = 1d0
 alpha_semiconvection = 1.0d0
 thermohaline_coeff = 1.0d0
