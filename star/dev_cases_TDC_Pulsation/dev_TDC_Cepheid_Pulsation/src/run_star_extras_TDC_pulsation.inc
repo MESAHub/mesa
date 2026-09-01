@@ -127,8 +127,8 @@
          contains
 
          logical function get_period_info()
-            real(dp) :: v_surf, v_surf_start, KE, min_period, time_ended, &
-               Rphot, v_phot, delta_R, min_deltaR_for_periods, growth_avg_frac_new, &
+            real(dp) :: v_surf, KE, min_period, time_ended, &
+               Rphot, v_phot, v_phot_start, delta_R, min_deltaR_for_periods, growth_avg_frac_new, &
                min_period_div_target, cs, vesc
             include 'formats'
             get_period_info = .false.
@@ -145,16 +145,14 @@
 
             if (s% v_flag) then
                v_surf = s% v(1)
-               v_surf_start = s% v_start(1)
             else if (s% u_flag) then
                v_surf = s% u(1)
-               v_surf_start = s% u_start(1)
             else
                v_surf = 0d0
-               v_surf_start = 0d0
             end if
             Rphot = s% photosphere_r*Rsun
             v_phot = s% photosphere_v
+            v_phot_start = s% photosphere_v_start
             if (Rphot < Rphot_min) Rphot_min = Rphot
             if (Rphot > Rphot_max) Rphot_max = Rphot
             if (v_surf < V_min) V_min = v_surf
@@ -166,8 +164,8 @@
             vesc = sqrt(2*s% cgrav(1)*s% m(1)/(s% r(1)))
             if (v_surf > v_div_vesc_max*vesc) v_div_vesc_max = v_surf/vesc
 
-            ! period is completed when v_surf goes from positive to negative during step
-            if (v_surf > 0d0 .or. v_surf_start < 0d0) return
+            ! period is completed when v_phot goes from positive to negative during step
+            if (v_phot > 0d0 .or. v_phot_start <= 0d0) return
 
             if (time_started == 0) then ! start of 1st cycle
                time_started = s% time
@@ -188,8 +186,8 @@
             end if
 
             time_ended = s% time
-            if (abs(v_surf - v_surf_start) > 1d-10) & ! tweak the end time to match when v_surf == 0
-               time_ended = s% time - v_surf*s% dt/(v_surf - v_surf_start)
+            if (abs(v_phot - v_phot_start) > 1d-10) & ! tweak the end time to match when v_phot == 0
+               time_ended = s% time - v_phot*s% dt/(v_phot - v_phot_start)
             min_period_div_target = s% x_ctrl(10)
             min_period = target_period*(24*3600)*min_period_div_target
             if (min_period > 0d0 .and. &
