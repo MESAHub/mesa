@@ -175,7 +175,7 @@
    TDC_alpha_D = 1d0
    TDC_alpha_R = 0d0
    TDC_alpha_Pt = 0d0
-   TDC_alpha_M = 0.6d0
+   TDC_alpha_M = 0.75d0
    TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .false.
 
    use_rsp_form_of_scale_height = .false.
@@ -310,7 +310,7 @@ hard_limit_for_rel_error_in_energy_conservation = 1d99 !1d-3
    pgstar_interval = 100 !100
 
     History_Panels1_xaxis_name = 'day'!'model_number'
-    History_Panels1_max_width = 10000! 10000
+    History_Panels1_max_width = 2000! 10000
 
 
 /
