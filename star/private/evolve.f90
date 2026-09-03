@@ -180,7 +180,7 @@
             call set_to_NaN(s% mesh_adjust_PE_conservation)
             call set_to_NaN(s% min_conv_time_scale)
             call set_to_NaN(s% mstar_dot_old)
-            call set_to_NaN(s% mstar_old)
+            if (.not. s% doing_first_model_after_restart) call set_to_NaN(s% mstar_old)
             call set_to_NaN(s% mx1_bot)
             call set_to_NaN(s% mx1_bot_r)
             call set_to_NaN(s% mx1_top)
@@ -1894,6 +1894,7 @@
 
          call new_generation(s, ierr)
          if (failed('new_generation ierr')) return
+         s% doing_first_model_after_restart = .false.
          s% generations = 2
 
          if ((s% time + s% dt_next) > s% max_age*secyer .and. s% max_age > 0) then
