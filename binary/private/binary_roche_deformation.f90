@@ -41,10 +41,11 @@ module binary_roche_deformation
    implicit none
 
    real(dp), parameter :: nudge = 1d-4
-   real(dp), pointer :: xvals(:), yvals(:), fpfunc1d(:), ftfunc1d(:), &
-         irotfunc1d(:), otherrfunc1d(:), afunc1d(:), psifunc1d(:)
+   real(dp), pointer :: xvals(:), yvals(:), psi_xvals(:), psi_yvals(:), &
+         fpfunc1d(:), ftfunc1d(:), irotfunc1d(:), otherrfunc1d(:), &
+         afunc1d(:), psifunc1d(:)
    logical :: inter_ok = .false., dbg = .false.
-   integer :: num_xpts, num_ypts
+   integer :: num_xpts, num_ypts, num_psi_xpts, num_psi_ypts
 
 contains
 
@@ -62,8 +63,8 @@ contains
                num_ypts, ftfunc1d, ierr)
          call setup_interpolator(trim(upstairs) // 'irot_data.txt', xvals, num_xpts, &
                yvals, num_ypts, irotfunc1d, ierr)
-         call setup_interpolator(trim(upstairs) // 'psi_data.txt', xvals, num_xpts, &
-               yvals, num_ypts, psifunc1d, ierr)
+         call setup_interpolator(trim(upstairs) // 'psi_data.txt', psi_xvals, num_psi_xpts, &
+               psi_yvals, num_psi_ypts, psifunc1d, ierr)
 
          if (dbg) then
             xtest = -0.5
@@ -185,14 +186,36 @@ contains
       ! note there was an error in Fabry et al. (2022) regarding this scaling.
 
       real(dp), intent(in) :: lq
-      real(dp) :: ar
+      real(dp) :: ar, ar_cutoff, ar_next, psi_cutoff, psi_next, dpsi_dinv_ar
       integer, intent(out) :: ierr
 
       include 'formats'
 
-      if (ar >= yvals(num_ypts)) ar = yvals(num_ypts) - 2 * nudge
-      call interp_evbipm_db(lq, ar, xvals, num_xpts, yvals, num_ypts,&
-            psifunc1d, num_xpts, psi, ierr)
+      if (ar <= 0d0) then
+         psi = -9d99
+         ierr = 0
+         return
+      end if
+
+      ar_cutoff = psi_yvals(1)
+      if (ar < ar_cutoff) then
+         ! Continue the profile-output potential through the invalid part of the
+         ! original table. The deformation factors use separate finite tables.
+         ar_next = psi_yvals(2)
+         call interp_evbipm_db(lq, ar_cutoff, psi_xvals, num_psi_xpts, &
+            psi_yvals, num_psi_ypts, psifunc1d, num_psi_xpts, psi_cutoff, ierr)
+         if (ierr /= 0) return
+         call interp_evbipm_db(lq, ar_next, psi_xvals, num_psi_xpts, &
+            psi_yvals, num_psi_ypts, psifunc1d, num_psi_xpts, psi_next, ierr)
+         if (ierr /= 0) return
+         dpsi_dinv_ar = (psi_next - psi_cutoff) / (1d0 / ar_next - 1d0 / ar_cutoff)
+         psi = psi_cutoff + dpsi_dinv_ar * (1d0 / ar - 1d0 / ar_cutoff)
+         return
+      end if
+
+      if (ar >= psi_yvals(num_psi_ypts)) ar = psi_yvals(num_psi_ypts) - 2 * nudge
+      call interp_evbipm_db(lq, ar, psi_xvals, num_psi_xpts, psi_yvals, num_psi_ypts,&
+            psifunc1d, num_psi_xpts, psi, ierr)
       if (ierr /= 0) write(*, 1) "error in eval psi", ar, psi
    end function eval_psi
 
@@ -213,6 +236,11 @@ contains
       call binary_ptr(s% binary_id, b, ierr)
       if (ierr /= 0) return
 
+      this_star = 0
+      other_star = 0
+      call assign_stars(id, this_star, other_star, ierr)
+      if (ierr /= 0) return
+
       m1 = b% m(this_star)
       m2 = b% m(other_star)
       a = b% separation
@@ -226,10 +254,6 @@ contains
       lq = log10(m2 / m1)
 
       psi = eval_psi(lq, r / r_roche, ierr)
-      if (ieee_is_nan(psi)) then
-         psi = -9d99  ! let's put negative a lot for regions outside what we can interpolate
-                      ! this likely happens in the core where r ~= 0, and so psi == -infty
-      end if
 
    end subroutine roche_psi
 
