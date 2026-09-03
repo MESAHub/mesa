@@ -41,7 +41,7 @@
       add_atmosphere_to_pulse_data = .true.
       fgong_ivers = 1300
 
-      photo_interval = 100
+      photo_interval = 25
       profile_interval = 100
       history_interval = 5
       terminal_interval = 10 
