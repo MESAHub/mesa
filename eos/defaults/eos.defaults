@@ -180,7 +180,7 @@
    ! Only consider isotopes in the EOS if their mass fraction is above this value.
    ! ::
 
-      mass_fraction_limit_for_Skye = 1d-4
+      mass_fraction_limit_for_Skye = 1d-16
 
 
    ! ``Skye_use_ion_offsets``
