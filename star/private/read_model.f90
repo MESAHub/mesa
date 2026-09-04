@@ -106,7 +106,10 @@
             ! to account for the loading of old saved models.
             if (s% have_j_rot) then
                if (restart) then
-                  ! only need to compute irot, w_div_w_crit_roche is stored in photos
+                  ! Photo loading does not restore w_div_w_crit_roche.
+                  ! Initialize it before either the fallback or set_vars can use it.
+                  call use_xh_to_update_i_rot(s)
+                  ! Preserve the photo's omega for rotation-dependent tidal deformation.
                   call set_i_rot_from_omega_and_j_rot(s)
                else
                   ! need to set w_div_w_crit_roche as well

@@ -524,6 +524,12 @@
                if (failed('mlt_vc')) exit
                call do1(s% conv_vel, c% conv_vel)
                if (failed('conv_vel')) exit
+
+               ! These are persistent inputs needed for ST time smoothing.
+               call do1(s% D_ST_start, c% D_ST_start)
+               if (failed('D_ST_start')) exit
+               call do1(s% nu_ST_start, c% nu_ST_start)
+               if (failed('nu_ST_start')) exit
             end if
 
             call do1(s% q, c% q)
@@ -810,12 +816,6 @@
             if (failed('dynamo_B_r')) exit
             call do1(s% dynamo_B_phi, c% dynamo_B_phi)
             if (failed('dynamo_B_phi')) exit
-
-            !for ST time smoothing
-            call do1(s% D_ST_start, c% D_ST_start)
-            if (failed('D_ST_start')) exit
-            call do1(s% nu_ST_start, c% nu_ST_start)
-            if (failed('nu_ST_start')) exit
 
             call do1(s% opacity, c% opacity)
             if (failed('opacity')) exit
