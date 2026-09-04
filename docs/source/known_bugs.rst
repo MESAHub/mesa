@@ -33,6 +33,19 @@ approximate reaction after the hot CNO and ``o18`` extensions have been added::
 
 See `gh-1056 <https://github.com/MESAHub/mesa/issues/1056>`_.
 
+.. _drag_energy_u_flag_bug:
+
+Star: drag energy could be included with ``u_flag``
+---------------------------------------------------
+
+In releases ``r24.03.1`` through ``r26.4.1``, setting ``u_flag = .true.``
+with a nonzero ``drag_coefficient`` and ``use_drag_energy = .true.`` could
+inject spurious energy. The drag energy source was evaluated even though the
+corresponding drag force only applies when ``v_flag = .true.``.
+
+This is fixed in the main branch after ``r26.4.1``. As a workaround, set
+``use_drag_energy = .false.`` when using ``u_flag``.
+
 .. _plasmon_weinberg_angle_bug:
 
 Neu: plasmon neutrino cooling used a hardcoded Weinberg angle
