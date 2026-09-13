@@ -142,6 +142,17 @@ model. Previously, a first-step retry or redo from a terminal photo could
 rewind the binary age and orbit one step while the stars remained at the
 saved model. Incomplete binary state records are also rejected.
 
+Fixed the convective velocity interpolation used to set the diffusion
+coefficient at ``f0*Hp`` inside the convective region. In MLT or TDC models,
+interpolation between a mesh face and a convective boundary that did not
+bracket this point could produce excessively large or negative coefficients.
+The code now uses the convective boundary only when it gives a valid
+interpolation interval; otherwise it uses the two mesh faces. Boundary radii
+on mesh faces are preserved exactly, and the weights are calculated without
+subtracting nearly equal cubes. This applies to exponential, step, and
+``step+exponential`` overshooting. The sampling distance, mixing length, and
+overshoot prescriptions are unchanged.
+
 Switching to radiative transport no longer overwrites saved convective
 velocities during photo loading or retries with
 ``restore_mesh_on_retry = .true.``. Loading a photo also preserves the stored
