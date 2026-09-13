@@ -141,14 +141,14 @@ mass_fraction_limit_for_Skye = 1d-5
 
    ! The control below is useful when running with burning + convection during pulses.
    make_gradr_sticky_in_solver_iters = .true.
-   convergence_ignore_equL_residuals = .true.
+   convergence_ignore_equL_residuals = .false.
 
    max_abs_du_div_cs_for_convection = 0.03d0
    max_v_div_cs_for_convection = 10d0
    max_v_for_convection = 1d5 ! v should never hit this anyway, see x_ctrl(17) below.
 
    use_superad_reduction = .true.
-   superad_reduction_max_logT = 7d0
+   superad_reduction_max_logT = 1d99 !7d0
    superad_reduction_diff_grads_limit = 1d-4
    superad_reduction_use_turnover_limit = .true.
    superad_reduction_Gamma_limit = 0.5d0
@@ -387,8 +387,8 @@ mass_fraction_limit_for_Skye = 1d-5
    Pvsc_zsh = 0.1d0
 
    photo_interval = 50
-   profile_interval = 200
-   history_interval = 10
+   profile_interval = 1 !200
+   history_interval = 1
    terminal_interval = 10
 
 / ! end of controls namelist

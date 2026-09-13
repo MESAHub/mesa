@@ -39,6 +39,9 @@
    Riemann_shock_D_mix_reduction_on = 0.01d0
    Riemann_shock_D_mix_reduction_full_on = 0.05d0
 
+
+   ! drag energy bugfix
+   use_drag_energy = .false.
 / ! end of controls namelist
 
 &pgstar

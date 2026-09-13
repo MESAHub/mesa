@@ -14,6 +14,13 @@
 
    use_split_merge_amr = .true.
 
+   ! Dampen extreme velocities in the outer 2% by mass during u_flag,
+   ! reaching full strength in the outer 1%.
+   ! Set v_drag_factor to zero to disable this pseudo-drag.
+   v_drag_factor = 1d0
+   q_for_v_drag_full_off = 0.98d0
+   q_for_v_drag_full_on = 0.99d0
+
    mesh_min_dlnR = 1d-9
    merge_if_dlnR_too_small = .true.
 
@@ -36,9 +43,8 @@
    RTI_log_max_boost = 0d0
 
    ! Limit chemical diffusion at strong Riemann shocks without disabling TDC.
-   Riemann_shock_D_mix_reduction_on = 0.01d0
-   Riemann_shock_D_mix_reduction_full_on = 0.05d0
-
+   !Riemann_shock_D_mix_reduction_on = 0.01d0
+   !Riemann_shock_D_mix_reduction_full_on = 0.05d0
 / ! end of controls namelist
 
 &pgstar

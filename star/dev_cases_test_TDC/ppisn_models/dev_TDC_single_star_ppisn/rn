@@ -3,7 +3,7 @@
 set -e
 
 # uncomment the following line to skip the optional inlists
-# MESA_SKIP_OPTIONAL=t
+ MESA_SKIP_OPTIONAL=t
 
 run_model() {
    local inlist_name="$1"

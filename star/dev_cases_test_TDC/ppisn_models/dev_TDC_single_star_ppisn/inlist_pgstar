@@ -126,8 +126,8 @@
    Profile_Panels3_yaxis_name(2) = 'Power'
    Profile_Panels3_yaxis_name(3) = 'Mixing'
 
-   Profile_Panels3_xaxis_name = 'zone'
-   Profile_Panels3_xaxis_reversed = .true.
+   Profile_Panels3_xaxis_name = 'mass'
+   Profile_Panels3_xaxis_reversed = .false.
    Profile_Panels3_xmin = -101d0 ! only used if /= -101d0
    Profile_Panels3_xmax = -101d0 ! 10 ! only used if /= -101d0
 

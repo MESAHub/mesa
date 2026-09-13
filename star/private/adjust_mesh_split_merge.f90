@@ -22,6 +22,7 @@
       use star_private_def
       use const_def, only: dp, ln10, pi4, four_thirds_pi, crad
       use chem_def, only: ih1, ihe3, ihe4
+      use math_lib, only: log1p
       use utils_lib
       use auto_diff_support
 
@@ -29,6 +30,8 @@
 
       private
       public :: remesh_split_merge
+
+      real(dp), parameter :: numerical_dlnR_floor = 64d0*epsilon(1d0)
 
       contains
 
@@ -102,7 +105,7 @@
             s% dm(k)*s% opacity(k)/(pi4*s% rmid(k)*s% rmid(k))
          call enforce_surface_dq_min
          if (ierr /= 0) return
-         call enforce_dlnR_min
+         call enforce_numerical_dlnR_floor
          if (ierr /= 0) return
          do iter = 1, s% split_merge_amr_max_iters
             call biggest_smallest(s, tau_center, TooBig, TooSmall, iTooBig, iTooSmall)
@@ -196,7 +199,7 @@
          end subroutine enforce_surface_dq_min
 
 
-         subroutine enforce_dlnR_min
+         subroutine enforce_numerical_dlnR_floor
             integer :: j, j_merge
             real(dp) :: dlnR, min_dlnR
             include 'formats'
@@ -208,19 +211,19 @@
                min_dlnR = huge(1d0)
                do j = 1, s% nz
                   dlnR = cell_dlnR(s, j)
-                  if (dlnR >= s% mesh_min_dlnR .or. dlnR >= min_dlnR) cycle
+                  if (dlnR > numerical_dlnR_floor .or. dlnR >= min_dlnR) cycle
                   if (.not. merge_respects_surface_dq_max(s, j)) cycle
                   j_merge = j
                   min_dlnR = dlnR
                end do
                if (j_merge == 0) exit
                if (s% trace_split_merge_amr) &
-                  write(*,2) 'dlnR floor merge', j_merge, min_dlnR
+                  write(*,2) 'numerical dlnR floor merge', j_merge, min_dlnR
                call do_merge(s, j_merge, species, new_xa, .true., ierr)
                if (ierr /= 0) return
                num_merge = num_merge + 1
             end do
-         end subroutine enforce_dlnR_min
+         end subroutine enforce_numerical_dlnR_floor
 
 
          subroutine split1  ! ratio of desired/actual is too large
@@ -259,6 +262,19 @@
       end subroutine amr
 
 
+      real(dp) function dlnR_between(r_outer, r_inner) result(dlnR)
+         real(dp), intent(in) :: r_outer, r_inner
+
+         if (r_inner <= 0d0) then
+            dlnR = huge(1d0)
+         else if (r_outer <= 0d0) then
+            dlnR = -huge(1d0)
+         else
+            dlnR = log1p((r_outer - r_inner)/r_inner)
+         end if
+      end function dlnR_between
+
+
       real(dp) function cell_dlnR(s, k) result(dlnR)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -273,7 +289,7 @@
          else
             r_inner = s% r(k+1)
          end if
-         dlnR = log(s% r(k)) - log(r_inner)
+         dlnR = dlnR_between(s% r(k), r_inner)
       end function cell_dlnR
 
 
@@ -291,8 +307,8 @@
             r_inner = s% r(k+1)
          end if
          r_mid = 0.5d0*(s% r(k) + r_inner)
-         dlnR_outer = log(s% r(k)) - log(r_mid)
-         dlnR_inner = log(r_mid) - log(r_inner)
+         dlnR_outer = dlnR_between(s% r(k), r_mid)
+         dlnR_inner = dlnR_between(r_mid, r_inner)
          split_respects_dlnR_min = &
             min(dlnR_outer, dlnR_inner) >= 2d0*s% mesh_min_dlnR
       end function split_respects_dlnR_min
@@ -379,7 +395,7 @@
          real(dp), intent(out) :: TooBig, TooSmall
          integer, intent(out) :: iTooBig, iTooSmall
          real(dp) :: &
-            oversize_ratio, undersize_ratio, abs_du_div_cs, &
+            oversize_ratio, undersize_ratio, dlnR, dlnR_ratio, abs_du_div_cs, &
             xmin, xmax, dx_actual, xR, xL, dq_min, dq_min_k, dq_max, dq_max_k, dx_baseline, &
             outer_dx_baseline, inner_dx_baseline, inner_outer_q, r_core_cm, &
             target_dr_core, target_dlnR_envelope, target_dlnR_core, target_dr_envelope, &
@@ -606,7 +622,18 @@
                undersize_ratio = dq_min_k/s% dq(k)
             end if
 
+            if (s% merge_if_dlnR_too_small .and. s% mesh_min_dlnR > 0d0) then
+               dlnR = cell_dlnR(s, k)
+               if (dlnR < s% mesh_min_dlnR) then
+                  dlnR_ratio = s% mesh_min_dlnR/max(dlnR, numerical_dlnR_floor)
+                  undersize_ratio = max(undersize_ratio, &
+                     max(1d0, s% split_merge_amr_MaxShort)*dlnR_ratio)
+               end if
+            end if
+
             call select_merge_pair(s, k, i_merge, ip_merge)
+            if (s% merge_amr_ignore_surface_cells .and. &
+                  i_merge <= s% merge_amr_k_for_ignore_surface_cells) cycle
             dq_merge_guard = .false.
             if (s% split_merge_amr_max_center_cell_dq > 0d0 .or. &
                   (i_merge == 1 .and. s% split_merge_amr_max_surface_cell_dq > 0d0)) &
@@ -649,15 +676,12 @@
 
          real(dp) function metric_dlnR(j)
             integer, intent(in) :: j
-            real(dp) :: x_inner, x_outer
 
-            if (j == nz) then
-               x_inner = log(max(1d0, s% R_center))
+            if (j == nz .and. s% R_center <= 0d0) then
+               metric_dlnR = abs(log(s% r(j)) - log(1d0))
             else
-               x_inner = log(s% r(j+1))
+               metric_dlnR = abs(cell_dlnR(s, j))
             end if
-            x_outer = log(s% r(j))
-            metric_dlnR = abs(x_outer - x_inner)
          end function metric_dlnR
 
 

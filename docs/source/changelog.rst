@@ -89,6 +89,11 @@ The new controls restore their incoming solver settings when relaxation ends.
 Bug Fixes
 ---------
 
+Fixed split/merge AMR handling of ``mesh_min_dlnR``. Cells below the requested
+spacing are now considered through the normal merge guards instead of being
+merged unconditionally. Only radial spacings near numerical precision force
+an emergency merge.
+
 Removed duplicate treatment of ``n14(a,g)f18(e+nu)o18`` in networks that
 include both the explicit hot CNO reactions and the corresponding approximate
 reaction. See :ref:`the known bugs entry <duplicate_n14ag_rate_bug>` and

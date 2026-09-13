@@ -1069,7 +1069,7 @@
          s% xtra(x_gamma_int_bound) = -1d0
 
          ! can be adjusted below if nearing breakout
-         s% profile_interval = 100
+         s% profile_interval = 1!100
 
          if (s% u_flag .and. k_keep > 0 .and. s% xtra(x_time_start_pulse) > 0d0) then
 
@@ -1130,9 +1130,9 @@
                   ! to breakout
                   if ((s% u(k1)>5d7 .and. s% u(1)<5d7) &
                      .or. (s% ixtra(ix_num_relaxations) == 0 .and. gamma1_integral < 0d0 .and. s% u(1)<5d7)) then
-                     s% profile_interval = 10
+                     s% profile_interval = 1!10
                   else
-                     s% profile_interval = 100
+                     s% profile_interval = 1!100
                   end if
                   exit
                end if

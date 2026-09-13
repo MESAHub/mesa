@@ -6089,8 +6089,11 @@
       ! merge_if_dlnR_too_small
       ! ~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! If true, standard and split/merge AMR mesh adjustment will force merge
-      ! if difference in lnR across cell is too small.
+      ! If true, standard mesh adjustment will force a merge if the difference
+      ! in lnR across a cell is too small. Split/merge AMR instead treats the
+      ! cell as a priority merge candidate subject to its usual merge guards.
+      ! It only forces a merge when the radial spacing approaches numerical
+      ! precision.
 
       ! ::
 
