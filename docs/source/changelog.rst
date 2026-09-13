@@ -89,6 +89,17 @@ The new controls restore their incoming solver settings when relaxation ends.
 Bug Fixes
 ---------
 
+Fixed the convective velocity interpolation used to set the diffusion
+coefficient at ``f0*Hp`` inside the convective region. In MLT or TDC models,
+interpolation between a mesh face and a convective boundary that did not
+bracket this point could produce excessively large or negative coefficients.
+The code now uses the convective boundary only when it gives a valid
+interpolation interval; otherwise it uses the two mesh faces. Boundary radii
+on mesh faces are preserved exactly, and the weights are calculated without
+subtracting nearly equal cubes. This applies to exponential, step, and
+``step+exponential`` overshooting. The sampling distance, mixing length, and
+overshoot prescriptions are unchanged.
+
 Fixed split/merge AMR handling of ``mesh_min_dlnR``. Cells below the requested
 spacing are now considered through the normal merge guards instead of being
 merged unconditionally. Only radial spacings near numerical precision force
