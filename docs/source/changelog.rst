@@ -168,6 +168,11 @@ energies now use double-precision literals. See
 
 Fixed a typo in the OPLIB hydrogen grid that could cause incorrect opacities or interpolation failures at low hydrogen abundance; see `gh-1078 <https://github.com/MESAHub/mesa/pull/1078>`_.
 
+Fixed split/merge AMR handling of ``mesh_min_dlnR``. Cells below the requested
+spacing are now considered through the normal merge guards instead of being
+merged unconditionally. Only radial spacings near numerical precision force
+an emergency merge.
+
 Removed duplicate treatment of ``n14(a,g)f18(e+nu)o18`` in networks that
 include both the explicit hot CNO reactions and the corresponding approximate
 reaction. See :ref:`the known bugs entry <duplicate_n14ag_rate_bug>` and
