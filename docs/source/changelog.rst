@@ -51,6 +51,18 @@ Two new profile columns, ``superad_reduction_Lrad_div_Ledd`` and ``superad_reduc
 
 The new control ``superad_reduction_use_turnover_limit`` relaxes the applied superadiabatic reduction from its previous accepted value toward the instantaneous value. ``superad_reduction_turnover_limit_function`` selects either the exponential response ``1-exp(-dt/tau_conv)`` or the linear response ``min(dt/tau_conv,1)``. The limiter acts on the applied reduction ``1/Gamma_factor``. Zones with a lagged convective velocity use ``scale_height/max(mlt_vc,1d-10 cm/s)``; other zones use the Brunt frequency. The timescale is set at the start of the step and held fixed during solver iterations. With ``use_face_reconstruction``, this calculation uses the reconstructed face thermodynamic state. The scale height is the interpolated or reconstructed face value used by MLT and TDC. The previous reduction is preserved across retries, remeshing, and photo restarts. For ``k > 0``, ``superad_reduction_max_logT`` restricts the reduction to faces whose start-of-step temperature is below the selected ``logT``. Its default is ``7d0``, corresponding to :math:`10^7\,\mathrm{K}`. The ``k=0`` model-construction path is unchanged.
 
+Metric zoning for split/merge AMR now uses ``split_merge_amr_MaxLong`` both
+to split an existing oversized cell and to reject a proposed merge whose
+summed metric would exceed the same limit. This removes the redundant metric
+merge-guard control and keeps the prospective merge and subsequent split
+criteria consistent.
+
+The optional pressure-child reconstruction for cell-centered split/merge AMR
+now includes MLT turbulent pressure in its bounded pressure target. The
+conservative energy transfer continues to modify only the EOS pressure; the
+turbulent contribution is evaluated from its remapped face state. Split/merge
+AMR does not currently support RSP2.
+
 .. _Bug Fixes main:
 
 Bug Fixes
