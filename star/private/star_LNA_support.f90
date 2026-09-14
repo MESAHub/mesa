@@ -938,7 +938,7 @@
             dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnM, dlnPsurf_dlnkap, &
             dlnP_bc_dlnd, dlnP_bc_dlnT, dlnP_bc_dL, dlnP_bc_dlnR, &
             dlnkap_dlnd, dlnkap_dlnT, dP0, dP0_dlnR, &
-            dlnP_bc_dlnPsurf, dlnP_bc_dP0
+            dlnP_bc_dlnPsurf, dlnP_bc_dP0, Prad_bc
          logical :: offset_P_to_cell_center
          logical, parameter :: skip_partials = .false.
          logical, parameter :: need_P_surf = .true.
@@ -972,6 +972,18 @@
          dlnP_bc_dlnT = dlnP_bc_dlnPsurf*dlnPsurf_dlnkap*dlnkap_dlnT
          dlnP_bc_dL = dlnP_bc_dlnPsurf*dlnPsurf_dL
          dlnP_bc_dlnR = dlnP_bc_dlnPsurf*dlnPsurf_dlnR + dlnP_bc_dP0*dP0_dlnR
+
+         if (s% use_momentum_outer_BC .and. s% floor_momentum_outer_BC_at_Prad) then
+            Prad_bc = (crad/3d0)*pow4(exp(lnT_surf))
+            if (P_bc < Prad_bc) then
+               P_bc = Prad_bc
+               s% P_surf = P_bc
+               dlnP_bc_dlnd = 4d0*dlnTsurf_dlnkap*dlnkap_dlnd
+               dlnP_bc_dlnT = 4d0*dlnTsurf_dlnkap*dlnkap_dlnT
+               dlnP_bc_dL = 4d0*dlnTsurf_dL
+               dlnP_bc_dlnR = 4d0*dlnTsurf_dlnR
+            end if
+         end if
 
          call wrap(P_bc_ad, P_bc, &
             0d0, P_bc*dlnP_bc_dlnd, 0d0, &
@@ -1430,14 +1442,11 @@
          type(star_info), pointer :: s
          type(auto_diff_real_star_order1), intent(out) :: lnT_bc_ad
          integer, intent(out) :: ierr
-         real(dp) :: r, L, Teff, lnT_surf, lnP_surf, T_surf, &
+         real(dp) :: r, L, Teff, lnT_surf, lnP_surf, &
             dlnTsurf_dL, dlnTsurf_dlnR, dlnTsurf_dlnM, dlnTsurf_dlnkap, &
             dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnM, dlnPsurf_dlnkap, &
-            dlnT_bc_dlnd, dlnT_bc_dlnT, dlnT_bc_dL, dlnT_bc_dlnR, &
-            dlnkap_dlnd, dlnkap_dlnT, dPinv_dlnd, dPinv_dlnT, &
-            dP0, dT0, T_bc, dT0_dlnR, dT0_dlnT, dT0_dlnd, dT0_dL, &
-            dlnT_bc_dlnTsurf, dlnT_bc_dT0, d_gradT_dlnR, &
-            d_gradT_dlnT00, d_gradT_dlnd00, d_gradT_dL
+            dlnkap_dlnd, dlnkap_dlnT
+         type(auto_diff_real_star_order1) :: dT0_ad
          logical, parameter :: skip_partials = .false.
          logical, parameter :: need_P_surf = .true.
          logical, parameter :: need_T_surf = .true.
@@ -1449,57 +1458,26 @@
             lnP_surf, dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnM, dlnPsurf_dlnkap, ierr)
          if (ierr /= 0) return
 
-         T_surf = exp(lnT_surf)
-
-         dP0 = 0d0
-         if (.not. s% use_momentum_outer_BC) &
-            dP0 = s% cgrav(1)*s% m_grav(1)*s% dm(1)/(8d0*pi*pow4(r))
-         dT0 = dP0*s% gradT(1)*s% T(1)/s% Peos(1)
-         T_bc = T_surf + dT0
-
-         dT0_dlnR = 0d0
-         dT0_dlnT = 0d0
-         dT0_dlnd = 0d0
-         dT0_dL = 0d0
-         if (dP0 /= 0d0) then
-            d_gradT_dlnR = s% gradT_ad(1)%d1Array(i_lnR_00)
-            d_gradT_dlnT00 = s% gradT_ad(1)%d1Array(i_lnT_00)
-            d_gradT_dlnd00 = s% gradT_ad(1)%d1Array(i_lnd_00)
-            d_gradT_dL = s% gradT_ad(1)%d1Array(i_L_00)
-            dT0_dlnR = -4d0*dT0 + dP0*d_gradT_dlnR*s% T(1)/s% Peos(1)
-            dPinv_dlnT = -s% chiT_for_partials(1)/s% Peos(1)
-            dT0_dlnT = dT0 + dP0*d_gradT_dlnT00*s% T(1)/s% Peos(1) + &
-               dP0*s% gradT(1)*s% T(1)*dPinv_dlnT
-            dPinv_dlnd = -s% chiRho_for_partials(1)/s% Peos(1)
-            dT0_dlnd = dP0*d_gradT_dlnd00*s% T(1)/s% Peos(1) + &
-               dP0*s% gradT(1)*s% T(1)*dPinv_dlnd
-            dT0_dL = dP0*d_gradT_dL*s% T(1)/s% Peos(1)
-         end if
-
-         dlnT_bc_dT0 = 1d0/T_bc
-         dlnT_bc_dlnTsurf = T_surf/T_bc
          dlnkap_dlnd = s% d_opacity_dlnd(1)/s% opacity(1)
          dlnkap_dlnT = s% d_opacity_dlnT(1)/s% opacity(1)
 
-         dlnT_bc_dlnT = dlnT_bc_dlnTsurf*dlnTsurf_dlnkap*dlnkap_dlnT + &
-            dlnT_bc_dT0*dT0_dlnT
-         dlnT_bc_dlnd = dlnT_bc_dlnTsurf*dlnTsurf_dlnkap*dlnkap_dlnd + &
-            dlnT_bc_dT0*dT0_dlnd
-         dlnT_bc_dL = dlnT_bc_dlnTsurf*dlnTsurf_dL + dlnT_bc_dT0*dT0_dL
-         dlnT_bc_dlnR = dlnT_bc_dlnTsurf*dlnTsurf_dlnR + dlnT_bc_dT0*dT0_dlnR
-
-         call wrap(lnT_bc_ad, log(T_bc), &
-            0d0, dlnT_bc_dlnd, 0d0, &
-            0d0, dlnT_bc_dlnT, 0d0, &
+         call wrap(lnT_bc_ad, lnT_surf, &
+            0d0, dlnTsurf_dlnkap*dlnkap_dlnd, 0d0, &
+            0d0, dlnTsurf_dlnkap*dlnkap_dlnT, 0d0, &
             0d0, 0d0, 0d0, &
-            0d0, dlnT_bc_dlnR, 0d0, &
+            0d0, dlnTsurf_dlnR, 0d0, &
             0d0, 0d0, 0d0, &
-            0d0, dlnT_bc_dL, 0d0, &
+            0d0, dlnTsurf_dL, 0d0, &
             0d0, 0d0, 0d0, &
             0d0, 0d0, 0d0, &
             0d0, 0d0, 0d0, &
             0d0, 0d0, 0d0, &
             0d0, 0d0, 0d0)
+
+         ! Use the same face-to-center temperature offset as the evolution equations.
+         dT0_ad = s% cgrav(1)*s% m_grav(1)*s% dm(1)/(8*pi*pow4(wrap_r_00(s,1)))
+         dT0_ad = dT0_ad*s% gradT_ad(1)*wrap_T_00(s,1)/wrap_Peos_00(s,1)
+         lnT_bc_ad = log(exp(lnT_bc_ad) + dT0_ad)
       end subroutine surface_lnT_bc_for_star_LNA
 
 
