@@ -204,7 +204,7 @@ mass_fraction_limit_for_Skye = 1d-8
    dX_nuc_drop_max_A_limit = 52
    dX_nuc_drop_min_X_limit = 1d-4
    dX_nuc_drop_hard_limit = 1d99
-   delta_lgTeff_limit = 1d0
+   delta_lgTeff_limit = 1d99 !1d0
    delta_lgL_limit = 1d99
    delta_lgL_hard_limit = 1d99
    delta_lgR_limit = 0.025d0
@@ -348,7 +348,7 @@ mass_fraction_limit_for_Skye = 1d-8
                     ! The additional conditions are as follows
    x_ctrl(6) = 20d0 ! absolute velocities must be below this in km/s (max_v_for_relax)
    x_ctrl(7) = 0.5d0 ! the ratio of the (absolute) velocity to the sound speed must be below this (max_machn_for_relax)
-   x_ctrl(8) = 9d0 !11d0 ! do not relax if log10 Lneu/Lsun is bigger than this (max_Lneu_for_relax)
+   x_ctrl(8) = 10d0 !11d0 ! do not relax if log10 Lneu/Lsun is bigger than this (max_Lneu_for_relax)
    x_ctrl(9) = 9d0 !10d0 ! do not relax if log10 Lnuc/Lsun is bigger than this (max_Lnuc_for_relax)
 
    x_integer_ctrl(1) = 100 ! conditions for relax must be satisfied for this number of consecutive steps

@@ -107,7 +107,7 @@
       real(dp) :: delta_lgLnuc_limit, max_Lphoto_for_lgLnuc_limit, max_Lphoto_for_lgLnuc_limit2
       real(dp) :: delta_lgRho_cntr_hard_limit, dt_div_min_dr_div_cs_limit
       real(dp) :: logT_for_v_flag, logLneu_for_v_flag
-      logical :: use_RTI_during_hydro
+      logical :: use_RTI_during_hydro, limit_convection_in_unbound_layers
 
       contains
 
@@ -162,6 +162,7 @@
          logT_for_v_flag = s% x_ctrl(15)
          logLneu_for_v_flag = s% x_ctrl(16)
          use_RTI_during_hydro = s% x_logical_ctrl(3)
+         limit_convection_in_unbound_layers = s% x_logical_ctrl(4)
          vsurf_for_fixed_bc = s% x_ctrl(17)
          surface_ejecta_removal_mode = s% x_integer_ctrl(2)
          surface_ejecta_radius_limit = s% x_ctrl(18)
@@ -347,9 +348,13 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if (s% generations > 2) then
-            write(*,*) "check mdots", s% mstar_dot, s% mstar_dot_old
-            if (abs(s% mstar_dot) > 1.05d0*abs(s% mstar_dot_old)) then
+         if (s% generations > 1) then
+            if (s% mstar_dot_old == 0d0) then
+               s% mstar_dot = 0.05d0*s% mstar_dot
+            else if (s% mstar_dot*s% mstar_dot_old <= 0d0) then
+               s% mstar_dot = s% mstar_dot_old + &
+                  0.05d0*(s% mstar_dot - s% mstar_dot_old)
+            else if (abs(s% mstar_dot) > 1.05d0*abs(s% mstar_dot_old)) then
                s% mstar_dot = 1.05d0*s% mstar_dot_old
             else if (abs(s% mstar_dot) < 0.95d0*abs(s% mstar_dot_old)) then
                s% mstar_dot = 0.95d0*s% mstar_dot_old
@@ -1069,7 +1074,7 @@
          s% xtra(x_gamma_int_bound) = -1d0
 
          ! can be adjusted below if nearing breakout
-         s% profile_interval = 1!100
+         s% profile_interval = 1
 
          if (s% u_flag .and. k_keep > 0 .and. s% xtra(x_time_start_pulse) > 0d0) then
 
@@ -1130,9 +1135,9 @@
                   ! to breakout
                   if ((s% u(k1)>5d7 .and. s% u(1)<5d7) &
                      .or. (s% ixtra(ix_num_relaxations) == 0 .and. gamma1_integral < 0d0 .and. s% u(1)<5d7)) then
-                     s% profile_interval = 1!10
+                     s% profile_interval = 1
                   else
-                     s% profile_interval = 1!100
+                     s% profile_interval = 1
                   end if
                   exit
                end if
@@ -1417,7 +1422,7 @@
          integer, intent(in) :: id
          real(dp), intent(in) :: dt
          integer, intent(out) :: res  ! keep_going, redo, retry, terminate
-         real(dp) :: power_photo
+         real(dp) :: power_photo, v_esc
          integer :: ierr, k
          type (star_info), pointer :: s
          include 'formats'
@@ -1429,6 +1434,27 @@
          !do this to ensure proper behaviour of retries
          if(s% u_flag) then
             call star_read_controls(id, 'inlist_hydro_on', ierr)
+            if (s% xtra(x_time_start_pulse) > 0d0) then
+               s% v_drag = 1d5*vsurf_for_fixed_bc
+            else
+               s% v_drag = 0d0
+            end if
+
+            if (limit_convection_in_unbound_layers) then
+               if (s% xtra(x_time_start_pulse) > 0d0) then
+                  s% max_q_for_convection_with_hydro_on = 1d99
+                  do k = s% nz, 1, -1
+                     v_esc = sqrt(2d0*s% cgrav(k)*s% m(k)/s% r(k))
+                     if (s% u(k) > 4d0*v_esc) exit
+                  end do
+                  if (k > 1) s% max_q_for_convection_with_hydro_on = s% q(k)
+               else
+                  s% max_q_for_convection_with_hydro_on = 0.999d0
+               end if
+            else
+               s% max_q_for_convection_with_hydro_on = 1d99
+            end if
+
             if (s% xtra(x_time_start_pulse) > 0d0) then
                if (max_dt_during_pulse > 0d0) then
                   s% max_timestep = max_dt_during_pulse
@@ -1463,6 +1489,7 @@
                s% max_timestep = 1d99
             end if
             call star_read_controls(id, 'inlist_hydro_off', ierr)
+            s% max_q_for_convection_with_hydro_on = 1d99
          end if
          call set_direct_removal_boundary(s)
 
@@ -1488,11 +1515,13 @@
                s% delta_lgL_nuc_hard_limit = -1d0
             else
                s% delta_lgL_nuc_limit = delta_lgLnuc_limit
-               s% delta_lgL_nuc_hard_limit = 2d0*delta_lgLnuc_limit
+               ! hard limits can crash the model, be careful
+               s% delta_lgL_nuc_hard_limit = 10d0*delta_lgLnuc_limit
             end if
             if (safe_log10(abs(power_photo)) > max_Lphoto_for_lgLnuc_limit) then
                s% delta_lgL_power_photo_limit = delta_lgLnuc_limit
-               s% delta_lgL_power_photo_hard_limit = 2d0*delta_lgLnuc_limit
+               ! hard limits can crash the model, be careful
+               s% delta_lgL_power_photo_hard_limit = 10d0*delta_lgLnuc_limit
             else
                s% delta_lgL_power_photo_limit = -1d0
                s% delta_lgL_power_photo_hard_limit = -1d0
@@ -1505,7 +1534,7 @@
                .or. safe_log10(s% power_neutrinos) > max_Lneu_for_mass_loss &
                .or. s% u_flag) then
             s% use_other_wind = .false.
-            s% use_other_adjust_mdot = use_other_adjust_mdot_for_winds
+            s% use_other_adjust_mdot = .false.
             s% was_in_implicit_wind_limit = .false.
          else
             s% use_other_wind = .true.

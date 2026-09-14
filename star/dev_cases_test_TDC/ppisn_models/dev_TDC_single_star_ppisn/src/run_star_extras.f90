@@ -1515,11 +1515,13 @@
                s% delta_lgL_nuc_hard_limit = -1d0
             else
                s% delta_lgL_nuc_limit = delta_lgLnuc_limit
-               s% delta_lgL_nuc_hard_limit = 2d0*delta_lgLnuc_limit
+               ! hard limits can crash the model, be careful
+               s% delta_lgL_nuc_hard_limit = 10d0*delta_lgLnuc_limit
             end if
             if (safe_log10(abs(power_photo)) > max_Lphoto_for_lgLnuc_limit) then
                s% delta_lgL_power_photo_limit = delta_lgLnuc_limit
-               s% delta_lgL_power_photo_hard_limit = 2d0*delta_lgLnuc_limit
+               ! hard limits can crash the model, be careful
+               s% delta_lgL_power_photo_hard_limit = 10d0*delta_lgLnuc_limit
             else
                s% delta_lgL_power_photo_limit = -1d0
                s% delta_lgL_power_photo_hard_limit = -1d0
@@ -1532,7 +1534,7 @@
                .or. safe_log10(s% power_neutrinos) > max_Lneu_for_mass_loss &
                .or. s% u_flag) then
             s% use_other_wind = .false.
-            s% use_other_adjust_mdot = use_other_adjust_mdot_for_winds
+            s% use_other_adjust_mdot = .false.
             s% was_in_implicit_wind_limit = .false.
          else
             s% use_other_wind = .true.
