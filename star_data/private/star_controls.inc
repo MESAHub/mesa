@@ -251,7 +251,7 @@
          real(dp) :: thermohaline_coeff
          character (len=32) :: &
             thermohaline_option, MLT_option, semiconvection_option
-         real(dp) :: mixing_length_alpha, remove_small_D_limit
+         real(dp) :: mixing_length_alpha, harmonic_dissipation_length_beta, remove_small_D_limit
          logical :: use_Ledoux_criterion
          integer :: num_cells_for_smooth_gradL_composition_term
          integer :: steps_before_use_TDC

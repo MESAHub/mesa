@@ -2153,6 +2153,33 @@
     mixing_length_alpha = 2
 
 
+      ! harmonic_dissipation_length_beta
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If positive, limit the MLT and TDC mixing length using
+
+      ! .. math::
+
+      !    \frac{1}{\Lambda}
+      !    =
+      !    \frac{1}{\alpha_{\rm MLT} H_P}
+      !    +
+      !    \frac{1}{\mathtt{harmonic\_dissipation\_length\_beta}\,r}.
+
+      ! The control is the dimensionless :math:`\beta_r` in Eq. (17) of
+      ! `Wuchterl & Feuchtinger (1998)`_; :math:`\beta_r r` is the radial
+      ! limiting length. Here :math:`H_P=P/(\rho g)` is the usual pressure
+      ! scale height. This option ignores ``alt_scale_height_flag`` when
+      ! constructing the MLT and TDC mixing length. Non-positive values
+      ! preserve the existing behavior.
+
+      ! .. _Wuchterl & Feuchtinger (1998): https://ui.adsabs.harvard.edu/abs/1998A%26A...340..419W
+
+      ! ::
+
+    harmonic_dissipation_length_beta = 0d0
+
+
       ! remove_small_D_limit
       ! ~~~~~~~~~~~~~~~~~~~~
 
@@ -2264,8 +2291,8 @@
 
       ! If false, then stick to the usual definition -- P/(g*rho).
       ! If true, use min of the usual and sound speed * hydro time scale, sqrt(P/G)/rho.
-      ! Note that the 'TDC' ``MLT_option`` does not respect the ``alt_scale_height`` option, and continues to use ``h = P / rho g``
-      ! even if that flag is set.
+      ! A positive ``harmonic_dissipation_length_beta`` overrides this option
+      ! when constructing the MLT and TDC mixing length.
 
       ! ::
 

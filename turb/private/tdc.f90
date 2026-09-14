@@ -64,7 +64,7 @@ contains
       include 'formats'
 
       ierr = 0
-      if (info%mixing_length_alpha == 0d0 .or. info%dt <= 0d0) then
+      if (info%Lambda <= 0d0 .or. info%dt <= 0d0) then
          call mesa_error(__FILE__,__LINE__,'bad call to TDC get_TDC_solution')
       end if
 
