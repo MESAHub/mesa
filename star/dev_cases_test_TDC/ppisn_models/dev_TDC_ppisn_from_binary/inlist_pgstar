@@ -174,8 +174,8 @@
    Profile_Panels1_other_ymax(1) = 1.41
    Profile_Panels1_other_ymin(1) = 1.28
 
-   Profile_Panels1_yaxis_name(2) = 'Riemann_shock_D_mix_factor'
-   Profile_Panels1_other_yaxis_name(2) = 'Riemann_shock_strength '!'fp_rot' ! 'vel_km_per_s'
+   Profile_Panels1_yaxis_name(2) = 'superad_reduction_factor'!'log_Lrad_div_Ledd'!'Riemann_shock_D_mix_factor'
+   Profile_Panels1_other_yaxis_name(2) = 'log_opacity'!'Riemann_shock_strength '!'fp_rot' ! 'vel_km_per_s'
    Profile_Panels1_other_ymax(2) = -101d0 ! -101d0
    Profile_Panels1_other_ymin(2) = -101d0 ! -101d0
    Profile_Panels1_ymax(2) = -101d0 ! -101d0
@@ -229,6 +229,6 @@
    Grid2_file_width = 27 ! negative means use same value as for window
    Grid2_file_aspect_ratio = -1 ! negative means use same value as for window
 
-   !show_TRho_Profile_eos_regions = .true.
+   show_TRho_Profile_eos_regions = .true.
 
 / ! end of pgstar namelist

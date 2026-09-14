@@ -1,0 +1,220 @@
+&star_job
+
+show_log_description_at_start = .false.
+show_timestep_limit_counts_when_terminate = .true.
+save_model_when_terminate = .true.
+load_saved_model = .false.
+! create_pre_main_sequence_model = .true.
+
+change_net = .true.
+change_initial_net = .true.
+new_net_name = "approx21_cr60_plus_co56.net"
+adv_net = "approx21_cr60_plus_co56.net"
+
+change_v_flag = .false.
+new_v_flag = .false.
+
+set_initial_age = .true.
+initial_age = 0
+
+set_initial_model_number = .true.
+initial_model_number = 0
+
+pgstar_flag = .true.
+
+change_initial_Z = .true.
+! value set in inlist_extra
+
+show_net_reactions_info = .true.
+
+num_special_rate_factors = 1
+reaction_for_special_factor(1) = 'r_c12_ag_o16'
+special_rate_factor(1) = 1
+filename_of_special_rate(1) = 'c12ag_deboer_sigma_0p0_2000_Tgrid.dat'
+
+! reaction_for_special_factor(2) = 'r_he4_he4_he4_to_c12'
+! special_rate_factor(2) = 1
+! filename_of_special_rate(2) = 'r_he4_he4_he4_to_c12_cf88.txt'
+
+/ ! end of star_job namelist
+
+
+&eos
+mass_fraction_limit_for_Skye = 1d-5
+/ ! end of eos namelist
+
+
+&kap
+
+use_Type2_opacities = .true.
+! Zbase set in inlist_extra
+/
+
+
+&controls
+
+x_logical_ctrl(1) = .true.
+
+use_other_wind = .true.
+x_character_ctrl(1) = 'Bjorklund' ! donor mass in Msun
+x_character_ctrl(2) = 'nowind' ! accretor mass in Msun
+
+
+hard_limit_for_rel_error_in_energy_conservation = -1d0
+use_superad_reduction = .true.
+
+! to stop at C depletion
+! x_logical_ctrl(2) = .true.
+max_model_number = 80000 ! if true above, and the binary detaches, this will be overwritten in run_star_extras.f90
+redo_limit = 300
+
+!stop when the center mass fraction of he4 drops below this limit
+xa_central_lower_limit_species(1) = 'he4'
+xa_central_lower_limit(1) = 1d-6
+
+!wind
+! hot_wind_scheme =  'Bjorklund' !'Dutch'
+! cool_wind_RGB_scheme = 'Dutch'
+! cool_wind_AGB_scheme = 'Dutch'
+! Dutch_scaling_factor = 1.0
+! Bjorklund_scaling_factor = 1.0
+mdot_omega_power = 0.43d0
+
+! mixing
+use_ledoux_criterion = .true.
+mixing_length_alpha = 2d0
+MLT_option = "TDC"
+include_mlt_corr_to_TDC = .false.
+TDC_include_eturb_in_energy_equation = .true.
+harmonic_dissipation_length_beta = 1d0
+alpha_semiconvection = 1.0d0
+thermohaline_coeff = 1.0d0
+! thermohaline_option = 'Brown_Garaud_Stellmach_13'
+
+! overshoot controls
+! Match the PPISN helium-core overshoot before the catch-all core rule.
+overshoot_scheme(1) = 'exponential'
+overshoot_zone_type(1) = 'burn_He'
+overshoot_zone_loc(1) = 'core'
+overshoot_bdy_loc(1) = 'any'
+overshoot_f(1) = 0.01d0
+overshoot_f0(1) = 0.005d0
+
+overshoot_scheme(2) = 'exponential'
+overshoot_zone_type(2) = 'any'
+overshoot_zone_loc(2) = 'core'
+overshoot_bdy_loc(2) = 'any'
+overshoot_f(2) = 4.15d-2
+overshoot_f0(2) = 0.008d0
+
+! from inlist_massive_defaults -------------------------------------
+dX_nuc_drop_limit = 5d-2
+dX_nuc_drop_limit_at_high_T = 5d-3 ! for center logT > 9.45
+delta_Ye_highT_limit = 1d-3
+include_composition_in_eps_grav = .true.
+
+! rotation and mixing:
+! rotation is initialized by orbital synchronization
+am_nu_ST_factor = 1.0 !! 1.0 !default
+D_visc_factor = 0.0
+am_nu_SH_factor = 0.0
+D_ST_factor = 0.0
+D_SH_factor = 0.0
+D_GSF_factor = 1.0
+D_ES_factor = 1.0
+D_SSI_factor = 1.0
+D_DSI_factor = 1.0
+am_D_mix_factor = 0.03333d0
+am_gradmu_factor = 0.1d0
+premix_omega = .true.
+remove_small_D_limit = 1d-10
+mixing_D_limit_for_log = 1d-10
+! max_mdot_jump_for_rotation = 1d99
+
+
+!added by Neev
+!surf_omega_div_omega_crit_limit = 0.80d0
+!surf_omega_div_omega_crit_tol = 0.05d0
+
+max_mdot_redo_cnt = 100
+min_years_dt_for_redo_mdot = 1d-2
+surf_omega_div_omega_crit_limit = 0.9d0
+surf_omega_div_omega_crit_tol = 0.05d0
+rotational_mdot_boost_fac = 1.2d10
+rotational_mdot_kh_fac = 1d10
+mdot_revise_factor = 1.2
+implicit_mdot_boost = 0.1
+max_mdot_jump_for_rotation = 10d0
+
+history_interval = 1
+terminal_interval = 1
+
+! resolution
+! time
+min_timestep_limit = 1e-10 !sec ! 1e-10 !to be able to reach CC
+varcontrol_target = 1d-2
+max_timestep_factor = 1.05d0
+retry_hold = 2
+min_J_div_delta_J = 5d0
+! space
+max_dq = 2d-3
+max_allowed_nz = 50000
+
+star_history_dbl_format = '(1pes32.16e3, 1x)'
+star_history_int_format = '(i32, 1x)'
+star_history_txt_format = '(a32, 1x)'
+
+
+! time step resolution on fuel depletion
+delta_lg_XH_cntr_limit = 0.01d0
+delta_lg_XH_cntr_max   = 0.0d0
+delta_lg_XH_cntr_min   = -4.0d0
+delta_lg_XH_cntr_hard_limit = 0.02d0
+delta_lg_XHe_cntr_limit = 0.01d0
+delta_lg_XHe_cntr_max   = 0.0d0
+delta_lg_XHe_cntr_min   = -4.0d0
+delta_lg_XHe_cntr_hard_limit = 0.02d0
+delta_lg_XC_cntr_limit = 0.02d0
+delta_lg_XC_cntr_max   = 0.2d0
+delta_lg_XC_cntr_min   = -2.0d0 ! -3.0d0
+delta_lg_XC_cntr_hard_limit = 0.02d0
+delta_lg_XO_cntr_limit = 0.01d0
+delta_lg_XO_cntr_max   = 0.0d0
+delta_lg_XO_cntr_min   = -3.0d0
+delta_lg_XO_cntr_hard_limit = 0.02d0
+
+delta_lgL_limit = 0.01d0
+delta_lgL_hard_limit = 0.2d0
+
+delta_lgTeff_limit = 0.008d0
+delta_lgTeff_hard_limit = 0.01d0
+
+delta_lgT_cntr_limit = 0.005d0   ! default 0.01
+delta_lgT_limit = 0.025d0         ! default 0.5
+delta_lgRho_cntr_limit = 0.025d0   ! default 0.05
+delta_lgRho_limit = 0.5d0          ! default 1.0
+delta_lgL_nuc_limit = 1d-2
+
+delta_lgL_He_limit = 0.03d0
+delta_lgL_He_hard_limit = 0.05d0
+delta_HR_ds_Teff = 1d-5
+
+delta_lgL_H_limit = 0.01d0
+delta_lgL_H_hard_limit = 0.025d0
+
+
+! spatial increase resolution during He core burning
+T_function2_weight = 100d0
+T_function2_param = 2.4d8
+
+! increase resolution for omega
+omega_function_weight = 100d0
+
+! Jim Fuller's suggestion
+set_min_D_mix = .true.
+min_D_mix=1d-2
+
+! when_to_stop_rtol = 1d-2
+! when_to_stop_atol = 1d-2
+
+/ ! end of controls namelist

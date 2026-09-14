@@ -114,8 +114,8 @@ mass_fraction_limit_for_Skye = 1d-5
    ! of the star so we don't want to have a retry if that happens
    retry_for_v_above_clight = .false.
 
-   ! limit max_model_number as part of test_suite
-   max_model_number = 15000 ! RECOMMENDED -1
+   ! Continue through successive pulses.
+   max_model_number = -1
 
    relax_max_number_retries = 1000
    max_number_retries = 5000 ! RECOMMENDED 5000
@@ -385,12 +385,12 @@ mass_fraction_limit_for_Skye = 1d-5
 
    TDC_adjust_mass_fallback_to_mlt = .true.
 
-   x_logical_ctrl(1) = .true. ! If true, terminate 100 days after the first pulse relaxation.
+   x_logical_ctrl(1) = .false.! If true, terminate after evolving 100d after first relax
                               ! (stop_100d_after_pulse)
-                              ! RECOMMENDED .false.
 
    x_logical_ctrl(3) = .false. ! Enable RTI during Riemann-hydro phases.
                               ! (use_RTI_during_hydro)
+
 
    ! Dampen velocities in the outer 2% by mass while v_flag is on.
    min_q_for_drag = 0.98d0
@@ -402,7 +402,7 @@ mass_fraction_limit_for_Skye = 1d-5
 
    photo_interval = 50
    profile_interval = 200
-   history_interval = 1
+   history_interval = 10
    terminal_interval = 10
 
 / ! end of controls namelist
