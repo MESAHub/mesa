@@ -136,6 +136,10 @@ contains
          call mesa_error(__FILE__, __LINE__)
       end if
 
+      if (net_file == 'approx21.net') then
+         call test_approx21_reduced_flow_derivatives(n)
+      end if
+
       if (symbolic .and. .not. qt) then
          write (*, *) 'nonzero d_dxdt_dx entries'
          k = 0
@@ -179,6 +183,99 @@ contains
       write (*, *)
 
    end subroutine do1_net
+
+   subroutine test_approx21_reduced_flow_derivatives(n)
+      use net_approx21, only: eval_approx21_reduced_flows
+      type(Net_Info), intent(in) :: n
+
+      integer :: i, j, i_max, j_max
+      real(qp), parameter :: temp = 2.0e9_qp, rel_step = 1.0e-5_qp, &
+         tolerance = 1.0e-7_qp
+      real(qp) :: deriv, error, max_error, scale, step
+      real(qp), allocatable :: y(:), y_plus(:), y_minus(:)
+      real(qp), allocatable :: rate(:), rate_plus(:), rate_minus(:), drate(:)
+      real(qp), allocatable :: dydt(:), dydt_plus(:), dydt_minus(:), drate_dydt(:)
+      real(qp), allocatable :: dfdy(:,:)
+
+      allocate( &
+         y(size(n% y)), y_plus(size(n% y)), y_minus(size(n% y)), &
+         rate(size(n% rate_screened)), rate_plus(size(n% rate_screened)), &
+         rate_minus(size(n% rate_screened)), drate(size(n% rate_screened)), &
+         dydt(size(n% y)), dydt_plus(size(n% y)), dydt_minus(size(n% y)), &
+         drate_dydt(size(n% y)), dfdy(size(n% y),size(n% y)))
+
+      do i = 1, size(y)
+         y(i) = 0.2_qp + 0.01_qp*real(mod(11*i,17),kind=qp)
+      end do
+      do i = 1, size(rate)
+         rate(i) = 0.75_qp + 0.01_qp*real(mod(19*i,43),kind=qp)
+      end do
+
+      call eval_approx21_reduced_flows(y, rate, temp, dydt, dfdy)
+      max_error = 0.0_qp
+      i_max = 0
+      j_max = 0
+      do j = 1, size(y)
+         step = rel_step*max(1.0_qp,abs(y(j)))
+         y_plus = y
+         y_minus = y
+         y_plus(j) = y_plus(j) + step
+         y_minus(j) = y_minus(j) - step
+         call eval_approx21_reduced_flows(y_plus, rate, temp, dydt_plus)
+         call eval_approx21_reduced_flows(y_minus, rate, temp, dydt_minus)
+         do i = 1, size(y)
+            deriv = (dydt_plus(i) - dydt_minus(i))/(2.0_qp*step)
+            scale = max(1.0_qp,abs(deriv),abs(dfdy(i,j)))
+            error = abs(deriv - dfdy(i,j))/scale
+            if (error > max_error) then
+               max_error = error
+               i_max = i
+               j_max = j
+            end if
+         end do
+      end do
+      if (max_error > tolerance) then
+         write (*, '(a,2i6,1x,es14.6)') &
+            'bad approx21 reduced-flow composition derivative', i_max, j_max, max_error
+         call mesa_error(__FILE__, __LINE__)
+      end if
+
+      max_error = 0.0_qp
+      i_max = 0
+      j_max = 0
+      do j = 1, size(rate)
+         drate = 0.0_qp
+         drate(j) = 1.0_qp
+         call eval_approx21_reduced_flows( &
+            y, rate, temp, dydt, drate=drate, reduced_drate=drate_dydt)
+         step = rel_step*max(1.0_qp,abs(rate(j)))
+         rate_plus = rate
+         rate_minus = rate
+         rate_plus(j) = rate_plus(j) + step
+         rate_minus(j) = rate_minus(j) - step
+         call eval_approx21_reduced_flows(y, rate_plus, temp, dydt_plus)
+         call eval_approx21_reduced_flows(y, rate_minus, temp, dydt_minus)
+         do i = 1, size(y)
+            deriv = (dydt_plus(i) - dydt_minus(i))/(2.0_qp*step)
+            scale = max(1.0_qp,abs(deriv),abs(drate_dydt(i)))
+            error = abs(deriv - drate_dydt(i))/scale
+            if (error > max_error) then
+               max_error = error
+               i_max = i
+               j_max = j
+            end if
+         end do
+      end do
+      if (max_error > tolerance) then
+         write (*, '(a,2i6,1x,es14.6)') &
+            'bad approx21 reduced-flow rate derivative', i_max, j_max, max_error
+         call mesa_error(__FILE__, __LINE__)
+      end if
+
+      deallocate( &
+         y, y_plus, y_minus, rate, rate_plus, rate_minus, drate, &
+         dydt, dydt_plus, dydt_minus, drate_dydt, dfdy)
+   end subroutine test_approx21_reduced_flow_derivatives
 
    subroutine show_results( &
       g, n, logT, logRho, species, num_reactions, xin, &

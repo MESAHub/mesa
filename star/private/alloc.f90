@@ -1216,6 +1216,9 @@
             call do2(s% xa_sub_xa_start, c% xa_sub_xa_start, species, 'xa_sub_xa_start')
             if (failed('xa_sub_xa_start')) exit
 
+            call do1(s% solver_T_reference, c% solver_T_reference)
+            if (failed('solver_T_reference')) exit
+
             call do1(s% lnd_start, c% lnd_start)
             if (failed('lnd_start')) exit
             call do1(s% lnPgas_start, c% lnPgas_start)
