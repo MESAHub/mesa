@@ -1086,6 +1086,30 @@
       end subroutine split1_non_negative
 
 
+      subroutine split1_non_negative_mass_weighted( &
+            val, grad, dr, dm, dmR, dmL, min_val, max_val, new_valL, new_valR)
+         real(dp), intent(in) :: val, grad, dr, dm, dmR, dmL, min_val, max_val
+         real(dp), intent(out) :: new_valL, new_valR
+         real(dp) :: delta_val, f
+
+         new_valR = val
+         new_valL = val
+         if (val <= 0d0 .or. grad == 0d0) return
+
+         delta_val = 0.5d0*grad*dr
+         new_valR = val + dmL*delta_val/dm
+         new_valL = val - dmR*delta_val/dm
+         f = 1d0
+         if (new_valR < min_val) f = min(f, (val - min_val)/(val - new_valR))
+         if (new_valR > max_val) f = min(f, (max_val - val)/(new_valR - val))
+         if (new_valL < min_val) f = min(f, (val - min_val)/(val - new_valL))
+         if (new_valL > max_val) f = min(f, (max_val - val)/(new_valL - val))
+         delta_val = max(0d0, f)*delta_val
+         new_valR = val + dmL*delta_val/dm
+         new_valL = val - dmR*delta_val/dm
+      end subroutine split1_non_negative_mass_weighted
+
+
       subroutine do_split(s, i_split, species, tau_center, grad_xa, new_xa, ierr)
          use alloc, only: reallocate_star_info_arrays
          use star_utils, only: set_rmid, store_r_in_xh
@@ -1101,7 +1125,7 @@
             v, energy, v2_R, energy_R, rho_R, energy_C, rho_C, v2_L, energy_L, rho_L, &
             dLeft, dRght, dCntr, grad_rho, grad_energy, grad_v, &
             sumx, sumxp, new_xaL, new_xaR, star_PE0, star_PE1, &
-            grad_alpha, f, new_alphaL, new_alphaR, v_R, v_C, v_L, min_dm, &
+            grad_alpha, min_alpha, max_alpha, f, new_alphaL, new_alphaR, v_R, v_C, v_L, min_dm, &
             mlt_vcL, mlt_vcR, tauL, tauR, etrb, etrb_L, etrb_C, etrb_R, grad_etrb, &
             j_rot_new, dmbar_old, dmbar_p1_old, dmbar_new, dmbar_p1_new, dmbar_p2_new, J_old, &
             u_R, u_L, delta_u, delta_KE, delta_KE_div_dm, &
@@ -1255,8 +1279,13 @@
          grad_pressure = get1_grad(pressure_L, pressure_C, pressure_R, dLeft, dCntr, dRght)
          pressure_difference_target = -0.5d0*grad_pressure*dr_old
 
-         if (s% RTI_flag) grad_alpha = get1_grad( &
-            s% alpha_RTI(iL), s% alpha_RTI(iC), s% alpha_RTI(iR), dLeft, dCntr, dRght)
+         if (s% RTI_flag) then
+            grad_alpha = get1_grad( &
+               s% alpha_RTI(iL), s% alpha_RTI(iC), s% alpha_RTI(iR), dLeft, dCntr, dRght)
+            min_alpha = max(0d0, min( &
+               s% alpha_RTI(iL), s% alpha_RTI(iC), s% alpha_RTI(iR)))
+            max_alpha = max(s% alpha_RTI(iL), s% alpha_RTI(iC), s% alpha_RTI(iR))
+         end if
 
          if (s% RSP2_flag) then
             etrb_R = pow2(s% w(iR))
@@ -1461,9 +1490,10 @@
             if (i == 1) then
                s% alpha_RTI(ip) = s% alpha_RTI(i)
             else
-               call split1_non_negative( &
+               ! Preserve the mass-weighted RTI scalar when child densities differ.
+               call split1_non_negative_mass_weighted( &
                   s% alpha_RTI(i), grad_alpha, &
-                  dr, dV, dVR, dVL, new_alphaL, new_alphaR)
+                  dr, dm, dMR, dML, min_alpha, max_alpha, new_alphaL, new_alphaR)
                s% alpha_RTI(i) = new_alphaR
                s% alpha_RTI(ip) = new_alphaL
             end if
