@@ -58,6 +58,12 @@
             call copy_to_old(s% mlt_vc, s% mlt_vc_old, ierr)
             if (ierr /= 0) return
 
+            call copy_to_old(s% superad_reduction_factor, &
+               s% superad_reduction_factor_old, ierr)
+            if (ierr /= 0) return
+            s% have_superad_reduction_factor = .true.
+            s% okay_to_set_superad_reduction_factor = .true.
+
             call enlarge_if_needed_2(s% xh_old,s% nvar_hydro,nz,nz_alloc_extra,ierr)
             if (ierr /= 0) return
             if (s% fill_arrays_with_NaNs) call fill_with_NaNs_2d(s% xh_old)
@@ -191,8 +197,10 @@
                end do
                s% dq(k) = s% dq_old(k)
                s% mlt_vc(k) = s% mlt_vc_old(k)
+               s% superad_reduction_factor(k) = s% superad_reduction_factor_old(k)
             end do
             s% okay_to_set_mlt_vc = .true.
+            s% okay_to_set_superad_reduction_factor = .true.
 
             call set_qs(s, s% nz, s% q, s% dq, ierr)
             if (ierr /= 0) then

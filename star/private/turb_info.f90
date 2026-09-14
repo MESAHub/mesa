@@ -36,24 +36,37 @@
       public :: check_for_redo_MLT  ! for hydro_vars
       public :: set_gradT_excess_alpha  ! for evolve
 
+      real(dp), parameter :: min_mlt_vc_for_tau_conv = 1d-10  ! cm/s
+
       contains
 
-      subroutine set_mlt_vars(s, nzlo, nzhi, ierr)
+      subroutine set_mlt_vars(s, nzlo, nzhi, ierr, set_tau_conv)
          use star_utils, only: start_time, update_time
          type (star_info), pointer :: s
          integer, intent(in) :: nzlo, nzhi
          integer, intent(out) :: ierr
+         logical, intent(in), optional :: set_tau_conv
          integer :: k, op_err
          integer(i8) :: time0
          real(dp) :: total
-         logical :: make_gradr_sticky_in_solver_iters
+         logical :: make_gradr_sticky_in_solver_iters, set_tau, use_mlt_vc_tau_surface
          include 'formats'
          ierr = 0
+         ! Keep the start-state timescale fixed during solver iterations.
+         set_tau = .false.
+         if (present(set_tau_conv)) set_tau = set_tau_conv
+         set_tau = set_tau .and. s% superad_reduction_use_turnover_limit
+         use_mlt_vc_tau_surface = .false.
+         if (set_tau .and. s% have_mlt_vc .and. nzlo == 1) then
+            if (associated(s% mlt_vc)) &
+               use_mlt_vc_tau_surface = s% mlt_vc(1) > 0d0
+         end if
          if (s% doing_timing) call start_time(s, time0, total)
 !$OMP PARALLEL DO PRIVATE(k,op_err,make_gradr_sticky_in_solver_iters) SCHEDULE(dynamic,2)
          do k = nzlo, nzhi
             op_err = 0
-            call do1_mlt_2(s, k, make_gradr_sticky_in_solver_iters, op_err)
+            call do1_mlt_2(s, k, make_gradr_sticky_in_solver_iters, op_err, &
+               set_tau_conv_in = set_tau)
             if (make_gradr_sticky_in_solver_iters .and. s% solver_iter > 3) then
                if (.not. s% fixed_gradr_for_rest_of_solver_iters(k)) then
                   s% fixed_gradr_for_rest_of_solver_iters(k) = &
@@ -63,6 +76,10 @@
             if (op_err /= 0) ierr = op_err
          end do
 !$OMP END PARALLEL DO
+         ! The surface Brunt timescale uses the first interior face.
+         if (ierr == 0 .and. set_tau .and. s% use_face_reconstruction .and. &
+               nzlo == 1 .and. nzhi >= 2 .and. .not. use_mlt_vc_tau_surface) &
+            s% tau_conv_start(1) = s% tau_conv_start(2)
          if (s% doing_timing) call update_time(s, time0, total, s% time_mlt)
 
       end subroutine set_mlt_vars
@@ -70,7 +87,7 @@
 
       subroutine do1_mlt_2(s, k, &
             make_gradr_sticky_in_solver_iters, ierr, &
-            mixing_length_alpha_in, gradL_composition_term_in)
+            mixing_length_alpha_in, gradL_composition_term_in, set_tau_conv_in)
          ! get convection info for point k
          use star_utils
          use turb_support, only: do1_mlt_eval
@@ -82,14 +99,15 @@
          integer, intent(out) :: ierr
          real(dp), intent(in), optional :: &
             mixing_length_alpha_in, gradL_composition_term_in
+         logical, intent(in), optional :: set_tau_conv_in
 
          type(auto_diff_real_star_order1) :: gradr_factor
-         real(dp) :: f, gradL_composition_term, abs_du_div_cs, cs, mixing_length_alpha
+         real(dp) :: f, gradL_composition_term, abs_du_div_cs, cs, mixing_length_alpha, tau_conv
          real(dp), pointer :: vel(:)
          integer :: i, mixing_type, nz, k_T_max
          real(dp), parameter :: conv_vel_mach_limit = 0.9d0
          real(dp) :: crystal_pad
-         logical :: no_mix
+         logical :: no_mix, set_tau_conv
          type(auto_diff_real_star_order1) :: &
             T_face_ad, P_face_ad, energy_face_ad, opacity_face_ad, rho_face_ad, chiRho_face_ad, chiT_face_ad, Cp_face_ad, &
             grada_face_ad, scale_height_ad, gradr_ad, &
@@ -98,6 +116,8 @@
 
          ierr = 0
          nz = s% nz
+         set_tau_conv = .false.
+         if (present(set_tau_conv_in)) set_tau_conv = set_tau_conv_in
 
          if (k < 1 .or. k > nz) then
             write(*,3) 'bad k for do1_mlt', k, nz
@@ -128,6 +148,21 @@
             s, k, T_face_ad, rho_face_ad, P_face_ad, energy_face_ad, Cp_face_ad, chiRho_face_ad, chiT_face_ad, &
             grada_face_ad, opacity_face_ad, scale_height_ad, gradr_ad, ierr)
          if (ierr /= 0) return
+
+         ! Save the timescale after face reconstruction and before MLT updates mlt_vc.
+         if (set_tau_conv) then
+            tau_conv = s% tau_conv_start(k)
+            if (s% use_face_reconstruction .and. k > 1) &
+               tau_conv = conv_time_scale(s,k)
+            if (s% have_mlt_vc) then
+               if (associated(s% mlt_vc)) then
+                  if (s% mlt_vc(k) > 0d0) &
+                     tau_conv = scale_height_ad% val/ &
+                        max(s% mlt_vc(k), min_mlt_vc_for_tau_conv)
+               end if
+            end if
+            s% tau_conv_start(k) = tau_conv
+         end if
 
          if (s% rotation_flag .and. s% mlt_use_rotation_correction) then
             gradr_factor = s% ft_rot(k)/s% fp_rot(k)*s% gradr_factor(k)
