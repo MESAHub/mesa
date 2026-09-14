@@ -91,7 +91,7 @@ Bug Fixes
 
 Fixed the surface temperature offset when using an atmospheric temperature
 boundary condition with ``use_momentum_outer_BC``. The conversion from the
-outer face to the center of cell 1 is now independent of the pressure offset.
+outer face to the center of the surface cell is now independent of the pressure offset.
 This also removes dependence on an overridden momentum boundary flag when
 compression, zero gas pressure, fixed pressure, or fixed velocity is selected.
 The pressure supplied to the momentum equation remains at the outer face,

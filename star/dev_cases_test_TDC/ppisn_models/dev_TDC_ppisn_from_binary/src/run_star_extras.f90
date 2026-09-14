@@ -403,7 +403,7 @@
          s% force_tau_factor = s% tau_factor
          if (s% u_flag) then
             s% use_fixed_vsurf_outer_BC = .true.
-            ! Fixed velocity takes precedence; this keeps P and T at the cell face.
+            ! Fixed velocity takes precedence over the momentum boundary.
             s% use_momentum_outer_BC = .true.
             s% fixed_vsurf = min(s% xtra(x_direct_removal_vsurf), &
                1d5*vsurf_for_fixed_bc)
@@ -1006,6 +1006,7 @@
             max_years_for_timestep, omega_crit, &
             denergy
          real(dp) :: core_mass, rmax, alfa, log10_r, lburn_div_lsurf
+         real(dp) :: fixed_Tsurf, fixed_vsurf, removed_energy, removed_mass, dT0
          logical :: just_did_relax
          character (len=200) :: fname
          include 'formats'
@@ -1016,6 +1017,50 @@
 
          !this is used to ensure we read the right inlist options
          s% use_other_before_struct_burn_mix = .true.
+
+         ! Remove ejecta before the solve so accepted output satisfies the new boundary.
+         if (surface_ejecta_removal_mode == surface_ejecta_removal_direct .and. s% u_flag) then
+            call find_surface_ejecta(s, k_keep, removed_mass, removed_energy)
+            if (k_keep > 1) then
+               write(*,*) 'Removing detached surface layers', &
+                  k_keep, removed_mass/Msun, removed_energy
+
+               fixed_Tsurf = s% T(k_keep)
+               if (surface_ejecta_radius_limit > 0d0) then
+                  fixed_vsurf = max(s% u(k_keep), &
+                     2d0*sqrt(2d0*standard_cgrav*s% m(k_keep)/ &
+                     (surface_ejecta_radius_limit*Rsun)))
+               else
+                  fixed_vsurf = max(s% u(k_keep), &
+                     2d0*sqrt(2d0*s% cgrav(k_keep)*s% m(k_keep)/s% r(k_keep)))
+               end if
+               s% atm_option = 'fixed_Tsurf'
+               s% atm_fixed_Tsurf = fixed_Tsurf
+               s% use_fixed_vsurf_outer_BC = .false.
+               s% use_momentum_outer_BC = .true.
+               call star_remove_surface_at_cell_k(s% id, k_keep, ierr)
+               if (dbg) write(*,*) 'check ierr', ierr
+               if (ierr /= 0) return
+
+               ! Use the rebuilt surface gradient, including the new k=1 cell opacity.
+               ! Subtract the face-to-center temperature offset without changing T(1).
+               dT0 = s% cgrav(1)*s% m_grav(1)*s% dm(1)/(8*pi*pow4(s% r(1)))
+               dT0 = dT0*s% gradT(1)*s% T(1)/s% Peos(1)
+               fixed_Tsurf = s% T(1) - dT0
+               if (is_bad(fixed_Tsurf) .or. fixed_Tsurf <= 0d0) then
+                  write(*,1) 'invalid face temperature after surface removal', fixed_Tsurf
+                  write(*,1) 'surface cell temperature', s% T(1)
+                  write(*,1) 'surface temperature offset', dT0
+                  return
+               end if
+               s% xtra(x_direct_removal_Tsurf) = fixed_Tsurf
+               s% xtra(x_direct_removal_tau_factor) = s% tau_factor
+               s% xtra(x_direct_removal_vsurf) = fixed_vsurf
+               s% lxtra(lx_using_direct_removal_bcs) = .true.
+               call set_direct_removal_boundary(s)
+               s% need_to_setvars = .true.
+            end if
+         end if
 
          ! be sure power info is stored
          call star_set_power_info(s)
@@ -1563,8 +1608,7 @@
       integer function extras_finish_step(id)
          use run_star_support
          integer, intent(in) :: id
-         integer :: ierr, k_keep
-         real(dp) :: fixed_Tsurf, fixed_vsurf, max_vel_inside, removed_energy, removed_mass
+         integer :: ierr
          type (star_info), pointer :: s
          include 'formats'
          ierr = 0
@@ -1581,40 +1625,6 @@
          if (s% lxtra(lx_have_reached_gamma_limit)) then
             s% xtra(x_time_since_first_gamma_zero) = &
                s% xtra(x_time_since_first_gamma_zero) + s% dt
-         end if
-
-         if (surface_ejecta_removal_mode == surface_ejecta_removal_direct .and. s% u_flag) then
-            call find_surface_ejecta(s, k_keep, removed_mass, removed_energy)
-            if (k_keep > 1) then
-               write(*,*) 'Removing detached surface layers', &
-                  k_keep, removed_mass/Msun, removed_energy
-
-               fixed_Tsurf = s% T(k_keep)
-               if (surface_ejecta_radius_limit > 0d0) then
-                  fixed_vsurf = max(s% u(k_keep), &
-                     2d0*sqrt(2d0*standard_cgrav*s% m(k_keep)/ &
-                     (surface_ejecta_radius_limit*Rsun)))
-               else
-                  fixed_vsurf = max(s% u(k_keep), &
-                     2d0*sqrt(2d0*s% cgrav(k_keep)*s% m(k_keep)/s% r(k_keep)))
-               end if
-               s% atm_option = 'fixed_Tsurf'
-               s% atm_fixed_Tsurf = fixed_Tsurf
-               s% use_fixed_vsurf_outer_BC = .false.
-               s% use_momentum_outer_BC = .true.
-               call star_remove_surface_at_cell_k(s% id, k_keep, ierr)
-               if (dbg) write(*,*) 'check ierr', ierr
-               if (ierr /= 0) then
-                  extras_finish_step = terminate
-                  return
-               end if
-               s% xtra(x_direct_removal_Tsurf) = fixed_Tsurf
-               s% xtra(x_direct_removal_tau_factor) = s% tau_factor
-               s% xtra(x_direct_removal_vsurf) = fixed_vsurf
-               s% lxtra(lx_using_direct_removal_bcs) = .true.
-               call set_direct_removal_boundary(s)
-               s% need_to_setvars = .true.
-            end if
          end if
 
          s% ixtra(ix_steps_since_relax) = s% ixtra(ix_steps_since_relax) + 1
