@@ -89,6 +89,17 @@ The new controls restore their incoming solver settings when relaxation ends.
 Bug Fixes
 ---------
 
+Fixed the surface temperature offset when using an atmospheric temperature
+boundary condition with ``use_momentum_outer_BC``. The conversion from the
+outer face to the center of cell 1 is now independent of the pressure offset.
+This also removes dependence on an overridden momentum boundary flag when
+compression, zero gas pressure, fixed pressure, or fixed velocity is selected.
+The pressure supplied to the momentum equation remains at the outer face,
+and its optional radiation-pressure floor uses the atmospheric face temperature.
+The corresponding temperature offset and pressure floor are included in
+``star_LNA``. Custom surface PT hooks and surface luminosity boundary conditions
+are unchanged. This correction is not specific to MLT or TDC.
+
 Fixed the convective velocity interpolation used to set the diffusion
 coefficient at ``f0*Hp`` inside the convective region. In MLT or TDC models,
 interpolation between a mesh face and a convective boundary that did not

@@ -784,7 +784,7 @@
 
          offset_P_to_cell_center = .not. s% use_momentum_outer_BC
 
-         offset_T_to_cell_center = .true.
+         offset_T_to_cell_center = need_T_surf
          if (s% use_other_surface_PT .or. &
                (s% RSP2_flag .and. s% RSP2_use_L_eqn_at_surface) .or. &
                s% use_RSP_L_eqn_outer_BC) &
@@ -800,7 +800,6 @@
             if (s% use_momentum_outer_BC) then
                if (s% floor_momentum_outer_BC_at_Prad) then
                   ! Do not let the atmosphere imply negative gas pressure.
-                  Prad_bc_ad = (crad/3d0)*pow4(T_bc_ad)
                   if (P_bc_ad%val < Prad_bc_ad%val) then
                      P_bc_ad = Prad_bc_ad
                      s% P_surf = P_bc_ad%val
@@ -843,14 +842,11 @@
                lnT_surf, dlnTsurf_dL, dlnTsurf_dlnR, dlnTsurf_dlnM, dlnTsurf_dlnkap, &
                lnP_surf, dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnM, dlnPsurf_dlnkap
             real(dp) :: &
-               dlnT_bc_dlnd, dlnT_bc_dlnT, dlnT_bc_dlnR, &
-               dlnT_bc_dL, dlnP_bc_dlnd, dlnP_bc_dlnT, dlnP_bc_dL, dlnP_bc_dlnR, &
-               dlnkap_dlnd, dlnkap_dlnT, dPinv_dlnd, dPinv_dlnT, dP0, dT0, &
-               P_surf, T_surf, dlnP_bc_dlnPsurf, &
-               dlnT_bc_dlnTsurf, P_bc, T_bc, lnT_bc, lnP_bc, &
-               dP0_dlnR, dT0_dlnR, dT0_dlnT, dT0_dlnd, dT0_dL, dlnP_bc_dP0, dlnT_bc_dT0, &
-               d_gradT_dlnR, d_gradT_dlnT00, d_gradT_dlnd00, d_gradT_dL, &
+               dlnP_bc_dlnd, dlnP_bc_dlnT, dlnP_bc_dL, dlnP_bc_dlnR, &
+               dlnkap_dlnd, dlnkap_dlnT, dP0, &
+               P_surf, T_surf, dlnP_bc_dlnPsurf, P_bc, lnP_bc, dP0_dlnR, dlnP_bc_dP0, &
                dlnR00, dlnT00, dlnd00
+            type(auto_diff_real_star_order1) :: dT0_ad
             logical, parameter :: skip_partials = .false.
             include 'formats'
             ierr = 0
@@ -875,17 +871,12 @@
             s% T_surf = T_surf
 
             dP0 = 0
-            dT0 = 0
             if (offset_P_to_cell_center) &
                dP0 = s% cgrav(1)*s% m_grav(1)*s% dm(1)/(8*pi*pow4(r))
-            if (offset_T_to_cell_center) &
-               dT0 = dP0*s% gradT(1)*s% T(1)/s% Peos(1)
 
             P_bc = P_surf + dP0
-            T_bc = T_surf + dT0
 
             lnP_bc = log(P_bc)
-            lnT_bc = log(T_bc)
 
             if (is_bad(P_bc)) then
                write(*,1) 'lnP_bc', lnP_bc
@@ -897,47 +888,14 @@
                call mesa_error(__FILE__,__LINE__,'P bc')
             end if
 
-            if (is_bad(T_bc)) then
-               write(*,1) 'lnT_bc', lnT_bc
-               write(*,1) 'T_bc', T_bc
-               write(*,1) 'T_surf', T_surf
-               write(*,1) 'dP0', dP0
-               write(*,1) 'lnT_surf', lnT_surf
-               call mesa_error(__FILE__,__LINE__,'T bc')
-            end if
-
             dP0_dlnR = 0
             if (offset_P_to_cell_center) then  ! include partials of dP0
                dP0_dlnR = -4*dP0
             end if
 
-            dT0_dlnR = 0
-            dT0_dlnT = 0
-            dT0_dlnd = 0
-            dT0_dL = 0
-            if (offset_T_to_cell_center) then  ! include partials of dT0
-               d_gradT_dlnR = s% gradT_ad(1)%d1Array(i_lnR_00)
-               d_gradT_dlnT00 = s% gradT_ad(1)%d1Array(i_lnT_00)
-               d_gradT_dlnd00 = s% gradT_ad(1)%d1Array(i_lnd_00)
-               d_gradT_dL = s% gradT_ad(1)%d1Array(i_L_00)
-               dT0_dlnR = -4*dT0 + dP0*d_gradT_dlnR*s% T(1)/s% Peos(1)
-               dPinv_dlnT = -s% chiT_for_partials(1)/s% Peos(1)
-               dT0_dlnT = &
-                    dT0 + &
-                    dP0*d_gradT_dlnT00*s% T(1)/s% Peos(1) + &
-                    dP0*s% gradT(1)*s% T(1)*dPinv_dlnT
-               dPinv_dlnd = -s% chiRho_for_partials(1)/s% Peos(1)
-               dT0_dlnd = &
-                    dP0*d_gradT_dlnd00*s% T(1)/s% Peos(1) + &
-                    dP0*s% gradT(1)*s% T(1)*dPinv_dlnd
-               dT0_dL = dP0*d_gradT_dL*s% T(1)/s% Peos(1)
-            end if
-
             dlnP_bc_dP0 = 1/P_bc
-            dlnT_bc_dT0 = 1/T_bc
 
             dlnP_bc_dlnPsurf = P_surf/P_bc
-            dlnT_bc_dlnTsurf = T_surf/T_bc
 
             dlnkap_dlnd = s% d_opacity_dlnd(1)/s% opacity(1)
             dlnkap_dlnT = s% d_opacity_dlnT(1)/s% opacity(1)
@@ -978,43 +936,42 @@
                0d0, 0d0, 0d0, &
                0d0, 0d0, 0d0)
 
-            dlnT_bc_dlnT = dlnT_bc_dlnTsurf*dlnTsurf_dlnkap*dlnkap_dlnT &
-                  + dlnT_bc_dT0*dT0_dlnT
-            dlnT_bc_dlnd = dlnT_bc_dlnTsurf*dlnTsurf_dlnkap*dlnkap_dlnd &
-                  + dlnT_bc_dT0*dT0_dlnd
-            dlnT_bc_dL = dlnT_bc_dlnTsurf*dlnTsurf_dL + dlnT_bc_dT0*dT0_dL
-            dlnT_bc_dlnR = dlnT_bc_dlnTsurf*dlnTsurf_dlnR + dlnT_bc_dT0*dT0_dlnR
+            dlnR00 = T_surf*dlnTsurf_dlnR
+            dlnT00 = T_surf*dlnTsurf_dlnkap*dlnkap_dlnT
+            dlnd00 = T_surf*dlnTsurf_dlnkap*dlnkap_dlnd
+            call wrap(T_bc_ad, T_surf, &
+               0d0, dlnd00, 0d0, &
+               0d0, dlnT00, 0d0, &
+               0d0, 0d0, 0d0, &
+               0d0, dlnR00, 0d0, &
+               0d0, 0d0, 0d0, &
+               0d0, T_surf*dlnTsurf_dL, 0d0, &
+               0d0, 0d0, 0d0, &
+               0d0, 0d0, 0d0, &
+               0d0, 0d0, 0d0, &
+               0d0, 0d0, 0d0, &
+               0d0, 0d0, 0d0)
 
-            dlnR00 = T_bc*dlnT_bc_dlnR
-            dlnT00 = T_bc*dlnT_bc_dlnT
-            dlnd00 = T_bc*dlnT_bc_dlnd
-            call wrap(T_bc_ad, T_bc, &
-               0d0, dlnd00, 0d0, &
-               0d0, dlnT00, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0, dlnR00, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0, T_bc*dlnT_bc_dL, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0, 0d0, 0d0)
-            dlnR00 = dlnT_bc_dlnR
-            dlnT00 = dlnT_bc_dlnT
-            dlnd00 = dlnT_bc_dlnd
-            call wrap(lnT_bc_ad, lnT_bc, &
-               0d0, dlnd00, 0d0, &
-               0d0, dlnT00, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0, dlnR00, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0, dlnT_bc_dL, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0, 0d0, 0d0)
+            ! The pressure floor uses the atmosphere temperature at the outer face.
+            if (need_P_surf .and. s% use_momentum_outer_BC .and. s% floor_momentum_outer_BC_at_Prad) &
+               Prad_bc_ad = (crad/3d0)*pow4(T_bc_ad)
+
+            ! Offset temperature to the cell center independently of the pressure BC.
+            if (offset_T_to_cell_center) then
+               dT0_ad = s% cgrav(1)*s% m_grav(1)*s% dm(1)/(8*pi*pow4(wrap_r_00(s,1)))
+               dT0_ad = dT0_ad*s% gradT_ad(1)*wrap_T_00(s,1)/wrap_Peos_00(s,1)
+               T_bc_ad = T_bc_ad + dT0_ad
+            end if
+            lnT_bc_ad = log(T_bc_ad)
+
+            if (is_bad(T_bc_ad%val)) then
+               write(*,1) 'lnT_bc', lnT_bc_ad%val
+               write(*,1) 'T_bc', T_bc_ad%val
+               write(*,1) 'T_surf', T_surf
+               write(*,1) 'dP0', dP0
+               write(*,1) 'lnT_surf', lnT_surf
+               call mesa_error(__FILE__,__LINE__,'T bc')
+            end if
 
          end subroutine get_PT_bc_ad
 
