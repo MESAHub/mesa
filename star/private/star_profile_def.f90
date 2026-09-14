@@ -582,7 +582,11 @@
       integer, parameter :: p_etrb = p_w + 1
       integer, parameter :: p_log_etrb = p_etrb + 1
       integer, parameter :: p_Pvsc = p_log_etrb + 1
-      integer, parameter :: p_Hp_face = p_Pvsc + 1
+      integer, parameter :: p_Riemann_shock_compression = p_Pvsc + 1
+      integer, parameter :: p_Riemann_shock_pressure_jump = p_Riemann_shock_compression + 1
+      integer, parameter :: p_Riemann_shock_strength = p_Riemann_shock_pressure_jump + 1
+      integer, parameter :: p_Riemann_shock_D_mix_factor = p_Riemann_shock_strength + 1
+      integer, parameter :: p_Hp_face = p_Riemann_shock_D_mix_factor + 1
       integer, parameter :: p_Y_face = p_Hp_face + 1
       integer, parameter :: p_PII_face = p_Y_face + 1
       integer, parameter :: p_Chi = p_PII_face + 1
@@ -1272,6 +1276,10 @@
          profile_column_name(p_etrb) = 'etrb'
          profile_column_name(p_log_etrb) = 'log_etrb'
          profile_column_name(p_Pvsc) = 'Pvsc'
+         profile_column_name(p_Riemann_shock_compression) = 'Riemann_shock_compression'
+         profile_column_name(p_Riemann_shock_pressure_jump) = 'Riemann_shock_pressure_jump'
+         profile_column_name(p_Riemann_shock_strength) = 'Riemann_shock_strength'
+         profile_column_name(p_Riemann_shock_D_mix_factor) = 'Riemann_shock_D_mix_factor'
          profile_column_name(p_Hp_face) = 'Hp_face'
          profile_column_name(p_Y_face) = 'Y_face'
          profile_column_name(p_PII_face) = 'PII_face'

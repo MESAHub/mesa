@@ -262,6 +262,7 @@
 
       subroutine getval_for_profile(s, c, k, val, int_flag, int_val)
          use chem_def
+         use hydro_riemann, only: get_Riemann_shock_diagnostics
          use rates_def
          use ionization_def
          use mod_typical_charge, only: eval_typical_charge
@@ -1896,6 +1897,14 @@
                end if
             case(p_Pvsc)
                if (s% use_Pvsc_art_visc .or. s% RSP_flag) val = s% Pvsc(k)
+            case(p_Riemann_shock_compression)
+               val = get_Riemann_shock_diagnostic(1)
+            case(p_Riemann_shock_pressure_jump)
+               val = get_Riemann_shock_diagnostic(2)
+            case(p_Riemann_shock_strength)
+               val = get_Riemann_shock_diagnostic(3)
+            case(p_Riemann_shock_D_mix_factor)
+               val = get_Riemann_shock_diagnostic(4)
             case(p_Hp_face)
                if (rsp_or_w) val = s% Hp_face(k)
             case(p_Y_face)
@@ -2277,6 +2286,27 @@
 
 
          contains
+
+
+         real(dp) function get_Riemann_shock_diagnostic(which)
+            integer, intent(in) :: which
+            integer :: ierr_local
+            real(dp) :: compression, pressure_jump, shock_strength, D_mix_factor
+
+            call get_Riemann_shock_diagnostics( &
+               s, k, compression, pressure_jump, shock_strength, D_mix_factor, ierr_local)
+
+            select case(which)
+            case(1)
+               get_Riemann_shock_diagnostic = compression
+            case(2)
+               get_Riemann_shock_diagnostic = pressure_jump
+            case(3)
+               get_Riemann_shock_diagnostic = shock_strength
+            case default
+               get_Riemann_shock_diagnostic = D_mix_factor
+            end select
+         end function get_Riemann_shock_diagnostic
 
 
          real(dp) function get_L_vel(k) result(v)  ! velocity if L carried by convection
