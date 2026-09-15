@@ -106,6 +106,7 @@
       real(dp) :: max_Lneu_for_mass_loss
       real(dp) :: delta_lgLnuc_limit, max_Lphoto_for_lgLnuc_limit, max_Lphoto_for_lgLnuc_limit2
       real(dp) :: delta_lgRho_cntr_hard_limit, dt_div_min_dr_div_cs_limit
+      real(dp) :: gold_tol_residual_norm3, gold_tol_max_residual3
       real(dp) :: logT_for_v_flag, logLneu_for_v_flag
       logical :: use_RTI_during_hydro, limit_convection_in_unbound_layers
 
@@ -191,6 +192,9 @@
          ! high value until the onset of a pulse to prevent unnecessarily
          ! small timesteps before a pulsation
          dt_div_min_dr_div_cs_limit = s% dt_div_min_dr_div_cs_limit
+
+         gold_tol_residual_norm3 = s% gold_tol_residual_norm3
+         gold_tol_max_residual3 = s% gold_tol_max_residual3
 
       end subroutine extras_controls
 
@@ -1073,6 +1077,8 @@
                if((abs(log10(lburn_div_lsurf))) < 0.01d0 .and. &
                   (s% star_age > 1d3 .or. s% center_he4 < 0.98d0)) then
                   s% use_other_before_struct_burn_mix = .false.
+                  s% gold_tol_residual_norm3 = gold_tol_residual_norm3
+                  s% gold_tol_max_residual3 = gold_tol_max_residual3
                   call star_relax_uniform_omega(id, 1, s% job% new_omega_div_omega_crit,&
                                                 s% job% num_steps_to_relax_rotation, 1d0, ierr)
                   s% use_other_before_struct_burn_mix = .true.
@@ -1119,7 +1125,7 @@
          s% xtra(x_gamma_int_bound) = -1d0
 
          ! can be adjusted below if nearing breakout
-         s% profile_interval = 1
+         s% profile_interval = 100
 
          if (s% u_flag .and. k_keep > 0 .and. s% xtra(x_time_start_pulse) > 0d0) then
 
@@ -1180,9 +1186,9 @@
                   ! to breakout
                   if ((s% u(k1)>5d7 .and. s% u(1)<5d7) &
                      .or. (s% ixtra(ix_num_relaxations) == 0 .and. gamma1_integral < 0d0 .and. s% u(1)<5d7)) then
-                     s% profile_interval = 1
+                     s% profile_interval = 10
                   else
-                     s% profile_interval = 1
+                     s% profile_interval = 100
                   end if
                   exit
                end if
@@ -1300,6 +1306,10 @@
                s% delta_lgL_nuc_hard_limit = -1d0
                s% use_other_before_struct_burn_mix = .false.
                s% timestep_hold = 0
+
+               ! Use the original residual tolerances during entropy relaxation.
+               s% gold_tol_residual_norm3 = gold_tol_residual_norm3
+               s% gold_tol_max_residual3 = gold_tol_max_residual3
 
                call star_relax_to_star_cut(s% id, k_keep, .true., .true., .true., ierr)
                if (ierr /= 0) then
@@ -1537,6 +1547,16 @@
             s% max_q_for_convection_with_hydro_on = 1d99
          end if
          call set_direct_removal_boundary(s)
+
+         if (.not. s% doing_relax) then
+            ! Set level 3 gold tolerances after reading the hydro inlist on each try.
+            s% gold_tol_residual_norm3 = gold_tol_residual_norm3
+            s% gold_tol_max_residual3 = gold_tol_max_residual3
+            if (s% x_ctrl(23) > 0d0 .and. maxval(s% T(1:s% nz)) > s% x_ctrl(23)) then
+               s% gold_tol_residual_norm3 = 1d3
+               s% gold_tol_max_residual3 = 1d3
+            end if
+         end if
 
          !ignore L_nuc limit if L_phot is too high or if we just did a relax
          !(ixtra(ix_steps_since_relax) is set to zero right after a relax)
