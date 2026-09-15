@@ -50,9 +50,9 @@ read_extra_controls_inlist(2) = .true.
 extra_controls_inlist_name(2) = 'inlist_extra'
 
 
-! set this to .true. to continue post-RLOF with a single star accretor
-! otherwise see stopping condition in inlist_both or run_star_extras.f
-x_logical_ctrl(1) = .true.
+! Stopping condition: 1 = central he4 <= 1d-8; 2 = log10(T_center/K) >= 9.
+! Save this star and continue its companion to its own stopping condition.
+x_integer_ctrl(1) = 2
 
 ! extra_terminal_output_file = 'log1'
 log_directory = 'LOGS1'
