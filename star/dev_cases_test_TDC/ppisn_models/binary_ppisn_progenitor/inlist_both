@@ -53,8 +53,6 @@ use_Type2_opacities = .true.
 
 &controls
 
-x_logical_ctrl(1) = .true.
-
 use_other_wind = .true.
 x_character_ctrl(1) = 'Bjorklund' ! donor mass in Msun
 x_character_ctrl(2) = 'nowind' ! accretor mass in Msun
@@ -74,14 +72,13 @@ superad_reduction_Gamma_inv_scale = 5d0
 ! for debugging
 report_solver_progress = .false.
 
-! to stop at C depletion
-! x_logical_ctrl(2) = .true.
-max_model_number = 80000 ! if true above, and the binary detaches, this will be overwritten in run_star_extras.f90
+max_model_number = 80000
 redo_limit = 300
 
-!stop when the center mass fraction of he4 drops below this limit
-xa_central_lower_limit_species(1) = 'he4'
-xa_central_lower_limit(1) = 1d-6
+! Stopping conditions are selected in inlist1/inlist2 and handled independently in run_binary_extras.
+! A built-in abundance stop would terminate the entire binary at the first stopping condition.
+xa_central_lower_limit_species(1) = ''
+xa_central_lower_limit(1) = 0d0
 
 !wind
 ! hot_wind_scheme =  'Bjorklund' !'Dutch'
@@ -103,20 +100,21 @@ thermohaline_coeff = 1.0d0
 ! thermohaline_option = 'Brown_Garaud_Stellmach_13'
 
 ! overshoot controls
-! Match the PPISN helium-core overshoot before the catch-all core rule.
+! Keep the larger overshoot only for the H-burning core; first match wins.
 overshoot_scheme(1) = 'exponential'
-overshoot_zone_type(1) = 'burn_He'
+overshoot_zone_type(1) = 'burn_H'
 overshoot_zone_loc(1) = 'core'
 overshoot_bdy_loc(1) = 'any'
-overshoot_f(1) = 0.01d0
-overshoot_f0(1) = 0.005d0
+overshoot_f(1) = 4.15d-2
+overshoot_f0(1) = 0.008d0
 
+! Match the PPISN overshoot in all other regions.
 overshoot_scheme(2) = 'exponential'
 overshoot_zone_type(2) = 'any'
-overshoot_zone_loc(2) = 'core'
+overshoot_zone_loc(2) = 'any'
 overshoot_bdy_loc(2) = 'any'
-overshoot_f(2) = 4.15d-2
-overshoot_f0(2) = 0.008d0
+overshoot_f(2) = 0.01d0
+overshoot_f0(2) = 0.005d0
 
 ! from inlist_massive_defaults -------------------------------------
 dX_nuc_drop_limit = 5d-2
@@ -198,7 +196,7 @@ delta_lgL_limit = 0.01d0
 delta_lgL_hard_limit = 0.2d0
 
 delta_lgTeff_limit = 0.008d0
-delta_lgTeff_hard_limit = 0.01d0
+delta_lgTeff_hard_limit = 0.1d0 ! hard limits can crash models.
 
 delta_lgT_cntr_limit = 0.005d0   ! default 0.01
 delta_lgT_limit = 0.025d0         ! default 0.5
@@ -206,12 +204,12 @@ delta_lgRho_cntr_limit = 0.025d0   ! default 0.05
 delta_lgRho_limit = 0.5d0          ! default 1.0
 delta_lgL_nuc_limit = 1d-2
 
-delta_lgL_He_limit = 0.03d0
-delta_lgL_He_hard_limit = 0.05d0
+delta_lgL_He_limit = 1d-1 !0.03d0
+delta_lgL_He_hard_limit = 0.1d0
 delta_HR_ds_Teff = 1d-5
 
-delta_lgL_H_limit = 0.01d0
-delta_lgL_H_hard_limit = 0.025d0
+delta_lgL_H_limit = 1d0       !.01d0
+delta_lgL_H_hard_limit = 1d99 !0.1d0
 
 
 ! spatial increase resolution during He core burning
@@ -222,8 +220,17 @@ T_function2_param = 2.4d8
 omega_function_weight = 100d0
 
 ! Jim Fuller's suggestion
-set_min_D_mix = .true.
-min_D_mix=1d-2
+!set_min_D_mix = .true.
+!min_D_mix=1d-2
+
+!solver
+make_gradr_sticky_in_solver_iters = .true.
+
+! hydrodynamic drag for v_flag
+drag_coefficient = 1d0
+min_q_for_drag = 0.8d0
+
+
 
 ! when_to_stop_rtol = 1d-2
 ! when_to_stop_atol = 1d-2
