@@ -90,9 +90,11 @@ mass_fraction_limit_for_Skye = 1d-8
    relax_use_gold_tolerances = .true.
    use_gold_tolerances = .true.
    use_gold2_tolerances = .false.
-   maxT_for_gold_tolerances = 5d9
+   maxT_for_gold_tolerances = 1d99
    gold_tol_residual_norm3 = 1d-5
    gold_tol_max_residual3 = 1d-3
+   ! Relax level 3 gold tolerances to 1d3 to ease core collapse above this temperature (K).
+   x_ctrl(23) = 5d9 ! <= 0 disables.
    ignore_too_large_correction = .true.
    scale_max_correction = 1d0
    corr_coeff_limit = 1d-2
@@ -392,7 +394,7 @@ mass_fraction_limit_for_Skye = 1d-8
    Pvsc_zsh = 0.1d0
 
    photo_interval = 50
-   profile_interval = 1 !200
+   profile_interval = -1
    history_interval = 1
    terminal_interval = 10
 

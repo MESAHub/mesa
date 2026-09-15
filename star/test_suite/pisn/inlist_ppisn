@@ -5,7 +5,6 @@
    kap_blend_logT_upper_bdy = 4.1d0
    kap_blend_logT_lower_bdy = 4.0d0
 
-   ! We use 10% solar, with the definition of Asplund+ 2009
    ! Zbase defined in inlist_extra
    use_Type2_opacities = .true.
 
@@ -127,6 +126,8 @@ mass_fraction_limit_for_Skye = 1d-8
    !initial_mass = 72
    read_extra_controls_inlist(1) = .true.
    extra_controls_inlist_name(1)= 'inlist_extra'
+
+   Pextra_factor = 1.5d0 ! stabilize surface.
 
    ! our wind implementation follows Brott+ 2011
    use_other_wind = .true.
@@ -386,7 +387,7 @@ mass_fraction_limit_for_Skye = 1d-8
 
    TDC_adjust_mass_fallback_to_mlt = .true.
 
-   x_logical_ctrl(1) = .true. ! If true, terminate 100 days after the first pulse relaxation.
+   x_logical_ctrl(1) = .false. ! If true, terminate 100 days after the first pulse relaxation.
                               ! (stop_100d_after_pulse)
                               ! RECOMMENDED .false.
 
