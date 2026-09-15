@@ -7814,6 +7814,66 @@
     Grid9_file_width = -1
     Grid9_file_aspect_ratio = -1
 
+
+      ! Max_eq_resid
+      ! ------------
+
+      ! ::
+
+   Max_eq_resid_win_flag = .false.
+   Max_eq_resid_win_width = 7
+   Max_eq_resid_win_aspect_ratio = 5d-1
+
+   Max_eq_resid_xleft = 0.15
+   Max_eq_resid_xright = 0.85
+   Max_eq_resid_ybot = 0.15
+   Max_eq_resid_ytop = 0.85
+   Max_eq_resid_txt_scale = 1
+   Max_eq_resid_title = 'Max equation residuals'
+   Max_eq_resid_max_width = -1
+
+      ! **File output**
+
+      ! ::
+
+   Max_eq_resid_file_flag = .false.
+   Max_eq_resid_file_dir = 'png'
+   Max_eq_resid_file_prefix = 'max_eq_resid_'
+   Max_eq_resid_file_width = -1
+   Max_eq_resid_file_aspect_ratio = -1
+
+
+      ! Kipp_residuals
+      ! ------------
+
+      ! ::
+
+   Kipp_residuals_win_flag = .false.
+   Kipp_residuals_win_width = 9
+   Kipp_residuals_win_aspect_ratio = 6d-1
+
+      ! ::
+
+   Kipp_residuals_xleft = 0.15
+   Kipp_residuals_xright = 0.85
+   Kipp_residuals_ybot = 0.15
+   Kipp_residuals_ytop = 0.85
+   Kipp_residuals_txt_scale = 1
+   Kipp_residuals_title = 'Kippenhahn residuals'
+   Kipp_residuals_max_width = -1
+   Kipp_residuals_yaxis_name = 'mass'
+
+      ! **File output**
+
+      ! ::
+
+   Kipp_residuals_file_flag = .false.
+   Kipp_residuals_file_dir = 'png'
+   Kipp_residuals_file_prefix = 'kipp_residuals_'
+   Kipp_residuals_file_width = -1
+   Kipp_residuals_file_aspect_ratio = -1
+
+
 ! Annotation
 ! ==========
 
