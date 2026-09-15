@@ -68,7 +68,7 @@
          real(dp), dimension(:,:), pointer :: xh, xa
          integer, intent(out) :: ierr
 
-         real(dp) :: dxa, xmstar, mstar, sumx, &
+         real(dp) :: dxa, xmstar, mstar, sumx, j_rot_center, &
             total_internal_energy1, total_internal_energy2, err
          character (len=strlen) :: message
          integer :: k, j, op_err, nzlo, nzhi, nzlo_old, nzhi_old, species
@@ -230,9 +230,18 @@
          end if
 
          if (s% rotation_flag) then
-            call adjust_omega(s, nz, nz_old, comes_from, &
-               xq_old, xq, dq_old, dq, xh, j_rot_old, omega_old, &
-               xout_old, xout_new, dqbar_old, dqbar, ierr)
+            call do_interp_pt_val( &
+               s, nz, nz_old, nzlo, nzhi, s% omega, omega_old, omega_old(nz_old), &
+               xq, xq_old_plus1, xq_new, .false., work, tmp1, tmp2, ierr)
+            if (failed('omega')) return
+            j_rot_center = j_rot_old(nz_old)
+            if (s% R_center == 0d0) j_rot_center = 0d0
+            call do_interp_pt_val( &
+               s, nz, nz_old, nzlo, nzhi, s% j_rot, j_rot_old, j_rot_center, &
+               xq, xq_old_plus1, xq_new, .false., work, tmp1, tmp2, ierr)
+            if (failed('j_rot')) return
+            call adjust_omega(s, nz, nz_old, nzlo, nzhi, j_rot_old, &
+               dq_old, dq, dqbar_old, dqbar, ierr)
             if (failed('adjust_omega')) return
             if (s% D_omega_flag) then
                call do_interp_pt_val( &
@@ -1924,202 +1933,70 @@
       end subroutine get_xq_integral
 
 
-      subroutine adjust_omega(s, nz, nz_old, comes_from, &
-            old_xq, new_xq, old_dq, new_dq, xh, old_j_rot, old_omega, &
-            xout_old, xout_new, old_dqbar, new_dqbar, ierr)
-         use alloc
+      subroutine adjust_omega(s, nz, nz_old, nzlo, nzhi, old_j_rot, &
+            old_dq, new_dq, old_dqbar, new_dqbar, ierr)
+         use hydro_rotation, only: w_div_w_roche_jrot, update1_i_rot_from_xh
          type (star_info), pointer :: s
-         integer, intent(in) :: nz, nz_old
-         integer, dimension(:) :: comes_from
-         real(dp), dimension(:) :: &
-            old_xq, new_xq, old_dq, new_dq, old_j_rot, old_omega, &
-            xout_old, xout_new, old_dqbar, new_dqbar
-         real(dp), intent(in) :: xh(:,:)
+         integer, intent(in) :: nz, nz_old, nzlo, nzhi
+         real(dp), dimension(:), intent(in) :: &
+            old_j_rot, old_dq, new_dq, old_dqbar, new_dqbar
          integer, intent(out) :: ierr
-         integer :: k, op_err
-         include 'formats'
+         real(dp) :: old_j_tot, new_j_tot, correction_norm, domega, r00
+         integer :: k
+
          ierr = 0
 
-!$OMP PARALLEL DO PRIVATE(k, op_err) SCHEDULE(dynamic,2)
+!$OMP PARALLEL DO PRIVATE(k, r00) SCHEDULE(dynamic,2)
          do k = 1, nz
-            op_err = 0
-            call adjust1_omega(s, k, nz, nz_old, comes_from, &
-               xout_old, xout_new, old_dqbar, new_dqbar, &
-               old_j_rot, old_omega, xh, op_err)
-            if (op_err /= 0) ierr = op_err
+            r00 = get_r_from_xh(s,k)
+            s% w_div_w_crit_roche(k) = &
+               w_div_w_roche_jrot(r00,s% m(k),s% j_rot(k),s% cgrav(k), &
+               s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
+            call update1_i_rot_from_xh(s, k)
+            s% omega(k) = s% j_rot(k)/s% i_rot(k)% val
+         end do
+!$OMP END PARALLEL DO
+
+         old_j_tot = dot_product(old_dqbar(1:nz_old), old_j_rot(1:nz_old))
+         new_j_tot = dot_product(new_dqbar(1:nz), s% j_rot(1:nz))
+         correction_norm = 0d0
+         do k = nzlo, nzhi
+            correction_norm = correction_norm + &
+               new_dqbar(k)*s% i_rot(k)% val
+         end do
+
+         ! RSP uses half of the innermost cell in its dm_bar definition.
+         if (s% rsp_flag .or. s% RSP2_flag) then
+            old_j_tot = old_j_tot - 0.5d0*old_dq(nz_old)*old_j_rot(nz_old)
+            new_j_tot = new_j_tot - 0.5d0*new_dq(nz)*s% j_rot(nz)
+            if (nzhi == nz) correction_norm = correction_norm - &
+               0.5d0*new_dq(nz)*s% i_rot(nz)% val
+         end if
+
+         if (correction_norm <= 0d0 .or. is_bad(correction_norm)) then
+            ierr = -1
+            return
+         end if
+         domega = (old_j_tot - new_j_tot)/correction_norm
+         if (is_bad(domega)) then
+            ierr = -1
+            return
+         end if
+
+         ! A constant omega correction restores the discrete total angular momentum.
+!$OMP PARALLEL DO PRIVATE(k, r00) SCHEDULE(dynamic,2)
+         do k = nzlo, nzhi
+            s% j_rot(k) = s% j_rot(k) + domega*s% i_rot(k)% val
+            r00 = get_r_from_xh(s,k)
+            s% w_div_w_crit_roche(k) = &
+               w_div_w_roche_jrot(r00,s% m(k),s% j_rot(k),s% cgrav(k), &
+               s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
+            call update1_i_rot_from_xh(s, k)
+            s% omega(k) = s% j_rot(k)/s% i_rot(k)% val
          end do
 !$OMP END PARALLEL DO
 
       end subroutine adjust_omega
-
-
-      subroutine adjust1_omega(s, k, nz, nz_old, comes_from, &
-            xout_old, xout_new, old_dqbar, new_dqbar, &
-            old_j_rot, old_omega, xh, ierr)
-         use hydro_rotation, only: w_div_w_roche_jrot, update1_i_rot_from_xh
-         ! set new value for s% omega(k)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k, nz, nz_old
-         integer, dimension(:) :: comes_from
-         real(dp), dimension(:), intent(in) :: &
-            xout_old, xout_new, old_dqbar, new_dqbar, old_j_rot, old_omega
-         real(dp), intent(in) :: xh(:,:)
-         integer, intent(out) :: ierr
-
-         real(dp) :: xq_outer, xq_inner, j_tot, omega_tot, &
-            xq0, xq1, new_point_dqbar, dq_sum, dq, r00
-         integer :: kk, k_outer
-
-         integer, parameter :: k_dbg = -1
-
-         include 'formats'
-
-         ierr = 0
-         xq_outer = xout_new(k)
-         new_point_dqbar = new_dqbar(k)
-         if (k < nz) then
-            xq_inner = xq_outer + new_point_dqbar
-         else
-            xq_inner = 1d0
-         end if
-
-         if (k == k_dbg) then
-            write(*,2) 'xq_outer', k, xq_outer
-            write(*,2) 'xq_inner', k, xq_inner
-            write(*,2) 'new_point_dqbar', k, new_point_dqbar
-         end if
-
-         dq_sum = 0d0
-         j_tot = 0d0
-         omega_tot = 0d0
-         if (xq_outer >= xout_old(nz_old)) then
-            ! new contained entirely in old center zone
-            k_outer = nz_old
-            if (k == k_dbg) &
-               write(*,2) 'new contained in old center', &
-                  k_outer, xout_old(k_outer)
-         else if (k == 1) then
-            k_outer = 1
-         else
-            k_outer = comes_from(k-1)
-         end if
-
-         do kk = k_outer, nz_old  ! loop until reach m_inner
-
-            if (kk == nz_old) then
-               xq1 = 1d0
-            else
-               xq1 = xout_old(kk+1)
-            end if
-            if (xq1 <= xq_outer) cycle
-
-            xq0 = xout_old(kk)
-            if (xq0 >= xq_inner) then
-               if (dq_sum < new_point_dqbar .and. kk > 1) then
-                  ! need to add a bit more from the previous source
-                  dq = new_point_dqbar - dq_sum
-                  dq_sum = new_point_dqbar
-                  j_tot = j_tot + old_j_rot(kk-1)*dq
-                  omega_tot = omega_tot + old_omega(kk-1)*dq
-                  end if
-               exit
-            end if
-
-            if (xq1 < xq_outer) then
-               ierr = -1
-               return
-            end if
-
-            if (xq0 >= xq_outer .and. xq1 <= xq_inner) then  ! entire old kk is in new k
-
-               dq = old_dqbar(kk)
-               dq_sum = dq_sum + dq
-
-               if (dq_sum > new_point_dqbar) then
-                  ! dq too large -- numerical roundoff problems
-                  dq = dq - (new_point_dqbar - dq_sum)
-                  dq_sum = new_point_dqbar
-               end if
-
-               j_tot = j_tot + old_j_rot(kk)*dq
-               omega_tot = omega_tot + old_omega(kk)*dq
-
-            else if (xq0 <= xq_outer .and. xq1 >= xq_inner) then  ! entire new k is in old kk
-
-               dq = new_dqbar(k)
-               dq_sum = dq_sum + dq
-               j_tot = j_tot + old_j_rot(kk)*dq
-               omega_tot = omega_tot + old_omega(kk)*dq
-
-            else  ! only use the part of old kk that is in new k
-
-               if (k == k_dbg) then
-                  write(*,*) 'only use the part of old kk that is in new k', xq_inner <= xq1
-                  write(*,1) 'xq_outer', xq_outer
-                  write(*,1) 'xq_inner', xq_inner
-                  write(*,1) 'xq0', xq0
-                  write(*,1) 'xq1', xq1
-                  write(*,1) 'dq_sum', dq_sum
-                  write(*,1) 'new_point_dqbar', new_point_dqbar
-                  write(*,1) 'new_point_dqbar - dq_sum', new_point_dqbar - dq_sum
-               end if
-
-               if (xq_inner <= xq1) then  ! this is the last part of new k
-
-                  if (k == k_dbg) write(*,3) 'this is the last part of new k', k, kk
-
-                  dq = new_point_dqbar - dq_sum
-                  dq_sum = new_point_dqbar
-
-               else  ! we avoid this case if possible because of numerical roundoff
-
-                  if (k == k_dbg) write(*,3) 'we avoid this case if possible', k, kk
-
-                  dq = max(0d0, xq1 - xq_outer)
-                  if (dq_sum + dq > new_point_dqbar) dq = new_point_dqbar - dq_sum
-                  dq_sum = dq_sum + dq
-
-               end if
-
-               j_tot = j_tot + old_j_rot(kk)*dq
-               omega_tot = omega_tot + old_omega(kk)*dq
-
-               if (dq <= 0) then
-                  ierr = -1
-                  return
-               end if
-
-            end if
-
-            if (dq_sum >= new_point_dqbar) then
-               if (k == k_dbg) then
-                  write(*,2) 'exit for k', k
-                  write(*,2) 'dq_sum', kk, dq_sum
-                  write(*,2) 'new_point_dqbar', kk, new_point_dqbar
-               end if
-               exit
-            end if
-
-         end do
-
-         s% j_rot(k) = j_tot/dq_sum
-         ! set an omega seed before evaluating a rotation-dependent moment of inertia
-         s% omega(k) = omega_tot/dq_sum
-         r00 = get_r_from_xh(s,k)
-         s% w_div_w_crit_roche(k) = &
-            w_div_w_roche_jrot(r00,s% m(k),s% j_rot(k),s% cgrav(k), &
-            s% w_div_wcrit_max, s% w_div_wcrit_max2, s% w_div_wc_flag)
-         call update1_i_rot_from_xh(s, k)
-         s% omega(k) = s% j_rot(k)/s% i_rot(k)% val
-
-         if (k_dbg == k) then
-            write(*,2) 's% omega(k)', k, s% omega(k)
-            write(*,2) 's% j_rot(k)', k, s% j_rot(k)
-            write(*,2) 's% i_rot(k)', k, s% i_rot(k)
-            if (s% model_number > 1925) call mesa_error(__FILE__,__LINE__,'debugging: adjust1_omega')
-         end if
-
-      end subroutine adjust1_omega
 
 
       ! like adjust_omega.  conserve kinetic energy
