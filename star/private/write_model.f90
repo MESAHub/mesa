@@ -104,7 +104,7 @@
          if (BTEST(file_type, bit_for_RSP)) &
             write(iounit,'(a)',advance='no') ', RSP luminosity (L), turbulent energy (et_RSP), and radiative flux (erad_RSP)'
          if (BTEST(file_type, bit_for_RSP2)) &
-            write(iounit,'(a)',advance='no') ', RSP2 turbulent energy (w^2) and pressure scale height (Hp)'
+            write(iounit,'(a)',advance='no') ', RSP2 turbulent velocity (w) and superadiabaticity (Y_face)'
          write(iounit,'(a)',advance='no') &
             '. cgs units. lnd=ln(density), lnT=ln(temperature), lnR=ln(radius)'
          if (s% i_lum /= 0) then
@@ -185,7 +185,7 @@
                call write1(s% Fr(k),ierr); if (ierr /= 0) exit
             else if (RSP2_flag) then
                call write1(s% w(k),ierr); if (ierr /= 0) exit
-               call write1(s% Hp_face(k),ierr)
+               call write1(s% Y_face(k),ierr)
                if (ierr /= 0) exit
             end if
             call write1(s% L(k),ierr); if (ierr /= 0) exit
@@ -255,7 +255,7 @@
                write(iounit, fmt='(a26, 1x)', advance='no') 'Fr_RSP'
             else if (RSP2_flag) then
                write(iounit, fmt='(a26, 1x)', advance='no') 'w'
-               write(iounit, fmt='(a26, 1x)', advance='no') 'Hp'
+               write(iounit, fmt='(a26, 1x)', advance='no') 'Y_face'
             end if
             write(iounit, fmt='(a26, 1x)', advance='no') 'L'
             write(iounit, fmt='(a26, 1x)', advance='no') 'dq'

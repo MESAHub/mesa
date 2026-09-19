@@ -23,8 +23,9 @@ For a more in-depth look at the new build system, see :doc:`developing/build-sys
 
 ``Tsurf_factor`` and the associated controls and history column have been removed as they affected nothing. These controls were effectively deprecated after the removal of the black body boundary condition in 21.12.1.
 
-Photos now include the superadiabatic turnover-limiter history. Earlier
-photos are incompatible; saved ``.mod`` starting models remain compatible.
+Stellar photos now use format version 21 for the combined RSP2 state and
+superadiabatic turnover history. Earlier photos are incompatible; saved
+``.mod`` starting models remain compatible.
 
 A substantial clean up of old or deprecated controls has been undertaken in
 ``star``, ``binary``, PGSTAR, and PGBINARY.

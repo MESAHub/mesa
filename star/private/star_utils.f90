@@ -1660,7 +1660,7 @@
             dw_m1, dw_00, dw_p1, &
             dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
-            dHp_m1, dHp_00, dHp_p1, &
+            dY_m1, dY_00, dY_p1, &
             dw_div_wc_m1, dw_div_wc_00, dw_div_wc_p1, &
             djrot_m1, djrot_00, djrot_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
@@ -1672,7 +1672,7 @@
             dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
             dw_m1, dw_00, dw_p1, dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
-            dHp_m1, dHp_00, dHp_p1, &
+            dY_m1, dY_00, dY_p1, &
             dw_div_wc_m1, dw_div_wc_00, dw_div_wc_p1, &
             djrot_m1, djrot_00, djrot_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
@@ -1686,7 +1686,7 @@
          if (s% i_u /= 0) call unpack1(s% i_u, dv_m1, dv_00, dv_p1)
          if (s% i_lum /= 0) call unpack1(s% i_lum, dL_m1, dL_00, dL_p1)
          if (s% i_w /= 0) call unpack1(s% i_w, dw_m1, dw_00, dw_p1)
-         if (s% i_Hp /= 0) call unpack1(s% i_Hp, dHp_m1, dHp_00, dHp_p1)
+         if (s% i_Y /= 0) call unpack1(s% i_Y, dY_m1, dY_00, dY_p1)
          if (s% i_w_div_wc /= 0) call unpack1(s% i_w_div_wc, dw_div_wc_m1, dw_div_wc_00, dw_div_wc_p1)
          if (s% i_j_rot /= 0) call unpack1(s% i_j_rot, djrot_m1, djrot_00, djrot_p1)
 

@@ -183,7 +183,8 @@
             include 'formats'
             ierr = 0
             skip_P = eps_grav_form
-            if (s% use_P_d_1_div_rho_form_of_work) then
+            if (s% use_P_d_1_div_rho_form_of_work .or. &
+                  (s% RSP2_flag .and. eps_grav_form)) then
                call eval_simple_PdV_work(s, k, skip_P, dwork_dm_ad, dwork, &
                   d_dwork_dxa00, ierr)
                d_dwork_dxam1 = 0
@@ -230,7 +231,7 @@
 
 
          subroutine setup_sources_and_others(ierr) ! sources_ad, others_ad
-            use hydro_rsp2, only: compute_Eq_cell, compute_Uq_face
+            use hydro_rsp2, only: compute_Uq_face, compute_Uq_dm_cell
             use hydro_riemann, only: get_RTI_momentum_diffusion
             use tdc_hydro, only: &
                compute_tdc_Eq_cell, compute_tdc_Eq_div_w_face, &
@@ -300,6 +301,11 @@
                      if (ierr /= 0) return
                   end if
                   have_v_viscous_work = .true.
+               else if (include_dke_dt .and. s% u_flag) then
+                  Uq_00 = compute_Uq_dm_cell(s, k, ierr)/s%dm(k)
+                  if (ierr /= 0) return
+                  v_00 = 0.5d0*(wrap_u_00(s,k) + s%u_start(k))
+                  viscous_work_ad = v_00*Uq_00
                end if
             else if (s% TDC_alpha_M >0d0 .and. s% MLT_option == 'TDC' .and. &
                s% TDC_include_eturb_in_energy_equation .and. (s% v_flag .or. s% u_flag)) then
@@ -489,7 +495,7 @@
             include 'formats'
             ierr = 0
 
-            if (s% u_flag) then  ! for now, assume u_flag means no eps_grav
+            if (s% u_flag .and. .not. s% RSP2_flag) then
                eps_grav_form = .false.
                return
             end if
@@ -502,9 +508,6 @@
             end if
 
             if (eps_grav_form) then
-               if (s% RSP2_flag) then
-                  call mesa_error(__FILE__,__LINE__,'cannot use eps_grav with et yet.  fix energy eqn.')
-               end if
                call eval_eps_grav_and_partials(s, k, ierr)  ! get eps_grav info
                if (ierr /= 0) then
                   if (s% report_ierr) write(*,2) 'failed in eval_eps_grav_and_partials', k

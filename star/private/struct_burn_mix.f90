@@ -459,9 +459,9 @@
                do k = 1, nz
                   s% xh(j1,k) = s% w(k)
                end do
-            else if (j1 == s% i_Hp .and. s% i_Hp <= nvar) then
+            else if (j1 == s% i_Y .and. s% i_Y <= nvar) then
                do k = 1, nz
-                  s% xh(j1,k) = s% Hp_face(k)
+                  s% xh(j1,k) = s% Y_face(k)
                end do
             else if (j1 == s% i_v .and. s% i_v <= nvar) then
                do k = 1, nz

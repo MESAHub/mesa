@@ -146,6 +146,7 @@
          use accurate_sum_auto_diff_star_order1
          use star_utils, only: get_area_info_opt_time_center
          use tdc_hydro, only: compute_tdc_Uq_dm_cell
+         use hydro_rsp2, only: compute_Uq_dm_cell
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(in) :: P_surf_ad
@@ -178,12 +179,16 @@
          call setup_gravity_source
          call setup_diffusion_source
 
-         ! compute_tdc_Uq_dm_cell returns Uq*dm for the force sum.
+         ! Viscosity routines return Uq*dm for the force sum.
          Uq_cell = 0d0
-         if (include_tdc_Uq .and. &
-               s% MLT_option == 'TDC' .and. s% TDC_alpha_M > 0d0) then
-            Uq_cell = compute_tdc_Uq_dm_cell(s, k, ierr)
-            if (ierr /= 0) return
+         if (include_tdc_Uq) then
+            if (s% RSP2_flag) then
+               Uq_cell = compute_Uq_dm_cell(s, k, ierr)
+               if (ierr /= 0) return
+            else if (s% MLT_option == 'TDC' .and. s% TDC_alpha_M > 0d0) then
+               Uq_cell = compute_tdc_Uq_dm_cell(s, k, ierr)
+               if (ierr /= 0) return
+            end if
          end if
 
          sum_ad = flux_in_ad
@@ -358,20 +363,16 @@
       end subroutine get_RTI_momentum_diffusion
 
 
-      subroutine do_uface_and_Pface(s, ierr, include_rsp2_Uq)
+      subroutine do_uface_and_Pface(s, ierr)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
-         logical, intent(in), optional :: include_rsp2_Uq
          integer :: k, op_err
-         logical :: include_Uq
          include 'formats'
          ierr = 0
-         include_Uq = .true.
-         if (present(include_rsp2_Uq)) include_Uq = include_rsp2_Uq
 !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
          do k = 1, s% nz
             op_err = 0
-            call do1_uface_and_Pface(s, k, include_Uq, op_err)
+            call do1_uface_and_Pface(s, k, op_err)
             if (op_err /= 0) ierr = op_err
          end do
 !$OMP END PARALLEL DO
@@ -475,13 +476,11 @@
       end subroutine get_Riemann_shock_diagnostics
 
 
-      subroutine do1_uface_and_Pface(s, k, include_rsp2_Uq, ierr)
+      subroutine do1_uface_and_Pface(s, k, ierr)
          use eos_def, only: i_gamma1, i_lnfree_e, i_lnPgas
          use star_utils, only: calc_Ptot_ad_tw, get_face_weights
-         use hydro_rsp2, only: compute_Uq_face
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         logical, intent(in) :: include_rsp2_Uq
          integer, intent(out) :: ierr
          logical :: test_partials
 
@@ -489,7 +488,7 @@
             r_ad, A_ad, PL_ad, PR_ad, uL_ad, uR_ad, rhoL_ad, rhoR_ad, &
             gamma1L_ad, gamma1R_ad, csL_ad, csR_ad, G_ad, dPdm_grav_ad, &
             Sl1_ad, Sl2_ad, Sr1_ad, Sr2_ad, numerator_ad, denominator_ad, &
-            Sl_ad, Sr_ad, Ss_ad, P_face_L_ad, P_face_R_ad, du_ad, Uq_ad
+            Sl_ad, Sr_ad, Ss_ad, P_face_L_ad, P_face_R_ad, du_ad
          real(dp), dimension(s% species) :: d_Ptot_dxa  ! skip this
          logical, parameter :: skip_Peos = .false., skip_mlt_Pturb = .false.
          real(dp) :: delta_m, f
@@ -606,13 +605,6 @@
              end if
          end if
 
-
-         ! RSP2 currently applies Uq to the reconstructed face velocity.
-         if (s% RSP2_flag .and. include_rsp2_Uq) then
-            Uq_ad = compute_Uq_face(s, k, ierr)
-            if (ierr /= 0) return
-            s% u_face_ad(k) = s% u_face_ad(k) + Uq_ad
-         end if
 
          s% u_face_val(k) = s% u_face_ad(k)%val
 
