@@ -26,6 +26,8 @@ module run_star_extras
 
    implicit none
 
+   integer, parameter :: num_rsp2_profile_columns = 14
+
    include 'run_star_extras_TDC_pulsation_defs.inc'
 
    logical :: in_inlist_pulses, turn_off_remesh
@@ -192,9 +194,15 @@ contains
 
    integer function how_many_extra_profile_columns(id)
       integer, intent(in) :: id
+      integer :: ierr
+      type(star_info), pointer :: s
 
       how_many_extra_profile_columns = &
          TDC_pulsation_how_many_extra_profile_columns(id)
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+      if (s% RSP2_flag) how_many_extra_profile_columns = &
+         how_many_extra_profile_columns + num_rsp2_profile_columns
    end function how_many_extra_profile_columns
 
 
@@ -203,9 +211,61 @@ contains
       character(len=maxlen_profile_column_name) :: names(n)
       real(dp) :: vals(nz, n)
       integer, intent(out) :: ierr
+      type(star_info), pointer :: s
+      integer :: i, j, k, km1, num_tdc_columns
+      real(dp) :: alfa, beta, PII_div_Hp
 
+      num_tdc_columns = TDC_pulsation_how_many_extra_profile_columns(id)
       call TDC_pulsation_data_for_extra_profile_columns( &
-         id, n, nz, names, vals, ierr)
+         id, num_tdc_columns, nz, names(1:num_tdc_columns), vals(:,1:num_tdc_columns), ierr)
+      if (ierr /= 0) return
+      call star_ptr(id, s, ierr)
+      if (ierr /= 0) return
+      if (.not. s% RSP2_flag) return
+
+      i = num_tdc_columns + 1
+      names(i) = 'w_start'; vals(:,i) = s% w_start(1:nz); i = i+1
+      names(i) = 'Y_face_start'; vals(:,i) = s% Y_face_start(1:nz); i = i+1
+      names(i) = 'L_start'; vals(:,i) = s% L_start(1:nz); i = i+1
+      names(i) = 'Lt_start'; vals(:,i) = s% Lt_start(1:nz); i = i+1
+      names(i) = 'rho_start'; vals(:,i) = s% rho_start(1:nz); i = i+1
+      names(i) = 'energy_start'; vals(:,i) = s% energy_start(1:nz); i = i+1
+      names(i) = 'r_start'; vals(:,i) = s% r_start(1:nz); i = i+1
+      names(i) = 'v_start'; vals(:,i) = 0d0
+      if (s% v_flag) vals(:,i) = s% v_start(1:nz)
+      i = i+1
+      names(i) = 'u_start'; vals(:,i) = 0d0
+      if (s% u_flag) vals(:,i) = s% u_start(1:nz)
+      i = i+1
+      names(i) = 'T_start'; vals(:,i) = s% T_start(1:nz); i = i+1
+      names(i) = 'csound_start'; vals(:,i) = s% csound_start(1:nz); i = i+1
+
+      j = i
+      names(j) = 'w_face'
+      names(j+1) = 'Source_div_w'
+      names(j+2) = 'Ptrb_rsp2'
+      vals(:,j:j+2) = 0d0
+      do k = 1, nz
+         km1 = max(1,k-1)
+         if (k == 1) then
+            alfa = 1d0
+         else if (s% RSP2_use_mass_interp_face_values) then
+            alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
+         else
+            alfa = 0.5d0
+         end if
+         beta = 1d0 - alfa
+         vals(k,j) = alfa*s% w(k) + beta*s% w(km1)
+         if (s% mixing_length_alpha == 0d0 .or. &
+               k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
+               k > nz - int(nz/s% RSP2_nz_div_IBOTOM)) cycle
+
+         ! Match compute_Source_div_w without dividing by a possibly zero w.
+         PII_div_Hp = s% PII(k)/s% Hp_face(k)
+         if (k < nz) PII_div_Hp = 0.5d0*(PII_div_Hp + s% PII(k+1)/s% Hp_face(k+1))
+         vals(k,j+1) = PII_div_Hp*s% Peos(k)*s% chiT(k)/(s% rho(k)*s% chiRho(k)*s% Cp(k))
+         vals(k,j+2) = s% RSP2_alfap*(2d0/3d0)*s% rho(k)*s% w(k)**2
+      end do
    end subroutine data_for_extra_profile_columns
 
 

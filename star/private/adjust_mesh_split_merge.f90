@@ -45,10 +45,6 @@
 
          include 'formats'
 
-         if (s% RSP2_flag) then
-            call mesa_error(__FILE__,__LINE__,'split/merge AMR does not support RSP2')
-         end if
-
          s% amr_split_merge_has_undergone_remesh(:) = .false.
 
          remesh_split_merge = keep_going
@@ -961,9 +957,14 @@
             delta_KE = 0.5d0*dm_i*dm_ip*pow2(s% u(i) - s% u(ip))/dm
             s% u(i) = v
             cell_ie = cell_ie + delta_KE
-         else if (s% v_flag) then
-            ! there's no good solution for this.
-            ! so just leave s% v(i) unchanged.
+         else if (s% v_flag .and. s% RSP2_flag) then
+            v = s% v_center
+            if (ip < nz) v = s% v(ip+1)
+            cell_ie = cell_ie + KE_i + KE_ip - 0.25d0*dm*(pow2(s% v(i)) + pow2(v))
+            if (cell_ie <= 0d0) then
+               ierr = -1
+               return
+            end if
          end if
 
          s% energy(i) = cell_ie/dm
@@ -1003,7 +1004,7 @@
             end if
             if (s% RSP2_flag) then
                s% w(im) = s% w(i0)
-               s% Hp_face(im) = s% Hp_face(i0)
+               s% Y_face(im) = s% Y_face(i0)
             end if
             s% energy(im) = s% energy(i0)
             s% dPdr_dRhodr_info(im) = s% dPdr_dRhodr_info(i0)
@@ -1035,7 +1036,7 @@
 
          if (s% RSP2_flag) then
             s% xh(s% i_w,i) = s% w(i)
-            s% xh(s% i_Hp,i) = s% Hp_face(i)
+            s% xh(s% i_Y,i) = s% Y_face(i)
          end if
 
          ! do this after move cells since need new r(ip) to calc new rho(i).
@@ -1217,7 +1218,7 @@
             mC = s% m(k) - 0.5d0*dm
             PE = -s% cgrav(k)*mC*dm/rC
          end if
-         Etot = IE + KE + PE
+         Etot = IE + KE + PE + Etrb
          if (is_bad(Etot + IE + KE + PE) .or. &
              IE <= 0 .or. KE < 0) then
             write(*,2) 'nz', s% nz
@@ -1301,7 +1302,7 @@
             min_stencil_energy, max_stencil_energy, max_delta_KE_div_dm, &
             pressure_R, pressure_C, pressure_L, grad_pressure, pressure_difference_target, &
             min_stencil_pressure, max_stencil_pressure, min_stencil_lnT, max_stencil_lnT, &
-            superad_reduction_factorL, superad_reduction_factorR
+            superad_reduction_factorL, superad_reduction_factorR, Y_faceL, Y_faceR
          logical :: done, use_new_grad_rho, pressure_reconstructed
          include 'formats'
 
@@ -1351,6 +1352,14 @@
             tauL = s% tau(ip)
          end if
 
+         Y_faceR = 0d0
+         Y_faceL = 0d0
+         if (s% RSP2_flag) then
+            Y_faceR = s% Y_face(i)
+            Y_faceL = Y_faceR
+            if (i < nz) Y_faceL = s% Y_face(ip)
+         end if
+
          tauR = s% tau(i)
          if (i == nz) then
             tauL = tau_center
@@ -1384,6 +1393,7 @@
          end if
 
          energy = s% energy(i)
+         etrb = 0d0
          if (s% RSP2_flag) etrb = pow2(s% w(i))
 
          ! use iR, iC, and iL for getting values to determine slopes
@@ -1456,6 +1466,7 @@
             max_alpha = max(s% alpha_RTI(iL), s% alpha_RTI(iC), s% alpha_RTI(iR))
          end if
 
+         grad_etrb = 0d0
          if (s% RSP2_flag) then
             etrb_R = pow2(s% w(iR))
             etrb_C = pow2(s% w(iC))
@@ -1469,7 +1480,10 @@
             v_L = s% u(iL)
             grad_v = get1_grad(v_L, v_C, v_R, dLeft, dCntr, dRght)
          else if (s% v_flag) then
-            if (iL == s% nz) then
+            if (s% RSP2_flag) then
+               v_L = s% v_center
+               if (i < nz_old) v_L = s% v(ip)
+            else if (iL == s% nz) then
                v_L = s% v_center
             else
                v_L = s% v(ip)
@@ -1511,6 +1525,10 @@
                   s% u(jp) = s% u(j)
                else if (s% v_flag) then
                   s% v(jp) = s% v(j)
+               end if
+               if (s% RSP2_flag) then
+                  s% w(jp) = s% w(j)
+                  s% Y_face(jp) = s% Y_face(j)
                end if
                s% energy(jp) = s% energy(j)
                s% dPdr_dRhodr_info(jp) = s% dPdr_dRhodr_info(j)
@@ -1651,8 +1669,16 @@
             s% u(ip) = u_L
             s% energy(i) = s% energy(i) - delta_KE_div_dm
             s% energy(ip) = s% energy(ip) - delta_KE_div_dm
-         else if (s% v_flag) then  ! just make a rough approximation.
-            s% v(ip) = sqrt(0.5d0*(v2_L + v2_R))
+         else if (s% v_flag) then
+            if (s% RSP2_flag) then
+               s% v(ip) = v_R + (v_L - v_R)*dMR/dm
+               delta_KE = cell_KE_old - 0.25d0*( &
+                  dMR*(v2_R + pow2(s% v(ip))) + dML*(pow2(s% v(ip)) + v2_L))
+               s% energy(i) = s% energy(i) + delta_KE/dm
+               s% energy(ip) = s% energy(ip) + delta_KE/dm
+            else
+               s% v(ip) = sqrt(0.5d0*(v2_L + v2_R))
+            end if
          end if
 
          if (s% RTI_flag) then  ! set new alpha
@@ -1667,6 +1693,14 @@
                s% alpha_RTI(ip) = new_alphaL
             end if
             s% dPdr_dRhodr_info(ip) = s% dPdr_dRhodr_info(i)
+         end if
+
+         if (s% RSP2_flag) then
+            s% Y_face(ip) = Y_faceR + (Y_faceL - Y_faceR)*dMR/dM
+            s% xh(s% i_Y,i) = s% Y_face(i)
+            s% xh(s% i_Y,ip) = s% Y_face(ip)
+            s% xh(s% i_w,i) = s% w(i)
+            s% xh(s% i_w,ip) = s% w(ip)
          end if
 
          ! These are face-based, so a split creates new interior face values here.
@@ -1695,14 +1729,31 @@
             end if
             grad_xa(j) = 0
             grad_xa(j) = -sum(grad_xa)
-            ! set new mass fractions
-            do q = 1, species
-               call split1_non_negative( &
-                  s% xa(q,i), grad_xa(q), &
-                  dr, dV, dVR, dVL, new_xaL, new_xaR)
-               s% xa(q,i) = new_xaR
-               s% xa(q,ip) = new_xaL
-            end do
+            if (s% RSP2_flag) then
+               ! A common slope limiter preserves sum(xa) and each species mass.
+               f = 1d0
+               do q = 1, species
+                  new_xaR = grad_xa(q)*dr/4d0
+                  new_xaL = -dMR*new_xaR/dML
+                  if (new_xaR > 0d0) f = min(f, (1d0-s% xa(q,i))/new_xaR)
+                  if (new_xaR < 0d0) f = min(f, -s% xa(q,i)/new_xaR)
+                  if (new_xaL > 0d0) f = min(f, (1d0-s% xa(q,i))/new_xaL)
+                  if (new_xaL < 0d0) f = min(f, -s% xa(q,i)/new_xaL)
+               end do
+               do q = 1, species
+                  new_xaR = f*grad_xa(q)*dr/4d0
+                  s% xa(q,ip) = s% xa(q,i) - dMR*new_xaR/dML
+                  s% xa(q,i) = s% xa(q,i) + new_xaR
+               end do
+            else
+               do q = 1, species
+                  call split1_non_negative( &
+                     s% xa(q,i), grad_xa(q), &
+                     dr, dV, dVR, dVL, new_xaL, new_xaR)
+                  s% xa(q,i) = new_xaR
+                  s% xa(q,ip) = new_xaL
+               end do
+            end if
             !check mass fractions >= 0 and <= 1 and sum to 1.0
             do q = 1, species
                s% xa(q,i) = min(1d0, max(0d0, s% xa(q,i)))
@@ -2012,6 +2063,13 @@
          real(dp) :: alfa, beta, rho_00, rho_m1, rho_face, theta
 
          Pturb = 0d0
+         if (s% RSP2_flag) then
+            if (s% mixing_length_alpha == 0d0 .or. &
+                  k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
+                  k > s% nz - int(s% nz/s% RSP2_nz_div_IBOTOM)) return
+            Pturb = (2d0/3d0)*s% RSP2_alfap*(s% dm(k)/get_dV(s,k))*pow2(s% w(k))
+            return
+         end if
          if (s% mlt_Pturb_factor <= 0d0 .or. k <= 1) return
 
          rho_00 = s% dm(k)/get_dV(s,k)

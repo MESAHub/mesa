@@ -55,8 +55,8 @@
          if (ierr /= 0) return
 
          if (s% u_flag) then
-            ! Use the continuous Riemann face state without the RSP2 Uq shift.
-            call do_uface_and_Pface(s, ierr, include_rsp2_Uq=.false.)
+            ! Use the continuous Riemann face state.
+            call do_uface_and_Pface(s, ierr)
             if (ierr /= 0) return
          end if
 
@@ -101,7 +101,7 @@
          call assemble_luminosity_rows(s, problem% map, problem% mtx, ierr)
          if (ierr /= 0) return
 
-         ! RSP2 turbulent-energy and Hp closures.
+         ! RSP2 turbulent-energy and independent luminosity closures.
          call assemble_rsp2_turbulent_rows(s, problem% map, problem% mtx, ierr)
          if (ierr /= 0) return
 

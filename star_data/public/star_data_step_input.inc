@@ -71,7 +71,7 @@
          integer :: i_alpha_RTI ! alpha for Rayleigh-Taylor instabilities
          integer :: i_Et_RSP, i_erad_RSP, i_Fr_RSP ! only when RSP_flag is true
          integer :: i_w ! cell turbulent velocity. only when RSP2_flag is true.
-         integer :: i_Hp ! face pressure scale height. only when RSP2_flag is true.
+         integer :: i_Y ! signed face superadiabaticity. only when RSP2_flag is true.
 
       ! index definitions for the equations (= 0 if equation not in use)
          integer :: i_dlnR_dt ! dlnR/dt = v/r
@@ -83,7 +83,7 @@
          integer :: i_dalpha_RTI_dt ! alpha for Rayleigh-Taylor instabilities
          integer :: i_dEt_RSP_dt, i_derad_RSP_dt, i_dFr_RSP_dt ! only when RSP_flag is true.
          integer :: i_detrb_dt ! turbulent energy equation. only when RSP2_flag is true.
-         integer :: i_equ_Hp ! face pressure scale height equation. only when RSP2_flag is true.
+         integer :: i_rsp2_flux ! face luminosity closure. only when RSP2_flag is true.
 
       ! names of variables and equations
          character (len=name_len), dimension(:), pointer :: nameofvar, nameofequ ! (nvar)
@@ -204,4 +204,3 @@
 
          integer :: i_equ_w_div_wc ! equation for w_div_wc
          integer :: i_dj_rot_dt ! equation for specific angular momentum
-

@@ -50,7 +50,7 @@
          use hydro_chem_eqns, only: do_chem_eqns, do1_chem_eqns
          use hydro_energy, only: do1_energy_eqn
          use hydro_temperature, only: do1_dlnT_dm_eqn
-         use hydro_rsp2, only: do1_turbulent_energy_eqn, do1_rsp2_L_eqn, do1_rsp2_Hp_eqn
+         use hydro_rsp2, only: do1_turbulent_energy_eqn, do1_rsp2_L_eqn, do1_rsp2_flux_eqn
          use hydro_alpha_rti_eqns, only: do1_dalpha_RTI_dt_eqn
          use eps_grav, only: zero_eps_grav_and_partials
          use profile, only: do_save_profiles
@@ -241,10 +241,10 @@
                   if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_turbulent_energy_eqn'
                   ierr = op_err
                end if
-               call do1_rsp2_Hp_eqn(s, k, nvar, op_err)
+               call do1_rsp2_flux_eqn(s, k, nvar, op_err)
                if (op_err /= 0) then
-                  if (s% report_ierr) write(*,2) 'ierr in do1_rsp2_Hp_eqn', k
-                  if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_rsp2_Hp_eqn'
+                  if (s% report_ierr) write(*,2) 'ierr in do1_rsp2_flux_eqn', k
+                  if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_rsp2_flux_eqn'
                   ierr = op_err
                end if
             end if

@@ -45,8 +45,8 @@
 !# Structure
    !logM ! log10(m/Msun)
    !log_mass
-   !dm ! cell mass (grams)
-   !dm_bar ! boundary mass (grams) average of adjacent dm's
+   dm ! cell mass (grams)
+   dm_bar ! boundary mass (grams) average of adjacent dm's
    logdq ! log10(dq)
    !log_dq
    dq_ratio ! dq(k-1)/dq(k)
@@ -54,7 +54,7 @@
    log_q ! log10(q)
    !xq
 
-   !grav ! gravitational acceleration (cm sec^2)
+   grav ! gravitational acceleration (cm sec^2)
    !log_g ! log10 gravitational acceleration (cm sec^2)
    !g_div_r ! grav/radius (sec^2)
    !r_div_g ! radius/grav (sec^-2)
@@ -62,7 +62,7 @@
    vel_km_per_s ! velocity at outer boundary of zone (km/s) -- 0 if no velocity variable
 
    radius ! radius at outer boundary of zone (in Rsun units)
-   !radius_cm ! radius at outer boundary of zone (in centimeters)
+   radius_cm ! radius at outer boundary of zone (in centimeters)
    !radius_km ! radius at outer boundary of zone (in kilometers)
    !logR_cm ! log10 radius at outer boundary of zone (in centimeters)
    !rmid ! radius at center by mass of zone (in Rsun units)
@@ -98,7 +98,7 @@
    !log_xr_cm ! log10 radial distance from point to surface (cm)
    !log_xr_div_R ! log10 radial distance from point to surface in units of star radius
 
-   !dr ! r(outer edge) - r(inner edge); radial extent of cell in cm.
+   dr ! r(outer edge) - r(inner edge); radial extent of cell in cm.
    !log_dr ! log10 cell width (cm)
    !dv ! v(inner edge) - v(outer edge); rate at which delta_r is shrinking (cm/sec).
 
@@ -129,21 +129,21 @@
 
 
 !# Thermodynamics
-   !temperature ! temperature at center of zone
+   temperature ! temperature at center of zone
    !logT_face ! log10(temperature) at outer boundary of zone
    !logT_bb ! log10(black body temperature) at outer boundary of zone
    !logT_face_div_logT_bb
 
    energy ! internal energy (ergs/g)
    !logE ! log10(specific internal energy) at center of zone
-   !rho ! density
+   rho ! density
    !density ! rho
 
    entropy ! specific entropy divided by (avo*kerg)
    !logS ! log10(specific entropy)
    !logS_per_baryon ! log10(specific entropy per baryon / kerg)
 
-   !pressure ! total pressure at center of zone (pgas + prad)
+   pressure ! total pressure at center of zone (pgas + prad)
    !prad ! radiation pressure at center of zone
    !pgas ! gas pressure at center of zone (electrons and ions)
    logPgas ! log10(pgas)
@@ -155,7 +155,7 @@
    grada ! dlnT_dlnP at constant S
    !dE_dRho ! at constant T
    !cv ! specific heat at constant volume
-   !cp ! specific heat at constant total pressure
+   cp ! specific heat at constant total pressure
 
    !log_CpT
    gamma1 ! dlnP_dlnRho at constant S
@@ -163,8 +163,8 @@
    !gam ! plasma interaction parameter (> 160 or so means starting crystallization)
    free_e ! free_e is mean number of free electrons per nucleon
    !logfree_e ! log10(free_e), free_e is mean number of free electrons per nucleon
-   !chiRho ! dlnP_dlnRho at constant T
-   !chiT ! dlnP_dlnT at constant Rho
+   chiRho ! dlnP_dlnRho at constant T
+   chiT ! dlnP_dlnT at constant Rho
 
    csound ! sound speed
    log_csound
@@ -358,7 +358,7 @@
 
 
 !# Opacity
-   !opacity ! opacity measured at center of zone
+   opacity ! opacity measured at center of zone
    log_opacity ! log10(opacity)
    dkap_dlnrho_face ! partial derivative of opacity wrt. ln rho (at T=const) at outer edge of cell
       !  (was previously called dkap_dlnrho_at_face)
@@ -399,12 +399,12 @@
    !log_L_div_CpTMdot
    !log_abs_lum_erg_s
 
-   !L
-   !Lc
+   L
+   Lc
    Lc_div_L
-   !Lr
+   Lr
    !Lr_div_L
-   !Lt
+   Lt
    !Lt_div_L
 
 !# Energetics
@@ -432,7 +432,7 @@
 
    !dE
 
-   !etrb
+   etrb
    log_etrb
    !extra_grav
    log_rel_E_err
@@ -440,7 +440,7 @@
    !total_energy_sign
 
 !# Convection
-   !mlt_mixing_length ! mixing length for mlt (cm)
+   mlt_mixing_length ! mixing length for mlt (cm)
    mlt_mixing_type ! value returned by mlt
    mlt_Pturb
    !alpha_mlt
@@ -722,21 +722,21 @@
    !rsp_heat_exchange_timescale      !  1d0/(clight * opacity * density)
    !rsp_log_heat_exchange_timescale
    !rsp_log_dt_div_heat_exchange_timescale   ! Ratio of time step to heat exchange timescale
-   !w
+   w
    !log_w
 
-   !COUPL
-   !DAMP
-   !DAMPR
-   !SOURCE
-   !Chi
+   COUPL
+   DAMP
+   DAMPR
+   SOURCE
+   Chi
    Eq
-   !Hp_face
-   !PII_face
+   Hp_face
+   PII_face
    !Ptrb
    Pvsc
    Uq
-   !Y_face
+   Y_face
 
 !# RTI
 

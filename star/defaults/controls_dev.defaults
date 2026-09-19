@@ -72,8 +72,19 @@
     RSP2_Lsurf_factor = 0.5d0
 
     RSP2_report_adjust_w = .false.
+
+    ! RSP2_report_flux_solver
+    ! ~~~~~~~~~~~~~~~~~~~~~~~
+    ! Write RSP2_flux_* diagnostics to terminal output for each Newton trial.
+    ! Report the largest interior flux residual before and after the trial,
+    ! its luminosity scale, Y corrections, and the full Jacobian prediction.
+    ! Luminosities are in erg/s. No residuals or solver tolerances are changed.
+    !
+    ! ::
+
+    RSP2_report_flux_solver = .false.
+
     RSP2_use_L_eqn_at_surface = .true.
-    RSP2_assume_HSE = .true.
     RSP2_use_mass_interp_face_values = .true.
     ! Retained for inlist compatibility. The algebraic-gradient formulation
     ! uses Lr = Krad*gradT.
@@ -82,14 +93,14 @@
     RSP2_num_outermost_cells_forced_nonturbulent = 0
     RSP2_num_innermost_cells_forced_nonturbulent = 0
 
-   RSP2_w_fix_if_neg = 5d-5
+   RSP2_w_fix_if_neg = 1d-12
    RSP2_source_seed = 0d0
 
    ! Use the TDC_hydro_* controls for the common TDC and RSP2 remesher.
    ! This legacy trigger remeshes immediately when RSP2 is enabled and the
-   ! requested number of zones differs from the current model. Set it false
-   ! to use steps_before_remesh_for_TDC_pulsations instead.
-   RSP2_remesh_when_load = .true.
+   ! requested number of zones differs from the current model. By default,
+   ! use steps_before_remesh_for_TDC_pulsations instead.
+   RSP2_remesh_when_load = .false.
 
    RSP2_nz_div_IBOTOM = 30d0
 
@@ -368,7 +379,7 @@
       ! star_LNA_perturb_turbulent_energy
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! If true, include turbulent energy perturbations where supported. RSP2
-      ! models require this because w and Hp are part of the RSP2 LNA
+      ! models require this because w and Y_face are part of the RSP2 LNA
       ! variable set.
       !
       ! star_LNA_convection_treatment
@@ -574,9 +585,8 @@
 
       ! If use_TDC_enthalpy_flux_limiter = .true. , apply enthalpy flux limiter to TDC
       ! similar to the form presented in Wuchterl & Feuchtinger 1998, and Smolec 2008.
-      ! RSP2 includes the limiter in its algebraic temperature-gradient closure.
-      ! star_LNA linearizes the limited RSP2 relation. It ignores this limiter
-      ! for TDC and linearizes the unsaturated TDC relation.
+      ! This control applies only to TDC. star_LNA ignores it and linearizes
+      ! the unsaturated TDC relation.
 
       ! ::
 

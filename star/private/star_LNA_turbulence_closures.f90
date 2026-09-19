@@ -26,16 +26,16 @@
       use auto_diff
       use auto_diff_support, only: &
          shift_m1, shift_p1, wrap, wrap_Cp_00, wrap_Cp_m1, wrap_chiRho_00, &
-         wrap_chiT_00, wrap_d_00, wrap_d_m1, wrap_etrb_00, wrap_Hp_00, &
-         wrap_Hp_p1, wrap_kap_00, wrap_L_00, wrap_lnPeos_00, &
+         wrap_chiT_00, wrap_d_00, wrap_d_m1, wrap_etrb_00, &
+         wrap_kap_00, wrap_L_00, wrap_lnPeos_00, &
          wrap_lnPeos_m1, wrap_lnT_00, wrap_lnT_m1, wrap_Peos_00, &
          wrap_Peos_m1, wrap_r_00, wrap_r_p1, wrap_T_00, wrap_T_m1, wrap_u_00, &
          wrap_u_m1, wrap_v_00, wrap_v_p1, wrap_w_00, wrap_w_m1
-      use hydro_rsp2, only: get_RSP2_alfa_beta_face_weights
+      use hydro_rsp2, only: get_RSP2_alfa_beta_face_weights, compute_Source, compute_D, compute_Dr
       use reconstructed_face_support, only: &
          get_reconstructed_face_eos_kap_ad, get_reconstructed_face_state_ad
       use star_utils, only: get_mlt_mixing_length, get_rho_face_val
-      use tdc_hydro, only: get_TDC_mixing_length_face
+      use tdc_hydro, only: get_TDC_mixing_length_face, get_TDC_mixing_length_cell
       use turb, only: set_TDC_LNA
       use turb_support, only: get_TDC_dynamical_gradL
 
@@ -745,7 +745,8 @@
          type(auto_diff_real_star_order1) :: coupling_ad, dLt_dm_ad, dwork_dm_ad
 
          ierr = 0
-         call rsp2_coupling_for_star_LNA(s, k, coupling_ad)
+         call rsp2_coupling_for_star_LNA(s, k, coupling_ad, ierr)
+         if (ierr /= 0) return
          call rsp2_dLt_dm_for_star_LNA(s, k, dLt_dm_ad)
          call rsp2_turbulent_pressure_work_dm_for_star_LNA(s, k, dwork_dm_ad, ierr)
          if (ierr /= 0) return
@@ -794,103 +795,64 @@
       end subroutine turbulent_energy_inertia_for_star_LNA
 
 
-      subroutine rsp2_coupling_for_star_LNA(s, k, coupling_ad)
+      subroutine rsp2_coupling_for_star_LNA(s, k, coupling_ad, ierr)
          type(star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(out) :: coupling_ad
+         integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: source_ad, damping_ad, rad_damping_ad
 
+         ierr = 0
          coupling_ad = 0d0
          if (rsp2_forces_non_turbulent_cell(s, k)) return
 
-         call rsp2_source_for_star_LNA(s, k, source_ad)
-         call rsp2_damping_for_star_LNA(s, k, damping_ad)
-         call rsp2_radiative_damping_for_star_LNA(s, k, rad_damping_ad)
+         call rsp2_source_for_star_LNA(s, k, source_ad, ierr)
+         if (ierr /= 0) return
+         call rsp2_damping_for_star_LNA(s, k, damping_ad, ierr)
+         if (ierr /= 0) return
+         call rsp2_radiative_damping_for_star_LNA(s, k, rad_damping_ad, ierr)
+         if (ierr /= 0) return
          coupling_ad = source_ad - damping_ad - rad_damping_ad
       end subroutine rsp2_coupling_for_star_LNA
 
 
-      subroutine rsp2_source_for_star_LNA(s, k, source_ad)
+      subroutine rsp2_source_for_star_LNA(s, k, source_ad, ierr)
          type(star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(out) :: source_ad
-         type(auto_diff_real_star_order1) :: Hp_face_00_ad, Hp_face_p1_ad, &
-            PII_face_00_ad, PII_face_p1_ad, PII_div_Hp_cell_ad, QQ_00_ad, &
-            P_QQ_div_Cp_ad
+         integer, intent(out) :: ierr
 
+         ierr = 0
          source_ad = 0d0
          if (rsp2_forces_non_turbulent_cell(s, k)) return
-
-         Hp_face_00_ad = wrap_Hp_00(s, k)
-         call rsp2_PII_face_for_star_LNA(s, k, PII_face_00_ad)
-         if (k == s% nz) then
-            PII_div_Hp_cell_ad = PII_face_00_ad/Hp_face_00_ad
-         else
-            Hp_face_p1_ad = wrap_Hp_p1(s, k)
-            call rsp2_PII_face_for_star_LNA(s, k + 1, PII_face_p1_ad)
-            PII_face_p1_ad = shift_p1(PII_face_p1_ad)
-            PII_div_Hp_cell_ad = 0.5d0*( &
-               PII_face_00_ad/Hp_face_00_ad + PII_face_p1_ad/Hp_face_p1_ad)
-         end if
-
-         QQ_00_ad = wrap_chiT_00(s, k)/( &
-            wrap_d_00(s, k)*wrap_T_00(s, k)*wrap_chiRho_00(s, k))
-         P_QQ_div_Cp_ad = wrap_Peos_00(s, k)*QQ_00_ad/wrap_Cp_00(s, k)
-         source_ad = (wrap_w_00(s, k) + s% RSP2_source_seed)* &
-            PII_div_Hp_cell_ad*wrap_T_00(s, k)*P_QQ_div_Cp_ad
+         source_ad = compute_Source(s, k, ierr)
       end subroutine rsp2_source_for_star_LNA
 
 
-      subroutine rsp2_damping_for_star_LNA(s, k, damping_ad)
+      subroutine rsp2_damping_for_star_LNA(s, k, damping_ad, ierr)
          type(star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(out) :: damping_ad
-         real(dp), parameter :: x_CEDE = (8d0/3d0)*sqrt_2_div_3
-         type(auto_diff_real_star_order1) :: Hp_cell_ad, w_00_ad
+         integer, intent(out) :: ierr
 
+         ierr = 0
          damping_ad = 0d0
-         if (s% mixing_length_alpha == 0d0) return
-
-         Hp_cell_ad = rsp2_Hp_cell_for_star_LNA(s, k)
-         w_00_ad = wrap_w_00(s, k)
-         damping_ad = (s% RSP2_alfad*x_CEDE/s% mixing_length_alpha)* &
-            pow3(w_00_ad)/Hp_cell_ad
+         if (rsp2_forces_non_turbulent_cell(s, k)) return
+         damping_ad = compute_D(s, k, ierr)
       end subroutine rsp2_damping_for_star_LNA
 
 
-      subroutine rsp2_radiative_damping_for_star_LNA(s, k, rad_damping_ad)
+      subroutine rsp2_radiative_damping_for_star_LNA(s, k, rad_damping_ad, ierr)
          type(star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(out) :: rad_damping_ad
-         real(dp), parameter :: x_GAMMAR = 2d0*sqrt(3d0)
-         real(dp) :: alpha, gammar
-         type(auto_diff_real_star_order1) :: Hp_cell_ad, POM2_ad, w_00_ad
+         integer, intent(out) :: ierr
 
+         ierr = 0
          rad_damping_ad = 0d0
-         alpha = s% mixing_length_alpha
-         gammar = s% RSP2_alfar*x_GAMMAR
-         if (alpha == 0d0 .or. gammar == 0d0) return
-
-         Hp_cell_ad = rsp2_Hp_cell_for_star_LNA(s, k)
-         w_00_ad = wrap_w_00(s, k)
-         POM2_ad = pow3(wrap_T_00(s, k))/( &
-            pow2(wrap_d_00(s, k))*wrap_Cp_00(s, k)*wrap_kap_00(s, k))
-         rad_damping_ad = pow2(w_00_ad)* &
-            4d0*boltz_sigma*pow2(gammar/alpha)*POM2_ad/pow2(Hp_cell_ad)
+         if (rsp2_forces_non_turbulent_cell(s, k)) return
+         rad_damping_ad = compute_Dr(s, k, ierr)
       end subroutine rsp2_radiative_damping_for_star_LNA
-
-
-      function rsp2_Hp_cell_for_star_LNA(s, k) result(Hp_cell_ad)
-         type(star_info), pointer :: s
-         integer, intent(in) :: k
-         type(auto_diff_real_star_order1) :: Hp_cell_ad, grav_cell_ad
-
-         grav_cell_ad = 0.5d0*s% cgrav(k)*s% m_grav(k)/pow2(wrap_r_00(s, k))
-         if (k < s% nz) &
-            grav_cell_ad = grav_cell_ad + &
-               0.5d0*s% cgrav(k+1)*s% m_grav(k+1)/pow2(wrap_r_p1(s, k))
-         Hp_cell_ad = wrap_Peos_00(s, k)/(wrap_d_00(s, k)*grav_cell_ad)
-      end function rsp2_Hp_cell_for_star_LNA
 
 
       subroutine rsp2_turbulent_pressure_work_dm_for_star_LNA(s, k, dwork_dm_ad, ierr)
@@ -953,9 +915,12 @@
          ierr = 0
          call rsp2_PII_face_for_star_LNA(s, k, PII_ad)
          call rsp2_luminosity_terms_for_star_LNA(s, k, Lr_ad, Lc_ad, Lt_ad)
-         call rsp2_source_for_star_LNA(s, k, source_ad)
-         call rsp2_damping_for_star_LNA(s, k, damping_ad)
-         call rsp2_radiative_damping_for_star_LNA(s, k, rad_damping_ad)
+         call rsp2_source_for_star_LNA(s, k, source_ad, ierr)
+         if (ierr /= 0) return
+         call rsp2_damping_for_star_LNA(s, k, damping_ad, ierr)
+         if (ierr /= 0) return
+         call rsp2_radiative_damping_for_star_LNA(s, k, rad_damping_ad, ierr)
+         if (ierr /= 0) return
          call rsp2_Ptrb_for_star_LNA(s, k, Ptrb_ad, Ptrb_div_etrb_ad)
          call rsp2_turbulent_pressure_work_dm_for_star_LNA(s, k, dwork_dm_ad, ierr)
          if (ierr /= 0) return
@@ -1085,24 +1050,39 @@
          type(auto_diff_real_star_order1), intent(out) :: Chi_ad
          integer, intent(out) :: ierr
          real(dp) :: chi_coeff, dm_face, r00, rmid00, rmidm1
-         type(auto_diff_real_star_order1) :: d_u_div_r_ad, Lambda_ad
+         type(auto_diff_real_star_order1) :: d_u_div_r_ad, Lambda_ad, w_face_ad
+         real(dp) :: alpha_M, alfa, beta, num_outer, num_inner
 
          ierr = 0
          Chi_ad = 0d0
-         if (s%mixing_length_alpha == 0d0 .or. s%TDC_alpha_M == 0d0 .or. &
-               k <= s%TDC_num_outermost_cells_forced_nonturbulent + 1 .or. &
-               k > s%nz - s%TDC_num_innermost_cells_forced_nonturbulent) return
+         alpha_M = s%TDC_alpha_M
+         num_outer = s%TDC_num_outermost_cells_forced_nonturbulent
+         num_inner = s%TDC_num_innermost_cells_forced_nonturbulent
+         if (s%RSP2_flag) then
+            alpha_M = s%RSP2_alfam
+            num_outer = s%RSP2_num_outermost_cells_forced_nonturbulent
+            num_inner = int(s%nz/s%RSP2_nz_div_IBOTOM)
+         end if
+         if (s%mixing_length_alpha == 0d0 .or. alpha_M == 0d0 .or. &
+               k <= num_outer + 1 .or. &
+               k > s%nz - num_inner) return
 
          Lambda_ad = get_TDC_mixing_length_face(s, k, ierr)
          if (ierr /= 0) return
 
+         if (s%RSP2_flag) then
+            call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
+            w_face_ad = alfa*wrap_w_00(s,k) + beta*wrap_w_m1(s,k)
+         else
+            w_face_ad = s%mlt_vc(k)/sqrt_2_div_3
+         end if
          dm_face = 0.5d0*(s%dm(k) + s%dm(k-1))
          r00 = s%r(k)
          rmid00 = s%rmid(k)
          rmidm1 = s%rmid(k-1)
          d_u_div_r_ad = wrap_u_m1(s, k)/rmidm1 - wrap_u_00(s, k)/rmid00
-         chi_coeff = (16d0/3d0)*pi*s%TDC_alpha_M*pow2(get_rho_face_val(s, k))* &
-            r00**6*Lambda_ad%val*s%mlt_vc(k)/sqrt_2_div_3/dm_face
+         chi_coeff = (16d0/3d0)*pi*alpha_M*pow2(get_rho_face_val(s, k))* &
+            r00**6*Lambda_ad%val*w_face_ad%val/dm_face
          Chi_ad = chi_coeff*d_u_div_r_ad
       end subroutine static_eddy_Chi_face_for_star_LNA
 
@@ -1112,15 +1092,22 @@
          type(auto_diff_real_star_order1), intent(out) :: Chi_ad
          integer, intent(out) :: ierr
          real(dp) :: chi_coeff, dm_boundary, rmid_inner
-         type(auto_diff_real_star_order1) :: d_u_div_r_ad, Lambda_ad
+         type(auto_diff_real_star_order1) :: d_u_div_r_ad, Lambda_ad, w_face_ad
+         real(dp) :: alpha_M, num_inner
 
          ierr = 0
          Chi_ad = 0d0
+         alpha_M = 0d0
+         if (s%MLT_option == 'TDC') alpha_M = s%TDC_alpha_M
+         num_inner = s%TDC_num_innermost_cells_forced_nonturbulent
+         if (s%RSP2_flag) then
+            alpha_M = s%RSP2_alfam
+            num_inner = int(s%nz/s%RSP2_nz_div_IBOTOM)
+         end if
          if (.not. s%TDC_include_inner_boundary_eddy_viscosity .or. &
                s%R_center <= 0d0 .or. .not. s%u_flag .or. &
-               s%MLT_option /= 'TDC' .or. s%RSP2_flag .or. &
-               s%TDC_num_innermost_cells_forced_nonturbulent > 0d0 .or. &
-               s%mixing_length_alpha == 0d0 .or. s%TDC_alpha_M == 0d0) return
+               num_inner > 0d0 .or. &
+               s%mixing_length_alpha == 0d0 .or. alpha_M == 0d0) return
 
          Lambda_ad = get_TDC_mixing_length_face(s, s%nz, ierr)
          if (ierr /= 0) return
@@ -1131,11 +1118,16 @@
             ierr = -1
             return
          end if
+         if (s%RSP2_flag) then
+            w_face_ad = wrap_w_00(s, s%nz)
+         else
+            w_face_ad = s%mlt_vc(s%nz)/sqrt_2_div_3
+         end if
          dm_boundary = 0.5d0*s%dm(s%nz)
          d_u_div_r_ad = wrap_u_00(s, s%nz)/rmid_inner - &
             s%v_center/s%R_center
-         chi_coeff = (16d0/3d0)*pi*s%TDC_alpha_M*pow2(s%rho(s%nz))* &
-            s%R_center**6*Lambda_ad%val*s%mlt_vc(s%nz)/sqrt_2_div_3/dm_boundary
+         chi_coeff = (16d0/3d0)*pi*alpha_M*pow2(s%rho(s%nz))* &
+            s%R_center**6*Lambda_ad%val*w_face_ad%val/dm_boundary
          Chi_ad = chi_coeff*d_u_div_r_ad
       end subroutine static_eddy_Chi_inner_boundary_for_star_LNA
 
@@ -1205,24 +1197,26 @@
          ierr = 0
          chi_coeff = 0d0
          if (s% RSP2_flag) then
-            chi_coeff = rsp2_chi_coefficient_for_star_LNA(s, k)
+            chi_coeff = rsp2_chi_coefficient_for_star_LNA(s, k, ierr)
          else if (s% star_LNA_include_tdc .and. s% MLT_option == 'TDC') then
             chi_coeff = tdc_chi_coefficient_for_star_LNA(s, k, ierr)
          end if
       end function chi_coefficient_for_star_LNA
 
 
-      real(dp) function rsp2_chi_coefficient_for_star_LNA(s, k) result(chi_coeff)
+      real(dp) function rsp2_chi_coefficient_for_star_LNA(s, k, ierr) result(chi_coeff)
          type(star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp) :: alfam_alpha
+         integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1) :: Lambda_cell
 
+         ierr = 0
          chi_coeff = 0d0
-         alfam_alpha = s% RSP2_alfam*s% mixing_length_alpha
-         if (alfam_alpha == 0d0 .or. rsp2_forces_non_turbulent_cell(s, k)) return
-
-         chi_coeff = chi_geometry_coefficient_for_star_LNA(s, k, alfam_alpha, &
-            Hp_cell_for_rsp2_chi_for_star_LNA(s, k), s% w(k))
+         if (s% RSP2_alfam == 0d0 .or. rsp2_forces_non_turbulent_cell(s, k)) return
+         Lambda_cell = get_TDC_mixing_length_cell(s, k, ierr)
+         if (ierr /= 0) return
+         chi_coeff = chi_geometry_coefficient_for_star_LNA(s, k, s% RSP2_alfam, &
+            Lambda_cell%val, s% w(k))
       end function rsp2_chi_coefficient_for_star_LNA
 
 
@@ -1230,16 +1224,16 @@
          type(star_info), pointer :: s
          integer, intent(in) :: k
          integer, intent(out) :: ierr
-         real(dp) :: Lambda_cell
+         type(auto_diff_real_star_order1) :: Lambda_cell
 
          ierr = 0
          chi_coeff = 0d0
          if (s% TDC_alpha_M == 0d0 .or. tdc_forces_non_turbulent_cell(s, k)) return
 
-         call Lambda_cell_for_tdc_chi_for_star_LNA(s, k, Lambda_cell, ierr)
+         Lambda_cell = get_TDC_mixing_length_cell(s, k, ierr)
          if (ierr /= 0) return
          chi_coeff = chi_geometry_coefficient_for_star_LNA(s, k, s% TDC_alpha_M, &
-            Lambda_cell, tdc_w_for_star_LNA(s, k))
+            Lambda_cell%val, tdc_w_for_star_LNA(s, k))
       end function tdc_chi_coefficient_for_star_LNA
 
 
@@ -1265,39 +1259,6 @@
          chi_coeff = (16d0/3d0)*pi*alfam*s% rho(k)*s% rho(k)* &
             r6_cell*length_cell*w_cell/s% dm(k)
       end function chi_geometry_coefficient_for_star_LNA
-
-
-      real(dp) function Hp_cell_for_rsp2_chi_for_star_LNA(s, k) result(Hp_cell)
-         type(star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp) :: grav_cell
-
-         grav_cell = 0.5d0*s% cgrav(k)*s% m_grav(k)/pow2(s% r(k))
-         if (k < s% nz) &
-            grav_cell = grav_cell + &
-               0.5d0*s% cgrav(k+1)*s% m_grav(k+1)/pow2(s% r(k+1))
-         Hp_cell = s% Peos(k)/(s% rho(k)*grav_cell)
-      end function Hp_cell_for_rsp2_chi_for_star_LNA
-
-
-      subroutine Lambda_cell_for_tdc_chi_for_star_LNA(s, k, Lambda_cell, ierr)
-         type(star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp), intent(out) :: Lambda_cell
-         integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: Lambda_ad
-
-         ierr = 0
-         Lambda_ad = get_TDC_mixing_length_face(s, k, ierr)
-         if (ierr /= 0) return
-         Lambda_cell = 0.5d0*Lambda_ad% val
-
-         if (k < s% nz) then
-            Lambda_ad = get_TDC_mixing_length_face(s, k + 1, ierr)
-            if (ierr /= 0) return
-            Lambda_cell = Lambda_cell + 0.5d0*Lambda_ad% val
-         end if
-      end subroutine Lambda_cell_for_tdc_chi_for_star_LNA
 
 
       real(dp) function tdc_w_for_star_LNA(s, k) result(w_cell)

@@ -311,8 +311,10 @@
             s% gradT(k) = s% gradT_ad(k)%val
             s% mlt_gradT(k) = s% gradT(k)  ! prior to adjustments
 
-            s% Y_face_ad(k) = Y_face_ad
-            s% Y_face(k) = s% Y_face_ad(k)%val
+            if (.not. s% RSP2_flag) then
+               s% Y_face_ad(k) = Y_face_ad
+               s% Y_face(k) = s% Y_face_ad(k)%val
+            end if
 
             s% mlt_vc_ad(k) = mlt_vc_ad
             if (s% okay_to_set_mlt_vc) s% mlt_vc(k) = s% mlt_vc_ad(k)%val
@@ -353,8 +355,10 @@
             s% gradT(k) = s% gradT_ad(k)%val
 
             Y_face_ad = gradT_ad - grada_face_ad
-            s% Y_face_ad(k) = Y_face_ad
-            s% Y_face(k) = s% Y_face_ad(k)%val
+            if (.not. s% RSP2_flag) then
+               s% Y_face_ad(k) = Y_face_ad
+               s% Y_face(k) = s% Y_face_ad(k)%val
+            end if
 
             s% mlt_vc_ad(k) = 0d0
             if (s% okay_to_set_mlt_vc) s% mlt_vc(k) = 0d0

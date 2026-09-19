@@ -44,7 +44,6 @@ contains
       !  TDC_hydro_dq_1_factor = 2d0
       use interp_1d_def, only: pm_work_size
       use interp_1d_lib, only: interpolate_vector_pm
-      use hydro_rsp2, only: Hp_face_for_rsp2_val
       use hydro_vars, only: set_cgrav
       type(star_info), pointer :: s
       integer, intent(out) :: ierr
@@ -108,7 +107,14 @@ contains
       call set_new_lnd2
       call interpolate1_cell_val2(s%i_lnT)
       if (s%i_u /= 0) call interpolate1_cell_val2(s%i_u)
-      if (s%RSP2_flag) call interpolate1_cell_val2(s%i_w)
+      if (s%RSP2_flag) then
+         call interpolate1_face_val2(s%i_Y, s%xh(s%i_Y,nz_old))
+         s%xh(s%i_Y,1) = 0d0
+         v_old(1:nz_old) = pow2(s%xh(s%i_w,1:nz_old))
+         call remap1_cell_average2
+         s%xh(s%i_w,1:nz) = sqrt(max(0d0, v_new(1:nz)))
+         s%w(1:nz) = s%xh(s%i_w,1:nz)
+      end if
       do j = 1, s%species
          call remap1_xa2(j)
       end do
@@ -119,13 +125,6 @@ contains
       if (ierr /= 0) call mesa_error(__FILE__, __LINE__, 'remesh_for_TDC failed in set_cgrav')
       call revise_lnT_for_QHSE2(P_surf, ierr)
       if (ierr /= 0) call mesa_error(__FILE__, __LINE__, 'remesh_for_TDC failed in revise_lnT_for_QHSE')
-      if (s%RSP2_flag) then
-         do k = 1, nz
-            s%Hp_face(k) = Hp_face_for_rsp2_val(s, k, ierr)
-            if (ierr /= 0) call mesa_error(__FILE__, __LINE__, 'remesh_for_TDC failed to set RSP2 Hp')
-            s%xh(s%i_Hp, k) = s%Hp_face(k)
-         end do
-      end if
       if (s%rotation_flag) call set_rotation_seed2
       deallocate (work1)
       write (*, 1) 'new old L_surf/Lsun', s%xh(s%i_lum, 1)/Lsun, old_L1/Lsun
@@ -689,27 +688,34 @@ contains
 
       subroutine remap1_xa2(j)
          integer, intent(in) :: j
-         integer :: k_old, k_scan, k_new
-         real(dp) :: overlap, species_mass
 
          v_old(1:nz_old) = s%xa(j, 1:nz_old)
+         call remap1_cell_average2
+         s%xa(j, 1:nz) = v_new(1:nz)
+      end subroutine remap1_xa2
+
+
+      subroutine remap1_cell_average2
+         integer :: k_old, k_scan, k_new
+         real(dp) :: overlap, cell_integral
+
          k_old = 1
          do k_new = 1, nz
             do while (k_old < nz_old .and. xm_old(k_old + 1) <= xm(k_new))
                k_old = k_old + 1
             end do
-            species_mass = 0d0
+            cell_integral = 0d0
             k_scan = k_old
             do while (k_scan <= nz_old .and. xm_old(k_scan) < xm(k_new + 1))
-               ! A mass-overlap average conserves the total mass of each species.
+               ! Integrate the old cell averages over the new mass interval.
                overlap = min(xm(k_new + 1), xm_old(k_scan + 1)) - &
                   max(xm(k_new), xm_old(k_scan))
-               if (overlap > 0d0) species_mass = species_mass + overlap*v_old(k_scan)
+               if (overlap > 0d0) cell_integral = cell_integral + overlap*v_old(k_scan)
                k_scan = k_scan + 1
             end do
-            s%xa(j, k_new) = species_mass/s%dm(k_new)
+            v_new(k_new) = cell_integral/s%dm(k_new)
          end do
-      end subroutine remap1_xa2
+      end subroutine remap1_cell_average2
 
       subroutine remap_rotation2(old_J, old_abs_J)
          real(dp), intent(in) :: old_J, old_abs_J
@@ -834,9 +840,17 @@ contains
                dm_face = 0.5d0*(s%dm(k - 1) + s%dm(k))
             end if
             P_00 = P_m1 + s%cgrav(k)*s%m(k)*dm_face/(4d0*pi*pow4(s%r(k)))
-            logP = log10(P_00)  ! value for QHSE
-            s%lnPeos(k) = logP*ln10
             s%Peos(k) = P_00
+            if (s%RSP2_flag .and. s%mixing_length_alpha /= 0d0 .and. &
+                  k > s%RSP2_num_outermost_cells_forced_nonturbulent .and. &
+                  k <= nz - int(nz/s%RSP2_nz_div_IBOTOM)) &
+               s%Peos(k) = s%Peos(k) - (2d0/3d0)*s%RSP2_alfap*s%rho(k)*pow2(s%w(k))
+            if (s%Peos(k) <= 0d0) then
+               ierr = -1
+               return
+            end if
+            logP = log10(s%Peos(k))  ! EOS pressure required for QHSE
+            s%lnPeos(k) = logP*ln10
             logRho = s%lnd(k)/ln10
             logT_guess = s%lnT(k)/ln10
             logT_tol = 1d-11

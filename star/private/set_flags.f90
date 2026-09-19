@@ -338,8 +338,8 @@
          nvar_hydro_old = s% nvar_hydro
 
          if (.not. RSP2_flag) then
+            call remove1(s% i_Y)
             call remove1(s% i_w)
-            call remove1(s% i_Hp)
          end if
 
          call set_var_info(s, ierr)
@@ -374,7 +374,11 @@
                ierr = -1
                return
             end if
-            call insert1(s% i_Hp)  ! will be initialized by set_RSP2_vars
+            call insert1(s% i_Y)
+            s% xh(s% i_Y,1) = 0d0
+            do k=2,nz
+               s% xh(s% i_Y,k) = s% gradT(k) - s% gradL(k)
+            end do
          end if
 
          call set_chem_names(s)
@@ -386,8 +390,10 @@
             if (ierr /= 0) return
          end if
 
-         call set_v_flag(s% id, .true., ierr)
-         if (ierr /= 0) return
+         if (.not. s% u_flag) then
+            call set_v_flag(s% id, .true., ierr)
+            if (ierr /= 0) return
+         end if
 
          call set_vars(s, s% dt, ierr)
          if (ierr /= 0) return

@@ -430,7 +430,7 @@
     sum_xa_hard_limit, sum_xa_hard_limit_for_highT, logT_max_for_sum_xa_hard_limit, logT_min_for_sum_xa_hard_limit_for_highT, &
     xa_clip_limit, report_solver_progress, solver_test_partials_k_high, RSP2_use_L_eqn_at_surface, &
     solver_epsder_chem, solver_epsder_struct, solver_numerical_jacobian, energy_conservation_dump_model_number, &
-    solver_jacobian_nzlo, solver_jacobian_nzhi, solver_check_everything, solver_inspect_soln_flag, RSP2_assume_HSE, &
+    solver_jacobian_nzlo, solver_jacobian_nzhi, solver_check_everything, solver_inspect_soln_flag, &
     solver_test_partials_dx_0, solver_test_partials_k, solver_show_correction_info, eps_mdot_leak_frac_factor, &
     solver_test_partials_write_eos_call_info, solver_save_photo_call_number, RSP2_min_Lc_div_L_for_convective_mixing_type, &
     solver_test_partials_var_name, solver_test_partials_equ_name, RSP2_min_Lt_div_L_for_overshooting_mixing_type, &
@@ -443,7 +443,7 @@
     RSP2_target_steps_per_cycle, RSP2_max_num_periods, RSP2_work_period, RSP2_map_first_period, RSP2_map_last_period, &
     RSP2_min_max_R_for_periods, RSP2_GREKM_avg_abs_frac_new, RSP2_GREKM_avg_abs_limit, RSP2_map_zone_interval, &
     RSP2_work_filename, RSP2_map_columns_filename, RSP2_map_filename, RSP2_map_history_filename, RSP2_write_map, &
-    RSP2_nz_div_IBOTOM, RSP2_report_adjust_w, &
+    RSP2_nz_div_IBOTOM, RSP2_report_adjust_w, RSP2_report_flux_solver, &
     RSP2_source_seed, RSP2_w_fix_if_neg, &
     star_LNA_flag, star_LNA_model_number, star_LNA_stop_after_run, star_LNA_T_inner, &
     star_LNA_num_modes, &
@@ -2219,7 +2219,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% RSP2_remesh_when_load = RSP2_remesh_when_load
  s% RSP2_use_L_eqn_at_surface = RSP2_use_L_eqn_at_surface
  s% RSP2_report_adjust_w = RSP2_report_adjust_w
- s% RSP2_assume_HSE = RSP2_assume_HSE
+ s% RSP2_report_flux_solver = RSP2_report_flux_solver
  s% RSP2_use_mass_interp_face_values = RSP2_use_mass_interp_face_values
  s% RSP2_num_outermost_cells_forced_nonturbulent = RSP2_num_outermost_cells_forced_nonturbulent
  s% RSP2_num_innermost_cells_forced_nonturbulent = RSP2_num_innermost_cells_forced_nonturbulent
@@ -3989,7 +3989,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  RSP2_remesh_when_load = s% RSP2_remesh_when_load
  RSP2_use_L_eqn_at_surface = s% RSP2_use_L_eqn_at_surface
  RSP2_report_adjust_w = s% RSP2_report_adjust_w
- RSP2_assume_HSE = s% RSP2_assume_HSE
+ RSP2_report_flux_solver = s% RSP2_report_flux_solver
  RSP2_use_mass_interp_face_values = s% RSP2_use_mass_interp_face_values
  RSP2_num_outermost_cells_forced_nonturbulent = s% RSP2_num_outermost_cells_forced_nonturbulent
  RSP2_num_innermost_cells_forced_nonturbulent = s% RSP2_num_innermost_cells_forced_nonturbulent

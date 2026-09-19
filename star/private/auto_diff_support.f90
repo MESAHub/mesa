@@ -61,7 +61,7 @@
             dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, &
             dL_m1, dL_00, dL_p1, &
-            dHp_m1, dHp_00, dHp_p1, &
+            dY_m1, dY_00, dY_p1, &
             dw_div_wc_m1, dw_div_wc_00, dw_div_wc_p1, &
             djrot_m1, djrot_00, djrot_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
@@ -71,7 +71,7 @@
             val, dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
             dw_m1, dw_00, dw_p1, dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
-            dHp_m1, dHp_00, dHp_p1, &
+            dY_m1, dY_00, dY_p1, &
             dw_div_wc_m1, dw_div_wc_00, dw_div_wc_p1, &
             djrot_m1, djrot_00, djrot_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
@@ -95,9 +95,9 @@
          dL_m1 = var%d1Array(i_L_m1)
          dL_00 = var%d1Array(i_L_00)
          dL_p1 = var%d1Array(i_L_p1)
-         dHp_m1 = var%d1Array(i_Hp_m1)
-         dHp_00 = var%d1Array(i_Hp_00)
-         dHp_p1 = var%d1Array(i_Hp_p1)
+         dY_m1 = var%d1Array(i_Y_m1)
+         dY_00 = var%d1Array(i_Y_00)
+         dY_p1 = var%d1Array(i_Y_p1)
          dw_div_wc_m1 = var%d1Array(i_w_div_wc_m1)
          dw_div_wc_00 = var%d1Array(i_w_div_wc_00)
          dw_div_wc_p1 = var%d1Array(i_w_div_wc_p1)
@@ -119,7 +119,7 @@
             dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, &
             dL_m1, dL_00, dL_p1, &
-            dHp_m1, dHp_00, dHp_p1, &
+            dY_m1, dY_00, dY_p1, &
             dw_div_wc_m1, dw_div_wc_00, dw_div_wc_p1, &
             djrot_m1, djrot_00, djrot_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
@@ -129,7 +129,7 @@
             val, dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
             dw_m1, dw_00, dw_p1, dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
-            dHp_m1, dHp_00, dHp_p1, &
+            dY_m1, dY_00, dY_p1, &
             dw_div_wc_m1, dw_div_wc_00, dw_div_wc_p1, &
             djrot_m1, djrot_00, djrot_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
@@ -153,9 +153,9 @@
          var%d1Array(i_L_m1) = dL_m1
          var%d1Array(i_L_00) = dL_00
          var%d1Array(i_L_p1) = dL_p1
-         var%d1Array(i_Hp_m1) = dHp_m1
-         var%d1Array(i_Hp_00) = dHp_00
-         var%d1Array(i_Hp_p1) = dHp_p1
+         var%d1Array(i_Y_m1) = dY_m1
+         var%d1Array(i_Y_00) = dY_00
+         var%d1Array(i_Y_p1) = dY_p1
          var%d1Array(i_w_div_wc_m1) = dw_div_wc_m1
          var%d1Array(i_w_div_wc_00) = dw_div_wc_00
          var%d1Array(i_w_div_wc_p1) = dw_div_wc_p1
@@ -1272,36 +1272,36 @@
       end function wrap_opt_time_center_u_p1
 
 
-      function wrap_Hp_m1(s, k) result(Hp_m1)
+      function wrap_Y_m1(s, k) result(Y_m1)
          type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: Hp_m1
+         type(auto_diff_real_star_order1) :: Y_m1
          integer, intent(in) :: k
-         Hp_m1 = 0d0
+         Y_m1 = 0d0
          if (k > 1) then
-            Hp_m1 % val = s%Hp_face(k-1)
-            Hp_m1 % d1Array(i_Hp_m1) = 1d0
+            Y_m1 % val = s%Y_face(k-1)
+            Y_m1 % d1Array(i_Y_m1) = 1d0
          end if
-      end function wrap_Hp_m1
+      end function wrap_Y_m1
 
-      function wrap_Hp_00(s, k) result(Hp_00)
+      function wrap_Y_00(s, k) result(Y_00)
          type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: Hp_00
+         type(auto_diff_real_star_order1) :: Y_00
          integer, intent(in) :: k
-         Hp_00 = 0d0
-         Hp_00 % val = s%Hp_face(k)
-         Hp_00 % d1Array(i_Hp_00) = 1d0
-      end function wrap_Hp_00
+         Y_00 = 0d0
+         Y_00 % val = s%Y_face(k)
+         Y_00 % d1Array(i_Y_00) = 1d0
+      end function wrap_Y_00
 
-      function wrap_Hp_p1(s, k) result(Hp_p1)
+      function wrap_Y_p1(s, k) result(Y_p1)
          type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: Hp_p1
+         type(auto_diff_real_star_order1) :: Y_p1
          integer, intent(in) :: k
-         Hp_p1 = 0d0
+         Y_p1 = 0d0
          if (k < s%nz) then
-            Hp_p1 % val = s%Hp_face(k+1)
-            Hp_p1 % d1Array(i_Hp_p1) = 1d0
+            Y_p1 % val = s%Y_face(k+1)
+            Y_p1 % d1Array(i_Y_p1) = 1d0
          end if
-      end function wrap_Hp_p1
+      end function wrap_Y_p1
 
 
       function wrap_w_div_wc_m1(s, k) result(w_div_wc_m1)

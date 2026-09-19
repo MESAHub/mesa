@@ -10,7 +10,6 @@
 
 ! RSP2
    RSP2_use_L_eqn_at_surface = .false.
-   RSP2_assume_HSE = .true.
    
    RSP2_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap     
    RSP2_alfat =     0.0d0         ! turbulent flux; Lt ~ RSP2_alfat

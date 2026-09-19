@@ -42,13 +42,13 @@
       use math_lib, only: pow2, pow4
       use auto_diff
       use auto_diff_support, only: &
-         shift_m1, wrap, wrap_d_00, wrap_Hp_00, wrap_L_00, wrap_L_p1, &
+         shift_m1, wrap, wrap_d_00, wrap_L_00, wrap_L_p1, &
          wrap_lnd_00, wrap_lnPeos_00, wrap_lnPeos_m1, wrap_Peos_00, &
          wrap_lnT_00, wrap_lnT_m1, wrap_r_00, wrap_r_p1, wrap_r_m1, &
-         wrap_T_00, wrap_T_m1, wrap_v_00, wrap_v_p1
+         wrap_T_00, wrap_T_m1, wrap_v_00, wrap_v_p1, wrap_s_00
       use hydro_vars, only: set_Teff_info_for_eqns
       use hydro_riemann, only: do_uface_and_Pface, eval_Riemann_dudt_rhs
-      use hydro_rsp2, only: Hp_face_for_rsp2_eqn
+      use hydro_rsp2, only: rsp2_flux_residual
       use reconstructed_face_support, only: &
          get_effective_gradr_factor_ad, get_Lrad_per_gradT_face_ad, &
          get_reconstructed_face_eos_kap_ad
@@ -85,7 +85,7 @@
       integer, parameter :: lna_var_lnT = 5
       integer, parameter :: lna_var_L = 6
       integer, parameter :: lna_var_w = 7
-      integer, parameter :: lna_var_Hp = 8
+      integer, parameter :: lna_var_Y = 8
 
       integer, parameter :: lna_eq_density = 1
       integer, parameter :: lna_eq_radius = 2
@@ -102,7 +102,7 @@
       integer, parameter :: lna_eq_temperature_gradient = 14
       integer, parameter :: lna_eq_rsp2_turbulent_energy = 15
       integer, parameter :: lna_eq_rsp2_zero_w = 16
-      integer, parameter :: lna_eq_rsp2_Hp = 17
+      integer, parameter :: lna_eq_rsp2_flux = 17
       integer, parameter :: lna_eq_tdc_velocity = 18
       integer, parameter :: lna_eq_tdc_zero_w = 19
       integer, parameter :: lna_eq_mlt_static_temperature_gradient = 20
@@ -143,6 +143,18 @@
 
          ierr = 0
 
+         ! LNA can be requested before the first call to hydro_eqns.
+         select case (trim(s% energy_eqn_option))
+         case ('eps_grav')
+            s% eps_grav_form_for_energy_eqn = .true.
+         case ('dedt')
+            s% eps_grav_form_for_energy_eqn = .false.
+         case default
+            write(*,'(a)') 'Invalid choice for energy_eqn_option in star_LNA.'
+            ierr = -1
+            return
+         end select
+
          call check_static_star_LNA_background(s, ierr)
          if (ierr /= 0) return
 
@@ -153,16 +165,6 @@
                s% mlt_Pturb_factor > 0d0)) then
             write(*,'(a)') &
                'u_flag star_LNA requires turbulent pressure perturbations for this background.'
-            ierr = -1
-            return
-         end if
-
-         ! RSP2 places Uq in u_face rather than the cell momentum source.
-         if (s% u_flag .and. s% RSP2_flag .and. &
-               s% star_LNA_perturb_eddy_viscosity .and. &
-               s% RSP2_alfam*s% mixing_length_alpha /= 0d0) then
-            write(*,'(a)') &
-               'star_LNA does not support RSP2 eddy viscosity with u_flag.'
             ierr = -1
             return
          end if
@@ -215,8 +217,14 @@
             return
          end if
 
-         if (s% eps_grav_form_for_energy_eqn) then
-            write(*,'(a)') 'star_LNA requires the dE/dt energy equation form.'
+         if (s% eps_grav_form_for_energy_eqn .and. .not. s% RSP2_flag) then
+            write(*,'(a)') 'star_LNA requires the dE/dt energy equation form without RSP2.'
+            ierr = -1
+            return
+         end if
+
+         if (s% eps_grav_form_for_energy_eqn .and. s% use_other_eps_grav) then
+            write(*,'(a)') 'star_LNA does not support other_eps_grav hooks.'
             ierr = -1
             return
          end if
@@ -459,7 +467,7 @@
          call add_var(lna_var_L)
          if (s% RSP2_flag) then
             call add_var(lna_var_w)
-            call add_var(lna_var_Hp)
+            call add_var(lna_var_Y)
          else if (tdc_lna_active(s)) then
             call add_var(lna_var_w)
          end if
@@ -553,8 +561,8 @@
             else
                eq_id = lna_eq_tdc_velocity
             end if
-         case (lna_var_Hp)
-            eq_id = lna_eq_rsp2_Hp
+         case (lna_var_Y)
+            eq_id = lna_eq_rsp2_flux
          end select
       end function equation_id_for_star_LNA
 
@@ -1134,10 +1142,11 @@
          type(auto_diff_real_star_order1) :: P_cell_ad, rho_face_ad
 
          ierr = 0
-         if (s% use_P_d_1_div_rho_form_of_work) then
+         if (s% use_P_d_1_div_rho_form_of_work .or. s% eps_grav_form_for_energy_eqn) then
             call Ptot_for_star_LNA(s, k, P_cell_ad, ierr)
             if (ierr /= 0) return
             P_cell = P_cell_ad%val
+            if (s% eps_grav_form_for_energy_eqn) P_cell = P_cell - s% Peos(k)
             if (s% mlt_Pturb_factor > 0d0 .and. k > 1 .and. s% mlt_vc_old(k) > 0d0) then
                rho_face_ad = get_rho_face(s, k)
                P_cell = P_cell + &
@@ -1183,7 +1192,8 @@
          type(auto_diff_real_star_order1), intent(out) :: energy_inertia_ad
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: turbulent_inertia_ad, &
-            mechanical_inertia_ad
+            mechanical_inertia_ad, entropy_inertia_ad
+         real(dp) :: entropy_weight
 
          ierr = 0
          energy_inertia_ad = 0d0
@@ -1191,6 +1201,22 @@
          energy_inertia_ad%d1Array(i_lnd_00) = &
             s% dE_dRho_for_partials(k)*s% rho(k)
          energy_inertia_ad%d1Array(i_lnT_00) = s% Cv_for_partials(k)*s% T(k)
+
+         if (s% eps_grav_form_for_energy_eqn) then
+            energy_inertia_ad = 0d0
+            energy_inertia_ad%d1Array(i_lnd_00) = &
+               -s% T(k)*s% Cp(k)*s% grada(k)*s% chiRho(k) + s% latent_ddlnRho(k)
+            energy_inertia_ad%d1Array(i_lnT_00) = &
+               s% T(k)*s% Cp(k)*(1d0 - s% grada(k)*s% chiT(k)) + s% latent_ddlnT(k)
+            if (s% eos_frac_PC(k) > 0d0 .and. s% gam(k) > s% Gamma_lnS_eps_grav_full_off) then
+               entropy_weight = min(1d0, (s% gam(k) - s% Gamma_lnS_eps_grav_full_off)/ &
+                  (s% Gamma_lnS_eps_grav_full_on - s% Gamma_lnS_eps_grav_full_off))
+               entropy_inertia_ad = s% T(k)*wrap_s_00(s, k)
+               energy_inertia_ad = (1d0-entropy_weight)*energy_inertia_ad + &
+                  entropy_weight*entropy_inertia_ad
+            end if
+            energy_inertia_ad = s% eps_grav_factor*energy_inertia_ad
+         end if
 
          call turbulent_energy_inertia_for_star_LNA(s, k, turbulent_inertia_ad, ierr)
          if (ierr /= 0) return
@@ -1494,7 +1520,7 @@
          do k = 1, map%nz
             call assemble_rsp2_w_row(s, map, mtx, k, ierr)
             if (ierr /= 0) return
-            call assemble_rsp2_Hp_row(s, map, mtx, k, ierr)
+            call assemble_rsp2_flux_row(s, map, mtx, k, ierr)
             if (ierr /= 0) return
          end do
       end subroutine assemble_rsp2_turbulent_rows
@@ -1543,37 +1569,33 @@
       end subroutine assemble_rsp2_w_row
 
 
-      ! RSP2 algebraic pressure scale height row:
-      !   Hp_expected_k - Hp_k = 0
+      ! RSP2 algebraic luminosity closure:
+      !   Lr_k + Lc_k + Lt_k - L_k = 0; Y_face_1 = 0
       !
       ! Matrix:
       !   A(row,:) receives the scaled AD partials of this residual.
       !   B(row,:) is unchanged.
-      subroutine assemble_rsp2_Hp_row(s, map, mtx, k, ierr)
+      subroutine assemble_rsp2_flux_row(s, map, mtx, k, ierr)
          type(star_info), pointer :: s
          type(star_LNA_var_map), intent(in) :: map
          type(star_LNA_matrix), intent(inout) :: mtx
          integer, intent(in) :: k
          integer, intent(out) :: ierr
          integer :: row
-         real(dp) :: scale
-         type(auto_diff_real_star_order1) :: Hp_expected_ad, Hp_resid_ad
+         type(auto_diff_real_star_order1) :: flux_resid_ad
 
          ierr = 0
-         row = matrix_index(map, k, lna_var_Hp)
+         row = matrix_index(map, k, lna_var_Y)
          if (row <= 0) then
-            write(*,'(a,i0)') 'star_LNA RSP2 Hp row is missing a variable at k = ', k
+            write(*,'(a,i0)') 'star_LNA RSP2 flux row is missing a variable at k = ', k
             ierr = -1
             return
          end if
 
-         Hp_expected_ad = Hp_face_for_rsp2_eqn(s, k, ierr)
+         flux_resid_ad = rsp2_flux_residual(s, k)
+         call add_ad_partials_to_A(map, mtx, row, k, 1d0, flux_resid_ad, ierr)
          if (ierr /= 0) return
-         scale = 1d0/max(1d0, abs(Hp_expected_ad%val), abs(s% Hp_face(k)))
-         Hp_resid_ad = scale*(Hp_expected_ad - wrap_Hp_00(s, k))
-         call add_ad_partials_to_A(map, mtx, row, k, 1d0, Hp_resid_ad, ierr)
-         if (ierr /= 0) return
-      end subroutine assemble_rsp2_Hp_row
+      end subroutine assemble_rsp2_flux_row
 
 
       subroutine assemble_tdc_turbulent_rows(s, map, mtx, ierr)
@@ -1738,12 +1760,12 @@
             kk = k; var_id = lna_var_L
          case (i_L_p1)
             kk = k + 1; var_id = lna_var_L
-         case (i_Hp_m1)
-            kk = k - 1; var_id = lna_var_Hp
-         case (i_Hp_00)
-            kk = k; var_id = lna_var_Hp
-         case (i_Hp_p1)
-            kk = k + 1; var_id = lna_var_Hp
+         case (i_Y_m1)
+            kk = k - 1; var_id = lna_var_Y
+         case (i_Y_00)
+            kk = k; var_id = lna_var_Y
+         case (i_Y_p1)
+            kk = k + 1; var_id = lna_var_Y
          end select
       end subroutine ad_index_to_star_LNA_var
 
@@ -3167,7 +3189,7 @@
          integer :: io, k, velocity_var
          character(len=512) :: filename
          character(len=16) :: mode_string
-         complex(dp) :: lnd, lnR, v, lnT, L, w, Hp, dLr, dLc, dLt, dL_div_L0
+         complex(dp) :: lnd, lnR, v, lnT, L, w, Y_face, dLr, dLc, dLt, dL_div_L0
 
          ierr = 0
          velocity_var = velocity_var_for_star_LNA(map)
@@ -3206,7 +3228,7 @@
             '# normalized by surface delta_lnR; uses the largest component if abs(surface delta_lnR) <= 1d-99'
          write(io,'(a)') &
             '# k q m r re_lnd im_lnd re_lnR im_lnR re_v im_v ' // &
-            're_lnT im_lnT re_L im_L re_w im_w re_Hp im_Hp ' // &
+            're_lnT im_lnT re_L im_L re_w im_w re_Y_face im_Y_face ' // &
             're_dLr im_dLr re_dLc im_dLc re_dLt im_dLt ' // &
             'abs_dlnR phase_dlnR abs_dlnT phase_dlnT ' // &
             'abs_dL_div_L0 phase_dL_div_L0 abs_w phase_w'
@@ -3218,7 +3240,7 @@
             lnT = star_LNA_eigen_component(map, eigenvector, k, lna_var_lnT)
             L = star_LNA_eigen_component(map, eigenvector, k, lna_var_L)
             w = star_LNA_eigen_component(map, eigenvector, k, lna_var_w)
-            Hp = star_LNA_eigen_component(map, eigenvector, k, lna_var_Hp)
+            Y_face = star_LNA_eigen_component(map, eigenvector, k, lna_var_Y)
             call star_LNA_luminosity_perturbations(s, map, k, eigenvector, dLr, dLc, dLt, ierr)
             if (ierr /= 0) then
                close(io)
@@ -3230,7 +3252,7 @@
                k, s% q(k), s% m(k), s% r(k), &
                dble(lnd), aimag(lnd), dble(lnR), aimag(lnR), &
                dble(v), aimag(v), dble(lnT), aimag(lnT), &
-               dble(L), aimag(L), dble(w), aimag(w), dble(Hp), aimag(Hp), &
+               dble(L), aimag(L), dble(w), aimag(w), dble(Y_face), aimag(Y_face), &
                dble(dLr), aimag(dLr), dble(dLc), aimag(dLc), dble(dLt), aimag(dLt), &
                abs(lnR), phase_for_star_LNA(lnR), abs(lnT), phase_for_star_LNA(lnT), &
                abs(dL_div_L0), phase_for_star_LNA(dL_div_L0), abs(w), phase_for_star_LNA(w)
@@ -3775,12 +3797,12 @@
             return
          end if
          write(io,'(a,1x,1pe24.16)') 'max_abs_tdc_w_row_resid', diag
-         call max_abs_rsp2_Hp_row_resid_for_star_LNA(s, problem% map, diag, ierr)
+         call max_abs_rsp2_flux_row_resid_for_star_LNA(s, problem% map, diag, ierr)
          if (ierr /= 0) then
             close(io)
             return
          end if
-         write(io,'(a,1x,1pe24.16)') 'max_abs_rsp2_Hp_row_resid', diag
+         write(io,'(a,1x,1pe24.16)') 'max_abs_rsp2_flux_row_resid', diag
          write(io,'(a)') '# full pencil is scaled before algebraic elimination'
          write(io,'(a)') &
             '# reduced pencil is timescale normalized and equilibrated before DGGEV'
@@ -4201,26 +4223,22 @@
       end subroutine max_abs_tdc_w_row_resid_for_star_LNA
 
 
-      subroutine max_abs_rsp2_Hp_row_resid_for_star_LNA(s, map, max_resid, ierr)
+      subroutine max_abs_rsp2_flux_row_resid_for_star_LNA(s, map, max_resid, ierr)
          type(star_info), pointer :: s
          type(star_LNA_var_map), intent(in) :: map
          real(dp), intent(out) :: max_resid
          integer, intent(out) :: ierr
          integer :: k
-         real(dp) :: scale
-         type(auto_diff_real_star_order1) :: Hp_expected_ad, resid_ad
+         type(auto_diff_real_star_order1) :: resid_ad
 
          ierr = 0
          max_resid = 0d0
          if (.not. s% RSP2_flag) return
          do k = 1, map%nz
-            Hp_expected_ad = Hp_face_for_rsp2_eqn(s, k, ierr)
-            if (ierr /= 0) return
-            scale = 1d0/max(1d0, abs(Hp_expected_ad%val), abs(s% Hp_face(k)))
-            resid_ad = scale*(Hp_expected_ad - wrap_Hp_00(s, k))
+            resid_ad = rsp2_flux_residual(s, k)
             max_resid = max(max_resid, abs(resid_ad%val))
          end do
-      end subroutine max_abs_rsp2_Hp_row_resid_for_star_LNA
+      end subroutine max_abs_rsp2_flux_row_resid_for_star_LNA
 
       ! Small indexing, reporting, and public helper utilities.
       subroutine star_LNA_output_filename(s, suffix, filename)
@@ -4439,7 +4457,7 @@
          write(*,*)
 
          if (s% RSP2_flag) then
-            write(*,'(a)') 'star_LNA: RSP2 perturbations selected for Lr, Lc, Lt, w, and Hp.'
+            write(*,'(a)') 'star_LNA: RSP2 perturbations selected for Lr, Lc, Lt, w, and Y_face.'
          else if (tdc_lna_active(s)) then
             write(*,'(a)') &
                'star_LNA: TDC perturbations selected for Lr, Lc, and internal w.'
@@ -4500,8 +4518,8 @@
             name = 'L'
          case (lna_var_w)
             name = 'w'
-         case (lna_var_Hp)
-            name = 'Hp'
+         case (lna_var_Y)
+            name = 'Y_face'
          case default
             name = 'unknown'
          end select
@@ -4543,8 +4561,8 @@
             name = 'rsp2_turbulent_energy'
          case (lna_eq_rsp2_zero_w)
             name = 'rsp2_zero_w'
-         case (lna_eq_rsp2_Hp)
-            name = 'rsp2_Hp'
+         case (lna_eq_rsp2_flux)
+            name = 'rsp2_flux'
          case (lna_eq_tdc_velocity)
             name = 'tdc_velocity'
          case (lna_eq_tdc_zero_w)

@@ -20,7 +20,7 @@
 module tdc_hydro
 
    use star_private_def
-   use const_def, only: dp, boltz_sigma, pi, clight, crad, ln10
+   use const_def, only: dp, boltz_sigma, pi, clight, crad, ln10, one_third
    use utils_lib, only: is_bad
    use auto_diff
    use auto_diff_support
@@ -34,7 +34,8 @@ module tdc_hydro
    public :: &
       compute_tdc_Uq_face, compute_tdc_Eq_cell, compute_tdc_Eq_div_w_face, &
       compute_tdc_Eq_div_w_inner_boundary, &
-      get_TDC_alfa_beta_face_weights, get_TDC_mixing_length_face, &
+      get_TDC_alfa_beta_face_weights, get_TDC_Hp_face, &
+      get_TDC_mixing_length_face, get_TDC_mixing_length_cell, &
       set_viscosity_vars_TDC, compute_tdc_Uq_dm_cell
 
 contains
@@ -161,17 +162,29 @@ contains
       type(star_info), pointer :: s
       integer, intent(in) :: k
       integer, intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: Lambda0, Lambda1, Lambda_cell
+      type(auto_diff_real_star_order1) :: &
+         Lambda_cell, Hp_cell, Hp_alt, P, rho, r_00, r_p1, grav_00, grav_p1, rmid
 
       ierr = 0
-      Lambda0 = get_TDC_mixing_length_face(s, k, ierr)
-      if (ierr /= 0) return
-      Lambda1 = 0d0
+      P = wrap_Peos_00(s, k)
+      rho = wrap_d_00(s, k)
+      r_00 = wrap_r_00(s, k)
+      r_p1 = wrap_r_p1(s, k)
+      grav_00 = s%cgrav(k)*s%m_grav(k)/pow2(r_00)
+      grav_p1 = 0d0
       if (k < s%nz) then
-         Lambda1 = shift_p1(get_TDC_mixing_length_face(s, k+1, ierr))
-         if (ierr /= 0) return
+         grav_p1 = s%cgrav(k+1)*s%m_grav(k+1)/pow2(r_p1)
+      else if (s%R_center > 0d0) then
+         grav_p1 = s%cgrav(k)*s%M_center/pow2(r_p1)
       end if
-      Lambda_cell = 0.5d0*(Lambda0 + Lambda1)
+      ! Cell EOS avoids a second interpolation and wider stress derivatives.
+      Hp_cell = P/(rho*0.5d0*(grav_00 + grav_p1))
+      if (s%alt_scale_height_flag .and. s%harmonic_dissipation_length_beta <= 0d0) then
+         Hp_alt = sqrt(P/s%cgrav(k))/rho
+         if (Hp_alt < Hp_cell) Hp_cell = Hp_alt
+      end if
+      rmid = pow(0.5d0*(pow3(r_00) + pow3(r_p1)), one_third)
+      Lambda_cell = get_mlt_mixing_length(s, Hp_cell, rmid, s%mixing_length_alpha)
    end function get_TDC_mixing_length_cell
 
 
