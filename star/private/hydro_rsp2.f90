@@ -24,6 +24,7 @@
       use utils_lib, only: is_bad
       use auto_diff
       use auto_diff_support
+      use hydro_gradient_support, only: get_RSP2_alfa_beta_face_weights
       use accurate_sum_auto_diff_star_order1
       use star_utils
       use tdc_hydro, only: get_TDC_Hp_face, &
@@ -414,26 +415,6 @@
          end subroutine setup_dt_Eq_ad
 
       end subroutine do1_turbulent_energy_eqn
-
-
-      subroutine get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         real(dp), intent(out) :: alfa, beta
-         ! face_value = alfa*cell_value(k) + beta*cell_value(k-1)
-         if (k == 1) then
-            alfa = 1d0
-            beta = 0d0
-            return
-         end if
-         if (s% RSP2_use_mass_interp_face_values) then
-            alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
-            beta = 1d0 - alfa
-         else
-            alfa = 0.5d0
-            beta = 0.5d0
-         end if
-      end subroutine get_RSP2_alfa_beta_face_weights
 
 
       function compute_PII_face(s, k, ierr) result(PII_face)  ! ergs g^-1 K^-1 (like Cp)

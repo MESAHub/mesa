@@ -87,6 +87,7 @@ SRCS := \
    private/hydro_chem_eqns.f90 \
    private/hydro_energy.f90 \
    private/hydro_eqns.f90 \
+   private/hydro_gradient_support.f90 \
    private/hydro_momentum.f90 \
    private/hydro_riemann.f90 \
    private/hydro_rotation.f90 \

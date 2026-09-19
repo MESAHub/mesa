@@ -26,6 +26,7 @@
       use utils_lib, only: mesa_error, is_bad
       use auto_diff
       use auto_diff_support
+      use hydro_gradient_support, only: eval_dlnPdm_qhse, get_dPrad_dm_factors
 
       implicit none
 
@@ -78,10 +79,6 @@
          dbg = .false.
 
          scale = s% energy_start(k)*s% rho_start(k)
-         dm_bar = s% dm_bar(k)
-         ! Use ordinary cell-center spacing next to an excised inner boundary.
-         if (s% R_center > 0d0 .and. k == s% nz) &
-            dm_bar = 0.5d0*(s% dm(k - 1) + s% dm(k))
          L_ad = wrap_L_00(s,k)
          r_00 = wrap_r_00(s,k)
          area = pi4*pow2(r_00); area2 = pow2(area)
@@ -111,9 +108,7 @@
             Lrad_ad = L_ad
          end if
 
-         kap_face = opacity_face
-         if (kap_face%val < s% min_kap_for_dPrad_dm_eqn) &
-            kap_face = s% min_kap_for_dPrad_dm_eqn
+         call get_dPrad_dm_factors(s, k, opacity_face, kap_face, flxR, flxLambda, dm_bar)
 
          ! calculate expected d_P_rad from current L_rad
          d_P_rad_expected_ad = -dm_bar*kap_face*Lrad_ad/(clight*area2)
@@ -130,15 +125,7 @@
          s% flux_limit_R(k) = 0._dp
          s% flux_limit_lambda(k) =0._dp
          if (s% use_flux_limiting_with_dPrad_dm_form) then
-            ! calculate the flux ratio R
-            flxR = area * abs(T4_m1 - T4_00) / dm_bar / &
-                  (kap_face * 0.5_dp * (T4_m1 + T4_00))
-
             s% flux_limit_R(k) = flxR%val
-
-            ! calculate the flux limiter lambda
-            flxLambda = (6._dp + 3._dp*flxR) / (6._dp + (3._dp + flxR)*flxR)
-
             s% flux_limit_lambda(k) = flxLambda%val
 
             ! calculate d_P_rad given the flux limiter
@@ -429,109 +416,6 @@
 
       end subroutine set_RSP_Lsurf_BC
 
-      ! only used for dlnT_dm equation
-      subroutine eval_dlnPdm_qhse(s, k, &  ! calculate the expected dlnPdm for HSE
-            dlnPdm_qhse, Ppoint, ierr)
-         use hydro_momentum, only: expected_HSE_grav_term
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         type(auto_diff_real_star_order1), intent(out) :: dlnPdm_qhse, Ppoint
-         integer, intent(out) :: ierr
 
-         real(dp) :: alfa, P_theta
-         type(auto_diff_real_star_order1) :: grav, area, P00, Pm1, inv_R2, mlt_Ptrb00, mlt_Ptrbm1, mlt_Ptrb_face
-         type(auto_diff_real_star_order1) :: T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grada_face, opacity_face
-         include 'formats'
-
-         ierr = 0
-
-         ! basic eqn is dP/dm = -G m / (4 pi r^4)
-         ! divide by Ppoint to make it unitless
-
-         ! for rotation, multiply gravity by factor fp.  MESA 2, eqn 22.
-         call expected_HSE_grav_term(s, k, grav, area, ierr) ! note that expected_HSE_grav_term is negative
-
-         if (s% using_velocity_time_centering .and. &
-               s% include_P_in_velocity_time_centering .and. &
-               s% lnT(k)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) then
-            P_theta = s% P_theta_for_velocity_time_centering
-         else
-            P_theta = 1d0
-         end if
-
-         if (s% use_face_reconstruction) then
-            if (s% reconstructed_face_state_valid(k)) then
-               rho_face = s% reconstructed_rho_face_ad(k)
-               Ppoint = s% reconstructed_P_face_ad(k)
-            else
-               call get_reconstructed_face_eos_kap_ad( &
-                  s, k, T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grada_face, opacity_face, ierr)
-               if (ierr /= 0) return
-               Ppoint = P_face
-            end if
-            if (P_theta /= 1d0) then
-               Ppoint = P_theta*Ppoint + (1d0 - P_theta)*s% reconstructed_P_face_start(k)
-            end if
-            if (s% have_mlt_vc .and. s% okay_to_set_mlt_vc .and. s% include_mlt_Pturb_in_thermodynamic_gradients &
-               .and. s% mlt_Pturb_factor > 0d0) then
-               ! Keep the lagged convective velocity, but form the pressure term from the same
-               ! face density used by the reconstructed face thermodynamic quantities.
-               mlt_Ptrb_face = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*rho_face/3d0
-               Ppoint = Ppoint + mlt_Ptrb_face
-            end if
-         else
-            ! mlt_pturb in thermodynamic gradients does not currently support time centering because it is timelagged.
-            ! replace mlt_vc check with s% mlt_vc_old(k) >0 check.
-            if ((s% have_mlt_vc .and. s% okay_to_set_mlt_vc) .and. s% include_mlt_Pturb_in_thermodynamic_gradients &
-               .and. s% mlt_Pturb_factor > 0d0) then
-               if (k ==1) then
-                  mlt_Ptrb00 = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*wrap_d_00(s,k)/3d0
-                  mlt_Ptrbm1 = 0d0
-               else
-                  mlt_Ptrb00 = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*wrap_d_00(s,k)/3d0
-                  mlt_Ptrbm1 = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*wrap_d_m1(s,k)/3d0
-               end if
-            else ! no mlt_pturb
-               mlt_Ptrb00 = 0d0
-               mlt_Ptrbm1 = 0d0
-            end if
-
-            P00 = wrap_Peos_00(s,k)
-
-            ! mlt Pturb doesn't support time centering yet.
-            if (P_theta /= 1d0) P00 = P_theta*P00 + (1d0 - P_theta)*s% Peos_start(k)
-
-            if (k == 1) then
-               Pm1 = 0d0
-               Ppoint = P00 + mlt_Ptrb00
-            else
-               Pm1 = wrap_Peos_m1(s,k)
-               if (P_theta /= 1d0) Pm1 = P_theta*Pm1 + (1d0 - P_theta)*s% Peos_start(k-1)
-               Pm1 = Pm1 + mlt_Ptrbm1 ! include mlt Ptrb in k-1
-               P00 = P00 + mlt_Ptrb00 ! include mlt Ptrb in k
-               alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
-               Ppoint = alfa*P00 + (1d0-alfa)*Pm1
-            end if
-         end if
-
-         dlnPdm_qhse = grav/(area*Ppoint)  ! note that expected_HSE_grav_term is negative
-
-         if (is_bad(dlnPdm_qhse%val)) then
-            ierr = -1
-            s% retry_message = 'eval_dlnPdm_qhse: is_bad(dlnPdm_qhse)'
-            if (s% report_ierr) then
-!$OMP critical (hydro_vars_crit1)
-               write(*,*) 'eval_dlnPdm_qhse: is_bad(dlnPdm_qhse)'
-               stop
-!$OMP end critical (hydro_vars_crit1)
-            end if
-            if (s% stop_for_bad_nums) then
-               write(*,2) 'dlnPdm_qhse', k, dlnPdm_qhse
-               call mesa_error(__FILE__,__LINE__,'eval_dlnPdm_qhse')
-            end if
-            return
-         end if
-
-      end subroutine eval_dlnPdm_qhse
 
       end module hydro_temperature

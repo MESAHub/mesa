@@ -23,6 +23,7 @@
       use const_def, only: dp, ln10, secyer
       use utils_lib, only: mesa_error, is_bad
       use auto_diff
+      use hydro_gradient_support, only: expected_HSE_grav_term
       use star_utils, only: em1, e00, ep1
 
       implicit none
@@ -333,41 +334,6 @@
 
       end subroutine get1_momentum_eqn
 
-
-      ! returns -G*m/r^2 with possible modifications for rotation.  MESA 2, eqn 22.
-      subroutine expected_HSE_grav_term(s, k, grav, area, ierr)
-         use star_utils, only: get_area_info_opt_time_center
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         type(auto_diff_real_star_order1), intent(out) :: area, grav
-         integer, intent(out) :: ierr
-
-         type(auto_diff_real_star_order1) :: inv_R2
-         logical :: test_partials
-
-         include 'formats'
-         ierr = 0
-
-         call get_area_info_opt_time_center(s, k, area, inv_R2, ierr)
-         if (ierr /= 0) return
-
-         if (s% rotation_flag .and. s% use_gravity_rotation_correction) then
-            grav = -s% cgrav(k)*s% m_grav(k)*inv_R2*s% fp_rot(k)
-         else
-            grav = -s% cgrav(k)*s% m_grav(k)*inv_R2
-         end if
-
-         !test_partials = (k == s% solver_test_partials_k)
-         test_partials = .false.
-
-         if (test_partials) then
-            s% solver_test_partials_val = 0
-            s% solver_test_partials_var = 0
-            s% solver_test_partials_dval_dx = 0
-            write(*,*) 'expected_HSE_grav_term', s% solver_test_partials_var
-         end if
-
-      end subroutine expected_HSE_grav_term
 
 
       ! other = s% extra_grav(k) - s% dv_dt(k)
