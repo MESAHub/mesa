@@ -833,6 +833,17 @@
 
                call apply_coeff(nvar, nz, dxsave, soln, coeff, skip_eval_f)
 
+               if (s% RSP2_3equation_flag) then
+                  do k=2,nz-1
+                     if (s% xh_start(s% i_Pi,k) /= 0d0 .or. s% xh_start(s% i_Phi,k) /= 0d0) cycle
+                     if (pow2(s% xh_start(s% i_w,k) + s% solver_dx(s% i_w,k)) /= 0d0 .or. &
+                           pow2(s% xh_start(s% i_w,k-1) + s% solver_dx(s% i_w,k-1)) /= 0d0) cycle
+                     ! The zero energy face has homogeneous zero moment equations.
+                     s% solver_dx(s% i_Pi,k) = 0d0
+                     s% solver_dx(s% i_Phi,k) = 0d0
+                  end do
+               end if
+
                call do_equations(ierr)
                if (report_rsp2_flux) call report_rsp2_flux_trial(coeff, ierr)
                if (ierr /= 0) then

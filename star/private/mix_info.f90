@@ -59,8 +59,7 @@
          integer, intent(out) :: ierr
 
          integer :: nz, k, max_conv_bdy, max_mix_bdy, k_Tmax, i_h1, i_he4, i_c12
-         real(dp) :: rho_face, f, Tmax, min_conv_vel_for_convective_mixing_type, &
-            region_bottom_q, region_top_q, L_val, mixing_length
+         real(dp) :: rho_face, f, Tmax, region_bottom_q, region_top_q, mixing_length
          real(dp), allocatable, dimension(:) :: eps_h, eps_he, eps_z, cdc_factor
 
          logical :: RSP2_or_RSP
@@ -72,8 +71,6 @@
 
          ierr = 0
          nz = s% nz
-
-         min_conv_vel_for_convective_mixing_type = 1d0  ! make this a control parameter
 
          RSP2_or_RSP = s% RSP_flag .or. s% RSP2_flag
 
@@ -133,15 +130,14 @@
                s% conv_vel(k) = get_RSP2_conv_velocity(s,k)
                s% D_mix(k) = s% conv_vel(k)*s% mlt_mixing_length(k)/3d0
                s% cdc(k) = cdc_factor(k)*s% D_mix(k)
-               L_val = max(1d-99,abs(s% L(k)))
-               if (abs(s% Lt(k)) > &
-                     L_val*s% RSP2_min_Lt_div_L_for_overshooting_mixing_type) then
-                  s% mixing_type(k) = overshoot_mixing
-               else if (abs(s% Lc(k)) > &
-                     L_val*s% RSP2_min_Lc_div_L_for_convective_mixing_type) then
-                  s% mixing_type(k) = convective_mixing
-               else
+               ! Stable layers can retain turbulence with either sign of Lc or Lt.
+               if (s% D_mix(k) <= 0d0 .or. &
+                     s% conv_vel(k) <= s% RSP2_min_conv_vel_for_mixing_type) then
                   s% mixing_type(k) = no_mixing
+               else if (s% Y_face(k) < 0d0) then
+                  s% mixing_type(k) = overshoot_mixing
+               else
+                  s% mixing_type(k) = convective_mixing
                end if
             end do
          else

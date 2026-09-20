@@ -24,7 +24,8 @@
       use utils_lib, only: is_bad
       use auto_diff
       use auto_diff_support
-      use hydro_gradient_support, only: get_RSP2_alfa_beta_face_weights
+      use hydro_gradient_support, only: get_RSP2_alfa_beta_face_weights, &
+         get_rsp2_face_eos, get_rsp2_Lrad_coeff, get_rsp2_thermal_gradient
       use accurate_sum_auto_diff_star_order1
       use star_utils
       use tdc_hydro, only: get_TDC_Hp_face, &
@@ -37,12 +38,18 @@
       public :: do1_turbulent_energy_eqn
       public :: do1_rsp2_flux_eqn
       public :: compute_Source, compute_D, compute_Dr
+      public :: compute_Source_div_w
       public :: compute_Eq_cell
       public :: compute_Uq_face, compute_Uq_dm_cell
       public :: set_RSP2_vars
       public :: rsp2_flux_residual, set_etrb_start_vars
       public :: RSP2_adjust_vars_before_call_solver
       public :: get_RSP2_alfa_beta_face_weights
+      public :: do1_rsp2_moment_eqns, rsp2_moment_rhs
+      public :: rsp2_zero_moments, init_rsp2_moments
+      public :: rsp2_dormant_moments, rsp2_local_w_equation
+      public :: remesh_rsp2_moments, interpolate_rsp2_face
+      public :: rsp2_remesh_w_face
 
       real(dp), parameter :: &
          x_ALFAP = 2.d0/3.d0, &  ! Ptrb
@@ -50,6 +57,13 @@
          x_ALFAC = (1.d0/2.d0)*sqrt_2_div_3, &  ! Lc
          x_CEDE  = (8.d0/3.d0)*sqrt_2_div_3, &  ! DAMP
          x_GAMMAR = 2.d0*sqrt(3.d0)  ! DAMPR
+
+      ! Kuhfuss local MLT calibration, as in Braun et al. (2026), section 2.
+      ! Pi = <v_r*s>; Phi = <s*s>. Using the full variance does not change its decay rate.
+      ! RSP2_alfa_pi and RSP2_alfa_phi multiply these coefficients.
+      real(dp), parameter :: &
+         x_ALFAPI = 6d0*sqrt_2_div_3, &
+         x_ALFAPHI = 4d0*sqrt_2_div_3
 
       contains
 
@@ -250,6 +264,320 @@
       end subroutine do1_rsp2_flux_eqn
 
 
+      logical function rsp2_zero_moments(s, k) result(zero_moments)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         zero_moments = k <= 1 .or. k >= s% nz .or. s% mixing_length_alpha == 0d0 .or. &
+            k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
+            k > s% nz - int(s% nz/s% RSP2_nz_div_IBOTOM)
+      end function rsp2_zero_moments
+
+
+      logical function rsp2_dormant_moments(s, k) result(dormant)
+         type(star_info), pointer :: s
+         integer, intent(in) :: k
+         dormant = .true.
+         if (rsp2_zero_moments(s,k)) return
+         dormant = get_etrb(s,k) == 0d0 .and. get_etrb(s,k-1) == 0d0 .and. &
+            s% Pi(k) == 0d0 .and. s% Phi(k) == 0d0
+      end function rsp2_dormant_moments
+
+
+      subroutine interpolate_rsp2_face( &
+            s, i_var, n_old, x_old, n_new, x_new, face_old, face_new, work, ierr)
+         use interp_1d_lib, only: interpolate_vector_pm
+         type(star_info), pointer :: s
+         integer, intent(in) :: i_var, n_old, n_new
+         real(dp), intent(in) :: x_old(:), x_new(:), face_old(:)
+         real(dp), intent(inout) :: face_new(:)
+         real(dp), pointer :: work(:)
+         integer, intent(out) :: ierr
+         integer :: j, k
+
+         ierr = 0
+         if (i_var == s% i_Phi) then
+            if (any(is_bad(face_old(1:n_old))) .or. minval(face_old(1:n_old)) < 0d0) then
+               s% retry_message = 'invalid RSP2 Phi before remesh'
+               ierr = -1
+               return
+            end if
+         end if
+         call interpolate_vector_pm( &
+            n_old, x_old, n_new, x_new, face_old, face_new, work, 'RSP2 face remesh', ierr)
+         if (ierr /= 0) return
+         j = 1
+         do k=1,n_new
+            do while (j < n_old-1)
+               if (x_new(k) < x_old(j+1)) exit
+               j = j+1
+            end do
+            ! Preserve old faces exactly and protect Phi from cubic evaluation roundoff.
+            if (x_new(k) == x_old(j)) then
+               face_new(k) = face_old(j)
+            else if (x_new(k) == x_old(j+1)) then
+               face_new(k) = face_old(j+1)
+            else if (i_var == s% i_Phi) then
+               face_new(k) = min(max(face_new(k), min(face_old(j),face_old(j+1))), &
+                  max(face_old(j),face_old(j+1)))
+            end if
+         end do
+      end subroutine interpolate_rsp2_face
+
+
+      real(dp) function rsp2_remesh_w_face(s, k, nz, dq, w) result(w_face)
+         type(star_info), pointer :: s
+         integer, intent(in) :: k, nz
+         real(dp), intent(in) :: dq(:), w(:)
+         real(dp) :: alfa
+
+         w_face = 0d0
+         if (k <= 1 .or. k >= nz) return
+         alfa = 0.5d0
+         if (s% RSP2_use_mass_interp_face_values) alfa = dq(k-1)/(dq(k-1) + dq(k))
+         w_face = sqrt(alfa*pow2(w(k)) + (1d0-alfa)*pow2(w(k-1)))
+      end function rsp2_remesh_w_face
+
+
+      subroutine remesh_rsp2_moments(s, nz, dq, xh, ierr)
+         type(star_info), pointer :: s
+         integer, intent(in) :: nz
+         real(dp), intent(in) :: dq(:)
+         real(dp), intent(inout) :: xh(:,:)
+         integer, intent(out) :: ierr
+         integer :: k
+         real(dp) :: alfa, beta, etrb_face
+
+         ierr = 0
+         ! Use the new mesh and remapped energy before rebuilding derived variables.
+         do k=1,nz
+            if (k <= 1 .or. k >= nz .or. s% mixing_length_alpha == 0d0 .or. &
+                  k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
+                  k > nz - int(nz/s% RSP2_nz_div_IBOTOM)) then
+               xh(s% i_Pi,k) = 0d0
+               xh(s% i_Phi,k) = 0d0
+               cycle
+            end if
+            alfa = 0.5d0
+            if (s% RSP2_use_mass_interp_face_values) alfa = dq(k-1)/(dq(k-1) + dq(k))
+            beta = 1d0 - alfa
+            etrb_face = alfa*pow2(xh(s% i_w,k)) + beta*pow2(xh(s% i_w,k-1))
+            ! Zero kinetic energy cannot carry entropy flux. Retain the entropy variance.
+            if (etrb_face == 0d0) xh(s% i_Pi,k) = 0d0
+         end do
+         if (minval(xh(s% i_Phi,1:nz)) < 0d0) then
+            ierr = -1
+            s% retry_message = 'negative RSP2 Phi after remesh'
+         end if
+      end subroutine remesh_rsp2_moments
+
+
+      function rsp2_buoyancy_face(s, k, ierr) result(buoyancy)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1) :: buoyancy, &
+            T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grad_ad, kap_face
+
+         ierr = 0
+         buoyancy = 0d0
+         if (rsp2_zero_moments(s,k)) return
+         call get_rsp2_face_eos( &
+            s, k, T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grad_ad, kap_face, ierr)
+         if (ierr /= 0) return
+         ! -(1/rho)*dP/dr times the isobaric expansion per unit entropy.
+         buoyancy = (ChiT_face/(ChiRho_face*Cp_face))* &
+            (4d0*pi*pow2(wrap_r_00(s,k))/(0.5d0*(s% dm(k-1) + s% dm(k))))* &
+            (wrap_Peos_00(s,k) - wrap_Peos_m1(s,k))
+      end function rsp2_buoyancy_face
+
+
+      function rsp2_moment_source(s, k, divide_by_w, ierr) result(source)
+         type(star_info), pointer :: s
+         integer, intent(in) :: k
+         logical, intent(in) :: divide_by_w
+         integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1) :: source, buoyancy, Pi_face, etrb_face, w_face, w_cell
+         real(dp) :: alfa, beta
+         integer :: j
+
+         ierr = 0
+         source = 0d0
+         w_cell = wrap_w_00(s,k)
+         do j=k,min(k+1,s% nz)
+            if (rsp2_zero_moments(s,j)) cycle
+            call get_RSP2_alfa_beta_face_weights(s,j,alfa,beta)
+            etrb_face = alfa*pow2(wrap_w_00(s,j)) + beta*pow2(wrap_w_m1(s,j))
+            Pi_face = wrap_Pi_00(s,j)
+            if (etrb_face%val == 0d0) then
+               if (Pi_face%val == 0d0) cycle
+               ierr = -1
+               s% retry_message = 'RSP2 entropy flux without turbulent energy'
+               return
+            end if
+            w_face = sqrt(etrb_face)
+            buoyancy = rsp2_buoyancy_face(s,j,ierr)
+            if (ierr /= 0) return
+            if (j > k) then
+               w_face = shift_p1(w_face)
+               buoyancy = shift_p1(buoyancy)
+               Pi_face = shift_p1(Pi_face)
+            end if
+            if (divide_by_w) then
+               source = source + 0.5d0*buoyancy*div_by_w(Pi_face,w_face)
+            else
+               source = source + 0.5d0*div_by_w(w_cell,w_face)*buoyancy*Pi_face
+            end if
+         end do
+      end function rsp2_moment_source
+
+
+      subroutine rsp2_moment_rhs(s, k, Pi_rhs, Phi_rhs, ierr, use_time_centering)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1), intent(out) :: Pi_rhs, Phi_rhs
+         integer, intent(out) :: ierr
+         logical, intent(in), optional :: use_time_centering
+         type(auto_diff_real_star_order1) :: Pi_face, Phi_face, &
+            etrb_face, w_face, Cp_face, T_face, rho_face, kap_face, Lambda_face, &
+            entropy_gradient, inverse_rad_time, buoyancy, inverse_dr, strain, &
+            P_face, ChiRho_face, ChiT_face, grad_ad, gradL
+         real(dp) :: alfa, beta
+
+         ierr = 0
+         Pi_rhs = 0d0
+         Phi_rhs = 0d0
+         if (rsp2_zero_moments(s,k)) return
+         call get_RSP2_alfa_beta_face_weights(s,k,alfa,beta)
+         etrb_face = alfa*pow2(wrap_w_00(s,k)) + beta*pow2(wrap_w_m1(s,k))
+         w_face = 0d0
+         if (etrb_face%val > 0d0) w_face = sqrt(etrb_face)
+         call get_rsp2_face_eos( &
+            s, k, T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grad_ad, kap_face, ierr)
+         if (ierr /= 0) return
+         Lambda_face = get_TDC_mixing_length_face(s,k,ierr)
+         if (ierr /= 0) return
+         if (Lambda_face%val <= 0d0) then
+            ierr = -1
+            return
+         end if
+         inverse_dr = 4d0*pi*pow2(wrap_r_00(s,k))*rho_face/(0.5d0*(s% dm(k-1) + s% dm(k)))
+         call get_rsp2_thermal_gradient(s, k, grad_ad, gradL, entropy_gradient, ierr, use_time_centering)
+         if (ierr /= 0) return
+         buoyancy = rsp2_buoyancy_face(s,k,ierr)
+         if (ierr /= 0) return
+         inverse_rad_time = 4d0*boltz_sigma*pow2(s% RSP2_alfar*x_GAMMAR)*pow3(T_face)/ &
+            (Cp_face*kap_face*pow2(rho_face)*pow2(Lambda_face))
+         if (s% u_flag) then
+            strain = inverse_dr*(wrap_u_m1(s,k) - wrap_u_00(s,k))
+         else
+            ! Interpolate the two cell velocity gradients to their common face.
+            strain = alfa*(wrap_v_00(s,k) - wrap_v_p1(s,k))/(wrap_r_00(s,k) - wrap_r_p1(s,k)) + &
+               beta*(wrap_v_m1(s,k) - wrap_v_00(s,k))/(wrap_r_m1(s,k) - wrap_r_00(s,k))
+         end if
+         Pi_face = wrap_Pi_00(s,k)
+         Phi_face = wrap_Phi_00(s,k)
+         Pi_rhs = (2d0/3d0)*etrb_face*entropy_gradient + buoyancy*Phi_face - &
+            (s% RSP2_alfa_pi*x_ALFAPI*w_face/Lambda_face + inverse_rad_time + strain)*Pi_face
+         Phi_rhs = 2d0*entropy_gradient*Pi_face - &
+            (s% RSP2_alfa_phi*x_ALFAPHI*w_face/Lambda_face + 2d0*inverse_rad_time)*Phi_face
+      end subroutine rsp2_moment_rhs
+
+
+      subroutine do1_rsp2_moment_eqns(s, k, nvar, ierr)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k, nvar
+         integer, intent(out) :: ierr
+         integer :: i_flux, i_variance
+         type(auto_diff_real_star_order1) :: Pi_rhs, Phi_rhs, Pi_resid, Phi_resid
+         real(dp) :: Pi_scale, Phi_scale
+
+         ierr = 0
+         if (.not. s% RSP2_3equation_flag) return
+         i_flux = s% i_Pi
+         i_variance = s% i_Phi
+         Pi_scale = s% Pi_scale(k)
+         Phi_scale = s% Phi_scale(k)
+         Pi_resid = wrap_Pi_00(s,k)
+         Phi_resid = wrap_Phi_00(s,k)
+         if (.not. rsp2_zero_moments(s,k) .and. &
+               .not. (rsp2_dormant_moments(s,k) .and. &
+                  s% xh_start(i_flux,k) == 0d0 .and. s% xh_start(i_variance,k) == 0d0)) then
+            call rsp2_moment_rhs(s,k,Pi_rhs,Phi_rhs,ierr)
+            if (ierr /= 0) return
+            ! Use the same implicit source time level as COUPL in the w equation.
+            Pi_resid = Pi_resid - s% xh_start(i_flux,k) - s% dt*Pi_rhs
+            Phi_resid = Phi_resid - s% xh_start(i_variance,k) - s% dt*Phi_rhs
+         end if
+         Pi_resid = Pi_resid/Pi_scale
+         Phi_resid = Phi_resid/Phi_scale
+         s% equ(i_flux,k) = Pi_resid%val
+         s% equ(i_variance,k) = Phi_resid%val
+         call save_eqn_residual_info(s,k,nvar,i_flux,Pi_resid,'dPi_dt',ierr)
+         if (ierr /= 0) return
+         call save_eqn_residual_info(s,k,nvar,i_variance,Phi_resid,'dPhi_dt',ierr)
+      end subroutine do1_rsp2_moment_eqns
+
+
+      subroutine init_rsp2_moments(s, Lc_old, ierr)
+         type (star_info), pointer :: s
+         real(dp), intent(in) :: Lc_old(:)
+         integer, intent(out) :: ierr
+         integer :: k
+         real(dp) :: alfa, beta, etrb_face
+         type(auto_diff_real_star_order1) :: &
+            T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grad_ad, kap_face, &
+            gradL, entropy_gradient
+
+         ierr = 0
+         do k=1,s% nz
+            s% Pi(k) = 0d0
+            s% Phi(k) = 0d0
+            if (.not. rsp2_zero_moments(s,k)) then
+               call get_rsp2_thermal_gradient(s,k,grad_ad,gradL,entropy_gradient,ierr)
+               if (ierr /= 0) return
+               ! Do not infer finite entropy fluctuations from a quiet stable layer.
+               if (entropy_gradient%val > 0d0 .and. Lc_old(k) > 0d0) then
+                  call get_RSP2_alfa_beta_face_weights(s,k,alfa,beta)
+                  etrb_face = alfa*pow2(s% w(k)) + beta*pow2(s% w(k-1))
+                  call get_rsp2_face_eos( &
+                     s, k, T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grad_ad, kap_face, ierr)
+                  if (ierr /= 0) return
+                  ! Preserve the old heat flux; seed a fully correlated parcel variance.
+                  s% Pi(k) = Lc_old(k)/(4d0*pi*pow2(s% r(k))*rho_face%val*T_face%val)
+                  if (etrb_face == 0d0 .and. s% Pi(k) /= 0d0) then
+                     ierr = -1
+                     s% retry_message = 'cannot initialize RSP2 moments without turbulent energy'
+                     return
+                  end if
+                  if (etrb_face > 0d0) s% Phi(k) = &
+                     1.5d0*pow2(s% Pi(k))/etrb_face
+               end if
+            end if
+            s% xh(s% i_Pi,k) = s% Pi(k)
+            s% xh(s% i_Phi,k) = s% Phi(k)
+         end do
+      end subroutine init_rsp2_moments
+
+
+      logical function rsp2_local_w_equation(s, k) result(local)
+         type(star_info), pointer :: s
+         integer, intent(in) :: k
+         ! Use the energy represented by the accepted state, including underflow to zero.
+         local = s% RSP2_source_seed == 0d0 .and. s% RSP2_alfat == 0d0 .and. &
+            get_etrb_start(s,k) == 0d0 .and. (.not. s% u_flag .or. s% RSP2_alfam == 0d0)
+      end function rsp2_local_w_equation
+
+
+      function div_by_w(x, w) result(quotient)
+         type(auto_diff_real_star_order1), intent(in) :: x, w
+         type(auto_diff_real_star_order1) :: quotient
+
+         ! Avoid 1/w**2, which can overflow when the quotient derivatives are finite.
+         quotient%val = x%val/w%val
+         quotient%d1Array = (x%d1Array - quotient%val*w%d1Array)/w%val
+      end function div_by_w
+
+
       subroutine do1_turbulent_energy_eqn(s, k, nvar, ierr)
          use star_utils, only: calc_Ptrb_ad_tw, set_energy_eqn_scal, save_eqn_residual_info
          type (star_info), pointer :: s
@@ -263,7 +591,7 @@
          type(auto_diff_real_star_order1) :: tst, resid_ad, dt_dLt_dm_ad
          type(accurate_auto_diff_real_star_order1) :: esum_ad
          logical :: non_turbulent_cell, positive_branch, test_partials
-         real(dp) :: residual, scal, P_theta
+         real(dp) :: residual, scal, P_theta, Ptrb_start
          include 'formats'
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
@@ -281,20 +609,17 @@
             resid_ad = w_00/s% csound(k)  ! make w = 0
          else
             call set_energy_eqn_scal(s, k, scal, ierr); if (ierr /= 0) return  ! 1/(erg g^-1 s^-1)
-            positive_branch = &
-               s% RSP2_source_seed == 0d0 .and. s% RSP2_alfat == 0d0 .and. &
-               s% w_start(k) == 0d0 .and. &
-               (.not. s% u_flag .or. s% RSP2_alfam == 0d0)
-            if (positive_branch) then
+            positive_branch = rsp2_local_w_equation(s,k)
+            if (positive_branch .or. (s% RSP2_3equation_flag .and. &
+                  w_00%val > 0d0 .and. w_00%val < s% csound(k))) then
                source_div_w_ad = compute_Source_div_w(s, k, ierr)
                if (ierr /= 0) return
+               if (.not. s% RSP2_3equation_flag .and. s% RSP2_source_seed /= 0d0) &
+                  source_div_w_ad = source_div_w_ad + div_by_w(s% RSP2_source_seed*source_div_w_ad,w_00)
                Eq_div_w_ad = compute_Eq_div_w_cell(s, k, ierr)
                if (ierr /= 0) return
-               positive_branch = source_div_w_ad%val + Eq_div_w_ad%val > 0d0
-            end if
 
-            if (positive_branch) then
-               ! The unstable zero branch factors from the local residual as w*G(w).
+               ! Cancel known w factors before differentiating the divided row.
                call calc_Ptrb_ad_tw(s, k, Ptrb_dV_ad, Ptrb_div_etrb, ierr)
                if (ierr /= 0) return
                dV_ad = 1d0/wrap_d_00(s,k) - 1d0/s% rho_start(k)
@@ -313,8 +638,16 @@
                esum_ad = esum_ad + Ptrb_dV_div_w_ad
                esum_ad = esum_ad - s% dt*C_div_w_ad
                esum_ad = esum_ad - s% dt*Eq_div_w_ad
-               ! Scale G as an energy row without restoring the vanishing factor w.
-               resid_ad = esum_ad*s% csound(k)*scal/s% dt
+               if (.not. positive_branch) then
+                  Ptrb_start = s% RSP2_alfap*(2d0/3d0)*s% rho_start(k)*get_etrb_start(s,k)
+                  esum_ad = esum_ad + div_by_w( &
+                     (1d0 - P_theta)*Ptrb_start*dV_ad - get_etrb_start(s,k), w_00)
+                  call setup_dt_dLt_dm_ad(ierr, .true.); if (ierr /= 0) return
+                  esum_ad = esum_ad + dt_dLt_dm_ad
+               end if
+               resid_ad = esum_ad
+               if (positive_branch .and. w_00%val <= resid_ad%val) resid_ad = w_00
+               resid_ad = resid_ad*s% csound(k)*scal/s% dt
             else
                call setup_d_turbulent_energy(ierr); if (ierr /= 0) return  ! erg g^-1 = cm^2 s^-2
                call setup_Ptrb_dV_ad(ierr); if (ierr /= 0) return  ! erg g^-1
@@ -327,12 +660,11 @@
                esum_ad = esum_ad + dt_dLt_dm_ad
                esum_ad = esum_ad - dt_C_ad
                esum_ad = esum_ad - dt_Eq_ad  ! erg g^-1
-               resid_ad = esum_ad*scal/s%dt
-            end if
-
-            if (.not. positive_branch .and. k==-35 .and. s% solver_iter == 1) then
-                  write(*,3) 'RSP2 w dEt PdV dtC dtEq', k, s% solver_iter, &
-                     w_00%val, d_turbulent_energy_ad%val, Ptrb_dV_ad%val, dt_C_ad%val, dt_Eq_ad%val
+               resid_ad = esum_ad
+               if (w_00%val == 0d0 .and. resid_ad%val == 0d0 .and. get_etrb_start(s,k) == 0d0) then
+                  resid_ad = w_00*s% csound(k)
+               end if
+               resid_ad = resid_ad*scal/s%dt
             end if
 
          end if
@@ -376,10 +708,11 @@
             Ptrb_dV_ad = Ptrb_ad*dV_ad  ! erg cm^-3 cm^-3 g^-1 = erg g^-1
          end subroutine setup_Ptrb_dV_ad
 
-         subroutine setup_dt_dLt_dm_ad(ierr)  ! erg g^-1
+         subroutine setup_dt_dLt_dm_ad(ierr, divide_by_w)
             integer, intent(out) :: ierr
+            logical, intent(in), optional :: divide_by_w
             type(auto_diff_real_star_order1) :: Lt_00, Lt_p1
-            real(dp) :: L_theta
+            real(dp) :: L_theta, Lt_start_p1
             include 'formats'
             ierr = 0
             if (s% using_velocity_time_centering .and. &
@@ -387,6 +720,23 @@
                L_theta = s% L_theta_for_velocity_time_centering
             else
                L_theta = 1d0
+            end if
+            if (present(divide_by_w)) then
+               if (divide_by_w) then
+                  Lt_00 = compute_Lt(s, k, ierr, k)
+                  if (ierr /= 0) return
+                  Lt_p1 = compute_Lt(s, k+1, ierr, k)
+                  if (ierr /= 0) return
+                  if (k < s% nz) Lt_p1 = shift_p1(Lt_p1)
+                  dt_dLt_dm_ad = L_theta*(Lt_00 - Lt_p1)*s% dt/s% dm(k)
+                  if (L_theta /= 1d0) then
+                     Lt_start_p1 = 0d0
+                     if (k < s% nz) Lt_start_p1 = s% Lt_start(k+1)
+                     Lt_00 = (1d0 - L_theta)*(s% Lt_start(k) - Lt_start_p1)
+                     dt_dLt_dm_ad = dt_dLt_dm_ad + div_by_w(Lt_00,w_00)*s% dt/s% dm(k)
+                  end if
+                  return
+               end if
             end if
             Lt_00 = L_theta*s% Lt_ad(k) + (1d0 - L_theta)*s% Lt_start(k)
             if (k == s% nz) then
@@ -417,12 +767,16 @@
       end subroutine do1_turbulent_energy_eqn
 
 
+
+
+
       function compute_PII_face(s, k, ierr) result(PII_face)  ! ergs g^-1 K^-1 (like Cp)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: PII_face
          integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: Y_face
+         type(auto_diff_real_star_order1) :: Y_face, w_face
+         real(dp) :: alfa, beta
          include 'formats'
          ierr = 0
          if (k > s% nz) then
@@ -439,8 +793,16 @@
          end if
          Y_face = s% Y_face_ad(k)
          if (ierr /= 0) return
-         PII_face = compute_PII_from_Y(s, k, Y_face, ierr)
-         if (ierr /= 0) return
+         if (s% RSP2_3equation_flag) then
+            ! PII remains a diagnostic; the moment equations use <v_r*s> directly.
+            call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
+            w_face = alfa*wrap_w_00(s,k) + beta*wrap_w_m1(s,k)
+            PII_face = 0d0
+            if (w_face%val > 0d0) PII_face = div_by_w(wrap_Pi_00(s,k),w_face)
+         else
+            PII_face = compute_PII_from_Y(s, k, Y_face, ierr)
+            if (ierr /= 0) return
+         end if
 
          s% PII(k) = PII_face%val
          s% PII_ad(k) = PII_face
@@ -483,6 +845,12 @@
          type(auto_diff_real_star_order1) :: w_00, Source_div_w
          include 'formats'
          ierr = 0
+         if (s% RSP2_3equation_flag) then
+            Source = rsp2_moment_source(s,k,.false.,ierr)
+            if (ierr /= 0) return
+            s% SOURCE(k) = Source%val
+            return
+         end if
          w_00 = wrap_w_00(s, k)
          Source_div_w = compute_Source_div_w(s, k, ierr)
          if (ierr /= 0) return
@@ -507,6 +875,10 @@
             Hp_face_00, Hp_face_p1, PII_face_00, PII_face_p1, PII_div_Hp_cell, &
             P_QQ_div_Cp
          ierr = 0
+         if (s% RSP2_3equation_flag) then
+            Source_div_w = rsp2_moment_source(s,k,.true.,ierr)
+            return
+         end if
          T_00 = wrap_T_00(s, k)
          d_00 = wrap_d_00(s, k)
          Peos_00 = wrap_Peos_00(s, k)
@@ -593,6 +965,8 @@
             w_00, T_00, d_00, Cp_00, kap_00, Lambda_cell, POM2
          real(dp) :: gammar, alpha, POM
          ierr = 0
+         Dr_div_w = 0d0
+         if (s% RSP2_3equation_flag) return
          alpha = s% mixing_length_alpha
          gammar = s% RSP2_alfar*x_GAMMAR
          if (gammar == 0d0 .or. alpha == 0d0) then
@@ -671,11 +1045,20 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: Eq_div_w, Chi_div_w
+         type(auto_diff_real_star_order1) :: Eq_div_w, Chi_div_w, Eq_p1
 
          ierr = 0
          Eq_div_w = 0d0
          if (s% mixing_length_alpha == 0d0 .or. s% RSP2_alfam == 0d0) return
+         if (s% u_flag) then
+            Eq_div_w = 0.5d0*compute_Eq_face(s, k, ierr, k)
+            if (ierr /= 0) return
+            Eq_p1 = compute_Eq_face(s, k+1, ierr, k)
+            if (ierr /= 0) return
+            if (k < s% nz) Eq_p1 = shift_p1(Eq_p1)
+            Eq_div_w = Eq_div_w + 0.5d0*Eq_p1
+            return
+         end if
          Chi_div_w = compute_Chi_div_w_cell(s, k, ierr)
          if (ierr /= 0) return
          Eq_div_w = 4d0*pi*Chi_div_w*compute_d_v_div_r(s, k, .true.)/s% dm(k)
@@ -780,10 +1163,11 @@
       end function compute_d_u_div_r_face
 
 
-      function compute_Chi_face(s, k, ierr) result(Chi_face)
+      function compute_Chi_face(s, k, ierr, k_div_w) result(Chi_face)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          integer, intent(out) :: ierr
+         integer, intent(in), optional :: k_div_w  ! divide by this cell's w
          type(auto_diff_real_star_order1) :: Chi_face, rho_face, r_face, Lambda_face, w_face
          real(dp) :: alfa, beta, dm_face
 
@@ -797,6 +1181,7 @@
             r_face = s% R_center
             Lambda_face = get_TDC_mixing_length_face(s, s% nz, ierr)
             w_face = wrap_w_00(s, s% nz)
+            if (present(k_div_w)) w_face = 1d0
             dm_face = 0.5d0*s% dm(s% nz)
          else
             if (k <= s% RSP2_num_outermost_cells_forced_nonturbulent + 1 .or. &
@@ -806,6 +1191,14 @@
             Lambda_face = get_TDC_mixing_length_face(s, k, ierr)
             call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
             w_face = alfa*wrap_w_00(s,k) + beta*wrap_w_m1(s,k)
+            if (present(k_div_w)) then
+               ! Cancel the local contribution before forming w_face/w_cell.
+               if (k_div_w == k) then
+                  w_face = alfa + div_by_w(beta*wrap_w_m1(s,k),wrap_w_00(s,k))
+               else
+                  w_face = div_by_w(alfa*wrap_w_00(s,k),wrap_w_m1(s,k)) + beta
+               end if
+            end if
             dm_face = 0.5d0*(s% dm(k) + s% dm(k-1))
          end if
          if (ierr /= 0) return
@@ -814,17 +1207,18 @@
       end function compute_Chi_face
 
 
-      function compute_Eq_face(s, k, ierr) result(Eq_face)
+      function compute_Eq_face(s, k, ierr, k_div_w) result(Eq_face)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          integer, intent(out) :: ierr
+         integer, intent(in), optional :: k_div_w
          type(auto_diff_real_star_order1) :: Eq_face, Chi_face
          real(dp) :: dm_face
 
          ierr = 0
          Eq_face = 0d0
          if (k == 1) return
-         Chi_face = compute_Chi_face(s, k, ierr)
+         Chi_face = compute_Chi_face(s, k, ierr, k_div_w)
          if (ierr /= 0) return
          if (k > s% nz) then
             dm_face = 0.5d0*s% dm(s% nz)
@@ -983,6 +1377,11 @@
          include 'formats'
          ierr = 0
 
+         if (s% RSP2_3equation_flag) then
+            Lrad_coeff = get_rsp2_Lrad_coeff(s, k, ierr)
+            return
+         end if
+
          r_00 = wrap_r_00(s,k)
          area = 4d0*pi*pow2(r_00)
          Hp_face = get_TDC_Hp_face(s, k, ierr)
@@ -1019,7 +1418,8 @@
          type(auto_diff_real_star_order1) :: Lc, Lc_div_w_face
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: r_00, area, &
-            T_m1, T_00, d_m1, d_00, w_m1, w_00, T_rho_face, PII_face, w_face
+            T_m1, T_00, d_m1, d_00, w_m1, w_00, T_rho_face, PII_face, w_face, &
+            T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grad_ad, kap_face
          real(dp) :: ALFAC, ALFAS, alfa, beta
          include 'formats'
          ierr = 0
@@ -1032,6 +1432,16 @@
          end if
          r_00 = wrap_r_00(s, k)
          area = 4d0*pi*pow2(r_00)
+         if (s% RSP2_3equation_flag) then
+            Lc = 0d0
+            Lc_div_w_face = 0d0
+            if (rsp2_zero_moments(s,k)) return
+            call get_rsp2_face_eos( &
+               s, k, T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grad_ad, kap_face, ierr)
+            if (ierr /= 0) return
+            Lc = area*rho_face*T_face*wrap_Pi_00(s,k)
+            return
+         end if
          T_m1 = wrap_T_m1(s, k)
          T_00 = wrap_T_00(s, k)
          d_m1 = wrap_d_m1(s, k)
@@ -1066,20 +1476,25 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: gradT, grad_ad, gradL, dynamical_gradL
+         type(auto_diff_real_star_order1) :: gradT, grad_ad, gradL, dynamical_gradL, entropy_gradient
          real(dp) :: alfa, beta
 
          ierr = 0
          gradT = 0d0
-         call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
-         grad_ad = alfa*wrap_grad_ad_00(s,k) + beta*wrap_grad_ad_m1(s,k)
-         gradL = grad_ad
-         if (s% use_Ledoux_criterion) &
-            gradL = gradL + s% gradL_composition_term(k)
-         if (k > 1 .and. s% TDC_use_dynamical_gradL) then
-            call get_TDC_dynamical_gradL(s, k, gradL, dynamical_gradL, ierr)
+         if (s% RSP2_3equation_flag) then
+            call get_rsp2_thermal_gradient(s, k, grad_ad, gradL, entropy_gradient, ierr)
             if (ierr /= 0) return
-            gradL = dynamical_gradL
+         else
+            call get_RSP2_alfa_beta_face_weights(s, k, alfa, beta)
+            grad_ad = alfa*wrap_grad_ad_00(s,k) + beta*wrap_grad_ad_m1(s,k)
+            gradL = grad_ad
+            if (s% use_Ledoux_criterion) &
+               gradL = gradL + s% gradL_composition_term(k)
+            if (k > 1 .and. s% TDC_use_dynamical_gradL) then
+               call get_TDC_dynamical_gradL(s, k, gradL, dynamical_gradL, ierr)
+               if (ierr /= 0) return
+               gradL = dynamical_gradL
+            end if
          end if
          s% grada_face_ad(k) = grad_ad
          s% grada_face(k) = grad_ad%val
@@ -1090,11 +1505,12 @@
       end function compute_RSP2_gradT
 
 
-      function compute_Lt(s, k, ierr) result(Lt)  ! erg s^-1
+      function compute_Lt(s, k, ierr, k_div_w) result(Lt)  ! erg s^-1
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: Lt
          integer, intent(out) :: ierr
+         integer, intent(in), optional :: k_div_w  ! divide by this cell's w
          type(auto_diff_real_star_order1) :: r_00, area2, d_m1, d_00, &
             rho2_face, Lambda_face, w_m1, w_00, w_face, etrb_m1, etrb_00
          real(dp) :: alpha_t, alfa, beta
@@ -1121,13 +1537,20 @@
          w_m1 = wrap_w_m1(s,k)
          w_00 = wrap_w_00(s,k)
          w_face = alfa*w_00 + beta*w_m1
+         if (present(k_div_w)) then
+            if (k_div_w == k) then
+               w_face = alfa + div_by_w(beta*w_m1,w_00)
+            else
+               w_face = div_by_w(alfa*w_00,w_m1) + beta
+            end if
+         end if
          etrb_m1 = pow2(w_m1)
          etrb_00 = pow2(w_00)
          Lambda_face = get_TDC_mixing_length_face(s, k, ierr)
          if (ierr /= 0) return
          Lt = - alpha_t * area2 * rho2_face * Lambda_face * w_face * (etrb_m1 - etrb_00) / s% dm_bar(k)
          ! units = (cm^4) (g^2 cm^-6) (cm) (cm s^-1) (ergs g^-1) g^-1 = erg s^-1
-         s% Lt(k) = Lt%val
+         if (.not. present(k_div_w)) s% Lt(k) = Lt%val
       end function compute_Lt
 
 
@@ -1135,9 +1558,12 @@
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          integer :: k
-         type(auto_diff_real_star_order1) :: Lt
+         type(auto_diff_real_star_order1) :: Lt, &
+            T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grad_ad, kap_face
+         real(dp) :: L_scale, max_L, flux_reference, velocity_reference, area_rho
          include 'formats'
          ierr = 0
+         max_L = maxval(abs(s% L(1:s% nz)))
          do k=1,s%nz
             s% Y_face_start(k) = s% Y_face(k)
             Lt = compute_Lt(s, k, ierr)
@@ -1145,113 +1571,119 @@
             s% Lt_ad(k) = Lt
             s% Lt_start(k) = Lt%val
             s% w_start(k) = s% w(k)
+            if (s% RSP2_3equation_flag) then
+               call get_rsp2_face_eos( &
+                  s, k, T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grad_ad, kap_face, ierr)
+               if (ierr /= 0) return
+               L_scale = max(1d0, abs(s% L(k)), 1d-3*max_L)
+               area_rho = 4d0*pi*pow2(s% r(k))*rho_face%val
+               flux_reference = L_scale/(area_rho*T_face%val)
+               velocity_reference = pow(L_scale/area_rho,1d0/3d0)
+               s% Pi_scale(k) = max(abs(s% Pi(k)), flux_reference)
+               s% Phi_scale(k) = max(s% Phi(k), &
+                  1.5d0*pow2(flux_reference/velocity_reference))
+            end if
          end do
       end subroutine set_etrb_start_vars
 
 
-      subroutine RSP2_adjust_vars_before_call_solver(s, ierr)  ! replaces check_omega in RSP
-         type (star_info), pointer :: s
+      subroutine RSP2_adjust_vars_before_call_solver(s, ierr)
+         type(star_info), pointer :: s
          integer, intent(out) :: ierr
-         real(dp) :: PII_div_Hp, QQ, source_coeff, Lambda_cell, &
-            damping_coeff, rad_damping_coeff, linear_coeff, discr, soln, w_initial, &
-            Lt_p1, detrb, detrb_dw, etrb, w_max, L_theta
-         integer :: k, k_lo, k_hi, op_err
-         type(auto_diff_real_star_order1) :: Lambda_cell_ad
-         include 'formats'
+         integer :: k, pass, k_lo, k_hi, k_first, k_last, k_step
+         real(dp) :: velocity_guess, source_coeff, linear_coeff, available_energy, &
+            discr, soln, w_initial, L_theta
+         type(auto_diff_real_star_order1) :: source, damping, rad_damping, Eq_cell, &
+            Lt_00, Lt_p1, Ptrb, Ptrb_div_etrb, dV, rhs, buoyancy
+
          ierr = 0
          if (s% mixing_length_alpha == 0d0 .or. s% dt <= 0d0) return
-
          k_lo = s% RSP2_num_outermost_cells_forced_nonturbulent + 1
          k_hi = s% nz - int(s% nz/s% RSP2_nz_div_IBOTOM)
          if (k_lo > k_hi) return
 
-         if (s% RSP2_alfat > 0d0) then
-            L_theta = 1d0
-            if (s% using_velocity_time_centering .and. s% include_L_in_velocity_time_centering) &
-               L_theta = s% L_theta_for_velocity_time_centering
-            !$OMP PARALLEL DO PRIVATE(k,Lt_p1,detrb,detrb_dw,etrb,w_max,discr,soln,w_initial) SCHEDULE(dynamic,2)
-            do k = k_lo, k_hi
-               Lt_p1 = 0d0
-               if (k < s% nz) Lt_p1 = s% Lt_start(k+1)
-               detrb = s% dt*((Lt_p1 - s% Lt_start(k))/s% dm(k))
-               ! Seed weak turbulence when incoming energy exceeds its starting energy.
-               if (is_bad(detrb) .or. detrb <= pow2(s% w_start(k))) cycle
-               Lt_p1 = 0d0
-               detrb_dw = -s% Lt_ad(k)%d1Array(i_w_00)
-               if (k < s% nz) then
-                  Lt_p1 = s% Lt_ad(k+1)%val
-                  detrb_dw = detrb_dw + s% Lt_ad(k+1)%d1Array(i_w_m1)
-               end if
-               detrb_dw = s% dt*L_theta*(detrb_dw/s% dm(k))
-               etrb = pow2(s% w_start(k)) + (1d0 - L_theta)*detrb + &
-                  s% dt*L_theta*((Lt_p1 - s% Lt_ad(k)%val)/s% dm(k)) - detrb_dw*s% w(k)
-               if (etrb <= 0d0 .or. is_bad(etrb) .or. is_bad(detrb_dw)) cycle
-               ! Retain w**2 and linearize Lt to select the positive initial guess.
-               discr = sqrt(pow2(detrb_dw) + 4d0*etrb)
+         ! A remaining entropy variance can generate flux at negligible kinetic energy.
+         if (s% RSP2_3equation_flag) then
+            do k=max(2,k_lo),min(k_hi,s% nz-1)
+               if (rsp2_zero_moments(s,k) .or. s% Phi(k) <= 0d0) cycle
+               buoyancy = rsp2_buoyancy_face(s,k,ierr)
+               if (ierr /= 0) return
+               velocity_guess = s% dt*abs(buoyancy%val)*sqrt(s% Phi(k))
+               if (velocity_guess == 0d0) cycle
+               ! Include w below roundoff relative to the buoyancy impulse.
+               if (max(s% w(k),s% w(k-1)) > epsilon(1d0)*velocity_guess) cycle
+               s% w(k) = velocity_guess
+               if (k-1 >= k_lo) s% w(k-1) = velocity_guess
+               s% Pi(k) = s% Pi(k) + s% dt*buoyancy%val*s% Phi(k)
+            end do
+         end if
+
+         ! Include neighboring w derivatives when shear heats a quiet region.
+         ! A diagonal test alone misses collective production with u velocity.
+         do k=k_lo,k_hi
+            if (s% w(k) /= 0d0) cycle
+            source = compute_Source_div_w(s,k,ierr)
+            if (ierr /= 0) return
+            Eq_cell = compute_Eq_cell(s,k,ierr)
+            if (ierr /= 0) return
+            source_coeff = source%val + Eq_cell%d1Array(i_w_m1) + &
+               Eq_cell%d1Array(i_w_00) + Eq_cell%d1Array(i_w_p1)
+            if (source_coeff <= 0d0) cycle
+            s% w(k) = s% dt*source_coeff
+         end do
+
+         L_theta = 1d0
+         if (s% using_velocity_time_centering .and. s% include_L_in_velocity_time_centering) &
+            L_theta = s% L_theta_for_velocity_time_centering
+         ! Sweep in both directions so imported energy also seeds empty cells.
+         ! These are trial values only; accepted state and time weights are unchanged.
+         do pass=1,2
+            k_first = k_lo
+            k_last = k_hi
+            k_step = 1
+            if (pass == 2) then
+               k_first = k_hi
+               k_last = k_lo
+               k_step = -1
+            end if
+            do k=k_first,k_last,k_step
+               source = compute_Source(s,k,ierr)
+               if (ierr /= 0) return
+               damping = compute_D(s,k,ierr)
+               if (ierr /= 0) return
+               rad_damping = compute_Dr(s,k,ierr)
+               if (ierr /= 0) return
+               Eq_cell = compute_Eq_cell(s,k,ierr)
+               if (ierr /= 0) return
+               Lt_00 = compute_Lt(s,k,ierr)
+               if (ierr /= 0) return
+               Lt_p1 = compute_Lt(s,k+1,ierr)
+               if (ierr /= 0) return
+               if (k < s% nz) Lt_p1 = shift_p1(Lt_p1)
+               Lt_00 = L_theta*Lt_00 + (1d0-L_theta)*s% Lt_start(k)
+               if (k < s% nz) Lt_p1 = L_theta*Lt_p1 + (1d0-L_theta)*s% Lt_start(k+1)
+               call calc_Ptrb_ad_tw(s,k,Ptrb,Ptrb_div_etrb,ierr)
+               if (ierr /= 0) return
+               dV = 1d0/wrap_d_00(s,k) - 1d0/s% rho_start(k)
+               rhs = s% dt*(source - damping - rad_damping + Eq_cell + (Lt_p1-Lt_00)/s% dm(k)) - Ptrb*dV
+               linear_coeff = rhs%d1Array(i_w_00)
+               available_energy = pow2(s% w_start(k)) + rhs%val - linear_coeff*s% w(k)
+               if (available_energy < 0d0 .or. is_bad(available_energy) .or. is_bad(linear_coeff)) cycle
+               discr = sqrt(pow2(linear_coeff) + 4d0*available_energy)
                if (is_bad(discr)) cycle
-               if (detrb_dw > 0d0) then
-                  soln = 0.5d0*(detrb_dw + discr)
+               soln = 0d0
+               if (linear_coeff >= 0d0) then
+                  soln = 0.5d0*(linear_coeff + discr)
                else
-                  soln = 2d0*etrb/(discr - detrb_dw)
+                  soln = 2d0*available_energy/(discr - linear_coeff)
                end if
-               w_max = max(s% w_start(max(1,k-1)), s% w_start(k), s% w_start(min(s% nz,k+1)))
-               ! Bound only the initial guess, using the neighboring starting values.
-               soln = min(w_max, soln)
                if (soln <= s% w(k) .or. is_bad(soln)) cycle
                w_initial = s% w(k)
                s% w(k) = soln
                if (s% RSP2_report_adjust_w) &
-                  write(*,3) 'RSP2_adjust_vars_before_call_solver Lt w', &
-                     k, s% model_number, w_initial, soln
+                  write(*,'(a,i7,2es16.7)') 'RSP2 initial w ', k, w_initial, soln
             end do
-            !$OMP END PARALLEL DO
-         end if
-
-         if (s% RSP2_source_seed /= 0d0) return
-         k_hi = min(k_hi,s% nz-1)
-         !$OMP PARALLEL DO PRIVATE(k,PII_div_Hp,QQ,source_coeff,Lambda_cell,Lambda_cell_ad,op_err, &
-         !$OMP    damping_coeff,rad_damping_coeff,linear_coeff,discr,soln,w_initial) &
-         !$OMP SCHEDULE(dynamic,2)
-         do k = k_lo, k_hi
-            ! Seed only an exactly dormant accepted cell.
-            if (s% w_start(k) /= 0d0) cycle
-
-            if (s% Hp_face(k) <= 0d0 .or. s% Hp_face(k+1) <= 0d0) cycle
-            PII_div_Hp = 0.5d0*( &
-               s% PII(k)/s% Hp_face(k) + s% PII(k+1)/s% Hp_face(k+1))
-            QQ = s% chiT(k)/(s% rho(k)*s% T(k)*s% chiRho(k))
-            source_coeff = PII_div_Hp*s% T(k)*s% Peos(k)*QQ/s% Cp(k)
-            if (source_coeff <= 0d0 .or. is_bad(source_coeff)) cycle
-
-            Lambda_cell_ad = get_TDC_mixing_length_cell(s, k, op_err)
-            if (op_err /= 0) then
-               ierr = op_err
-               cycle
-            end if
-            Lambda_cell = Lambda_cell_ad%val
-            if (Lambda_cell <= 0d0 .or. is_bad(Lambda_cell)) cycle
-            damping_coeff = s% RSP2_alfad*x_CEDE/Lambda_cell
-            rad_damping_coeff = &
-               4d0*boltz_sigma*pow2(s% RSP2_alfar*x_GAMMAR)*pow3(s% T(k))/ &
-               (pow2(s% rho(k))*s% Cp(k)*s% opacity(k)*pow2(Lambda_cell))
-            if (damping_coeff < 0d0 .or. rad_damping_coeff < 0d0 .or. &
-                  is_bad(damping_coeff) .or. is_bad(rad_damping_coeff)) cycle
-
-            linear_coeff = 1d0 + s% dt*rad_damping_coeff
-            discr = pow2(linear_coeff) + &
-               4d0*pow2(s% dt)*damping_coeff*source_coeff
-            if (discr < 0d0 .or. is_bad(discr)) cycle
-            soln = 2d0*s% dt*source_coeff/(linear_coeff + sqrt(discr))
-            if (soln <= s% w(k) .or. is_bad(soln)) cycle
-
-            w_initial = s% w(k)
-            s% w(k) = soln
-            if (s% RSP2_report_adjust_w) &
-               write(*,3) 'RSP2_adjust_vars_before_call_solver w', &
-                  k, s% model_number, w_initial, soln
          end do
-         !$OMP END PARALLEL DO
-
       end subroutine RSP2_adjust_vars_before_call_solver
 
       end module hydro_rsp2

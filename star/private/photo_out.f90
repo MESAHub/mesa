@@ -71,6 +71,7 @@
             s% force_tau_factor, s% force_opacity_factor, &
             s% crystal_core_boundary_mass
 
+         write(iounit) s% RSP2_3equation_flag
          write(iounit) s% net_name
 
          call write_part_number(iounit)

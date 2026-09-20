@@ -726,7 +726,10 @@
       integer, parameter :: p_flux_limit_R = p_lum_rad_div_L_Edd_sub_fourPrad_div_PchiT + 1
       integer, parameter :: p_flux_limit_lambda = p_flux_limit_R + 1
 
-      integer, parameter :: p_col_id_max = p_flux_limit_lambda
+      integer, parameter :: p_Pi = p_flux_limit_lambda + 1
+      integer, parameter :: p_Phi = p_Pi + 1
+      integer, parameter :: p_Pi_covariance_excess = p_Phi + 1
+      integer, parameter :: p_col_id_max = p_Pi_covariance_excess
 
       character (len=maxlen_profile_column_name) :: profile_column_name(p_col_id_max)
       type (integer_dict), pointer :: profile_column_names_dict
@@ -1433,6 +1436,9 @@
 
          profile_column_name(p_flux_limit_R) = 'flux_limit_R'
          profile_column_name(p_flux_limit_lambda) = 'flux_limit_lambda'
+         profile_column_name(p_Pi) = 'Pi'
+         profile_column_name(p_Phi) = 'Phi'
+         profile_column_name(p_Pi_covariance_excess) = 'Pi_covariance_excess'
 
          cnt = 0
          do i=1,p_col_id_max

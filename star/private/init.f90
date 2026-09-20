@@ -531,6 +531,7 @@
          s% am_nu_rot_flag = .false.
          s% RSP_flag = .false.
          s% RSP2_flag = .false.
+         s% RSP2_3equation_flag = .false.
 
          s% have_mixing_info = .false.
          s% doing_solver_iterations = .false.

@@ -41,6 +41,7 @@
       !integer, parameter ::  = 14
       integer, parameter :: bit_for_RSP = 15
       integer, parameter :: bit_for_no_L_basic_variable = 16
+      integer, parameter :: bit_for_RSP2_3equation = 17
 
       integer, parameter :: increment_for_rotation_flag = 1
       integer, parameter :: increment_for_have_j_rot = 1
@@ -343,6 +344,11 @@
          s% RTI_flag = BTEST(file_type, bit_for_RTI)
          s% RSP_flag = BTEST(file_type, bit_for_RSP)
          s% RSP2_flag = BTEST(file_type, bit_for_RSP2)
+         s% RSP2_3equation_flag = BTEST(file_type, bit_for_RSP2_3equation)
+         if (s% RSP2_3equation_flag .and. .not. s% RSP2_flag) then
+            ierr = -1
+            return
+         end if
          no_L = BTEST(file_type, bit_for_no_L_basic_variable)
 
          if (BTEST(file_type, bit_for_lnPgas)) then
@@ -595,6 +601,10 @@
             else if (s% RSP2_flag) then
                j=j+1; xh(i_w,k) = vec(j)
                j=j+1; xh(i_Y,k) = vec(j)
+               if (s% RSP2_3equation_flag) then
+                  j=j+1; xh(s% i_Pi,k) = vec(j)
+                  j=j+1; xh(s% i_Phi,k) = vec(j)
+               end if
             end if
             if (i_lum /= 0) then
                j=j+1; xh(i_lum,k) = vec(j)

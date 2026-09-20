@@ -55,6 +55,7 @@
          use interp_1d_lib
          use star_utils, only: set_m_grav_and_grav
          use auto_diff_support
+         use hydro_rsp2, only: remesh_rsp2_moments
          type (star_info), pointer :: s
          integer, intent(in) :: nz, nz_old
          integer, dimension(:) :: cell_type, comes_from
@@ -71,11 +72,11 @@
          integer, intent(out) :: ierr
 
          real(dp) :: dxa, xmstar, mstar, sumx, &
-            total_internal_energy1, total_internal_energy2, err
+            total_internal_energy1, total_internal_energy2, err, cell_integral
          character (len=strlen) :: message
-         integer :: k, j, op_err, nzlo, nzhi, nzlo_old, nzhi_old, species
-         real(dp), pointer :: work(:)
-         real(dp), dimension(:), allocatable :: &
+         integer :: k, j, op_err, nzlo, nzhi, nzlo_old, nzhi_old, species, k_old_last, num_remap_vars
+         real(dp), pointer :: work(:), remap_values(:,:)
+         real(dp), dimension(:), allocatable, target :: &
             dqbar, dqbar_old, new_r, Vol_new, xq_old_plus1, &
             xout_old, xout_new, xq_new, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7, &
             energy_new, density_new
@@ -222,12 +223,23 @@
                s, nz, nz_old, cell_type, comes_from, &
                xq_old, xq, dq_old, dq, xh, xh_old, tmp1, ierr)
             if (failed('do_etrb')) return
-            if (dbg) write(*,*) 'call do_Y_face'
-            call do_Y_face( &
-               s, nz, nz_old, nzlo, nzhi, comes_from, &
-               xh, xh_old, xq, xq_old_plus1, xq_new, &
+            call do_RSP2_face_var( &
+               s, s% i_Y, nz, nz_old, nzlo, nzhi, comes_from, &
+               xh, xh_old, dq, dq_old, xq, xq_old_plus1, xq_new, &
                work, tmp1, tmp2, ierr)
-            if (failed('do_Y_face')) return
+            if (failed('do_RSP2_face_var Y')) return
+            if (s% RSP2_3equation_flag) then
+               call do_RSP2_face_var( &
+                  s, s% i_Pi, nz, nz_old, nzlo, nzhi, comes_from, &
+                  xh, xh_old, dq, dq_old, xq, xq_old_plus1, xq_new, work, tmp1, tmp2, ierr)
+               if (failed('do_RSP2_face_var Pi')) return
+               call do_RSP2_face_var( &
+                  s, s% i_Phi, nz, nz_old, nzlo, nzhi, comes_from, &
+                  xh, xh_old, dq, dq_old, xq, xq_old_plus1, xq_new, work, tmp1, tmp2, ierr)
+               if (failed('do_RSP2_face_var Phi')) return
+               call remesh_rsp2_moments(s, nz, dq, xh, ierr)
+               if (failed('remesh_rsp2_moments')) return
+            end if
          end if
 
          if (s% rotation_flag) then
@@ -338,6 +350,49 @@
          ! needed because do1_lnT evaluates PE
          call set_m_grav_and_grav(s)
 
+         tmp5(1:nz) = 0d0
+         if (s% RSP2_flag) then
+            ! Reconstruct cell averages so splitting preserves thermal gradients.
+            num_remap_vars = 1
+            if (s% mesh_adjust_get_T_from_E .and. &
+                  s% max_rel_delta_IE_for_mesh_total_energy_balance /= 0d0) num_remap_vars = 2
+            do j=1,num_remap_vars
+               if (j == 2) then
+                  ! Use the same reconstruction for the mechanical energy correction.
+                  tmp4(1:nz_old) = specific_PE_old(1:nz_old) + specific_KE_old(1:nz_old)
+                  remap_values(1:1,1:nz_old) => tmp4(1:nz_old)
+               else if (s% mesh_adjust_get_T_from_E) then
+                  remap_values(1:1,1:nz_old) => energy_old(1:nz_old)
+               else
+                  remap_values(1:1,1:nz_old) => lnT_old(1:nz_old)
+               end if
+               do k=1,nz_old
+                  call get1_lpp(k, 1, nz_old, 1, dq_old, remap_values, .true., tmp1, tmp2, tmp3)
+                  ! Retain the cell average when the reconstruction limits curvature.
+                  tmp1(k) = remap_values(1,k) - tmp3(k)*pow2(dq_old(k))/24d0
+               end do
+               if (s% R_center > 0d0 .and. nz_old > 1) then
+                  ! An excised center has no zero-slope symmetry condition.
+                  tmp2(nz_old) = (remap_values(1,nz_old-1) - remap_values(1,nz_old))/ &
+                     (0.5d0*(dq_old(nz_old-1) + dq_old(nz_old)))
+                  if (j == 1 .and. s% mesh_adjust_get_T_from_E) tmp2(nz_old) = &
+                     sign(min(abs(tmp2(nz_old)),2d0*energy_old(nz_old)/dq_old(nz_old)),tmp2(nz_old))
+               end if
+               do k=1,nz
+                  call get_xq_integral(comes_from(k), nz_old, xq_old_plus1, xq(k), dq(k), &
+                     2, tmp1, tmp2, tmp3, cell_integral, dbg, k_old_last, ierr)
+                  if (failed('get_xq_integral thermal state')) return
+                  if (j == 2) then
+                     tmp5(k) = cell_integral/dq(k)
+                  else if (s% mesh_adjust_get_T_from_E) then
+                     energy_new(k) = cell_integral/dq(k)
+                  else
+                     xh(s% i_lnT,k) = cell_integral/dq(k)
+                  end if
+               end do
+            end do
+         end if
+
          do k = 1, nz
 
             op_err = 0
@@ -348,7 +403,7 @@
                xa, xh, xh_old, &
                xq, dq, xq_old, dq_old, eta_old, energy_old, lnT_old, &
                specific_PE_old, specific_KE_old, w_old, &
-               density_new, energy_new, op_err)
+               density_new, energy_new, tmp5(k), op_err)
             if (op_err /= 0) then
                write(*,2) 'failed for do1_lnT', k
                write(message,*) 'do1_lnT for k', k
@@ -444,7 +499,9 @@
          end subroutine do_alloc
 
          subroutine dealloc
-            call do_work_arrays(.false.,ierr)
+            integer :: ierr_dealloc
+            call do_work_arrays(.false.,ierr_dealloc)
+            if (ierr == 0) ierr = ierr_dealloc
          end subroutine dealloc
 
          subroutine do_work_arrays(alloc_flag, ierr)
@@ -467,7 +524,7 @@
                return
             end if
             failed = .true.
-            if (dbg) write(*, *) 'mesh_revisions failed in ' // trim(msg)
+            if (s% report_ierr .or. dbg) write(*, *) 'mesh_revisions failed in ' // trim(msg)
             call dealloc
             return
          end function failed
@@ -1340,7 +1397,7 @@
             xa, xh, xh_old, &
             xq, dq, xq_old, dq_old, eta_old, energy_old, lnT_old, &
             specific_PE_old, specific_KE_old, w_old, &
-            density_new, energy_new, ierr)
+            density_new, energy_new, mechanical_energy_average, ierr)
          use eos_def
          use star_utils, only: set_rmid, cell_specific_PE, cell_specific_KE
          type (star_info), pointer :: s
@@ -1349,6 +1406,7 @@
          real(dp), dimension(:) :: &
             xq, dq, xq_old, dq_old, eta_old, energy_old, lnT_old, &
             specific_PE_old, specific_KE_old, w_old, density_new, energy_new
+         real(dp), intent(in) :: mechanical_energy_average
          integer, intent(out) :: ierr
 
          integer :: k_old
@@ -1377,7 +1435,9 @@
          xq_outer = xq(k)
          cell_dq = dq(k)
 
-         if (cell_type(k) == revised_type) then
+         if (s% RSP2_flag .and. .not. s% mesh_adjust_get_T_from_E) then
+            avg_lnT = xh(s% i_lnT,k)
+         else if (cell_type(k) == revised_type) then
             avg_lnT = get_lnT_from_xh(s, k, xh_old)
          else  ! find average lnT between xq_outer and xq_inner
             call get_old_value_integral( &
@@ -1423,7 +1483,9 @@
 
          if (dbg) write(*,2) 'eta_old(k_old)', k_old, eta_old(k_old)
 
-         if (cell_type(k) == revised_type) then
+         if (s% RSP2_flag) then
+            avg_energy = energy_new(k)
+         else if (cell_type(k) == revised_type) then
             avg_energy = energy_old(k_old)
          else  ! find average internal energy between q_outer and q_inner
             call get_old_value_integral( &
@@ -1443,32 +1505,37 @@
 
          else
 
-            if (cell_type(k) == revised_type) then
-               avg_PE = specific_PE_old(k_old)
-            else  ! find average potential energy between q_outer and q_inner
-               call get_old_value_integral( &
-                  k, k_old, nz_old, xq_old, dq_old, xq_outer, cell_dq, &
-                  specific_PE_old, sum_energy, dbg, ierr)
-               if (ierr /= 0) then
-                  if (dbg) write(*,*) 'get_old_value_integral failed for do1_lnT'
-                  if (.not. dbg) return
-                  call mesa_error(__FILE__,__LINE__,'debug: mesh adjust: specific_PE_old do1_lnT')
+            if (s% RSP2_flag) then
+               delta_energy = mechanical_energy_average
+            else
+               if (cell_type(k) == revised_type) then
+                  avg_PE = specific_PE_old(k_old)
+               else  ! find average potential energy between q_outer and q_inner
+                  call get_old_value_integral( &
+                     k, k_old, nz_old, xq_old, dq_old, xq_outer, cell_dq, &
+                     specific_PE_old, sum_energy, dbg, ierr)
+                  if (ierr /= 0) then
+                     if (dbg) write(*,*) 'get_old_value_integral failed for do1_lnT'
+                     if (.not. dbg) return
+                     call mesa_error(__FILE__,__LINE__,'debug: mesh adjust: specific_PE_old do1_lnT')
+                  end if
+                  avg_PE = sum_energy/cell_dq
                end if
-               avg_PE = sum_energy/cell_dq
-            end if
 
-            if (cell_type(k) == revised_type) then
-               avg_KE = specific_KE_old(k_old)
-            else  ! find average kinetic energy between q_outer and q_inner
-               call get_old_value_integral( &
-                  k, k_old, nz_old, xq_old, dq_old, xq_outer, cell_dq, &
-                  specific_KE_old, sum_energy, dbg, ierr)
-               if (ierr /= 0) then
-                  if (dbg) write(*,*) 'get_old_value_integral failed for do1_lnT'
-                  if (.not. dbg) return
-                  call mesa_error(__FILE__,__LINE__,'debug: mesh adjust: specific_KE_old do1_lnT')
+               if (cell_type(k) == revised_type) then
+                  avg_KE = specific_KE_old(k_old)
+               else  ! find average kinetic energy between q_outer and q_inner
+                  call get_old_value_integral( &
+                     k, k_old, nz_old, xq_old, dq_old, xq_outer, cell_dq, &
+                     specific_KE_old, sum_energy, dbg, ierr)
+                  if (ierr /= 0) then
+                     if (dbg) write(*,*) 'get_old_value_integral failed for do1_lnT'
+                     if (.not. dbg) return
+                     call mesa_error(__FILE__,__LINE__,'debug: mesh adjust: specific_KE_old do1_lnT')
+                  end if
+                  avg_KE = sum_energy/cell_dq
                end if
-               avg_KE = sum_energy/cell_dq
+               delta_energy = avg_PE + avg_KE
             end if
 
             if (ierr /= 0) return
@@ -1482,7 +1549,7 @@
             new_KE = cell_specific_KE(s,k,d_dv00,d_dvp1)
 
             max_delta_energy = avg_energy*s% max_rel_delta_IE_for_mesh_total_energy_balance
-            delta_energy = avg_PE + avg_KE - (new_PE + new_KE)
+            delta_energy = delta_energy - (new_PE + new_KE)
             if (abs(delta_energy) > max_delta_energy) then
                delta_energy = sign(max_delta_energy,delta_energy)
             end if
@@ -2624,64 +2691,67 @@
       end subroutine adjust1_u
 
 
-      subroutine do_Y_face( &
-            s, nz, nz_old, nzlo, nzhi, comes_from, xh, xh_old, &
-            xq, xq_old_plus1, xq_new, work, Y_face_old_plus1, Y_face_new, ierr)
-         use interp_1d_def
-         use interp_1d_lib
+      subroutine do_RSP2_face_var( &
+            s, i_var, nz, nz_old, nzlo, nzhi, comes_from, xh, xh_old, &
+            dq, dq_old, xq, xq_old_plus1, xq_new, work, face_old_plus1, face_new, ierr)
+         use hydro_rsp2, only: interpolate_rsp2_face, rsp2_remesh_w_face
          type (star_info), pointer :: s
-         integer, intent(in) :: nz, nz_old, nzlo, nzhi, comes_from(:)
+         integer, intent(in) :: i_var, nz, nz_old, nzlo, nzhi, comes_from(:)
          real(dp), dimension(:,:), pointer :: xh, xh_old
          real(dp), dimension(:), pointer :: work
          real(dp), dimension(:) :: &
-            xq, xq_old_plus1, Y_face_old_plus1, Y_face_new, xq_new
+            dq, dq_old, xq, xq_old_plus1, face_old_plus1, face_new, xq_new
          integer, intent(out) :: ierr
 
-         integer :: n, i_Y, k
+         integer :: n, k
+         real(dp) :: w_face
 
          include 'formats'
 
          ierr = 0
-         i_Y = s% i_Y
-         if (i_Y == 0) return
+         if (i_var == 0) return
          n = nzhi - nzlo + 1
 
          do k=1,nz_old
-            Y_face_old_plus1(k) = xh_old(i_Y,k)
+            face_old_plus1(k) = xh_old(i_var,k)
+            if (i_var == s% i_Pi) then
+               w_face = rsp2_remesh_w_face(s,k,nz_old,dq_old,xh_old(s% i_w,:))
+               face_old_plus1(k) = 0d0
+               if (w_face > 0d0) face_old_plus1(k) = xh_old(i_var,k)/w_face
+            end if
          end do
-         Y_face_old_plus1(nz_old+1) = Y_face_old_plus1(nz_old)
+         face_old_plus1(nz_old+1) = face_old_plus1(nz_old)
 
-         call interpolate_vector( &
-               nz_old+1, xq_old_plus1, n, xq_new, &
-               Y_face_old_plus1, Y_face_new, interp_pm, nwork, work, &
-               'mesh_adjust do_Y_face', ierr)
-         if (ierr /= 0) then
-            return
-            write(*,*) 'interpolate_vector failed in do_Y_face for remesh'
-            call mesa_error(__FILE__,__LINE__,'debug: mesh adjust: do_Y_face')
-         end if
+         call interpolate_rsp2_face( &
+            s, i_var, nz_old+1, xq_old_plus1, n, xq_new, face_old_plus1, face_new, work, ierr)
+         if (ierr /= 0) return
 
          do k=nzlo,nzhi
-            xh(i_Y,k) = Y_face_new(k+1-nzlo)
+            xh(i_var,k) = face_new(k+1-nzlo)
          end do
 
          n = nzlo - 1
          if (n > 0) then
             do k=1,n
-               xh(i_Y,k) = xh_old(i_Y,k)
+               xh(i_var,k) = face_old_plus1(k)
             end do
          end if
 
          if (nzhi < nz) then
             n = nz - nzhi - 1  ! nz-n = nzhi+1
             do k=0,n
-               xh(i_Y,nz-k) = xh_old(i_Y,nz_old-k)
+               xh(i_var,nz-k) = face_old_plus1(nz_old-k)
             end do
          end if
 
-         xh(i_Y,1) = 0d0
+         if (i_var == s% i_Pi) then
+            do k=1,nz
+               xh(i_var,k) = xh(i_var,k)*rsp2_remesh_w_face(s,k,nz,dq,xh(s% i_w,:))
+            end do
+         end if
+         xh(i_var,1) = 0d0
 
-      end subroutine do_Y_face
+      end subroutine do_RSP2_face_var
 
 
       subroutine do_etrb( &  ! same logic as do_u

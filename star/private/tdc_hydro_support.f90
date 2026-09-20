@@ -45,12 +45,13 @@ contains
       use interp_1d_def, only: pm_work_size
       use interp_1d_lib, only: interpolate_vector_pm
       use hydro_vars, only: set_cgrav
+      use hydro_rsp2, only: remesh_rsp2_moments, interpolate_rsp2_face, rsp2_remesh_w_face
       type(star_info), pointer :: s
       integer, intent(out) :: ierr
       integer :: k, j, nz_old, nz
       real(dp) :: xm_anchor, P_surf, T_surf, old_L1, old_r1, old_J, old_abs_J
       real(dp), allocatable, dimension(:) :: &
-         xm_old, xm, xm_mid_old, xm_mid, v_old, v_new
+         xm_old, xm, xm_mid_old, xm_mid, v_old, v_new, dq_old
       real(dp), pointer :: work1(:)  ! =(nz_old+1, pm_work_size)
       include 'formats'
       ierr = 0
@@ -72,9 +73,10 @@ contains
       call get_PT_surf2(P_surf, T_surf, ierr)
       if (ierr /= 0) call mesa_error(__FILE__, __LINE__, 'remesh_for_TDC failed in get_PT_surf')
       allocate ( &
-         xm_old(nz_old + 1), xm_mid_old(nz_old), v_old(nz_old + 1), &
+         xm_old(nz_old + 1), xm_mid_old(nz_old), v_old(nz_old + 1), dq_old(nz_old), &
          xm(nz + 1), xm_mid(nz), v_new(nz + 1), work1((nz_old + 1)*pm_work_size))
       call set_xm_old2
+      dq_old = s%dq(1:nz_old)
       call find_xm_anchor2
       if (ierr /= 0) then
          deallocate(work1)
@@ -110,10 +112,24 @@ contains
       if (s%RSP2_flag) then
          call interpolate1_face_val2(s%i_Y, s%xh(s%i_Y,nz_old))
          s%xh(s%i_Y,1) = 0d0
+         if (s%RSP2_3equation_flag) then
+            call interpolate1_face_val2(s%i_Pi, 0d0)
+            call interpolate1_face_val2(s%i_Phi, 0d0)
+         end if
          v_old(1:nz_old) = pow2(s%xh(s%i_w,1:nz_old))
          call remap1_cell_average2
          s%xh(s%i_w,1:nz) = sqrt(max(0d0, v_new(1:nz)))
          s%w(1:nz) = s%xh(s%i_w,1:nz)
+         if (s%RSP2_3equation_flag) then
+            do k=1,nz
+               s%xh(s%i_Pi,k) = s%xh(s%i_Pi,k)*rsp2_remesh_w_face(s,k,nz,s%dq,s%w)
+            end do
+            call remesh_rsp2_moments(s, nz, s%dq, s%xh, ierr)
+            if (ierr /= 0) then
+               deallocate(work1)
+               return
+            end if
+         end if
       end if
       do j = 1, s%species
          call remap1_xa2(j)
@@ -622,12 +638,23 @@ contains
       subroutine interpolate1_face_val2(i, cntr_val)
          integer, intent(in) :: i
          real(dp), intent(in) :: cntr_val
+         real(dp) :: w_face
          do k = 1, nz_old
             v_old(k) = s%xh(i, k)
+            if (s%RSP2_3equation_flag .and. i == s%i_Pi) then
+               w_face = rsp2_remesh_w_face(s,k,nz_old,dq_old,s%xh(s%i_w,:))
+               v_old(k) = 0d0
+               if (w_face > 0d0) v_old(k) = s%xh(i,k)/w_face
+            end if
          end do
          v_old(nz_old + 1) = cntr_val
-         call interpolate_vector_pm( &
-            nz_old + 1, xm_old, nz + 1, xm, v_old, v_new, work1, 'remesh_for_TDC', ierr)
+         if (s%RSP2_flag .and. (i == s%i_Y .or. i == s%i_Pi .or. i == s%i_Phi)) then
+            call interpolate_rsp2_face( &
+               s, i, nz_old + 1, xm_old, nz + 1, xm, v_old, v_new, work1, ierr)
+         else
+            call interpolate_vector_pm( &
+               nz_old + 1, xm_old, nz + 1, xm, v_old, v_new, work1, 'remesh_for_TDC', ierr)
+         end if
          if (ierr /= 0) call mesa_error(__FILE__, __LINE__, 'TDC remesh face interpolation failed')
          do k = 1, nz
             s%xh(i, k) = v_new(k)

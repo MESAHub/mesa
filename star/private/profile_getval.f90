@@ -261,6 +261,7 @@
 
 
       subroutine getval_for_profile(s, c, k, val, int_flag, int_val)
+         use hydro_rsp2, only: get_RSP2_alfa_beta_face_weights
          use chem_def
          use hydro_riemann, only: get_Riemann_shock_diagnostics
          use rates_def
@@ -279,7 +280,7 @@
             r00_start, rp1_start, dr3, dr3_start, &
             d_dlnR00, d_dlnRp1, d_dv00, d_dvp1
          integer :: j, nz, ionization_k, klo, khi, i, ii, ierr
-         real(dp) :: f, lgT, full_on, full_off, am_nu_factor
+         real(dp) :: f, lgT, full_on, full_off, am_nu_factor, alfa_rsp2, beta_rsp2, etrb_face
          logical :: rsp_or_w, reconstructed_face_state_active
          include 'formats'
 
@@ -1909,6 +1910,17 @@
                if (rsp_or_w) val = s% Hp_face(k)
             case(p_Y_face)
                if (rsp_or_w) val = s% Y_face(k)
+            case(p_Pi)
+               if (s% RSP2_3equation_flag) val = s% Pi(k)
+            case(p_Phi)
+               if (s% RSP2_3equation_flag) val = s% Phi(k)
+            case(p_Pi_covariance_excess)
+               if (s% RSP2_3equation_flag) then
+                  call get_RSP2_alfa_beta_face_weights(s,k,alfa_rsp2,beta_rsp2)
+                  etrb_face = alfa_rsp2*pow2(s% w(k))
+                  if (k > 1) etrb_face = etrb_face + beta_rsp2*pow2(s% w(k-1))
+                  val = pow2(s% Pi(k)) - (2d0/3d0)*etrb_face*s% Phi(k)
+               end if
             case(p_PII_face)
                if (rsp_or_w) val = s% PII(k)
             case(p_Chi)

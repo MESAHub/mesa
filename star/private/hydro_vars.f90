@@ -315,15 +315,27 @@
                do k=1,nz
                   s% w(k) = s% xh(i_w, k)
                   if (s% w(k) < 0d0) then
-                     !write(*,4) 'unpack: fix w < 0', k, &
-                     !   s% solver_iter, s% model_number, s% w(k)
-                     s% w(k) = s% RSP2_w_fix_if_neg
+                     s% retry_message = 'negative RSP2 w'
+                     ierr = -1
+                     return
                   end if
                end do
             else if (j == i_Y) then
                do k=1,nz
                   s% Y_face(k) = s% xh(i_Y, k)
                end do
+            else if (j == s% i_Pi) then
+               s% Pi(1:nz) = s% xh(j,1:nz)
+               if (any(is_bad(s% Pi(1:nz)))) then
+                  ierr = -1
+                  return
+               end if
+            else if (j == s% i_Phi) then
+               s% Phi(1:nz) = s% xh(j,1:nz)
+               if (any(is_bad(s% Phi(1:nz))) .or. any(s% Phi(1:nz) < 0d0)) then
+                  ierr = -1
+                  return
+               end if
             else if (j == i_lum) then
                do k=1,nz
                   s% L(k) = s% xh(i_lum, k)

@@ -1819,7 +1819,7 @@
          use chem_def
          use star_utils, only: use_xh_to_set_rho_to_dm_div_dV, set_phot_info
          use hydro_vars, only: set_vars_if_needed
-         use set_flags, only: set_pulsation_envelope_mesh
+         use set_flags, only: set_pulsation_envelope_mesh, set_RSP2_3equation_flag
 
          type (star_info), pointer :: s
 
@@ -1834,6 +1834,13 @@
          did_TDC_remesh = .false.
 
          prepare_for_new_step = keep_going
+
+         call set_RSP2_3equation_flag(s% id, s% RSP2_flag .and. s% RSP2_use_3equation_model, ierr)
+         if (ierr /= 0) then
+            prepare_for_new_step = terminate
+            s% result_reason = nonzero_ierr
+            return
+         end if
 
          if (s% dt_next <= 0) then
             write(*, *) 's% dt_next', s% dt_next

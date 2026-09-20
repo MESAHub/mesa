@@ -61,13 +61,16 @@ new_rsp2_flag = .true.
    max_model_number = -1
    !tol_max_correction = 1d99
    rsp2_remesh_when_load=.false.
-   rsp2_alfam= 0.25d0
-   rsp2_alfat= 0.0d0
-   !min_dq_for_xa = 1d-4
    RSP2_use_L_eqn_at_surface = .true.
-   !rsp2_alfat = 0.1d0
    !RSP2_num_outermost_cells_forced_nonturbulent = 1
-RSP2_w_fix_if_neg = 1d-14
+
+    RSP2_use_3equation_model = .true.
+    RSP2_alfa_pi = 1d0
+    RSP2_alfa_phi = 1d0
+    rsp2_alfat = 0d0
+    rsp2_alfam= 0.25d0
+
+
 
 
    ! Star LNA
@@ -84,7 +87,7 @@ RSP2_w_fix_if_neg = 1d-14
    star_LNA_min_first_mode_eta = -3d0 ! minimum logKE per cycle for the first mode
    star_LNA_min_mode_eta = -5d0 ! minimum logKE per cycle for later modes
    star_LNA_max_abs_mode_eta = 100d0 ! 0 disables the absolute logKE guard
-   star_LNA_max_eigenvector_residual = 1d0 !1d-8
+   star_LNA_max_eigenvector_residual = 1d-8
 
    star_LNA_output_file_prefix = 'star_LNA'
    star_LNA_output_directory = 'LNA'
@@ -135,7 +138,7 @@ RSP2_w_fix_if_neg = 1d-14
 
    ! One-time TDC envelope remesh; -1 disables, 0 is before the first step,
    ! and a positive value waits for that many accepted steps.
-   steps_before_remesh_for_TDC_pulsations = -1 !100
+   steps_before_remesh_for_TDC_pulsations = 100
    TDC_hydro_use_mass_interp_face_values = .true.
    TDC_hydro_nz = 350 !190 ! 150-zone base grid + 20 inner + 20 T-gradient
    TDC_hydro_nz_outer = 140 !40
@@ -148,7 +151,7 @@ RSP2_w_fix_if_neg = 1d-14
    mesh_adjust_get_T_from_E = .false. ! can interact poorly with adjust_mass.
    !max_rel_delta_IE_for_mesh_total_energy_balance = 0d0 ! when above is false.
 
-   okay_to_remesh = .false. ! enable standard mesh adjustment
+   okay_to_remesh = .true. ! enable standard mesh adjustment
    x_logical_ctrl(24) = .true. ! turn off standard remeshing at x_ctrl(12)
    x_ctrl(12) = 100 ! model number to turn off standard remeshing
 
@@ -186,7 +189,7 @@ RSP2_w_fix_if_neg = 1d-14
    alt_scale_height_flag = .false.
    mlt_Pturb_factor = 0d0
    include_mlt_Pturb_in_thermodynamic_gradients = .false.
-   TDC_num_innermost_cells_forced_nonturbulent = 2
+   TDC_num_innermost_cells_forced_nonturbulent = 0
    RSP2_report_flux_solver = .false.
 
    ! Temperature-gradient equation

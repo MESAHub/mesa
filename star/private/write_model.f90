@@ -81,6 +81,7 @@
          if (rotation_flag) file_type = file_type + 2**bit_for_j_rot
          if (RSP_flag) file_type = file_type + 2**bit_for_RSP
          if (RSP2_flag) file_type = file_type + 2**bit_for_RSP2
+         if (s% RSP2_3equation_flag) file_type = file_type + 2**bit_for_RSP2_3equation
          if (write_mlt_vc) file_type = file_type + 2**bit_for_mlt_vc
 
          write(iounit, '(i14)', advance='no') file_type
@@ -187,6 +188,10 @@
                call write1(s% w(k),ierr); if (ierr /= 0) exit
                call write1(s% Y_face(k),ierr)
                if (ierr /= 0) exit
+               if (s% RSP2_3equation_flag) then
+                  call write1(s% Pi(k),ierr); if (ierr /= 0) exit
+                  call write1(s% Phi(k),ierr); if (ierr /= 0) exit
+               end if
             end if
             call write1(s% L(k),ierr); if (ierr /= 0) exit
             call write1(s% dq(k),ierr); if (ierr /= 0) exit
@@ -256,6 +261,10 @@
             else if (RSP2_flag) then
                write(iounit, fmt='(a26, 1x)', advance='no') 'w'
                write(iounit, fmt='(a26, 1x)', advance='no') 'Y_face'
+               if (s% RSP2_3equation_flag) then
+                  write(iounit, fmt='(a26, 1x)', advance='no') 'Pi'
+                  write(iounit, fmt='(a26, 1x)', advance='no') 'Phi'
+               end if
             end if
             write(iounit, fmt='(a26, 1x)', advance='no') 'L'
             write(iounit, fmt='(a26, 1x)', advance='no') 'dq'

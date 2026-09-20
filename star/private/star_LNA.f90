@@ -63,7 +63,11 @@
          call setup_star_LNA_problem(s, problem, ierr)
          if (ierr /= 0) return
 
-         call report_star_LNA_setup(s, problem% map)
+         call report_star_LNA_setup(s, problem% map, ierr)
+         if (ierr /= 0) then
+            call free_star_LNA_problem(problem)
+            return
+         end if
 
          call assemble_star_LNA_equations(s, problem, ierr)
          if (ierr == 0 .and. s% star_LNA_write_matrix_summary) &

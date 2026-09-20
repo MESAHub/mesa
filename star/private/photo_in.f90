@@ -57,7 +57,7 @@
 
          read(iounit, iostat=ierr) version
          if (failed('version')) return
-         if (version /= star_def_version) then
+         if (version /= star_def_version .and. version /= 20) then
             write(*,'(/,a,/)') ' FAILURE: the restart data' // &
                ' is from a previous version of the code and is no longer usable.'
             ierr = -1
@@ -90,6 +90,15 @@
             s% crystal_core_boundary_mass
 
          if (failed('initial_y')) return
+         s% RSP2_3equation_flag = .false.
+         if (version >= 21) then
+            read(iounit, iostat=ierr) s% RSP2_3equation_flag
+            if (failed('RSP2_3equation_flag')) return
+         end if
+         if (s% RSP2_3equation_flag .and. .not. s% RSP2_flag) then
+            ierr = -1
+            return
+         end if
          s% nz_old = s% nz  ! needed by alloc
 
          if (s% force_tau_factor > 0 .and. s% tau_factor /= s% force_tau_factor .and. &

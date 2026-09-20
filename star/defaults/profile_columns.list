@@ -743,6 +743,9 @@
    !Riemann_shock_D_mix_factor ! factor applied to final chemical D_mix
    !Uq
    !Y_face
+   !Pi ! face entropy flux <v_r*s>, erg cm/(g K s)
+   !Phi ! full face entropy variance <s*s>, erg^2/(g^2 K^2)
+   !Pi_covariance_excess ! Pi^2 - (2/3)*etrb_face*Phi; positive violates the isotropic bound
 
    !reconstructed_T_face
    !reconstructed_rho_face

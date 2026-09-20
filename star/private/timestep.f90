@@ -2324,6 +2324,8 @@
                 j == s% i_v .or. &
                 j == s% i_w .or. &
                 j == s% i_Y .or. &
+                j == s% i_Pi .or. &
+                j == s% i_Phi .or. &
                 j == s% i_j_rot .or. &
                 j == s% i_w_div_wc .or. &
                 j == s% i_alpha_RTI .or. &

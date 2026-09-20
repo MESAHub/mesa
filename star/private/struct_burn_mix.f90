@@ -347,6 +347,7 @@
 
          if (s% RSP2_flag) then
             call set_etrb_start_vars(s,ierr)
+            if (ierr /= 0) return
          end if
 
          do k=1,s% nz
@@ -463,6 +464,10 @@
                do k = 1, nz
                   s% xh(j1,k) = s% Y_face(k)
                end do
+            else if (j1 == s% i_Pi) then
+               s% xh(j1,1:nz) = s% Pi(1:nz)
+            else if (j1 == s% i_Phi) then
+               s% xh(j1,1:nz) = s% Phi(1:nz)
             else if (j1 == s% i_v .and. s% i_v <= nvar) then
                do k = 1, nz
                   s% xh(j1,k) = s% v(k)

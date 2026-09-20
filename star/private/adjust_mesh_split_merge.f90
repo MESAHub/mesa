@@ -38,6 +38,7 @@
       ! makes new mesh and sets new values for xh and xa.
       integer function remesh_split_merge(s)
          use star_utils, only: total_angular_momentum, set_dm_bar
+         use hydro_rsp2, only: remesh_rsp2_moments
 
          type (star_info), pointer :: s
          real(dp) :: old_J, new_J
@@ -53,6 +54,11 @@
          if (s% rotation_flag) old_J = total_angular_momentum(s)
 
          call amr(s,ierr)
+         if (ierr == 0 .and. s% RSP2_3equation_flag) then
+            call remesh_rsp2_moments(s, s% nz, s% dq, s% xh, ierr)
+            s% Pi(1:s% nz) = s% xh(s% i_Pi,1:s% nz)
+            s% Phi(1:s% nz) = s% xh(s% i_Phi,1:s% nz)
+         end if
          if (ierr /= 0) then
             s% retry_message = 'remesh_split_merge failed'
             if (s% report_ierr) write(*, *) s% retry_message
@@ -853,6 +859,7 @@
       subroutine do_merge(s, i_merge, species, new_xa, bypass_repeated_remesh, ierr)
          use mesh_adjust, only: set_lnT_for_energy
          use star_utils, only: set_rmid
+         use hydro_rsp2, only: rsp2_remesh_w_face
          type (star_info), pointer :: s
          integer, intent(in) :: i_merge, species
          real(dp), intent(inout) :: new_xa(species)
@@ -867,7 +874,7 @@
             Esum_ip, KE_ip, PE_ip, IE_ip, Etrb_ip, &
             j_rot_new, j_rot_p1_new, J_old, &
             dmbar_old, dmbar_p1_old, dmbar_p2_old, &
-            dmbar_new, dmbar_p1_new
+            dmbar_new, dmbar_p1_new, Pi_div_wL, Pi_div_wR, w_face
          include 'formats'
 
          ierr = 0
@@ -891,6 +898,14 @@
          ! get energies for i and ip before merge
          call get_cell_energies(s, i, Esum_i, KE_i, PE_i, IE_i, Etrb_i)
          call get_cell_energies(s, ip, Esum_ip, KE_ip, PE_ip, IE_ip, Etrb_ip)
+         if (s% RSP2_3equation_flag) then
+            Pi_div_wR = 0d0
+            Pi_div_wL = 0d0
+            w_face = rsp2_remesh_w_face(s,i,nz,s% dq,s% w)
+            if (w_face > 0d0) Pi_div_wR = s% Pi(i)/w_face
+            w_face = rsp2_remesh_w_face(s,ip+1,nz,s% dq,s% w)
+            if (w_face > 0d0) Pi_div_wL = s% Pi(ip+1)/w_face
+         end if
 
          if (s% rotation_flag) then
             ! WARNING! this is designed to conserve angular momentum, but not to explicitly conserve energy
@@ -1005,6 +1020,10 @@
             if (s% RSP2_flag) then
                s% w(im) = s% w(i0)
                s% Y_face(im) = s% Y_face(i0)
+               if (s% RSP2_3equation_flag) then
+                  s% Pi(im) = s% Pi(i0)
+                  s% Phi(im) = s% Phi(i0)
+               end if
             end if
             s% energy(im) = s% energy(i0)
             s% dPdr_dRhodr_info(im) = s% dPdr_dRhodr_info(i0)
@@ -1037,6 +1056,14 @@
          if (s% RSP2_flag) then
             s% xh(s% i_w,i) = s% w(i)
             s% xh(s% i_Y,i) = s% Y_face(i)
+            if (s% RSP2_3equation_flag) then
+               s% Pi(i) = Pi_div_wR*rsp2_remesh_w_face(s,i,nz,s% dq,s% w)
+               s% xh(s% i_Pi,i) = s% Pi(i)
+               if (ip <= nz) then
+                  s% Pi(ip) = Pi_div_wL*rsp2_remesh_w_face(s,ip,nz,s% dq,s% w)
+                  s% xh(s% i_Pi,ip) = s% Pi(ip)
+               end if
+            end if
          end if
 
          ! do this after move cells since need new r(ip) to calc new rho(i).
@@ -1283,6 +1310,7 @@
       subroutine do_split(s, i_split, species, tau_center, grad_xa, new_xa, ierr)
          use alloc, only: reallocate_star_info_arrays
          use star_utils, only: set_rmid, store_r_in_xh
+         use hydro_rsp2, only: rsp2_remesh_w_face
          type (star_info), pointer :: s
          integer, intent(in) :: i_split, species
          real(dp) :: tau_center, grad_xa(species), new_xa(species)
@@ -1302,7 +1330,8 @@
             min_stencil_energy, max_stencil_energy, max_delta_KE_div_dm, &
             pressure_R, pressure_C, pressure_L, grad_pressure, pressure_difference_target, &
             min_stencil_pressure, max_stencil_pressure, min_stencil_lnT, max_stencil_lnT, &
-            superad_reduction_factorL, superad_reduction_factorR, Y_faceL, Y_faceR
+            superad_reduction_factorL, superad_reduction_factorR, Y_faceL, Y_faceR, &
+            Pi_div_wL, Pi_div_wR, PhiL, PhiR, w_face
          logical :: done, use_new_grad_rho, pressure_reconstructed
          include 'formats'
 
@@ -1358,6 +1387,21 @@
             Y_faceR = s% Y_face(i)
             Y_faceL = Y_faceR
             if (i < nz) Y_faceL = s% Y_face(ip)
+         end if
+
+         Pi_div_wL = 0d0
+         Pi_div_wR = 0d0
+         PhiL = 0d0
+         PhiR = 0d0
+         if (s% RSP2_3equation_flag) then
+            w_face = rsp2_remesh_w_face(s,i,nz,s% dq,s% w)
+            if (w_face > 0d0) Pi_div_wR = s% Pi(i)/w_face
+            PhiR = s% Phi(i)
+            if (i < nz) then
+               w_face = rsp2_remesh_w_face(s,ip,nz,s% dq,s% w)
+               if (w_face > 0d0) Pi_div_wL = s% Pi(ip)/w_face
+               PhiL = s% Phi(ip)
+            end if
          end if
 
          tauR = s% tau(i)
@@ -1529,6 +1573,10 @@
                if (s% RSP2_flag) then
                   s% w(jp) = s% w(j)
                   s% Y_face(jp) = s% Y_face(j)
+                  if (s% RSP2_3equation_flag) then
+                     s% Pi(jp) = s% Pi(j)
+                     s% Phi(jp) = s% Phi(j)
+                  end if
                end if
                s% energy(jp) = s% energy(j)
                s% dPdr_dRhodr_info(jp) = s% dPdr_dRhodr_info(j)
@@ -1696,6 +1744,19 @@
          end if
 
          if (s% RSP2_flag) then
+            if (s% RSP2_3equation_flag) then
+               s% Pi(i) = Pi_div_wR*rsp2_remesh_w_face(s,i,nz,s% dq,s% w)
+               s% Pi(ip) = (Pi_div_wR + (Pi_div_wL - Pi_div_wR)*dMR/dM)* &
+                  rsp2_remesh_w_face(s,ip,nz,s% dq,s% w)
+               s% xh(s% i_Pi,i) = s% Pi(i)
+               if (ip < nz) then
+                  s% Pi(ip+1) = Pi_div_wL*rsp2_remesh_w_face(s,ip+1,nz,s% dq,s% w)
+                  s% xh(s% i_Pi,ip+1) = s% Pi(ip+1)
+               end if
+               s% Phi(ip) = (1d0-dMR/dM)*PhiR + (dMR/dM)*PhiL
+               s% xh(s% i_Pi,ip) = s% Pi(ip)
+               s% xh(s% i_Phi,ip) = s% Phi(ip)
+            end if
             s% Y_face(ip) = Y_faceR + (Y_faceL - Y_faceR)*dMR/dM
             s% xh(s% i_Y,i) = s% Y_face(i)
             s% xh(s% i_Y,ip) = s% Y_face(ip)

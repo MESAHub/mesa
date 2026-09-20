@@ -390,6 +390,9 @@
 
          logical, pointer :: fixed_gradr_for_rest_of_solver_iters(:)
 
+         real(dp), pointer :: Pi(:), Phi(:) ! face entropy flux and full variance
+         real(dp), pointer :: Pi_scale(:), Phi_scale(:)
+
       ! Convective turbulent velocity w -- when RSP2_flag is true
 
          type(auto_diff_real_star_order1), pointer, dimension(:) :: &

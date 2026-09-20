@@ -30,8 +30,9 @@
          wrap_kap_00, wrap_L_00, wrap_lnPeos_00, &
          wrap_lnPeos_m1, wrap_lnT_00, wrap_lnT_m1, wrap_Peos_00, &
          wrap_Peos_m1, wrap_r_00, wrap_r_p1, wrap_T_00, wrap_T_m1, wrap_u_00, &
-         wrap_u_m1, wrap_v_00, wrap_v_p1, wrap_w_00, wrap_w_m1
+         wrap_u_m1, wrap_v_00, wrap_v_p1, wrap_w_00, wrap_w_m1, wrap_Y_00
       use hydro_rsp2, only: get_RSP2_alfa_beta_face_weights, compute_Source, compute_D, compute_Dr
+      use hydro_gradient_support, only: get_rsp2_thermal_gradient, get_rsp2_Lrad_coeff
       use reconstructed_face_support, only: &
          get_reconstructed_face_eos_kap_ad, get_reconstructed_face_state_ad
       use star_utils, only: get_mlt_mixing_length, get_rho_face_val
@@ -60,6 +61,7 @@
       public :: static_face_pressure_for_star_LNA
       public :: turbulent_viscous_heating_for_star_LNA
       public :: turbulent_energy_inertia_for_star_LNA
+      public :: rsp2_gradT_for_star_LNA
       public :: rsp2_turbulent_energy_rhs_for_star_LNA
       public :: rsp2_turbulent_energy_inertia_for_star_LNA
       public :: rsp2_forces_non_turbulent_cell
@@ -390,12 +392,36 @@
       end subroutine static_face_pressure_for_star_LNA
 
 
-      subroutine rsp2_luminosity_terms_for_star_LNA(s, k, Lr_ad, Lc_ad, Lt_ad)
+      subroutine rsp2_gradT_for_star_LNA(s, k, gradT, ierr)
+         type(star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1), intent(out) :: gradT
+         integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1) :: grad_ad, gradL, entropy_gradient
+
+         call get_rsp2_thermal_gradient(s,k,grad_ad,gradL,entropy_gradient,ierr,use_time_centering=.false.)
+         if (ierr /= 0) return
+         gradT = gradL + wrap_Y_00(s,k)
+      end subroutine rsp2_gradT_for_star_LNA
+
+
+      subroutine rsp2_luminosity_terms_for_star_LNA(s, k, Lr_ad, Lc_ad, Lt_ad, ierr)
          type(star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(out) :: Lr_ad, Lc_ad, Lt_ad
 
+         integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1) :: gradT, Lrad_coeff
+
+         ierr = 0
          Lr_ad = s% Lr_ad(k)
+         if (s% RSP2_3equation_flag .and. k > 1) then
+            call rsp2_gradT_for_star_LNA(s,k,gradT,ierr)
+            if (ierr /= 0) return
+            Lrad_coeff = get_rsp2_Lrad_coeff(s,k,ierr)
+            if (ierr /= 0) return
+            Lr_ad = Lrad_coeff*gradT
+         end if
          if (star_LNA_perturb_convective_luminosity(s)) then
             call rsp2_convective_luminosity_for_star_LNA(s, k, Lc_ad)
          else
@@ -417,6 +443,10 @@
          type(auto_diff_real_star_order1) :: r_ad, area_ad, T_rho_face_ad, &
             PII_face_ad, w_face_ad
 
+         if (s% RSP2_3equation_flag) then
+            Lc_ad = s% Lc_ad(k)
+            return
+         end if
          Lc_ad = 0d0
          if (k <= 1 .or. k > s% nz .or. rsp2_forces_non_turbulent_cell(s, k)) return
 
@@ -914,7 +944,8 @@
 
          ierr = 0
          call rsp2_PII_face_for_star_LNA(s, k, PII_ad)
-         call rsp2_luminosity_terms_for_star_LNA(s, k, Lr_ad, Lc_ad, Lt_ad)
+         call rsp2_luminosity_terms_for_star_LNA(s, k, Lr_ad, Lc_ad, Lt_ad, ierr)
+         if (ierr /= 0) return
          call rsp2_source_for_star_LNA(s, k, source_ad, ierr)
          if (ierr /= 0) return
          call rsp2_damping_for_star_LNA(s, k, damping_ad, ierr)

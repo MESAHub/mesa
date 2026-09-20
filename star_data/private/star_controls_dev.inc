@@ -25,9 +25,10 @@
          real(dp) :: RSP2_alfam
          real(dp) :: RSP2_alfar
          real(dp) :: RSP2_alfad
+         logical :: RSP2_use_3equation_model
+         real(dp) :: RSP2_alfa_pi, RSP2_alfa_phi
 
-         real(dp) :: RSP2_min_Lt_div_L_for_overshooting_mixing_type
-         real(dp) :: RSP2_min_Lc_div_L_for_convective_mixing_type
+         real(dp) :: RSP2_min_conv_vel_for_mixing_type
 
          real(dp) :: RSP2_w_fix_if_neg, RSP2_source_seed
 

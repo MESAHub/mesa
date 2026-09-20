@@ -314,11 +314,11 @@
       subroutine set_RSP2_flag(id, RSP2_flag, ierr)
          use const_def, only: sqrt_2_div_3
          use hydro_vars, only: set_vars
-         use hydro_rsp2, only: set_RSP2_vars
          integer, intent(in) :: id
          logical, intent(in) :: RSP2_flag
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
+         real(dp), allocatable :: gradT_old(:)
          integer :: nvar_hydro_old, i, k, nz
          logical, parameter :: dbg = .false.
 
@@ -330,9 +330,17 @@
 
          !write(*,*) 'set_RSP2_flag previous s% RSP2_flag', s% RSP2_flag
          !write(*,*) 'set_RSP2_flag new RSP2_flag', RSP2_flag
-         if (s% RSP2_flag .eqv. RSP2_flag) return
+         if (s% RSP2_flag .eqv. RSP2_flag) then
+            call set_RSP2_3equation_flag(id, RSP2_flag .and. s% RSP2_use_3equation_model, ierr)
+            return
+         end if
+         if (.not. RSP2_flag .and. s% RSP2_3equation_flag) then
+            call set_RSP2_3equation_flag(id, .false., ierr)
+            if (ierr /= 0) return
+         end if
 
          nz = s% nz
+         if (RSP2_flag) gradT_old = s% gradT(1:nz)
 
          s% RSP2_flag = RSP2_flag
          nvar_hydro_old = s% nvar_hydro
@@ -375,10 +383,6 @@
                return
             end if
             call insert1(s% i_Y)
-            s% xh(s% i_Y,1) = 0d0
-            do k=2,nz
-               s% xh(s% i_Y,k) = s% gradT(k) - s% gradL(k)
-            end do
          end if
 
          call set_chem_names(s)
@@ -398,7 +402,11 @@
          call set_vars(s, s% dt, ierr)
          if (ierr /= 0) return
 
-         call set_RSP2_vars(s,ierr)
+         ! Use the target neutral gradient, which is not set by the RSP model.
+         s% xh(s% i_Y,1:nz) = gradT_old - s% gradL(1:nz)
+         s% xh(s% i_Y,1) = 0d0
+         s% xh_start(s% i_Y,1:nz) = s% xh(s% i_Y,1:nz)
+         call set_vars(s, s% dt, ierr)
          if (ierr /= 0) return
 
          if (s% RSP2_remesh_when_load .and. s% nz /= s% TDC_hydro_nz) then
@@ -406,7 +414,7 @@
             if (ierr /= 0) return
          end if
 
-
+         call set_RSP2_3equation_flag(id, s% RSP2_use_3equation_model, ierr)
 
          contains
 
@@ -458,6 +466,79 @@
          end subroutine insert
 
       end subroutine set_RSP2_flag
+
+
+      subroutine set_RSP2_3equation_flag(id, enabled, ierr)
+         use hydro_vars, only: set_vars, unpack_xh
+         use hydro_rsp2, only: init_rsp2_moments
+         integer, intent(in) :: id
+         logical, intent(in) :: enabled
+         integer, intent(out) :: ierr
+         type(star_info), pointer :: s
+         real(dp), allocatable :: xh_save(:,:), xh_old_save(:,:), Lc_old(:), gradT_old(:)
+         integer :: nvar_old, i_Y, i_Pi, i_Phi, j, jj
+         logical :: have_old
+
+         call get_star_ptr(id,s,ierr)
+         if (ierr /= 0) return
+         if (enabled) then
+            if (.not. s% RSP2_flag .or. is_bad(s% RSP2_alfa_pi) .or. is_bad(s% RSP2_alfa_phi) .or. &
+                  s% RSP2_alfa_pi <= 0d0 .or. &
+                  s% RSP2_alfa_phi <= 0d0 .or. s% RSP2_source_seed /= 0d0) then
+               write(*,*) 'RSP2 three equation model requires RSP2, positive alfa coefficients and zero source seed'
+               ierr = -1
+               return
+            end if
+         end if
+         if (s% RSP2_3equation_flag .eqv. enabled) return
+         call set_vars(s,s% dt,ierr)
+         if (ierr /= 0) return
+         nvar_old = s% nvar_hydro
+         i_Y = s% i_Y
+         i_Pi = s% i_Pi
+         i_Phi = s% i_Phi
+         xh_save = s% xh(1:nvar_old,1:s% nz)
+         Lc_old = s% Lc(1:s% nz)
+         gradT_old = s% gradT(1:s% nz)
+         have_old = associated(s% xh_old) .and. s% generations > 1
+         if (have_old) xh_old_save = s% xh_old(1:nvar_old,1:s% nz_old)
+
+         s% RSP2_3equation_flag = enabled
+         call set_var_info(s,ierr)
+         if (ierr /= 0) return
+         call update_nvar_allocs(s,nvar_old,s% nvar_chem,ierr)
+         if (ierr /= 0) return
+         s% xh(1:s% nvar_hydro,1:s% nz) = 0d0
+         if (have_old) s% xh_old(1:s% nvar_hydro,1:s% nz_old) = 0d0
+         do j=1,nvar_old
+            jj = j
+            if (enabled) then
+               if (j > i_Y) jj = j+2
+            else
+               if (j == i_Pi .or. j == i_Phi) cycle
+               if (j > i_Phi) jj = j-2
+            end if
+            s% xh(jj,1:s% nz) = xh_save(j,1:s% nz)
+            if (have_old) s% xh_old(jj,1:s% nz_old) = xh_old_save(j,1:s% nz_old)
+         end do
+         call set_chem_names(s)
+         call set_vars(s,s% dt,ierr)
+         if (ierr /= 0) return
+         ! Initialize moments using the preserved gradient and its new reference.
+         s% xh(s% i_Y,1:s% nz) = gradT_old - s% gradL(1:s% nz)
+         s% xh(s% i_Y,1) = 0d0
+         call unpack_xh(s,ierr)
+         if (ierr /= 0) return
+         if (enabled) then
+            call init_rsp2_moments(s,Lc_old,ierr)
+            if (ierr /= 0) return
+         end if
+         s% xh_start(1:s% nvar_hydro,1:s% nz) = s% xh(1:s% nvar_hydro,1:s% nz)
+         ! Missing moment history cannot be used for temporal extrapolation.
+         s% generations = 1
+         s% need_to_setvars = .true.
+         call set_vars(s,s% dt,ierr)
+      end subroutine set_RSP2_3equation_flag
 
 
       subroutine set_RSP_flag(id, RSP_flag, ierr)

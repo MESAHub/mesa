@@ -1351,6 +1351,14 @@
 
             call do1(s% Hp_face, c% Hp_face); if (failed('Hp_face')) exit
 
+            call do1(s% Pi, c% Pi)
+            if (failed('Pi')) exit
+            call do1(s% Phi, c% Phi)
+            if (failed('Phi')) exit
+            call do1(s% Pi_scale, c% Pi_scale)
+            if (failed('Pi_scale')) exit
+            call do1(s% Phi_scale, c% Phi_scale)
+            if (failed('Phi_scale')) exit
             call do1(s% Y_face, c% Y_face); if (failed('Y_face')) exit
             call do1(s% Y_face_start, c% Y_face_start); if (failed('Y_face_start')) exit
 
@@ -2392,6 +2400,14 @@
             s% i_Y = 0
          end if
 
+         if (s% RSP2_flag .and. s% RSP2_3equation_flag) then
+            i = i+1; s% i_Pi = i
+            i = i+1; s% i_Phi = i
+         else
+            s% i_Pi = 0
+            s% i_Phi = 0
+         end if
+
          if (s% w_div_wc_flag) then
             i = i+1; s% i_w_div_wc = i
          else
@@ -2441,6 +2457,8 @@
          if (s% i_v /= 0) s% nameofvar(s% i_v) = 'v'
          if (s% i_w /= 0) s% nameofvar(s% i_w) = 'w'
          if (s% i_Y/= 0) s% nameofvar(s% i_Y) = 'Y_face'
+         if (s% i_Pi /= 0) s% nameofvar(s% i_Pi) = 'Pi'
+         if (s% i_Phi /= 0) s% nameofvar(s% i_Phi) = 'Phi'
          if (s% i_alpha_RTI /= 0) s% nameofvar(s% i_alpha_RTI) = 'alpha_RTI'
          if (s% i_Et_RSP /= 0) s% nameofvar(s% i_Et_RSP) = 'etrb_RSP'
          if (s% i_erad_RSP /= 0) s% nameofvar(s% i_erad_RSP) = 'erad_RSP'
@@ -2457,6 +2475,8 @@
          if (s% i_dlnR_dt /= 0) s% nameofequ(s% i_dlnR_dt) = 'dlnR_dt'
          if (s% i_detrb_dt /= 0) s% nameofequ(s% i_detrb_dt) = 'detrb_dt'
          if (s% i_rsp2_flux /= 0) s% nameofequ(s% i_rsp2_flux) = 'rsp2_flux'
+         if (s% i_Pi /= 0) s% nameofequ(s% i_Pi) = 'dPi_dt'
+         if (s% i_Phi /= 0) s% nameofequ(s% i_Phi) = 'dPhi_dt'
          if (s% i_dalpha_RTI_dt /= 0) s% nameofequ(s% i_dalpha_RTI_dt) = 'dalpha_RTI_dt'
          if (s% i_dEt_RSP_dt /= 0) s% nameofequ(s% i_dEt_RSP_dt) = 'dEt_RSP_dt'
          if (s% i_derad_RSP_dt /= 0) s% nameofequ(s% i_derad_RSP_dt) = 'derad_RSP_dt'

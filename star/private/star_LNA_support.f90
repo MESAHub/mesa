@@ -28,7 +28,7 @@
          rsp2_luminosity_terms_for_star_LNA, &
          rsp2_terms_for_star_LNA_audit, &
          rsp2_turbulent_energy_inertia_for_star_LNA, rsp2_turbulent_energy_rhs_for_star_LNA, &
-         star_LNA_eval_dlnPdm_qhse, star_LNA_HSE_grav_term, &
+         star_LNA_eval_dlnPdm_qhse, star_LNA_HSE_grav_term, rsp2_gradT_for_star_LNA, &
          star_LNA_L_conv_closure_ad => star_LNA_L_conv_ad, &
          tdc_face_state_for_star_LNA, &
          tdc_lna_active, tdc_luminosity_resid_for_star_LNA, &
@@ -45,10 +45,12 @@
          shift_m1, wrap, wrap_d_00, wrap_L_00, wrap_L_p1, &
          wrap_lnd_00, wrap_lnPeos_00, wrap_lnPeos_m1, wrap_Peos_00, &
          wrap_lnT_00, wrap_lnT_m1, wrap_r_00, wrap_r_p1, wrap_r_m1, &
-         wrap_T_00, wrap_T_m1, wrap_v_00, wrap_v_p1, wrap_s_00
+         wrap_T_00, wrap_T_m1, wrap_v_00, wrap_v_p1, wrap_s_00, get_etrb
       use hydro_vars, only: set_Teff_info_for_eqns
       use hydro_riemann, only: do_uface_and_Pface, eval_Riemann_dudt_rhs
-      use hydro_rsp2, only: rsp2_flux_residual
+      use hydro_rsp2, only: rsp2_flux_residual, rsp2_moment_rhs, &
+         rsp2_zero_moments, rsp2_dormant_moments, compute_Source_div_w, get_RSP2_alfa_beta_face_weights
+      use hydro_gradient_support, only: eval_dlnPdm_qhse, get_rsp2_Lrad_coeff
       use reconstructed_face_support, only: &
          get_effective_gradr_factor_ad, get_Lrad_per_gradT_face_ad, &
          get_reconstructed_face_eos_kap_ad
@@ -86,6 +88,8 @@
       integer, parameter :: lna_var_L = 6
       integer, parameter :: lna_var_w = 7
       integer, parameter :: lna_var_Y = 8
+      integer, parameter :: lna_var_Pi = 9
+      integer, parameter :: lna_var_Phi = 10
 
       integer, parameter :: lna_eq_density = 1
       integer, parameter :: lna_eq_radius = 2
@@ -106,11 +110,16 @@
       integer, parameter :: lna_eq_tdc_velocity = 18
       integer, parameter :: lna_eq_tdc_zero_w = 19
       integer, parameter :: lna_eq_mlt_static_temperature_gradient = 20
-      integer, parameter :: num_lna_equations = lna_eq_mlt_static_temperature_gradient
+      integer, parameter :: lna_eq_rsp2_Pi = 21
+      integer, parameter :: lna_eq_rsp2_Phi = 22
+      integer, parameter :: lna_eq_rsp2_zero_Pi = 23
+      integer, parameter :: lna_eq_rsp2_zero_Phi = 24
+      integer, parameter :: num_lna_equations = lna_eq_rsp2_zero_Phi
 
       integer, parameter :: star_LNA_max_refinement_iterations = 4
-      ! Newton refinement is local; do not move roots with order-unity defects.
+      ! Small components can have large relative errors in an otherwise accurate eigenpair.
       real(dp), parameter :: star_LNA_max_initial_refinement_residual = 1d-1
+      real(dp), parameter :: star_LNA_max_initial_normwise_residual = 1d-6
 
       character(len=1), parameter :: star_LNA_backslash = achar(92)
 
@@ -447,6 +456,7 @@
          map%nvar_per_zone = 5
          if (s% RSP2_flag) then
             map%nvar_per_zone = map%nvar_per_zone + 2
+            if (s% RSP2_3equation_flag) map%nvar_per_zone = map%nvar_per_zone + 2
          else if (tdc_lna_active(s)) then
             map%nvar_per_zone = map%nvar_per_zone + 1
          end if
@@ -468,6 +478,10 @@
          if (s% RSP2_flag) then
             call add_var(lna_var_w)
             call add_var(lna_var_Y)
+            if (s% RSP2_3equation_flag) then
+               call add_var(lna_var_Pi)
+               call add_var(lna_var_Phi)
+            end if
          else if (tdc_lna_active(s)) then
             call add_var(lna_var_w)
          end if
@@ -496,7 +510,8 @@
             do iv = 1, problem% map% nvar_per_zone
                var_id = problem% map% var_id(iv)
                row = matrix_index(problem% map, k, var_id)
-               eq_id = equation_id_for_star_LNA(s, k, var_id)
+               eq_id = equation_id_for_star_LNA(s, k, var_id, ierr)
+               if (ierr /= 0) return
                if (row <= 0 .or. eq_id <= 0) then
                   write(*,'(a,2(i0,1x))') &
                      'star_LNA failed to identify equation for k and variable: ', k, var_id
@@ -509,10 +524,12 @@
       end subroutine setup_star_LNA_equation_map
 
 
-      integer function equation_id_for_star_LNA(s, k, var_id) result(eq_id)
+      integer function equation_id_for_star_LNA(s, k, var_id, ierr) result(eq_id)
          type(star_info), pointer :: s
          integer, intent(in) :: k, var_id
+         integer, intent(out) :: ierr
 
+         ierr = 0
          eq_id = 0
          select case (var_id)
          case (lna_var_lnd)
@@ -551,7 +568,7 @@
             end if
          case (lna_var_w)
             if (s% RSP2_flag) then
-               if (rsp2_forces_non_turbulent_cell(s, k)) then
+               if (rsp2_zero_w_for_star_LNA(s,k,ierr)) then
                   eq_id = lna_eq_rsp2_zero_w
                else
                   eq_id = lna_eq_rsp2_turbulent_energy
@@ -563,6 +580,12 @@
             end if
          case (lna_var_Y)
             eq_id = lna_eq_rsp2_flux
+         case (lna_var_Pi)
+            eq_id = lna_eq_rsp2_Pi
+            if (rsp2_dormant_moments(s,k)) eq_id = lna_eq_rsp2_zero_Pi
+         case (lna_var_Phi)
+            eq_id = lna_eq_rsp2_Phi
+            if (rsp2_dormant_moments(s,k)) eq_id = lna_eq_rsp2_zero_Phi
          end select
       end function equation_id_for_star_LNA
 
@@ -1359,9 +1382,14 @@
          real(dp) :: delm, alfa
 
          ierr = 0
+         gradT_ad = s% gradT_ad(k)
+         if (s% RSP2_3equation_flag) then
+            call rsp2_gradT_for_star_LNA(s,k,gradT_ad,ierr)
+            if (ierr /= 0) return
+         end if
          if (s% use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn) then
             luminosity_resid_ad = &
-               s% gradT_ad(k)*(wrap_lnPeos_m1(s, k) - wrap_lnPeos_00(s, k)) - &
+               gradT_ad*(wrap_lnPeos_m1(s, k) - wrap_lnPeos_00(s, k)) - &
                (wrap_lnT_m1(s, k) - wrap_lnT_00(s, k))
             return
          end if
@@ -1371,10 +1399,13 @@
             return
          end if
 
-         call star_LNA_eval_dlnPdm_qhse(s, k, dlnPdm_ad, Ppoint_ad, ierr)
+         if (s% RSP2_3equation_flag) then
+            call eval_dlnPdm_qhse(s,k,dlnPdm_ad,Ppoint_ad,ierr,use_time_centering=.false.)
+         else
+            call star_LNA_eval_dlnPdm_qhse(s, k, dlnPdm_ad, Ppoint_ad, ierr)
+         end if
          if (ierr /= 0) return
 
-         gradT_ad = s% gradT_ad(k)
          dlnTdm_ad = dlnPdm_ad*gradT_ad
 
          Tm1_ad = wrap_T_m1(s, k)
@@ -1428,6 +1459,12 @@
          gradr_factor_ad = get_effective_gradr_factor_ad(s, k)
          if (s% RSP2_flag) then
             Lrad_ad = s% Lr_ad(k)
+            if (s% RSP2_3equation_flag) then
+               call rsp2_gradT_for_star_LNA(s,k,L0_ad,ierr)
+               if (ierr /= 0) return
+               Lrad_ad = get_rsp2_Lrad_coeff(s,k,ierr)*L0_ad
+               if (ierr /= 0) return
+            end if
          else if (s% lnT(k)/ln10 <= s% max_logT_for_mlt .and. &
                s% mlt_mixing_type(k) == convective_mixing .and. &
                abs(gradr_factor_ad%val) > 1d-20) then
@@ -1522,8 +1559,69 @@
             if (ierr /= 0) return
             call assemble_rsp2_flux_row(s, map, mtx, k, ierr)
             if (ierr /= 0) return
+            if (s% RSP2_3equation_flag) then
+               call assemble_rsp2_moment_rows(s,map,mtx,k,ierr)
+               if (ierr /= 0) return
+            end if
          end do
       end subroutine assemble_rsp2_turbulent_rows
+
+
+      subroutine assemble_rsp2_moment_rows(s, map, mtx, k, ierr)
+         type(star_info), pointer :: s
+         type(star_LNA_var_map), intent(in) :: map
+         type(star_LNA_matrix), intent(inout) :: mtx
+         integer, intent(in) :: k
+         integer, intent(out) :: ierr
+         integer :: row_Pi, row_Phi
+         real(dp) :: alfa, beta
+         type(auto_diff_real_star_order1) :: Pi_rhs, Phi_rhs
+
+         ierr = 0
+         row_Pi = matrix_index(map,k,lna_var_Pi)
+         row_Phi = matrix_index(map,k,lna_var_Phi)
+         if (rsp2_dormant_moments(s,k)) then
+            mtx%A(row_Pi,row_Pi) = 1d0
+            mtx%A(row_Phi,row_Phi) = 1d0
+            return
+         end if
+         call get_RSP2_alfa_beta_face_weights(s,k,alfa,beta)
+         if (alfa*get_etrb(s,k) + beta*get_etrb(s,k-1) == 0d0) then
+            write(*,'(a,i0)') 'star_LNA cannot linearize active RSP2 moments at zero face energy, k = ', k
+            ierr = -1
+            return
+         end if
+         call rsp2_moment_rhs(s,k,Pi_rhs,Phi_rhs,ierr,use_time_centering=.false.)
+         if (ierr /= 0) return
+         call add_ad_partials_to_A(map,mtx,row_Pi,k,1d0,Pi_rhs,ierr)
+         if (ierr /= 0) return
+         call add_ad_partials_to_A(map,mtx,row_Phi,k,1d0,Phi_rhs,ierr)
+         if (ierr /= 0) return
+         mtx%B(row_Pi,row_Pi) = 1d0
+         mtx%B(row_Phi,row_Phi) = 1d0
+      end subroutine assemble_rsp2_moment_rows
+
+
+      logical function rsp2_zero_w_for_star_LNA(s, k, ierr) result(zero_w)
+         type(star_info), pointer :: s
+         integer, intent(in) :: k
+         integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1) :: source_div_w
+
+         ierr = 0
+         zero_w = rsp2_forces_non_turbulent_cell(s,k)
+         if (zero_w .or. get_etrb(s,k) /= 0d0) return
+         if (s% RSP2_3equation_flag) then
+            zero_w = rsp2_dormant_moments(s,k) .and. rsp2_dormant_moments(s,k+1)
+            if (zero_w) return
+         end if
+         if (s% RSP2_source_seed /= 0d0 .or. s% RSP2_alfat /= 0d0) return
+         ! Select the local dormant branch on the current static background.
+         ! Viscous heating is quadratic in the mean velocity gradient.
+         source_div_w = compute_Source_div_w(s,k,ierr)
+         if (ierr /= 0) return
+         zero_w = source_div_w%val <= 0d0
+      end function rsp2_zero_w_for_star_LNA
 
 
       ! RSP2 turbulent energy row:
@@ -1552,10 +1650,11 @@
             return
          end if
 
-         if (rsp2_forces_non_turbulent_cell(s, k)) then
+         if (rsp2_zero_w_for_star_LNA(s,k,ierr)) then
             mtx%A(row, col_w) = 1d0
             return
          end if
+         if (ierr /= 0) return
 
          call rsp2_turbulent_energy_rhs_for_star_LNA(s, k, rhs_ad, ierr)
          if (ierr /= 0) return
@@ -1582,7 +1681,7 @@
          integer, intent(in) :: k
          integer, intent(out) :: ierr
          integer :: row
-         type(auto_diff_real_star_order1) :: flux_resid_ad
+         type(auto_diff_real_star_order1) :: flux_resid_ad, Lr_ad, Lc_ad, Lt_ad
 
          ierr = 0
          row = matrix_index(map, k, lna_var_Y)
@@ -1593,6 +1692,12 @@
          end if
 
          flux_resid_ad = rsp2_flux_residual(s, k)
+         if (s% RSP2_3equation_flag .and. k > 1) then
+            call rsp2_luminosity_terms_for_star_LNA(s,k,Lr_ad,Lc_ad,Lt_ad,ierr)
+            if (ierr /= 0) return
+            flux_resid_ad = (Lr_ad + Lc_ad + Lt_ad - wrap_L_00(s,k))/ &
+               max(1d0, abs(s% L(k)), 1d-3*maxval(abs(s% L(1:s% nz))))
+         end if
          call add_ad_partials_to_A(map, mtx, row, k, 1d0, flux_resid_ad, ierr)
          if (ierr /= 0) return
       end subroutine assemble_rsp2_flux_row
@@ -1766,6 +1871,18 @@
             kk = k; var_id = lna_var_Y
          case (i_Y_p1)
             kk = k + 1; var_id = lna_var_Y
+         case (i_xtra1_m1)
+            kk = k - 1; var_id = lna_var_Pi
+         case (i_xtra1_00)
+            kk = k; var_id = lna_var_Pi
+         case (i_xtra1_p1)
+            kk = k + 1; var_id = lna_var_Pi
+         case (i_xtra2_m1)
+            kk = k - 1; var_id = lna_var_Phi
+         case (i_xtra2_00)
+            kk = k; var_id = lna_var_Phi
+         case (i_xtra2_p1)
+            kk = k + 1; var_id = lna_var_Phi
          end select
       end subroutine ad_index_to_star_LNA_var
 
@@ -2173,7 +2290,7 @@
          integer, intent(in) :: var_id
 
          select case (var_id)
-         case (lna_var_lnR, lna_var_v, lna_var_u, lna_var_lnT, lna_var_w)
+         case (lna_var_lnR, lna_var_v, lna_var_u, lna_var_lnT, lna_var_w, lna_var_Pi, lna_var_Phi)
             is_dynamic = .true.
          case default
             is_dynamic = .false.
@@ -2201,7 +2318,7 @@
             refined_eigenpairs, converged_eigenpairs, refinement_iterations, &
             refinement_iterations_total, initial_residual_row
          real(dp) :: sigma_re, sigma_im, omega, best_omega, frequency_uHz, &
-            logKE_per_cycle, eigenvector_residual, initial_residual, &
+            logKE_per_cycle, eigenvector_residual, initial_residual, refinement_target, &
             min_rejected_residual, max_rejected_residual, &
             first_rejected_residual, first_rejected_period_days
          complex(dp) :: sigma, initial_sigma
@@ -2238,6 +2355,7 @@
          call star_LNA_matrix_bandwidth(A_scaled, B_scaled, kl, ku)
          used = .false.
          mode_residuals = 0d0
+         refinement_target = min(s% star_LNA_max_eigenvector_residual, star_LNA_max_initial_refinement_residual)
          found_first_mode = .false.
          do
             if (num_modes >= size(mode_indices)) exit
@@ -2277,15 +2395,12 @@
                eigenvector_residual_row, op_err)
             initial_residual = eigenvector_residual
             initial_residual_row = eigenvector_residual_row
-
-            if (op_err == 0 .and. &
-                  eigenvector_residual > s% star_LNA_max_eigenvector_residual .and. &
-                  eigenvector_residual <= star_LNA_max_initial_refinement_residual) then
+            if (op_err == 0 .and. eigenvector_residual > refinement_target) then
                refinement_attempts = refinement_attempts + 1
                initial_sigma = sigma
                initial_eigenvector = scaled_eigenvector
                call refine_star_LNA_eigenpair( &
-                  A_scaled, B_scaled, kl, ku, s% star_LNA_max_eigenvector_residual, &
+                  A_scaled, B_scaled, kl, ku, refinement_target, &
                   sigma, scaled_eigenvector, refinement_iterations, &
                   refinement_improved, op_err)
                if (op_err /= 0) then
@@ -2304,7 +2419,7 @@
                      eigenvector_residual_row, op_err)
                   if (op_err == 0 .and. eigenvector_residual < initial_residual) then
                      refined_eigenpairs = refined_eigenpairs + 1
-                     if (eigenvector_residual <= s% star_LNA_max_eigenvector_residual) &
+                     if (eigenvector_residual <= refinement_target) &
                         converged_eigenpairs = converged_eigenpairs + 1
                      call store_star_LNA_eigenpair( &
                         alphar, alphai, beta, vr, best, sigma, scaled_eigenvector, op_err)
@@ -2370,7 +2485,7 @@
                ', improved eigenpairs = ', refined_eigenpairs, &
                ', converged eigenpairs = ', converged_eigenpairs, &
                ', iterations = ', refinement_iterations_total, &
-               ', target = ', s% star_LNA_max_eigenvector_residual
+               ', target = ', refinement_target
          if (refinement_attempts > 0) &
             write(*,'(a,i0,a,i0)') &
                'star_LNA: full-pencil lower bandwidth = ', kl, ', upper bandwidth = ', ku
@@ -2418,7 +2533,7 @@
          write(*,'(a)') &
             ' mode     P(days)      logKE/cyc      KE frac        GREKM       amp frac      residual'
          if (num_modes < 1) then
-            write(*,'(a)') 'star_LNA: no modes passed the frequency/logKE_per_cycle selection.'
+            write(*,'(a)') 'star_LNA: no modes passed the frequency, growth and eigenvector residual limits.'
             return
          end if
          do mode = 1, num_modes
@@ -2993,7 +3108,7 @@
 
 
       subroutine star_LNA_eigenvector_residual_from_vector( &
-            A, B, kl, ku, sigma, eigenvector, max_residual, max_residual_row, ierr, Ax, Bx)
+            A, B, kl, ku, sigma, eigenvector, max_residual, max_residual_row, ierr, Ax, Bx, normwise_residual)
          real(dp), intent(in) :: A(:,:), B(:,:)
          integer, intent(in) :: kl, ku
          complex(dp), intent(in) :: sigma, eigenvector(:)
@@ -3001,6 +3116,7 @@
          integer, intent(out) :: max_residual_row
          integer, intent(out) :: ierr
          complex(dp), intent(out), optional :: Ax(:), Bx(:)
+         real(dp), intent(out), optional :: normwise_residual
          integer :: i, j, i_first, i_last
          real(dp) :: residual
          real(dp) :: row_scale(size(A, 1))
@@ -3008,6 +3124,7 @@
 
          ierr = 0
          max_residual = huge(1d0)
+         if (present(normwise_residual)) normwise_residual = huge(1d0)
          max_residual_row = 0
          Ax_local = (0d0, 0d0)
          Bx_local = (0d0, 0d0)
@@ -3031,12 +3148,20 @@
          do i = 1, size(A, 1)
             if (row_scale(i) <= tiny(1d0)) cycle
             residual = abs(Ax_local(i) - sigma*Bx_local(i))/row_scale(i)
+            if (is_bad(residual)) then
+               ierr = -1
+               return
+            end if
+            ! The triangle inequality bounds this residual by one.
+            residual = min(1d0,residual)
             if (residual > max_residual) then
                max_residual = residual
                max_residual_row = i
             end if
          end do
          if (is_bad(max_residual)) ierr = -1
+         if (present(normwise_residual)) normwise_residual = &
+            maxval(abs(Ax_local - sigma*Bx_local))/maxval(row_scale)
          if (present(Ax)) Ax = Ax_local
          if (present(Bx)) Bx = Bx_local
       end subroutine star_LNA_eigenvector_residual_from_vector
@@ -3055,11 +3180,12 @@
          integer, intent(out) :: ierr
          integer :: i, j, i_first, i_last, ldab, lapack_info, line_search, n, norm_idx
          integer, allocatable :: ipiv(:)
-         real(dp) :: best_residual, current_residual, initial_residual, step, trial_residual
+         real(dp) :: best_residual, current_residual, initial_residual, step, trial_residual, normwise_residual
          complex(dp) :: current_sigma, delta_sigma, best_sigma, trial_sigma
          complex(dp), allocatable :: AB(:,:), Ax(:), Bx(:), correction(:), &
             current_vector(:), best_vector(:), rhs(:,:), trial_vector(:)
          integer :: residual_row
+         logical :: update_frequency
 
          ierr = 0
          iterations = 0
@@ -3093,7 +3219,7 @@
             current_vector = current_vector/current_vector(norm_idx)
             call star_LNA_eigenvector_residual_from_vector( &
                A, B, kl, ku, current_sigma, current_vector, current_residual, &
-               residual_row, ierr, Ax, Bx)
+               residual_row, ierr, Ax, Bx, normwise_residual)
             if (ierr /= 0) then
                ierr = 0
                exit
@@ -3115,12 +3241,25 @@
             call ZGBTRS('N', n, kl, ku, 2, AB, ldab, ipiv, rhs, n, lapack_info)
             if (lapack_info /= 0 .or. abs(rhs(norm_idx, 2)) <= tiny(1d0)) exit
 
-            delta_sigma = -rhs(norm_idx, 1)/rhs(norm_idx, 2)
-            correction = rhs(:, 1) + delta_sigma*rhs(:, 2)
+            update_frequency = current_residual <= star_LNA_max_initial_refinement_residual .or. &
+               normwise_residual <= star_LNA_max_initial_normwise_residual
+            if (update_frequency) then
+               delta_sigma = -rhs(norm_idx, 1)/rhs(norm_idx, 2)
+               correction = rhs(:, 1) + delta_sigma*rhs(:, 2)
+            else
+               ! Repair small eigenvector components before changing the frequency.
+               delta_sigma = 0d0
+               correction = rhs(:, 2)/rhs(norm_idx, 2)
+            end if
             step = 1d0
             do line_search = 1, 4
                trial_sigma = current_sigma + step*delta_sigma
-               trial_vector = current_vector + step*correction
+               if (update_frequency) then
+                  trial_vector = current_vector + step*correction
+               else
+                  ! Preserve the repaired tiny components without subtracting the old vector.
+                  trial_vector = (1d0-step)*current_vector + step*correction
+               end if
                call star_LNA_eigenvector_residual_from_vector( &
                   A, B, kl, ku, trial_sigma, trial_vector, trial_residual, &
                   residual_row, ierr)
@@ -3189,7 +3328,7 @@
          integer :: io, k, velocity_var
          character(len=512) :: filename
          character(len=16) :: mode_string
-         complex(dp) :: lnd, lnR, v, lnT, L, w, Y_face, dLr, dLc, dLt, dL_div_L0
+         complex(dp) :: lnd, lnR, v, lnT, L, w, Y_face, dLr, dLc, dLt, dL_div_L0, dPi, dPhi
 
          ierr = 0
          velocity_var = velocity_var_for_star_LNA(map)
@@ -3226,12 +3365,14 @@
             s% star_LNA_kick_fraction_3
          write(io,'(a)') &
             '# normalized by surface delta_lnR; uses the largest component if abs(surface delta_lnR) <= 1d-99'
-         write(io,'(a)') &
+         write(io,'(a)',advance='no') &
             '# k q m r re_lnd im_lnd re_lnR im_lnR re_v im_v ' // &
             're_lnT im_lnT re_L im_L re_w im_w re_Y_face im_Y_face ' // &
             're_dLr im_dLr re_dLc im_dLc re_dLt im_dLt ' // &
             'abs_dlnR phase_dlnR abs_dlnT phase_dlnT ' // &
             'abs_dL_div_L0 phase_dL_div_L0 abs_w phase_w'
+         if (s% RSP2_3equation_flag) write(io,'(a)',advance='no') ' re_Pi im_Pi re_Phi im_Phi'
+         write(io,'(a)') ''
 
          do k = 1, map%nz
             lnd = star_LNA_eigen_component(map, eigenvector, k, lna_var_lnd)
@@ -3248,7 +3389,7 @@
             end if
             dL_div_L0 = (0d0, 0d0)
             if (abs(s% L(1)) > 0d0) dL_div_L0 = L/s% L(1)
-            write(io,'(i8,1x,31(1pe24.16,1x))') &
+            write(io,'(i8,1x,31(1pe24.16,1x))',advance='no') &
                k, s% q(k), s% m(k), s% r(k), &
                dble(lnd), aimag(lnd), dble(lnR), aimag(lnR), &
                dble(v), aimag(v), dble(lnT), aimag(lnT), &
@@ -3256,6 +3397,12 @@
                dble(dLr), aimag(dLr), dble(dLc), aimag(dLc), dble(dLt), aimag(dLt), &
                abs(lnR), phase_for_star_LNA(lnR), abs(lnT), phase_for_star_LNA(lnT), &
                abs(dL_div_L0), phase_for_star_LNA(dL_div_L0), abs(w), phase_for_star_LNA(w)
+            if (s% RSP2_3equation_flag) then
+               dPi = star_LNA_eigen_component(map,eigenvector,k,lna_var_Pi)
+               dPhi = star_LNA_eigen_component(map,eigenvector,k,lna_var_Phi)
+               write(io,'(4(1pe24.16,1x))',advance='no') dble(dPi), aimag(dPi), dble(dPhi), aimag(dPhi)
+            end if
+            write(io,'(a)') ''
          end do
 
          close(io)
@@ -3552,7 +3699,8 @@
 
          ierr = 0
          if (s% RSP2_flag) then
-            call rsp2_luminosity_terms_for_star_LNA(s, k, Lr_ad, Lc_ad, Lt_ad)
+            call rsp2_luminosity_terms_for_star_LNA(s, k, Lr_ad, Lc_ad, Lt_ad, ierr)
+            if (ierr /= 0) return
          else
             Lc_ad = star_LNA_L_conv_ad(s, k)
             Lr_ad = wrap_L_00(s, k) - Lc_ad
@@ -4187,9 +4335,10 @@
          max_resid = 0d0
          if (.not. s% RSP2_flag) return
          do k = 1, map%nz
-            if (rsp2_forces_non_turbulent_cell(s, k)) then
+            if (rsp2_zero_w_for_star_LNA(s,k,ierr)) then
                resid_ad = s% w(k)/max(1d0, s% csound(k))
             else
+               if (ierr /= 0) return
                call rsp2_turbulent_energy_rhs_for_star_LNA(s, k, resid_ad, ierr)
                if (ierr /= 0) return
             end if
@@ -4403,13 +4552,17 @@
       end function max_star_LNA_v_div_csound
 
 
-      subroutine report_star_LNA_setup(s, map)
+      subroutine report_star_LNA_setup(s, map, ierr)
          type(star_info), pointer :: s
          type(star_LNA_var_map), intent(in) :: map
-         integer :: iv
+         integer, intent(out) :: ierr
+         integer :: iv, k
+         real(dp) :: max_dPi_dt, max_dPhi_dt
+         type(auto_diff_real_star_order1) :: Pi_rhs, Phi_rhs
          character(len=512) :: output_directory
          character(len=512) :: file_prefix
 
+         ierr = 0
          write(*,'(a,i0,a,i0)') 'star_LNA: active zones = ', map%nz, ' of ', s% nz
          if (s% star_LNA_T_inner > 0d0) then
             write(*,'(a,1pe12.4,a)') &
@@ -4439,10 +4592,9 @@
          end if
          write(*,'(a,1pe12.4)') 'star_LNA: max eigenvector residual = ', &
             s% star_LNA_max_eigenvector_residual
-         write(*,'(a,i0,a,1pe12.4)') 'star_LNA: full-pencil refinement uses up to ', &
-            star_LNA_max_refinement_iterations, &
-            ' iterations for initial residuals <= ', &
-            star_LNA_max_initial_refinement_residual
+         write(*,'(a,i0,a)') 'star_LNA: full-pencil refinement uses up to ', &
+            star_LNA_max_refinement_iterations, ' iterations.'
+         write(*,'(a)') 'star_LNA: poorly resolved eigenvectors are first refined at fixed frequency.'
          call resolve_star_LNA_output_directory(s, output_directory)
          call resolve_star_LNA_output_file_prefix(s, file_prefix)
          write(*,'(a,a)') 'star_LNA: output directory = ', trim(output_directory)
@@ -4496,6 +4648,18 @@
          if (s% use_Pvsc_art_visc) &
             write(*,'(a)') &
                'star_LNA: hydro artificial viscosity pressure is active; LNA ignores it like RSP LINA.'
+         if (s% RSP2_3equation_flag) then
+            max_dPi_dt = 0d0
+            max_dPhi_dt = 0d0
+            do k=1,map% nz
+               call rsp2_moment_rhs(s,k,Pi_rhs,Phi_rhs,ierr,use_time_centering=.false.)
+               if (ierr /= 0) return
+               max_dPi_dt = max(max_dPi_dt,abs(Pi_rhs%val))
+               max_dPhi_dt = max(max_dPhi_dt,abs(Phi_rhs%val))
+            end do
+            write(*,'(a,1pe12.4)') 'star_LNA: max abs(dPi/dt), erg cm/(g K s^2) = ', max_dPi_dt
+            write(*,'(a,1pe12.4)') 'star_LNA: max abs(dPhi/dt), erg^2/(g^2 K^2 s) = ', max_dPhi_dt
+         end if
       end subroutine report_star_LNA_setup
 
 
@@ -4520,6 +4684,10 @@
             name = 'w'
          case (lna_var_Y)
             name = 'Y_face'
+         case (lna_var_Pi)
+            name = 'Pi'
+         case (lna_var_Phi)
+            name = 'Phi'
          case default
             name = 'unknown'
          end select
@@ -4563,6 +4731,14 @@
             name = 'rsp2_zero_w'
          case (lna_eq_rsp2_flux)
             name = 'rsp2_flux'
+         case (lna_eq_rsp2_Pi)
+            name = 'dPi_dt'
+         case (lna_eq_rsp2_Phi)
+            name = 'dPhi_dt'
+         case (lna_eq_rsp2_zero_Pi)
+            name = 'zero_Pi'
+         case (lna_eq_rsp2_zero_Phi)
+            name = 'zero_Phi'
          case (lna_eq_tdc_velocity)
             name = 'tdc_velocity'
          case (lna_eq_tdc_zero_w)

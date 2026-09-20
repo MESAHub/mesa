@@ -26,7 +26,7 @@
       implicit none
 
       ! current use of xtra's
-      ! xtra1 is w_div_wc
+      ! xtra1 and xtra2 hold the optional RSP2 entropy moments.
 
       public
 
@@ -1397,6 +1397,24 @@
             omega_p1 = jrot_p1/shift_p1(s% i_rot(k+1))
          end if
       end function wrap_omega_p1
+
+
+      function wrap_Pi_00(s, k) result(Pi_face)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: Pi_face
+         Pi_face = s% Pi(k)
+         Pi_face%d1Array(i_xtra1_00) = 1d0
+      end function wrap_Pi_00
+
+
+      function wrap_Phi_00(s, k) result(Phi_face)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: Phi_face
+         Phi_face = s% Phi(k)
+         Phi_face%d1Array(i_xtra2_00) = 1d0
+      end function wrap_Phi_00
 
 
       function wrap_xtra1_m1(s, k) result(xtra1_m1)

@@ -60,6 +60,7 @@
          logical :: RTI_flag ! true for Rayleigh-Taylor instabilities
          logical :: RSP_flag ! true if we using RSP
          logical :: RSP2_flag ! true for turbulent velocity as a solver variable
+         logical :: RSP2_3equation_flag ! stored layout; selected by RSP2_use_3equation_model
 
       ! index definitions for the variables (= 0 if variable not in use)
          integer :: i_lnd ! ln(cell density average by mass)
@@ -72,6 +73,8 @@
          integer :: i_Et_RSP, i_erad_RSP, i_Fr_RSP ! only when RSP_flag is true
          integer :: i_w ! cell turbulent velocity. only when RSP2_flag is true.
          integer :: i_Y ! signed face superadiabaticity. only when RSP2_flag is true.
+         integer :: i_Pi ! face <v_r*s>
+         integer :: i_Phi ! face <s*s>
 
       ! index definitions for the equations (= 0 if equation not in use)
          integer :: i_dlnR_dt ! dlnR/dt = v/r

@@ -1,0 +1,2323 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\definecolor{LnaDynamic}{HTML}{155A83}
+\definecolor{LnaAlgebraic}{HTML}{974707}
+\definecolor{LnaLink}{HTML}{284E6B}
+\newenvironment{rowpair}[1]{%
+  \def\rowcolor{#1}%
+  \begin{tcolorbox}[colback=#1!3!white,colframe=#1,
+    coltext=black,boxrule=0.4pt,leftrule=2pt,arc=0pt,
+    left=7pt,right=7pt,top=5pt,bottom=3pt,
+    before skip=7pt,after skip=7pt]
+  \setlength{\abovedisplayskip}{6pt}%
+  \setlength{\belowdisplayskip}{6pt}%
+  \setlength{\abovedisplayshortskip}{4pt}%
+  \setlength{\belowdisplayshortskip}{4pt}%
+  \noindent\textbf{Model equation.}\par
+}{\end{tcolorbox}\nopagebreak[4]}
+\newenvironment{equationblock}{%
+  \par\noindent\begin{minipage}{\linewidth}%
+}{\end{minipage}\par\addvspace{12pt}}
+\newenvironment{linearized}[1]{%
+  \par\smallskip\begingroup\color{\rowcolor}%
+  \noindent\textbf{Linearized #1.}\par
+}{\endgroup}
+\setcounter{tocdepth}{1}
+\clubpenalty=10000
+\widowpenalty=10000
+\usepackage[T1]{fontenc}
+\usepackage{microtype}
+\usepackage[colorlinks=true,linkcolor=LnaLink,urlcolor=LnaLink]{hyperref}
+
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\e}{\mathrm{e}}
+\newcommand{\code}[1]{\texttt{\detokenize{#1}}}
+\newcommand{\sourcefile}[1]{\path{#1}}
+
+\title{Radial Linear Nonadiabatic Analysis in MESA/star\\
+Discretization, Convection Closures, and Diagnostics}
+\author{}
+\date{2026-09-19}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This document specifies the radial linear nonadiabatic operator in MESA/star.
+Section~\ref{sec:equation-system} pairs each model
+equation with its colored linearized row and source routine. It distinguishes
+the velocity grids, energy forms, pressure work, and RSP2, TDC, frozen-flux,
+and static MLT closures. RSP2 solves independent face superadiabaticity and
+cell turbulent velocity, using shared TDC lengths. The optional three equation
+model adds face entropy flux and variance to the turbulence evolution system;
+the default model retains its signed algebraic convection closure.
+The appendices retain closure details, work diagnostics, and schema 130 export.
+\end{abstract}
+
+\begingroup
+\small
+\tableofcontents
+\endgroup
+\clearpage
+
+\section{Scope and conventions}
+
+The implementation is a MESA/star operator, not a wrapper around the RSP LINA
+matrix.  RSP defines the comparison output and growth rate convention.  The
+matrix rows use MESA/star variables and the residual branches listed below.
+MESA/star indexes the surface with $k=1$ and the innermost cell with
+$k=N\equiv\texttt{s\%nz}$.  The normal mode convention is
+\begin{equation}
+  \delta q_k(t)=\widehat{q}_k\e^{\sigma t},
+  \qquad \sigma=\gamma+\mathrm{i}\omega .
+\end{equation}
+A positive $\gamma$ is unstable.  For $\omega>0$, the period is
+\begin{equation}
+  \Pi=\frac{2\pi}{\omega}.
+\end{equation}
+
+The base perturbation variables in each zone are
+\begin{equation}
+  \mathbf{x}_k=
+  \left(\delta\ln\rho,\,\delta\ln r,\,\delta v_{\mathrm{rad}},\,
+  \delta\ln T,\,\delta L\right)_k .
+\end{equation}
+Here $v_{\mathrm{rad}}$ is the face variable $v$ or the cell variable $u$,
+according to the active hydro momentum equation.
+RSP2 adds cell $\delta w$ and face $\delta Y_{\rm face}$, with $e_t=w^2$.
+Its face pressure scale height is derived, not an independent unknown.
+With \code{RSP2_use_3equation_model}, RSP2 also evolves face
+$\mathrm{Pi}=\langle v_r's'\rangle$ and
+$\mathrm{Phi}=\langle s'^2\rangle$. These roman names denote the code variables;
+they are distinct from period $\Pi$ and gravitational potential $\Phi$ below.
+Active TDC adds an internal
+$\delta w$ variable used only by LNA; it does not add a persistent variable to
+the normal star solver. In the TDC formulas below, this internal amplitude is
+written as $A=v_c/\sqrt{2/3}$ to distinguish it from RSP2 $w$.
+
+
+\subsection{Equation key and notation}
+
+The colored equations are the rows assembled into the global eigenproblem:
+\begin{itemize}
+\setlength{\itemsep}{2pt}
+\item \textcolor{LnaDynamic}{\textbf{Blue: dynamic row.}}
+      $\delta F=\sigma\,\delta Q$ contributes to both matrix sides.
+\item \textcolor{LnaAlgebraic}{\textbf{Rust: algebraic row.}}
+      $\delta G=0$ has a zero row on the time-derivative side.
+\end{itemize}
+Each box keeps the model equation and its linearization together. The row
+labels also identify the type without color. Unboxed equations give
+coefficients, local closures, thermodynamic comparisons, or output
+quantities; they do not add independent rows to the global system.
+
+In linearized equations, all unperturbed coefficients are evaluated at the
+static background. Mass and composition are fixed. The symbol $\delta$ denotes
+the complex mode amplitude; the common factor $\e^{\sigma t}$ is omitted.
+For any AD quantity $f$,
+\begin{equation}
+  \delta f=\sum_j\left.\frac{\partial f}{\partial x_j}\right|_0\delta x_j.
+  \label{eq:ad-linearization}
+\end{equation}
+Thus a term such as $\delta U_q$ or $\delta L_c$ includes the full supported
+AD response of its closure, not only its explicit velocity dependence.
+Fixed background row scales are suppressed in the displayed equations; they
+multiply every term in a row and do not change its solutions.
+Use $\mathcal A_k=4\pi r_k^2$ for face area and $\mathcal V_k$ for cell
+volume. The convection amplitude $A$ and the matrix $\mathbf A$ are distinct.
+
+The five base rows are density, radius, momentum, energy, and transport.
+Perturbed TDC adds one convection row; RSP2 adds a turbulent-energy row and a
+face-flux row, with two further moment rows in its optional three equation
+model. Boundary conditions and forced-zero constraints
+replace the indicated rows. They do not increase the number of unknowns.
+
+\subsection{Independent choices in the operator}
+
+The velocity grid and the energy form are separate choices. With
+\code{u_flag}, the velocity unknown is cell-centered $u$ and the face
+velocity is reconstructed. Otherwise the LNA uses a face velocity unknown
+$v$, including on a background with \code{v_flag} off. This changes the
+momentum stencil and the face quantities used by radius and work; it does
+not select an energy form.
+
+The \code{dedt} energy option is supported for all accepted convection paths.
+RSP2 also supports \code{eps_grav}, with either velocity grid.
+Within \code{dedt}, \path{use_P_d_1_div_rho_form_of_work} chooses both the
+work stencil and the energy inertia:
+\begin{center}
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+Work control & Pressure work & Energy differentiated in time\\
+\midrule
+True & Cell $P\,\dd(1/\rho)/\dd t$ & $e+E_t$\\
+False & Face $P\mathcal A v_f$ flux difference
+      & $e+E_t+K+\Phi$\\
+\bottomrule
+\end{tabular}
+\end{center}
+Here $E_t$ is the selected cell turbulent energy, $K$ is specific kinetic
+energy, and $\Phi$ is specific gravitational potential energy.
+Section~\ref{sec:energy-row} gives the two substitutions in the same
+linearized energy row. The work control acts independently of velocity
+time centering. For RSP2 \code{eps_grav}, thermal storage and EOS compression
+enter through the entropy coefficients; turbulent storage and non-EOS local
+pressure work remain explicit. This form contains no kinetic or potential
+inertia, regardless of the work-control setting. Non-RSP2 LNA still requires
+\code{dedt}.
+
+\subsection{Envelope domain}
+
+Routine \code{setup_star_LNA_var_map} uses all $N$ cells when
+\code{star_LNA_T_inner} is nonpositive. For a positive value, it retains the
+contiguous surface cells $1\leq k\leq N_{\rm LNA}$ whose temperatures do not
+exceed that limit. Selection stops at the first hotter cell and requires at
+least two active cells. The background mesh and stellar structure are retained.
+
+The matrix contains only active variables. Routine
+\code{add_ad_partials_to_matrix} omits columns outside this domain, imposing
+$\delta q_k=0$ for $k>N_{\rm LNA}$. Coefficients at the cut still use the
+full-model background; the cut does not replace the physical inner boundary
+at $N$ or set a new \code{R_center}. Output records both zone counts. A
+velocity kick sets the excluded core velocities to zero.
+
+
+
+\section{Equations and their linearization}
+\label{sec:equation-system}
+
+Read Sections~\ref{sec:density-row}--\ref{sec:transport-row} for the five base
+rows. Then use the TDC row in Section~\ref{sec:tdc-row}, or the two RSP2 rows
+in Section~\ref{sec:rsp2-rows}, when that convection model is active.
+Section~\ref{sec:boundary-rows} gives the surface and forced-zero replacements.
+All rows refer to the same static background and mode vector.
+
+\begin{equationblock}
+\subsection{Density: fixed cell mass}
+\label{sec:density-row}
+
+The cell volume is
+$\mathcal V_k=(4\pi/3)(r_k^3-r_{k+1}^3)$.
+\begin{rowpair}{LnaAlgebraic}
+\begin{equation}
+  \rho_k\mathcal V_k=\Delta m_k.
+\end{equation}
+\begin{linearized}{algebraic row}
+\begin{equation}
+  \delta\ln\rho_k+
+  \frac{3r_k^3\delta\ln r_k-3r_{k+1}^3\delta\ln r_{k+1}}
+       {r_k^3-r_{k+1}^3}=0.
+  \label{eq:density}
+\end{equation}
+\end{linearized}
+\end{rowpair}
+\textit{Code:} \code{assemble_density_rows} and
+\code{cell_volume_for_star_LNA} in \code{star_LNA_support.f90}.
+At a fixed inner radius, its perturbation is zero. The same rule applies to
+columns below a temperature-selected envelope cut.
+\end{equationblock}
+
+\begin{equationblock}
+\subsection{Radius: kinematics}
+
+The face velocity is $v_f=v$ on the face grid. With \code{u_flag}, $v_f$ is
+the Riemann contact velocity reconstructed from cell velocity $u$.
+\begin{rowpair}{LnaDynamic}
+\begin{equation}
+  \frac{\dd\ln r_k}{\dd t}=\frac{v_{f,k}}{r_k}.
+\end{equation}
+\begin{linearized}{dynamic row}
+\begin{equation}
+  \frac{\delta v_{f,k}}{r_k}=\sigma\,\delta\ln r_k.
+  \label{eq:radius}
+\end{equation}
+\end{linearized}
+\end{rowpair}
+\textit{Code:} \code{assemble_radius_rows}.
+The background velocity is zero, so the product of its value with
+$\delta r$ vanishes. The Riemann reconstruction remains differentiated:
+$\delta v_f$ generally contains pressure, density, radius, and cell-velocity
+responses. It is not an arithmetic average of neighboring $\delta u$.
+At the surface, the reconstruction gives $v_{f,1}=u_1$.
+Appendix~\ref{app:riemann-state} gives the contact-state formulas.
+For a cell constrained to zero velocity, the algebraic replacement is given
+in Section~\ref{sec:forced-rows}.
+\end{equationblock}
+
+\begin{equationblock}
+\subsection{Momentum: the active velocity grid}
+\label{sec:momentum-row}
+
+\paragraph{Face velocity (\code{v_flag}, or the LNA face variable).}
+Write $\Delta P_k=\Delta P_{{\rm tot},k}+\Delta P_{{\rm MLT},k}$, where
+$\Delta P_{{\rm tot},k}=P_{{\rm tot},k-1}-P_{{\rm tot},k}$.
+The pressure closure is given in Appendix~\ref{app:pressure-energy} and
+$U_q$ in Appendix~\ref{app:viscosity}.
+\begin{rowpair}{LnaDynamic}
+\begin{equation}
+  \frac{\dd v_k}{\dd t}=-\frac{G_km_{g,k}}{r_k^2}
+      +U_{q,k}-\frac{\mathcal A_k}{\Delta m_{f,k}}\Delta P_k.
+  \label{eq:momentum}
+\end{equation}
+\begin{linearized}{dynamic row}
+\begin{equation}
+  \left(\frac{2G_km_{g,k}}{r_k^2}
+       -\frac{2\mathcal A_k\Delta P_k}{\Delta m_{f,k}}\right)\delta\ln r_k
+  +\delta U_{q,k}-\frac{\mathcal A_k}{\Delta m_{f,k}}\delta\Delta P_k
+  =\sigma\,\delta v_k.
+  \label{eq:momentum-linear}
+\end{equation}
+\end{linearized}
+\end{rowpair}
+\textit{Code:} \code{assemble_momentum_rows} and
+\code{momentum_rhs_for_star_LNA}. The face mass is fixed:
+$\Delta m_{f,k}=(\Delta m_{k-1}+\Delta m_k)/2$ in the interior and
+$\Delta m_{f,1}=\Delta m_1/2$ at the surface.
+\end{equationblock}
+
+\begin{equationblock}
+\paragraph{Cell velocity (\code{u_flag}).}
+Define the pressure, geometry, and gravity force sum
+\begin{equation}
+  \mathcal F_{h,k}=P_{f,k+1}\mathcal A_{k+1}-P_{f,k}\mathcal A_k
+    +P_k(\mathcal A_k-\mathcal A_{k+1})+F_{g,k}.
+\end{equation}
+\begin{rowpair}{LnaDynamic}
+\begin{equation}
+  \frac{\dd u_k}{\dd t}=\frac{\mathcal F_{h,k}}{\Delta m_k}+U_{q,k}.
+  \label{eq:umomentum}
+\end{equation}
+\begin{linearized}{dynamic row}
+\begin{equation}
+  \frac{\delta\mathcal F_{h,k}}{\Delta m_k}+\delta U_{q,k}
+    =\sigma\,\delta u_k.
+\end{equation}
+\end{linearized}
+\end{rowpair}
+\textit{Code:} \code{eval_Riemann_dudt_rhs} in \code{hydro_riemann.f90},
+called by \code{momentum_rhs_for_star_LNA}, followed by
+\code{Uq_cell_for_star_LNA}. For example,
+$\delta(P_f\mathcal A)=\mathcal A\,\delta P_f+
+2P_f\mathcal A\,\delta\ln r$; all force terms are differentiated this way.
+Here $P_k$ is the cell pressure used by the Riemann reconstruction,
+including its active turbulent-pressure terms. $P_f$ is the reconstructed
+contact pressure, not an interpolation of EOS pressure alone. The gravity
+source is
+\begin{equation}
+  F_{g,k}=-\frac{\Delta m_k}{2}
+    \left(\frac{G_km_k}{r_k^2}
+         +\frac{G_{k+1}m_{k+1}}{r_{k+1}^2}\right),\qquad k<N.
+\end{equation}
+At $k=N$, only the first gravity contribution remains, the inward pressure
+flux is zero, and the geometry source is $P_N\mathcal A_N$, including when
+\code{R_center > 0}. At the surface, the outward momentum flux uses
+$P_{\rm bc}\mathcal A_1$. Its pressure need not equal the surface pressure
+used in energy work.
+
+The cell equation therefore changes both the force stencil and the
+reconstructed quantities; replacing the symbol $v$ by $u$ in the face
+equation would not give this row. Finite-step pressure and radius time
+centering is excluded. The separate cell eddy-viscosity source is described
+in Appendix~\ref{app:viscosity}.
+\end{equationblock}
+
+\begin{equationblock}
+\subsection{Energy: luminosity divergence, sources, and work}
+\label{sec:energy-row}
+
+For \code{dedt}, both work choices use the following row, with different
+$e_{\rm eff}$ and $\mathcal W$ as specified below. Let
+$D_mL_k=(L_k-L_{k+1})/\Delta m_k$.
+\begin{rowpair}{LnaDynamic}
+\begin{equation}
+  \frac{\dd e_{{\rm eff},k}}{\dd t}
+    =-D_mL_k+\epsilon_k-\mathcal W_k.
+  \label{eq:energy}
+\end{equation}
+\begin{linearized}{dynamic row}
+\begin{equation}
+  -D_m\delta L_k+\delta\epsilon_k-\delta\mathcal W_k
+    =\sigma\,\delta e_{{\rm eff},k}.
+  \label{eq:energy-linear}
+\end{equation}
+\end{linearized}
+\end{rowpair}
+\textit{Code:} \path{assemble_energy_rows},
+\path{energy_rhs_for_star_LNA}, and \path{energy_inertia_for_star_LNA}.
+The thermal contribution is
+\begin{equation}
+  \delta e_k=\rho_k\left(\frac{\partial e}{\partial\rho}\right)_T
+      \delta\ln\rho_k+C_{V,k}T_k\delta\ln T_k.
+  \label{eq:thermalinertia}
+\end{equation}
+The source $\epsilon$ contains the supported nuclear, neutrino, and fixed
+heating terms. Their implementation and the energy coefficients are given
+in Appendix~\ref{app:pressure-energy}. The work formulas below define
+$\delta\mathcal W$ in this row; they are not additional global equations.
+\end{equationblock}
+
+\begin{equationblock}
+\paragraph{Local pressure work: internal plus turbulent energy.}
+For \path{use_P_d_1_div_rho_form_of_work = .true.}, define the cell volume
+rate $\dot{\mathcal V}_k=\mathcal A_kv_{f,k}
+-\mathcal A_{k+1}v_{f,k+1}$. Then
+\begin{align}
+  e_{{\rm eff},k}&=e_k+E_{t,k},&
+  \mathcal W_k^{\rm local}
+    &=\frac{P_{c,k}}{\Delta m_k}\dot{\mathcal V}_k,\\
+  \delta e_{{\rm eff},k}&=\delta e_k+\delta E_{t,k},&
+  \delta\mathcal W_k^{\rm local}
+    &=\frac{P_{c,k,0}}{\Delta m_k}
+       \left(\mathcal A_k\delta v_{f,k}
+             -\mathcal A_{k+1}\delta v_{f,k+1}\right).
+  \label{eq:simplepressurework}
+\end{align}
+$P_c$ is the cell work pressure from
+\code{dwork_dm_for_star_LNA}: the selected EOS/RSP2 pressure plus the
+MLT turbulent-pressure coefficient where enabled. The same $P_{c,k,0}$
+multiplies both bounding volume fluxes. The nonlinear counterpart is
+\code{hydro_energy:eval_simple_PdV_work}.
+
+On the full domain, mass conservation and the radius rows give
+\begin{equation}
+  \frac{\delta\dot{\mathcal V}_k}{\Delta m_k}
+   =\sigma\,\delta(1/\rho_k)
+   =-\frac{\sigma}{\rho_k}\delta\ln\rho_k.
+\end{equation}
+Thus the work contribution can be moved to the inertia side as
+$-(P_{c,k,0}/\rho_k)\delta\ln\rho_k$ after eliminating the velocity
+divergence. The code retains that divergence in $\mathbf A$ and
+$\delta e+\delta E_t$ in $\mathbf B$. It adds neither $\delta K$ nor
+$\delta\Phi$ for this work choice.
+\end{equationblock}
+
+\begin{equationblock}
+\paragraph{Face pressure work: total energy.}
+For \path{use_P_d_1_div_rho_form_of_work = .false.}, the paired choices are
+\begin{align}
+  e_{{\rm eff},k}&=e_k+E_{t,k}+K_k+\Phi_k,\\
+  \mathcal W_k^{\rm flux}
+    &=\frac{P_{f,k}\mathcal A_kv_{f,k}
+            -P_{f,k+1}\mathcal A_{k+1}v_{f,k+1}}{\Delta m_k},\\
+  \delta e_{{\rm eff},k}
+    &=\delta e_k+\delta E_{t,k}+\delta K_k+\delta\Phi_k,\\
+  \delta\mathcal W_k^{\rm flux}
+    &=\frac{P_{f,k,0}\mathcal A_k\delta v_{f,k}
+            -P_{f,k+1,0}\mathcal A_{k+1}\delta v_{f,k+1}}{\Delta m_k}.
+  \label{eq:pressurework}
+\end{align}
+Now the two work coefficients are different face pressures.
+On the face-velocity grid, \path{static_face_pressure_for_star_LNA} forms
+them from mass-weighted cell pressures and the selected MLT contribution.
+With \code{u_flag}, they are the background Riemann pressures
+\path{s%P_face_ad}. At the surface of the cell-velocity scheme,
+$P_{f,1}=P_{{\rm eos},1}$ for energy work, even when the momentum
+boundary uses a different $P_{\rm bc}$.
+
+\code{mechanical_energy_inertia_for_star_LNA} adds the kinetic and
+potential derivatives only for \code{dedt} with this work control false.
+On a static background $\delta K=0$, but $\delta\Phi$ is first order
+in the radius perturbations and must remain. Appendix~\ref{app:mechanical}
+gives the discrete energies for both velocity grids.
+
+Changing the work form therefore changes both $\mathcal W$ and
+$e_{\rm eff}$. It is not a row rescaling, and the two discrete operators
+need not give identical modes. The pressure-gradient work represented by
+the face flux is paired with the mechanical energy derivatives.
+\end{equationblock}
+
+\begin{equationblock}
+\paragraph{Static limit, time centering, and boundaries.}
+Both work forms use the same face velocity: the independent face variable
+for the face scheme, and the differentiated Riemann contact velocity for
+\code{u_flag}. Holding the work pressure at its background value does not
+freeze that contact-velocity response. At $v_{f,0}=0$,
+\begin{equation}
+  \delta(P\mathcal A v_f)=P_0\mathcal A_0\,\delta v_f.
+\end{equation}
+Terms $\delta P\,\mathcal A_0v_{f,0}$ and
+$P_0\delta\mathcal A\,v_{f,0}$ vanish. Eddy-viscosity heating and the
+mechanical power $vU_q$ are also second order, although
+$\delta U_q$ remains in momentum.
+
+The LNA uses continuous time derivatives. It does not differentiate a
+finite timestep or retain the nonlinear velocity/pressure time weights.
+The choice of local versus flux work still applies; turning on nonlinear
+velocity time centering does not select the local work form.
+
+At the physical inner boundary $k=N$, the fixed inward velocity has
+zero perturbation, so the inward term in $\delta\mathcal W_N$ is absent.
+A temperature-selected envelope cut instead retains the full-model
+stencil and discards excluded variable columns. It does not introduce
+a new physical boundary or replace its pressure coefficients.
+\end{equationblock}
+
+\begin{equationblock}
+\paragraph{RSP2 \code{eps_grav}: entropy and turbulent storage.}
+This is an alternative energy row for RSP2 with either velocity grid.
+Define the separate non-EOS work by
+\begin{equation}
+ \mathcal W_{\neg\mathrm{EOS},k}
+ =\frac{P_{c,k}-P_{{\rm eos},k}}{\Delta m_k}\dot{\mathcal V}_k.
+\end{equation}
+The EOS compression is already contained in $\epsilon_{\rm grav}$.
+\begin{rowpair}{LnaDynamic}
+\begin{equation}
+ \dot E_{t,k}=-D_mL_k+\epsilon_k+\epsilon_{{\rm grav},k}
+                    -\mathcal W_{\neg\mathrm{EOS},k}.
+\end{equation}
+\begin{linearized}{dynamic row}
+\begin{align}
+ -D_m\delta L_k+\delta\epsilon_k-\delta\mathcal W_{\neg\mathrm{EOS},k}
+ &=\sigma\bigg\{2w_k\delta w_k\notag\\
+ &\quad+T_kC_{P,k}\Big[(1-\nabla_{{\rm ad},k}\chi_{T,k})\delta\ln T_k
+       -\nabla_{{\rm ad},k}\chi_{\rho,k}\delta\ln\rho_k\Big]\bigg\}.
+ \label{eq:epsgrav-row}
+\end{align}
+\end{linearized}
+\end{rowpair}
+This display uses the standard thermal coefficients with
+\code{eps_grav_factor = 1}; Appendix~\ref{app:epsgrav} gives the implemented
+latent-heat and entropy-blend substitutions. The non-EOS work linearization
+uses the background $P_c-P_{\rm eos}$ times the perturbed volume rate.
+\textit{Code:} \code{energy_inertia_for_star_LNA} and
+\code{dwork_dm_for_star_LNA}. The work control does not select a face-work
+or mechanical-inertia branch for this energy option.
+\end{equationblock}
+
+\begin{equationblock}
+\paragraph{Relation to local-work \code{dedt}.}
+For a consistent EOS at fixed composition, write $\nu=1/\rho$. Then
+\begin{align}
+ \epsilon_{\rm grav}&=-\dot e-P_{\rm eos}\dot\nu,\\
+ \delta\epsilon_{\rm grav}
+ &=-\sigma\left(\delta e-\frac{P_{\rm eos}}{\rho}\delta\ln\rho\right).
+ \label{eq:epsgrav-comparison}
+\end{align}
+Using mass conservation in the local-work \code{dedt} row gives this same
+continuous thermodynamic relation, plus the turbulent terms.
+$\epsilon_{\rm grav}$ is not simply $-\dot\Phi$. Adding explicit
+EOS pressure work or $\dot e$ to the \code{eps_grav} row would count those
+terms twice. Numerical EOS derivatives and finite-step time discretizations
+can differ, so this relation does not guarantee identical numerical modes or
+nonlinear timesteps. The two formulations remain separately documented.
+\end{equationblock}
+
+\begin{equationblock}
+\subsection{Transport: one row in the luminosity slot}
+\label{sec:transport-row}
+
+Routine \code{assemble_luminosity_rows} selects exactly one of the following
+interior rows. The surface replacement is in
+Section~\ref{sec:thermal-boundary}. The matrix unknown in this slot is
+$\delta L$, even when the equation is written as a temperature gradient.
+The nonlinear solver retains the existing name \code{equL} for this transport
+row. RSP2's additional flux row is \code{rsp2_flux}, with index
+\code{i_rsp2_flux}; row labels do not assign one equation to one unknown.
+
+\paragraph{Perturbed TDC or frozen convective flux.}
+The face closure supplies $L_r$ and $L_c$.
+\begin{rowpair}{LnaAlgebraic}
+\begin{equation}
+  L_{r,k}+L_{c,k}-L_k=0.
+  \label{eq:tdclum}
+\end{equation}
+\begin{linearized}{algebraic row}
+\begin{equation}
+  \delta L_{r,k}+\delta L_{c,k}-\delta L_k=0.
+  \label{eq:tdclum-linear}
+\end{equation}
+\end{linearized}
+\end{rowpair}
+For \code{frozen_flux}, replace $L_c$ by its fixed background value
+$L_{c,0}$ and set $\delta L_c=0$ in this same row.
+\textit{Code:} \code{tdc_luminosity_resid_for_star_LNA} or
+\code{frozen_flux_luminosity_resid_for_star_LNA}.
+The TDC coefficients are given in Appendix~\ref{app:tdc}.
+\end{equationblock}
+
+\begin{equationblock}
+\paragraph{Static MLT or RSP2: logarithmic-pressure form.}
+Here $P=P_{\rm eos}$. Define
+$\Delta\ln P_k=\ln P_{k-1}-\ln P_k$ and similarly for $T$.
+This branch has priority when
+\path{use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn} is true.
+\begin{rowpair}{LnaAlgebraic}
+\begin{equation}
+  \nabla_k\Delta\ln P_k-\Delta\ln T_k=0.
+  \label{eq:tgrad}
+\end{equation}
+\begin{linearized}{algebraic row}
+\begin{equation}
+  \Delta\ln P_k\,\delta\nabla_k
+    +\nabla_k\,\delta\Delta\ln P_k-\delta\Delta\ln T_k=0.
+\end{equation}
+\end{linearized}
+\end{rowpair}
+\textit{Code:} \code{temperature_gradient_resid_for_star_LNA}.
+The EOS supplies $\delta\ln P=\chi_\rho\delta\ln\rho+
+\chi_T\delta\ln T$. For RSP2,
+$\nabla=\nabla_{L,\rm eff}+Y_{\rm face}$ and
+$\delta\nabla=\delta\nabla_{L,\rm eff}+\delta Y_{\rm face}$.
+The independent flux row in Section~\ref{sec:rsp2-rows} supplies
+$L_r+L_c+L_t=L$; no local inversion for $Y_{\rm face}$ remains.
+\end{equationblock}
+
+\begin{equationblock}
+\paragraph{Static MLT or RSP2: radiation-pressure form.}
+If the preceding branch is off and
+\path{use_dPrad_dm_form_of_T_gradient_eqn} is true, define
+\begin{equation}
+  K_f=\frac{\Delta m_f\kappa_f}{c\mathcal A_f^2\lambda_f},
+  \qquad \Delta P_{{\rm rad},k}=\frac{a}{3}(T_{k-1}^4-T_k^4).
+\end{equation}
+\begin{rowpair}{LnaAlgebraic}
+\begin{equation}
+  -K_fL_{r,k}-\Delta P_{{\rm rad},k}=0.
+  \label{eq:dpraddm}
+\end{equation}
+\begin{linearized}{algebraic row}
+\begin{equation}
+  -K_f\delta L_{r,k}-L_{r,k}\delta K_f
+  -\frac{4a}{3}\left(T_{k-1}^4\delta\ln T_{k-1}
+                    -T_k^4\delta\ln T_k\right)=0.
+\end{equation}
+\end{linearized}
+\end{rowpair}
+\textit{Code:} \code{dPrad_dm_resid_for_star_LNA}.
+At fixed mass, $\delta K_f/K_f=\delta\kappa_f/\kappa_f-
+4\delta\ln r_f-\delta\lambda_f/\lambda_f$.
+Appendix~\ref{app:transport} specifies the opacity floor, radiative flux limiter,
+radiative luminosity, and inner-boundary spacing.
+\end{equationblock}
+
+\begin{equationblock}
+\paragraph{Static MLT or RSP2: QHSE form.}
+When both preceding switches are off, define
+\begin{equation}
+  h_f=(\dd\ln P/\dd m)_{\rm QHSE},\qquad
+  \Delta m_{c,f}=\frac{\Delta m_{k-1}+\Delta m_k}{2},
+\end{equation}
+with the mass-weighted temperature
+\begin{equation}
+  T_{*,f}=a_fT_k+(1-a_f)T_{k-1},\qquad
+  a_f=\frac{\Delta m_{k-1}}{\Delta m_{k-1}+\Delta m_k}.
+\end{equation}
+\begin{rowpair}{LnaAlgebraic}
+\begin{equation}
+  \Delta m_{c,f}h_f\nabla_k-\frac{T_{k-1}-T_k}{T_{*,f}}=0.
+\end{equation}
+\begin{linearized}{algebraic row}
+\begin{equation}
+\begin{aligned}
+  0={}&\Delta m_{c,f}(h_f\delta\nabla_k+\nabla_k\delta h_f)
+       -\frac{\delta T_{k-1}-\delta T_k}{T_{*,f}}\\
+     &+\frac{T_{k-1}-T_k}{T_{*,f}^2}\,\delta T_{*,f}.
+\end{aligned}
+\end{equation}
+\end{linearized}
+\end{rowpair}
+\textit{Code:} \code{temperature_gradient_resid_for_star_LNA} and
+\code{star_LNA_eval_dlnPdm_qhse}. Here $\delta T=T\delta\ln T$ and
+$\delta T_{*,f}=a_f\delta T_k+(1-a_f)\delta T_{k-1}$.
+For active TDC, the selected spatial relation instead supplies the gradient
+inside its closure; the global row remains equation~\eqref{eq:tdclum-linear}.
+\end{equationblock}
+
+\begin{equationblock}
+\subsection{Additional row for perturbed TDC}
+\label{sec:tdc-row}
+
+The internal convection amplitude is $A=v_c/\sqrt{2/3}$ at the face.
+Let $F_A=S_0-A D_{R0}-A^2D_0$, with the buoyancy and damping coefficients
+specified in Appendix~\ref{app:tdc}. The compressive term uses face density.
+\begin{rowpair}{LnaDynamic}
+\begin{equation}
+  2\dot A-\frac{2}{3}\alpha_{Pt}A\,\dot{\ln\rho_f}
+    =S_0-A D_{R0}-A^2D_0.
+\end{equation}
+\begin{linearized}{dynamic row}
+\begin{equation}
+\begin{aligned}
+  \delta S_0-(D_{R0}+2AD_0)\delta A-A\delta D_{R0}-A^2\delta D_0
+  =\sigma\left(2\delta A-\frac{2}{3}\alpha_{Pt}A\delta\ln\rho_f\right).
+\end{aligned}
+  \label{eq:tdcvelocity}
+\end{equation}
+\end{linearized}
+\end{rowpair}
+\textit{Code:} \code{assemble_tdc_w_row},
+\code{tdc_relation_for_star_LNA}, and \code{set_TDC_LNA}.
+The AD inertia is represented locally by
+\begin{equation}
+  I_A=2A+\frac{2}{3}\alpha_{Pt}A_0\frac{\rho_{f,0}}{\rho_f},
+  \qquad \delta I_A=2\delta A-\frac{2}{3}\alpha_{Pt}A_0\delta\ln\rho_f.
+  \label{eq:tdcinertia}
+\end{equation}
+Only the variation of this expression is used; $A_0$ and $\rho_{f,0}$ are
+held fixed. Nonconvective or forced-zero faces use the algebraic constraint
+in Section~\ref{sec:forced-rows}. Static MLT and frozen-flux treatments do
+not add this convection unknown.
+\end{equationblock}
+
+\begin{equationblock}
+\subsection{Additional rows for RSP2}
+\label{sec:rsp2-rows}
+
+\paragraph{Turbulent energy.}
+Use $e_t=w^2$, $C=S-D-D_r$, turbulent luminosity $L_t$, and turbulent
+pressure $P_t$. The source and flux formulas are in Appendix~\ref{app:rsp2}.
+\begin{rowpair}{LnaDynamic}
+\begin{equation}
+  \frac{\dd w_k^2}{\dd t}
+    =C_k+Eq_k-\frac{L_{t,k}-L_{t,k+1}}{\Delta m_k}
+       -\frac{P_{t,k}}{\Delta m_k}\dot{\mathcal V}_k.
+\end{equation}
+\begin{linearized}{dynamic row}
+\begin{equation}
+  \delta C_k-\frac{\delta L_{t,k}-\delta L_{t,k+1}}{\Delta m_k}
+      -\frac{P_{t,k}}{\Delta m_k}\delta\dot{\mathcal V}_k
+    =\sigma\,2w_k\delta w_k.
+  \label{eq:rsp2energy}
+\end{equation}
+\end{linearized}
+\end{rowpair}
+\textit{Code:} \code{assemble_rsp2_w_row} and
+\code{rsp2_turbulent_energy_rhs_for_star_LNA}.
+Here $\delta C=\delta S-\delta D-\delta D_r$ and
+$\delta\dot{\mathcal V}_k=\mathcal A_k\delta v_{f,k}
+-\mathcal A_{k+1}\delta v_{f,k+1}$, with fixed physical inner velocity.
+The compression coefficient is the background $P_t$, because
+$\dot{\mathcal V}_0=0$. Viscous heating is quadratic about a static
+background, so $\delta Eq=0$. Forced nonturbulent cells use $\delta w=0$.
+In the three equation model, $C=S-D$: radiative cooling acts in the entropy
+moments, so the direct $D_r$ term is absent. Both gas energy forms retain
+their existing turbulent storage term; no additional exchange term is added.
+\end{equationblock}
+
+\begin{equationblock}
+\paragraph{Independent face superadiabaticity and flux balance.}
+The new face unknown is signed $Y_{{\rm face},k}$, stored in \code{i_Y}.
+The gradient and its variation are
+\begin{equation}
+ \nabla_k=\nabla_{L,\rm eff,k}+Y_{{\rm face},k},\qquad
+ \delta\nabla_k=\delta\nabla_{L,\rm eff,k}+\delta Y_{{\rm face},k}.
+\end{equation}
+\begin{rowpair}{LnaAlgebraic}
+\begin{equation}
+ \begin{cases}
+ L_{r,k}+L_{c,k}+L_{t,k}-L_k=0,&k>1,\\
+ Y_{{\rm face},1}=0,&k=1.
+ \end{cases}
+\end{equation}
+\begin{linearized}{algebraic row}
+\begin{equation}
+ \begin{cases}
+ \delta L_{r,k}+\delta L_{c,k}+\delta L_{t,k}-\delta L_k=0,&k>1,\\
+ \delta Y_{{\rm face},1}=0,&k=1.
+ \end{cases}
+ \label{eq:rsp2flux}
+\end{equation}
+\end{linearized}
+\end{rowpair}
+\textit{Code:} \code{assemble_rsp2_flux_row} and
+\code{hydro_rsp2:rsp2_flux_residual}. The nonlinear interior row is
+\begin{equation}
+ R_{\mathrm{flux},k}=\frac{L_{r,k}+L_{c,k}+L_{t,k}-L_k}
+ {\max\!\left(|L_{\mathrm{start},k}|,
+ 10^{-3}\max_j|L_{\mathrm{start},j}|,\ 1\,\mathrm{erg\,s^{-1}}\right)}.
+\end{equation}
+This follows the TDC luminosity scale, adding a finite floor and using absolute
+values in the global maximum. Before solver iterations, current L initializes
+the scale. During iterations it uses L\_start, so its derivatives are zero.
+LNA uses the same residual and holds its background normalization fixed.
+The surface constraint $Y_1=0$ is dimensionless. The Newton correction measure
+uses $|\Delta Y|/\max(1,|Y_{\rm start}|)$: the native dimensionless column
+scale with unit correction weight. This gives an absolute scale near zero
+and a relative scale at large magnitude. Y is included in the norm and remains signed.
+The physical surface
+luminosity/temperature condition remains in its separate row. Radiative cells
+retain the flux equation and may have negative Y.
+\end{equationblock}
+
+\subsection{Optional RSP2 entropy moment rows}
+\label{sec:rsp2-moment-rows}
+
+These two face rows are present only in the three equation model.
+The cell variable remains $w$, and the face turbulent energy is
+$e_{t,f}=a_fw_k^2+(1-a_f)w_{k-1}^2$. The face entropy flux is
+$\mathrm{Pi}_f=\langle v_r's'\rangle$, and $\mathrm{Phi}_f=\langle s'^2\rangle$
+is the full entropy variance. The entropy differential and face coefficients
+are specified in Appendix~\ref{app:rsp2-moments}.
+
+\begin{equationblock}
+\paragraph{Entropy flux.} Pi carries its own time dependence.
+\begin{rowpair}{LnaDynamic}
+\begin{equation}
+\begin{aligned}
+ \dot{\mathrm{Pi}}_f={}&\frac23e_{t,f}(-\partial_r s)_f
+ +\left(-\frac{\partial_r P}{\rho}\right)_f
+       \frac{\chi_{T,f}}{\chi_{\rho,f}C_{P,f}}\mathrm{Phi}_f\\
+ &-\left(\alpha_{\mathrm{Pi}}\frac{\sqrt{e_{t,f}}}{\Lambda_f}
+       +\tau_{{\rm rad},f}^{-1}+ (\partial_r v_{\rm rad})_f\right)\mathrm{Pi}_f .
+\end{aligned}
+\end{equation}
+\begin{linearized}{dynamic row}
+\begin{equation}
+\begin{aligned}
+ \sigma\delta\mathrm{Pi}_f={}&\frac23\left[
+     (-\partial_r s)_f\delta e_{t,f}+e_{t,f}\delta(-\partial_r s)_f\right]\\
+ &+\left(-\frac{\partial_r P}{\rho}\right)_f
+       \frac{\chi_{T,f}}{\chi_{\rho,f}C_{P,f}}\delta\mathrm{Phi}_f\\
+ &+\mathrm{Phi}_f\delta\left[
+       -\frac{\partial_r P}{\rho}\frac{\chi_T}{\chi_\rho C_P}\right]_f\\
+ &-\left(\alpha_{\mathrm{Pi}}\frac{\sqrt{e_{t,f}}}{\Lambda_f}
+       +\tau_{{\rm rad},f}^{-1}\right)\delta\mathrm{Pi}_f\\
+ &-\mathrm{Pi}_f\delta\left[
+       \alpha_{\mathrm{Pi}}\frac{\sqrt{e_{t,f}}}{\Lambda_f}
+       +\tau_{{\rm rad},f}^{-1}+ (\partial_r v_{\rm rad})_f\right].
+\end{aligned}
+\end{equation}
+\end{linearized}
+\end{rowpair}
+The linearized expression assumes a static background. Mean strain vanishes
+there, but its velocity perturbation is retained.
+\end{equationblock}
+
+\begin{equationblock}
+\paragraph{Entropy variance.} Phi is the full variance of specific entropy.
+\begin{rowpair}{LnaDynamic}
+\begin{equation}
+\begin{aligned}
+ \dot{\mathrm{Phi}}_f={}&2(-\partial_r s)_f\mathrm{Pi}_f\\
+ &-\left(\alpha_{\mathrm{Phi}}\frac{\sqrt{e_{t,f}}}{\Lambda_f}
+             +2\tau_{{\rm rad},f}^{-1}\right)\mathrm{Phi}_f .
+\end{aligned}
+\end{equation}
+\begin{linearized}{dynamic row}
+\begin{equation}
+\begin{aligned}
+ \sigma\delta\mathrm{Phi}_f={}&2(-\partial_r s)_f\delta\mathrm{Pi}_f
+     +2\mathrm{Pi}_f\delta(-\partial_r s)_f\\
+ &-\left(\alpha_{\mathrm{Phi}}\frac{\sqrt{e_{t,f}}}{\Lambda_f}
+             +2\tau_{{\rm rad},f}^{-1}\right)\delta\mathrm{Phi}_f\\
+ &-\mathrm{Phi}_f\delta\left[
+       \alpha_{\mathrm{Phi}}\frac{\sqrt{e_{t,f}}}{\Lambda_f}
+             +2\tau_{{\rm rad},f}^{-1}\right].
+\end{aligned}
+\end{equation}
+\end{linearized}
+\end{rowpair}
+\textit{Code:} \code{hydro_rsp2:rsp2_moment_rhs},
+\code{do1_rsp2_moment_eqns}, and \code{assemble_rsp2_moment_rows}.
+Both moments use backward Euler in nonlinear hydro and identity inertia in
+LNA. The continuous LNA coefficients omit finite timestep centering.
+There is no spatial transport or additional viscosity in these two rows.
+The existing $L_t$ and $Eq/Uq$ terms remain in the energy and momentum equations.
+\end{equationblock}
+
+Forced faces use $\mathrm{Pi}=\mathrm{Phi}=0$. Fully dormant faces with both
+adjacent turbulent energies and both moments zero use the same zero branch.
+A face beside finite turbulent energy retains both evolution rows.
+LNA fixes $\delta w=0$ in a fully dormant cell. At zero represented cell
+energy, including underflow of $w^2$, a local row without a source seed
+or kinetic transport also uses this constraint when $S_k/w_k\leq0$.
+The factored source ratio determines the branch on the current static
+background; accepted timestep history does not enter LNA.
+Positive driving or nonlocal coupling retains the physical energy row.
+Constraining a cell does not constrain its active bounding moment faces.
+Active moments at exactly zero face energy have no regular linearization
+in these variables and cause an explicit LNA error.
+The dormant branch does not describe spontaneous turbulence onset.
+
+\begin{equationblock}
+\paragraph{Derived scale heights and mixing lengths.}
+\label{sec:cell-mixing-length}
+RSP2 uses TDC's public face helpers, \code{get_TDC_Hp_face} and
+\code{get_TDC_mixing_length_face}. Both models obtain cell lengths from
+\code{get_TDC_mixing_length_cell}. Face lengths retain the ordinary or
+reconstructed face state. The cell length uses its own EOS pressure and density,
+with gravity averaged over its bounding faces:
+\begin{align}
+ g_{\mathrm{cell},k}&=\tfrac12(g_k+g_{k+1}),
+ &g_j&=\frac{G_jm_{\mathrm{grav},j}}{r_j^2},\\
+ H_{P,\mathrm{cell},k}^{\mathrm{HSE}}
+   &=\frac{P_{\mathrm{eos},k}}{\rho_k g_{\mathrm{cell},k}},
+ &r_{\mathrm{cell},k}&=\left[\tfrac12(r_k^3+r_{k+1}^3)\right]^{1/3}.
+\end{align}
+At a full centre, $g_{N+1}=0$; an excised boundary uses
+$g_{N+1}=G_NM_{\rm centre}/R_{\rm centre}^2$.
+For $\beta_h=\code{harmonic_dissipation_length_beta}\leq0$, the alternate-height
+option replaces $H_P^{\mathrm{HSE}}$ by
+$\min(H_P^{\mathrm{HSE}},\sqrt{P_{\mathrm{eos}}/G_k}/\rho)$ in that cell.
+For $\beta_h>0$, the HSE height is used directly. Writing the selected height
+as $H_{P,\mathrm{cell}}$, the shared length law gives
+\begin{equation}
+ \Lambda_{\mathrm{cell},k}=
+ \begin{cases}
+  \alpha_{\mathrm{MLT}}H_{P,\mathrm{cell},k},&\beta_h\leq0,\\
+  \left[(\alpha_{\mathrm{MLT}}H_{P,\mathrm{cell},k})^{-1}
+        +(\beta_h r_{\mathrm{cell},k})^{-1}\right]^{-1},&\beta_h>0.
+ \end{cases}
+ \label{eq:cell-mixing-length}
+\end{equation}
+The EOS state is not interpolated through faces a second time. These lengths
+are differentiated functions of the cell state and bounding radii; there is
+no Hp row or independent $\delta H_P$. RSP2 cell w and TDC face convective
+velocity retain their separate storage and viscosity averaging.
+\end{equationblock}
+
+\begin{equationblock}
+\subsection{Surface rows and fixed perturbations}
+\label{sec:boundary-rows}
+\label{sec:thermal-boundary}
+\label{sec:forced-rows}
+
+\paragraph{Surface momentum or pressure.}
+\path{assemble_surface_velocity_row} replaces the interior momentum row at
+$k=1$. A fixed surface velocity has first priority and imposes
+$\delta v_{{\rm rad},1}=0$, as in Section~\ref{sec:forced-rows}.
+Otherwise, any of \path{use_momentum_outer_BC},
+\path{use_zero_Pgas_outer_BC}, or \path{use_fixed_Psurf_outer_BC}
+selects the dynamic surface equation.
+\begin{rowpair}{LnaDynamic}
+\begin{equation}
+  \dot v_{{\rm rad},1}=F_{{\rm surf},1}(P_{\rm bc},\ldots).
+\end{equation}
+\begin{linearized}{dynamic row}
+\begin{equation}
+  \delta F_{{\rm surf},1}=\sigma\,\delta v_{{\rm rad},1}.
+\end{equation}
+\end{linearized}
+\end{rowpair}
+\textit{Code:} \code{surface_momentum_rhs_for_star_LNA}.
+The force is the selected momentum formula above, with outer pressure
+$P_{\rm bc}$; on the face grid, $\Delta P_{{\rm tot},1}=P_{\rm bc}-P_{{\rm tot},1}$.
+\end{equationblock}
+
+\begin{equationblock}
+Without a surface momentum condition, the replacement is algebraic:
+\begin{rowpair}{LnaAlgebraic}
+\begin{equation}
+  \ln P_{\rm bc}-\ln P_{{\rm eos},1}=0.
+\end{equation}
+\begin{linearized}{algebraic row}
+\begin{equation}
+  \delta\ln P_{\rm bc}-\chi_{\rho,1}\delta\ln\rho_1
+    -\chi_{T,1}\delta\ln T_1=0.
+\end{equation}
+\end{linearized}
+\end{rowpair}
+\textit{Code:} \code{surface_P_bc_for_star_LNA} supplies either a fixed
+pressure or the atmosphere pressure and its supported AD response.
+\end{equationblock}
+
+\begin{equationblock}
+\paragraph{Surface luminosity or temperature.}
+The surface transport slot also contains one row. For RSP2,
+\code{RSP2_use_L_eqn_at_surface} selects its own luminosity boundary first.
+Otherwise \code{use_RSP_L_eqn_outer_BC} selects the shared boundary, also used
+with TDC. Both give the following continuous luminosity condition:
+\begin{rowpair}{LnaAlgebraic}
+\begin{equation}
+  L_1=L_{\rm surf},\qquad
+  L_{\rm surf}=f_{L,\rm surf}\,4\pi r_1^2caT_1^4.
+\end{equation}
+\begin{linearized}{algebraic row}
+\begin{equation}
+  \delta L_1-L_{\rm surf}(2\delta\ln r_1+4\delta\ln T_1)=0.
+\end{equation}
+\end{linearized}
+\end{rowpair}
+\textit{Code:} \code{rsp_lsurf_resid_for_star_LNA}, with
+$f_{L,\rm surf}=\code{RSP2_Lsurf_factor}$.
+\par
+Otherwise the atmosphere temperature supplies the row:
+\begin{rowpair}{LnaAlgebraic}
+\begin{equation}
+  \ln T_{\rm bc}-\ln T_1=0.
+\end{equation}
+\begin{linearized}{algebraic row}
+\begin{equation}
+  \delta\ln T_{\rm bc}-\delta\ln T_1=0.
+\end{equation}
+\end{linearized}
+\end{rowpair}
+\textit{Code:} \code{surface_temperature_resid_for_star_LNA} and
+\code{surface_lnT_bc_for_star_LNA}. The atmospheric face-to-center offset
+and its variation are given in Appendix~\ref{app:surface-details}.
+\end{equationblock}
+
+\begin{equationblock}
+\paragraph{Forced-zero rows.}
+These replace the radius row in a zero-velocity cell, the momentum row for a
+fixed surface velocity, or the TDC/RSP2 convection row where the amplitude
+is forced to zero. Here $z$ is that constrained variable.
+\begin{rowpair}{LnaAlgebraic}
+\begin{equation}
+  z=z_{\rm fixed}.
+\end{equation}
+\begin{linearized}{algebraic row}
+\begin{equation}
+  \delta z=0.
+\end{equation}
+\end{linearized}
+\end{rowpair}
+\textit{Code:} \code{assemble_radius_rows},
+\code{assemble_surface_velocity_row}, \code{assemble_tdc_w_row}, and
+\code{assemble_rsp2_w_row}. At the envelope cut, excluded perturbations are
+zero by omission of their columns, not by adding further constraint rows.
+\end{equationblock}
+
+\clearpage
+\section{From the linearized rows to the eigensolve}
+
+Routine \code{setup_star_LNA_problem} constructs a \code{star_LNA_problem}
+containing the variable map, equation identifier for every row, and dense
+matrices.  The top level sequence in \code{do_star_LNA} is
+\begin{enumerate}
+\item refresh the MESA variables with \code{set_vars_if_needed};
+\item reject unsupported model branches in \code{check_star_LNA_model};
+\item rebuild the Riemann face state for \code{u_flag}; RSP2 viscosity is
+      a cell momentum source, not a contact-velocity shift;
+\item construct the problem and report the selected variables;
+\item assemble density, radius, momentum, energy, luminosity, RSP2, and TDC
+      rows in that order;
+\item write matrix and closure audits when requested;
+\item solve and write mode products; and
+\item release the problem through \code{free_star_LNA_problem}.
+\end{enumerate}
+
+The colored rows above assemble the single problem
+\begin{equation}
+  \mathbf{A}\widehat{\mathbf{x}}
+  =\sigma\mathbf{B}\widehat{\mathbf{x}} .
+  \label{eq:generalized}
+\end{equation}
+For $\dot q=F(q)$, the perturbation $\delta F$ enters $\mathbf{A}$ and
+$\delta q$ enters $\mathbf{B}$.  Algebraic equations enter only
+$\mathbf{A}$. Automatic differentiation components are mapped to neighboring
+zone variables by \path{add_ad_partials_to_matrix}.
+
+The equation registry distinguishes density, radius, forced zero velocity,
+interior and surface momentum variants, energy, each luminosity closure, RSP2
+turbulent energy and face flux, and active or forced zero TDC velocity rows.  It is
+mechanical metadata: row formulas remain in their direct row assemblers.
+
+
+\subsection{Algebraic elimination and eigenpair refinement}
+
+Routine \code{scale_star_LNA_matrix_for_solver} scales each row and then each
+column by its largest absolute entry across $\mathbf{A}$ and $\mathbf{B}$.  A
+nominally dynamic variable remains in the generalized problem only when its
+row contains a time derivative.  Thus a forced $\delta w_k=0$ row is
+algebraic, while a TDC turbulent-velocity row remains dynamic.  Let $x_a$
+denote algebraic variables and $x_d$ dynamic variables.  Since algebraic rows
+have no $\mathbf{B}$ entries,
+\begin{equation}
+  A_{aa}x_a+A_{ad}x_d=0,
+  \qquad x_a=-A_{aa}^{-1}A_{ad}x_d.
+\end{equation}
+Substitution gives
+\begin{equation}
+  \left(A_{dd}-A_{da}A_{aa}^{-1}A_{ad}\right)x_d
+  =\sigma
+  \left(B_{dd}-B_{da}A_{aa}^{-1}A_{ad}\right)x_d.
+  \label{eq:schur}
+\end{equation}
+\code{build_reduced_star_LNA_problem} uses equilibrated \code{DGESVX} with
+iterative refinement to evaluate $A_{aa}^{-1}A_{ad}$.  Elimination changes the
+row and column norms.  Routine
+\code{scale_star_LNA_pencil} therefore applies alternating row and column
+max-norm scaling to the reduced matrices.  With $t_{\rm dyn}$ equal to the
+model dynamical timescale, the scaled problem is
+\begin{equation}
+  \widetilde A y=\lambda\widetilde B y,
+  \qquad
+  \widetilde A=R A_{\rm red}C,
+  \qquad
+  \widetilde B=\frac{R B_{\rm red}C}{t_{\rm dyn}},
+  \qquad
+  \lambda=\sigma t_{\rm dyn}.
+\end{equation}
+This keeps radial-mode eigenvalues near unity during \code{DGGEV}.  The code
+restores $x_d=Cy$, reconstructs $x_a$, and then reverses the full-pencil column
+scaling.
+
+Each candidate is checked against the original full matrices using the
+componentwise backward error
+\begin{equation}
+  \epsilon_{\rm eig}=
+  \max_i\frac{|(Ax-\sigma Bx)_i|}
+  {\sum_j|A_{ij}x_j|+|\sigma|\sum_j|B_{ij}x_j|}.
+\end{equation}
+Let $\epsilon_{\rm max}=\code{star_LNA_max_eigenvector_residual}$, which
+must be positive and defaults to $10^{-3}$. The triangle inequality bounds
+$\epsilon_{\rm eig}$ by one; evaluation enforces this upper bound after
+checking for nonfinite values. A limit of one therefore provides no
+eigenvector accuracy requirement. A candidate above
+$\min(\epsilon_{\rm max},10^{-1})$ enters \code{refine_star_LNA_eigenpair}.
+The Newton update can change frequency when either
+$\epsilon_{\rm eig}\leq10^{-1}$ or its balanced normwise residual satisfies
+\begin{equation}
+ \epsilon_{\rm norm}=
+ \frac{\max_i|(A_s x_s-\sigma B_s x_s)_i|}
+ {\max_i\left(\sum_j|(A_s)_{ij}(x_s)_j|
+       +|\sigma|\sum_j|(B_s)_{ij}(x_s)_j|\right)}\leq10^{-6}.
+\end{equation}
+Here $A_s,B_s,x_s$ use the full matrix scaling before algebraic elimination.
+Tiny moment components can have order-unity relative errors even when the
+eigenpair has a small normwise defect. This second criterion allows those
+components to be refined; it does not replace the final componentwise test.
+On the scaled full matrices, define
+$M=A-\sigma B$ and $r=Mx$. The Newton correction satisfies
+\begin{equation}
+  M\,\delta x-Bx\,\delta\sigma=-r,\qquad\delta x_j=0,
+\end{equation}
+where $j$ is the largest component of the current eigenvector at each
+iteration. Two solves give
+\begin{equation}
+  y=M^{-1}(-r),\qquad z=M^{-1}Bx,\qquad
+  \delta\sigma=-y_j/z_j,\qquad\delta x=y+z\,\delta\sigma.
+\end{equation}
+If neither initial criterion holds, keep $\sigma$ fixed and replace $x$
+by $z/z_j$. This inverse iteration repairs the eigenvector before allowing
+a frequency correction. Its trial update is a weighted average of the old
+and repaired vectors, preserving tiny components without subtractive loss.
+Each iteration uses \code{ZGBTRF} and \code{ZGBTRS} on the full banded
+matrix. At most four refinement steps are accepted; backtracking requires a
+decrease in the scaled residual. The refined pair is retained only if it also
+reduces the residual against the original unscaled matrices. The residual
+limit and mode filters are then applied.
+
+The solve computes the full
+reduced eigensystem.  The requested mode count limits output, not eigensolve
+cost.
+
+The scaling passes require quadratic work in the matrix dimension. Candidate
+residuals use the matrix bandwidth, as does the local Newton correction.
+Dense algebraic elimination and \code{DGGEV} require cubic
+work and determine the large-model scaling.  A targeted sparse or iterative
+solver is therefore required to make the requested mode count reduce the main
+solve cost.
+
+
+\clearpage
+\appendix
+\numberwithin{equation}{section}
+\section{Pressure, energy, and face closures}
+\label{app:pressure-energy}
+
+These quantities supply coefficients and derivatives to the rows in
+Section~\ref{sec:equation-system}. They are not additional global equations.
+
+\subsection{Pressure}
+
+The cell pressure closure shared by the operator and pressure work output is
+\begin{equation}
+  P_{\mathrm{tot}}=P_{\mathrm{eos}}+P_{\mathrm{t,RSP2}},
+  \qquad
+  P_{\mathrm{t,RSP2}}
+  =\alpha_p\frac{2}{3}\rho e_t,
+  \qquad e_t=w^2,
+  \label{eq:rsp2pressure}
+\end{equation}
+when RSP2 turbulent pressure perturbations are enabled.  TDC/MLT turbulent
+pressure remains face centered and enters separately through
+\code{d_mlt_Pturb_face_for_star_LNA}:
+\begin{equation}
+  P_{\mathrm{t,MLT},f}
+  =f_{\mathrm{Pt}}\frac{\rho_f v_c^2}{3}.
+  \label{eq:mltpressure}
+\end{equation}
+The separate MLT pressure term in face momentum uses one convection
+velocity coefficient multiplying a cell-density difference:
+\begin{align}
+  \Delta P_{{\rm MLT},k}
+    &=\frac{f_{\rm Pt}}{3}v_{c,k}^2(\rho_{k-1}-\rho_k),\\
+  \delta\Delta P_{{\rm MLT},k}
+    &=\frac{f_{\rm Pt}}{3}\left[
+       v_{c,k}^2(\rho_{k-1}\delta\ln\rho_{k-1}
+                       -\rho_k\delta\ln\rho_k)\right.\nonumber\\
+    &\hspace{38mm}\left.
+       +2v_{c,k}(\rho_{k-1}-\rho_k)\delta v_{c,k}\right].
+\end{align}
+These expressions apply when turbulent-pressure perturbations are enabled.
+Active TDC supplies $\delta v_c$ from its internal amplitude. Otherwise the
+helper uses a positive \code{mlt_vc_old} as a fixed coefficient, so
+$\delta v_c=0$ in this term. The term is zero when its controls or velocity
+condition are inactive. It is not a difference of independently evaluated
+turbulent pressures at two adjacent faces.
+
+\subsection{Work coefficients on the two grids}
+\label{app:work-coefficients}
+
+Section~\ref{sec:energy-row} gives both work stencils and their
+linearizations. Their pressure coefficients are constructed differently.
+For local work, \code{dwork_dm_for_star_LNA} uses
+\begin{equation}
+  P_{c,k,0}=P_{{\rm tot},k,0}
+     +f_{\rm Pt}\frac{\rho_{f,k,0}v_{c,{\rm old},k}^2}{3},
+\end{equation}
+where the second term is included only for $k>1$,
+\code{mlt_Pturb_factor > 0}, and \code{mlt_vc_old(k) > 0}.
+This face-density contribution to the cell work coefficient is evaluated
+by \code{get_rho_face}; it is not replaced by the Riemann pressure.
+
+For flux work on the face-velocity grid,
+\code{static_face_pressure_for_star_LNA} gives
+\begin{equation}
+  P_{f,k,0}=a_kP_{{\rm tot},k,0}
+       +(1-a_k)P_{{\rm tot},k-1,0}+P_{{\rm t,MLT},f,k,0},
+  \quad
+  a_k=\frac{\Delta m_{k-1}}{\Delta m_{k-1}+\Delta m_k}.
+\end{equation}
+At $k=1$, the cell-pressure part is $P_{{\rm tot},1,0}$.
+The MLT addition uses current $v_c$ and the TDC face state for an active
+TDC face with positive velocity; otherwise it uses the positive
+\code{mlt_vc_old} and \code{get_rho_face_val} when enabled.
+For flux work with \code{u_flag}, the code instead takes the values of
+\path{s%P_face_ad}, including the surface convention stated in the main
+text. These distinctions must be retained when comparing energy and
+momentum pressure terms.
+
+\subsection{Mechanical energy inertia}
+\label{app:mechanical}
+
+For the supported case without mass corrections,
+\code{star_utils:cell_specific_KE_qp} uses
+\begin{equation}
+  K_k=\begin{cases}
+    u_k^2/2,&\code{u_flag},\\
+    (v_k^2+v_{k+1}^2)/4,&\code{v_flag},\\
+    0,&\text{neither hydro velocity flag}.
+  \end{cases}
+\end{equation}
+Consequently,
+\begin{equation}
+  \delta K_k=\begin{cases}
+    u_{k,0}\delta u_k,&\code{u_flag},\\
+    (v_{k,0}\delta v_k+v_{k+1,0}\delta v_{k+1})/2,
+       &\code{v_flag},\\
+    0,&\text{otherwise}.
+  \end{cases}
+\end{equation}
+Both hydrodynamic expressions vanish on a static background. The face
+scheme averages the squares of the bounding velocities; it does not
+square their average. At $N$, the inward velocity is fixed.
+
+For $k<N$, \code{cell_specific_PE_qp} gives the same gravitational
+energy for both velocity grids:
+\begin{align}
+  \Phi_k&=-\frac{1}{2}
+      \left(\frac{G_km_{g,k}}{r_k}
+           +\frac{G_{k+1}m_{g,k+1}}{r_{k+1}}\right),\\
+  \delta\Phi_k&=\frac{1}{2}
+      \left(\frac{G_km_{g,k}}{r_k}\delta\ln r_k
+           +\frac{G_{k+1}m_{g,k+1}}{r_{k+1}}
+             \delta\ln r_{k+1}\right).
+\end{align}
+This is the average of the two face potentials, not a cell-center
+$-Gm/r$ approximation. At $N$, a nonzero fixed
+\code{R_center} contributes a constant inward potential; its perturbation
+is zero. The contribution is omitted when \code{R_center = 0}.
+An envelope cut drops excluded perturbation columns and keeps the
+background coefficients.
+
+\code{mechanical_energy_inertia_for_star_LNA} calls
+\code{get_dke_dt_dpe_dt} with a unit time interval to recover these
+derivatives. It places them in $\mathbf B$ only when
+\code{energy_eqn_option = 'dedt'} and the local-work control is false.
+A retained kinetic derivative at a small nonzero background velocity
+does not make the rest of the operator a nonstatic linearization.
+
+\subsection{Turbulent energy and the RSP2 gas-energy relation}
+\label{app:turbulent-energy}
+
+The control \path{star_LNA_perturb_turbulent_energy} gates the cell
+turbulent inertia. When it is false,
+\path{turbulent_energy_inertia_for_star_LNA} returns zero.
+Otherwise RSP2 contributes
+\begin{equation}
+  E_{t,k}=w_k^2,\qquad \delta E_{t,k}=2w_k\delta w_k.
+\end{equation}
+For TDC, inclusion additionally requires
+\code{star_LNA_include_tdc}, \code{MLT_option = 'TDC'}, and
+\path{TDC_include_eturb_in_energy_equation}. The cell inertia is
+\begin{align}
+  E_{t,k}&=\frac{3}{4}(v_{c,k}^2+v_{c,k+1}^2)
+          =\frac{1}{2}(A_k^2+A_{k+1}^2),\\
+  \delta E_{t,k}&=A_k\delta A_k+A_{k+1}\delta A_{k+1},
+  \qquad k<N.
+\end{align}
+Only the first face term remains at the physical inner cell $N$.
+Active TDC uses its internal LNA amplitude through
+\code{turbulent_tdc_energy_inertia_for_star_LNA}. The nonactive TDC
+branch, when these inclusion controls still apply, takes derivatives
+from \path{s%mlt_vc_ad}; it does not introduce a new amplitude unknown.
+These are cell energy coefficients, distinct from the TDC face-amplitude
+inertia $I_A$ in equation~\eqref{eq:tdcinertia}.
+
+For the local-work RSP2 case with turbulent energy and pressure included,
+and without an additional MLT pressure term, the two equations are
+\begin{align}
+  \dot e+\dot E_t
+    &=-D_m(L_r+L_c+L_t)+\epsilon+Eq
+      -(P_{\rm eos}+P_t)\dot{\mathcal V}/\Delta m,\\
+  \dot E_t
+    &=C+Eq-D_mL_t-P_t\dot{\mathcal V}/\Delta m.
+\end{align}
+Subtracting the second from the first gives
+\begin{align}
+  \dot e&=-D_m(L_r+L_c)+\epsilon-C
+            -P_{\rm eos}\dot{\mathcal V}/\Delta m,\\
+  \sigma\delta e&=-D_m(\delta L_r+\delta L_c)+\delta\epsilon-\delta C
+            -\frac{P_{{\rm eos},0}}{\Delta m}
+               \delta\dot{\mathcal V}.
+\end{align}
+Thus $L_t$, $Eq$, and turbulent-pressure work cancel in the derived gas row;
+none is counted twice.
+This gas-energy equation is a derived combination of assembled rows,
+not an extra row. In the flux-work branch the mechanical terms and
+face-pressure stencil must also be retained in the subtraction.
+Freezing the turbulent inertia or pressure removes the corresponding
+cancellation.
+
+\subsection{The \code{eps_grav} coefficients and their limits}
+\label{app:epsgrav}
+
+For a thermodynamically consistent EOS at fixed composition, the
+thermal part of the first-law relation can also be written
+\begin{equation}
+  \epsilon_{\rm grav}
+    =-TC_P\left[
+       (1-\nabla_{\rm ad}\chi_T)\dot{\ln T}
+       -\nabla_{\rm ad}\chi_\rho\dot{\ln\rho}\right].
+\end{equation}
+The standard MESA implementation is
+\code{eps_grav:do_std_eps_grav}. Its static thermal variation is
+\begin{equation}
+  \delta\epsilon_{\rm grav}
+    =-\sigma TC_P\left[
+       (1-\nabla_{\rm ad}\chi_T)\delta\ln T
+       -\nabla_{\rm ad}\chi_\rho\delta\ln\rho\right].
+\end{equation}
+The identity linking this to the internal-energy derivatives is
+\begin{equation}
+  \delta e-\frac{P_{\rm eos}}{\rho}\delta\ln\rho
+    =TC_P\left[
+       (1-\nabla_{\rm ad}\chi_T)\delta\ln T
+       -\nabla_{\rm ad}\chi_\rho\delta\ln\rho\right].
+\end{equation}
+This is a thermodynamic comparison. Numerical EOS quantities, especially
+across blends, need not satisfy the identity exactly. Finite-step
+\code{dedt} and \code{eps_grav} residuals also have different time
+discretizations. Equality of these continuous expressions therefore does
+not establish identical numerical operators or finite-step solutions.
+
+For RSP2, \code{energy_inertia_for_star_LNA} implements the two thermal
+coefficients directly. Its standard branch adds the stored latent-heat terms:
+\begin{align}
+ B_{\ln\rho}&=-TC_P\nabla_{\rm ad}\chi_\rho
+                  +\code{latent_ddlnRho},\\
+ B_{\ln T}&=TC_P(1-\nabla_{\rm ad}\chi_T)
+                  +\code{latent_ddlnT}.
+\end{align}
+In the PC EOS entropy transition it uses the same background Gamma thresholds
+as \path{eval1_eps_grav_and_partials}, blending this standard expression with
+$T_0\delta s$. The thermal contribution is multiplied by
+\path{eps_grav_factor}; $2w\delta w$ is then added without that factor.
+The blend weight is a background coefficient: its perturbation multiplies a
+zero background time derivative. Composition perturbations vanish in the
+fixed-composition LNA. The nonlinear time-centering weights are not part of
+the continuous LNA operator. User \code{other_eps_grav} hooks are rejected.
+
+The corresponding nonlinear RSP2 path calls the existing
+\code{eval_eps_grav_and_partials}, retaining its composition and finite-step
+choices. See \sourcefile{star/private/eps_grav.f90} and
+\sourcefile{star/defaults/controls.defaults}. Non-RSP2 LNA retains its
+\code{dedt}-only restriction.
+
+\subsection{Source derivatives}
+
+\code{energy_sources_for_star_LNA} retains the stored nuclear derivatives
+with respect to $\ln\rho$ and $\ln T$. Nuclear heating is fixed when the
+selected split-burn branch uses \code{burn_avg_epsnuc}, and the explicit
+nuclear term is zero for zero \code{eps_nuc_factor} or the nonlocal
+Ni/Co decay branch. The nonnuclear neutrino coefficient retains the
+nonlinear half weight:
+\begin{equation}
+  \delta\epsilon_{\nu,{\rm nonnuc}}
+   =\frac{1}{2}\left[
+      \frac{\partial\epsilon_{\nu,{\rm nonnuc}}}{\partial\ln\rho}
+          \delta\ln\rho+
+      \frac{\partial\epsilon_{\nu,{\rm nonnuc}}}{\partial\ln T}
+          \delta\ln T\right].
+\end{equation}
+It enters $\delta\epsilon$ with a minus sign.
+\code{extra_heat} and \code{irradiation_heat} are fixed coefficients.
+The diffusion, sedimentation, premixing, and phase-separation
+\code{others} terms of the nonlinear energy equation supply no
+additional LNA derivatives. Static viscous heating and $vU_q$ have zero
+first-order variation, as described in Appendix~\ref{app:viscosity}.
+
+\subsection{Riemann face state for \code{u_flag}}
+\label{app:riemann-state}
+
+Routine \code{hydro_riemann:do1_uface_and_Pface} uses the inner cell
+$L=k$ and outer cell $R=k-1$. Let $\widetilde P_L,\widetilde P_R$
+be their cell pressures after the gravity reconstruction, with
+\begin{align}
+  h_g&=-\frac{G_km_{g,k}}{r_k^2\mathcal A_k},\\
+  \widetilde P_L&=P_L+\frac{\Delta m_k}{2}h_g,\qquad
+  \widetilde P_R=P_R-\frac{\Delta m_{k-1}}{2}h_g.
+\end{align}
+The acoustic speeds use the unreconstructed cell pressures:
+$c_{s,L}^2=\Gamma_{1,L}P_L/\rho_L$ and similarly for $R$. The selected
+wave speeds and contact state are
+\begin{align}
+  S_L&=\min(u_L-c_{s,L},u_R-c_{s,R}),\\
+  S_R&=\max(u_R+c_{s,R},u_L+c_{s,L}),\\
+  Z&=\rho_R(S_R-u_R)+\rho_L(u_L-S_L),\\
+  v_f=S_*&=\frac{\rho_Ru_R(S_R-u_R)+\rho_Lu_L(u_L-S_L)
+                      +\widetilde P_L-\widetilde P_R}{Z},\\
+  P_f&=\frac{1}{2}\left[
+      \widetilde P_L+\rho_L(u_L-S_L)(u_L-S_*)
+      +\widetilde P_R+\rho_R(u_R-S_R)(u_R-S_*)\right].
+\end{align}
+Writing the numerator of $S_*$ as $N_*$,
+\begin{equation}
+  \delta v_f=\frac{\delta N_*-v_{f,0}\delta Z}{Z_0}.
+\end{equation}
+AD differentiates the selected wave-speed branches, the EOS response,
+and the gravity reconstruction. At $v_{f,0}=0$, this reduces to
+$\delta N_*/Z_0$, which still contains the pressure-difference response.
+The same contact velocity enters the radius equation and both work forms.
+$P_f$ is differentiated in momentum; in static work only its background
+value multiplies $\delta v_f$.
+
+At $k=1$, the routine sets $v_f=u_1$ and $P_f=P_{{\rm eos},1}$
+directly. The outward momentum flux separately uses $P_{\rm bc}$.
+\code{do_star_LNA} rebuilds this face state. RSP2 now puts its viscous
+force in cell momentum, using \code{compute_Uq_dm_cell}; it does not add
+an acceleration to the contact velocity. The static counterpart is
+\code{Uq_cell_for_star_LNA}. Active turbulent pressure with \code{u_flag}
+still requires \path{star_LNA_perturb_turbulent_pressure}, so the momentum,
+work, and reconstructed face states use consistent pressure responses.
+
+\subsection{Radiative transport}
+\label{app:transport}
+
+The face temperature $T_{*,f}$ and spacing $\Delta m_{c,f}$ are defined in
+Section~\ref{sec:transport-row}. The selected static MLT/RSP2 transport row
+and its linearization are given there in full.
+
+The spatial gradient used by active TDC is
+\begin{equation}
+  \nabla_{\mathrm{actual},f}=
+  \frac{(T_{k-1}-T_k)/T_{*,f}}
+       {\Delta m_{c,f}(\dd\ln P/\dd m)_{\rm QHSE}}.
+  \label{eq:tdcqhse}
+\end{equation}
+Routine \code{star_LNA_eval_dlnPdm_qhse} supplies the QHSE derivative,
+including the selected turbulent-pressure terms. Without those terms it is
+$-Gm_f/(4\pi r_f^4P_f)$. The helper starts from the reconstructed EOS pressure
+when face reconstruction is active, then adds the selected MLT turbulent
+pressure. The TDC radiative conductance $L_{0,f}$ uses the reconstructed EOS
+pressure. Without the turbulent-pressure addition, the same EOS pressure
+therefore enters both expressions.
+
+For the radiation-pressure branch, equation~\eqref{eq:dpraddm} gives the
+assembled row. The following coefficients define that relation.
+
+The opacity uses \code{min_kap_for_dPrad_dm_eqn} as a floor. The face state is
+reconstructed when \code{use_face_reconstruction} is active. In an MLT cell,
+$L_{\mathrm{rad}}$ is obtained from the background temperature gradient rather
+than from the total luminosity. With flux limiting,
+\begin{equation}
+  R_f=\frac{\mathcal A_f|T_{k-1}^4-T_k^4|}
+  {\Delta m_f\kappa_f(T_{k-1}^4+T_k^4)/2},
+  \qquad
+  \lambda_f=\frac{6+3R_f}{6+(3+R_f)R_f}.
+\end{equation}
+Without flux limiting, $\lambda_f=1$.
+
+In \code{dPrad_dm_resid_for_star_LNA}, $\Delta m_f$ is normally
+\path{s%dm_bar(k)}. At $k=N$ with \code{R_center > 0}, it is replaced by
+$\Delta m_{c,f}$, matching the cell-center spacing beside an excised core.
+
+For active TDC, this transport relation supplies the spatial gradient while the
+single algebraic row remains equation~\eqref{eq:tdclum}. The implementation
+first obtains
+\begin{equation}
+  L_{\mathrm{rad},f}=
+  -\frac{c\mathcal A_f^2\lambda_f}{\Delta m_f\kappa_f}
+  \frac{a}{3}\left(T_{k-1}^4-T_k^4\right),
+  \qquad
+  \nabla_{\mathrm{actual},f}=\frac{L_{\mathrm{rad},f}}{L_{0,f}},
+  \label{eq:tdcdprad}
+\end{equation}
+and passes this gradient to \code{set_TDC_LNA}. Thus the TDC luminosity and
+turbulent-velocity relations use the selected spatial transport equation
+without adding another unknown or residual row. RSP2 instead inserts its
+reconstructed $L_r$ directly in equation~\eqref{eq:dpraddm}.
+The TDC helper \code{actual_gradT_for_star_LNA} still uses
+\path{s%dm_bar(k)} in this branch; the explicit inner-spacing replacement
+above applies to the static MLT/RSP2 row. These paths require separate
+inner-boundary checks.
+
+
+\section{TDC coefficients and reconstructed faces}
+\label{app:tdc}
+
+The global luminosity and amplitude rows are
+in Sections~\ref{sec:transport-row} and \ref{sec:tdc-row}.
+This appendix defines their local coefficients and AD inputs.
+
+The active TDC relation is evaluated by \code{set_TDC_LNA}. The MESA/star
+routine \path{tdc_face_state_for_star_LNA} obtains
+\begin{equation}
+  (T,\rho,P,e,C_P,\chi_\rho,\chi_T,\nabla_{\mathrm{ad}},
+  \kappa,H_P,\nabla_{\mathrm{rad}})_f
+\end{equation}
+from \code{get_reconstructed_face_state_ad}.  When
+\code{use_face_reconstruction} is true, these are the cached reconstructed EOS
+and opacity quantities. Otherwise they are the
+stored face values.  They remain automatic differentiation objects in both
+paths.
+
+The routine \code{actual_gradT_for_star_LNA} supplies
+$\nabla_{\mathrm{actual}}$. It uses the logarithmic-pressure or QHSE spatial
+relation normally and equation~\eqref{eq:tdcdprad} when the model selects
+\path{use_dPrad_dm_form_of_T_gradient_eqn}. The QHSE path uses reconstructed
+face pressure when face reconstruction is active.
+
+The internal velocity variable is
+\begin{equation}
+  A=\frac{v_c}{\sqrt{2/3}}.
+\end{equation}
+Define
+\begin{align}
+  L_0 &=\frac{16\pi ac}{3}\frac{GmT^4}{P\kappa},
+  &\nabla_r&=\frac{L}{L_0},\\
+  Y&=\nabla_{\mathrm{actual}}-\nabla_{L,\rm eff}.
+\end{align}
+The default is $\nabla_{L,\rm eff}=\nabla_L$. With
+\code{TDC_use_dynamical_gradL}, \code{get_TDC_dynamical_gradL} supplies
+the following instantaneous spatial relation, using its actual local
+\code{pressure_gradient_factor}:
+\begin{align}
+ \mathrm{pressure\_gradient\_factor}_k
+   &=\frac{P_{k-1}-P_k}{\Delta P_{{\rm QHSE},k}},\\
+ \nabla_{L,\rm eff,k}
+   &=\mathrm{pressure\_gradient\_factor}_k\,\nabla_{L,k}.
+  \label{eq:dynamicgradl}
+\end{align}
+Here $\Delta P_{{\rm QHSE},k}=-G_km_{g,k}\Delta m_f/(4\pi r_k^4)$
+on the nonrotating, fixed-mass background accepted by LNA, with
+$\Delta m_f=(\Delta m_{k-1}+\Delta m_k)/2$.
+Both TDC and the default one equation RSP2 gradient closure retain the product rule:
+\begin{align}
+ \delta\nabla_{L,\rm eff,k}
+   &=\mathrm{pressure\_gradient\_factor}_k\,\delta\nabla_{L,k}\notag\\
+   &\quad+\nabla_{L,k}\,\delta\mathrm{pressure\_gradient\_factor}_k,\\
+ \delta\mathrm{pressure\_gradient\_factor}_k
+   &=\frac{\delta P_{k-1}-\delta P_k}{\Delta P_{{\rm QHSE},k}}
+     +4\,\mathrm{pressure\_gradient\_factor}_k\,\delta\ln r_k.
+\end{align}
+The composition-gradient contribution in $\nabla_L$ is a fixed background
+input to these AD derivatives. In RSP2, \code{compute_RSP2_gradT} stores this
+response in \code{gradT_ad}; the LNA temperature and flux rows use it directly.
+The optional RSP2 moment model instead uses the row consistent mapping in
+Appendix~\ref{app:rsp2-moments}.
+The pressure-ratio perturbation is retained even when its background value
+is one. The control defaults to false. The helper leaves $\nabla_L$ unchanged
+at the surface, without an active hydro velocity variable, or when the ratio
+is undefined. It does the same at $k=N$ with \code{R_center > 0} if the ratio
+is nonpositive.
+Its pressure difference includes the selected MLT turbulent pressure, using
+\code{mlt_vc_old} in that coefficient. Its Ledoux support is incomplete: the uncommon
+\code{get_brunt_B} fallback already uses the QHSE pressure interval, so its
+composition contribution receives an extra pressure-ratio factor.
+The TDC length passed to \code{set_TDC_LNA} is
+\begin{align}
+  H_P^* &=
+  \begin{cases}
+  H_P,&\beta_h\leq 0,\\
+  P/(\rho g),&\beta_h>0,
+  \end{cases}\\
+  \Lambda_0 &= \alpha_{\mathrm{MLT}}H_P^*,\\
+  \Lambda &=
+  \begin{cases}
+  \Lambda_0,&\beta_h\leq 0,\\
+  \left(\Lambda_0^{-1}+(\beta_h r)^{-1}\right)^{-1},&\beta_h>0,
+  \end{cases}\\
+  \alpha_{\mathrm{eff}} &=
+  \begin{cases}
+  \alpha_{\mathrm{MLT}},&\beta_h\leq 0,\\
+  \Lambda/H_P^*,&\beta_h>0.
+  \end{cases}
+\end{align}
+Here \code{get_mlt_mixing_length} evaluates $\Lambda$. Thus the LNA and
+nonlinear TDC paths differentiate the same harmonic length.
+The local MLT call supplies $\Gamma$.  The environmental excess is
+\begin{equation}
+  Y_{\mathrm{env}}=
+  \begin{cases}
+  Y\Gamma/(1+\Gamma),&Y>0\text{ and the MLT correction is enabled},\\
+  Y,&\text{otherwise}.
+  \end{cases}
+  \label{eq:yenv}
+\end{equation}
+The TDC call to \code{set_TDC_LNA} sets the nonlinear enthalpy flux limiter
+to false. The TDC coefficients are
+\begin{align}
+  S_0 &=\alpha_Sx_S\alpha_{\mathrm{eff}}\frac{C_PT}{H_P^*}
+       \nabla_{\mathrm{ad}}Y_{\mathrm{env}}+E_q/w,
+       \label{eq:tdcsource}\\
+  D_0 &=\frac{\alpha_Dx_D}{\Lambda},\\
+  D_{R0} &=4\sigma_{\mathrm{SB}}
+    \left(\frac{\alpha_Rx_R}{\Lambda}\right)^2
+    \frac{T^3}{\rho^2C_P\kappa}.
+\end{align}
+Here $E_q/w=0$ for the static first order operator.  The two algebraic
+luminosities are
+\begin{align}
+  L_{\mathrm{rad}} &=L_0\nabla_{\mathrm{actual}},\\
+  L_{\mathrm{conv}} &=\alpha_C\alpha_{\mathrm{eff}}\alpha_c\rho TC_P
+     4\pi r^2A Y_{\mathrm{env}},
+  \qquad \alpha_c=\frac{1}{2}\sqrt{\frac{2}{3}}.
+\end{align}
+They enter Equation~\eqref{eq:tdclum}.
+
+The TDC cell eddy-viscosity length is the shared cell-local
+$\Lambda_{\mathrm{cell},k}$ in Equation~\eqref{eq:cell-mixing-length}.
+Both nonlinear TDC and \code{tdc_chi_coefficient_for_star_LNA} call
+\code{get_TDC_mixing_length_cell}. At a static zero-shear background,
+the perturbation of the stress coefficient multiplies zero shear, so the
+first-order viscous force uses its background value times the perturbed
+velocity shear. Face lengths used by the TDC convection closure and
+u-grid viscosity retain their face definition.
+
+
+\section{RSP2 convection coefficients}
+\label{app:rsp2}
+
+These coefficients supply the transport, turbulent-energy, and independent
+flux rows in Sections~\ref{sec:transport-row} and \ref{sec:rsp2-rows}.
+Their AD values are calculated in \code{hydro_rsp2.f90} and reused by
+\path{star_LNA_turbulence_closures.f90}.
+The PII, convective luminosity and buoyant source formulas below describe
+the default one equation model. Appendix~\ref{app:rsp2-moments} gives their
+replacements for the optional moment model. Mixing lengths, turbulent
+pressure, kinetic energy transport and viscosity retain their existing forms.
+
+\subsection{Face state and velocity--entropy correlation}
+
+RSP2 stores $w$ in cells. Its face value is
+\begin{equation}
+ w_f=a_fw_k+(1-a_f)w_{k-1},\qquad
+ a_f=\begin{cases}
+ \Delta m_{k-1}/(\Delta m_{k-1}+\Delta m_k),&\text{mass interpolation},\\
+ 1/2,&\text{otherwise}.
+ \end{cases}
+\end{equation}
+These are the weights in \path{get_RSP2_alfa_beta_face_weights}.
+
+\begin{equationblock}
+PII has units of specific entropy, with the turbulent-speed factor applied
+separately in luminosity and source. With $x_S=x_C=\tfrac12\sqrt{2/3}$,
+\path{compute_PII_from_Y} evaluates
+\begin{equation}
+ \mathrm{PII}_f=x_S\frac{\Lambda_f}{Hp_f}C_{P,f}Y_f,
+ \qquad Y_f=\nabla_f-\nabla_{L,\rm eff,f}.
+ \label{eq:pii}
+\end{equation}
+Hp and $\Lambda$ come from the shared TDC length functions. The ratio
+$\Lambda/Hp$ cannot in general be replaced by $\alpha_{\rm MLT}$ when
+harmonic lengths are selected. PII is zero at $k=1,N$ and in the selected
+forced-nonturbulent face region.
+
+The same signed PII enters convective luminosity and buoyant driving.
+Its perturbation is the product rule
+\begin{align}
+ \delta\mathrm{PII}_f
+ &=x_S\frac{\Lambda_f}{Hp_f}C_{P,f}\,\delta Y_f\notag\\
+ &\quad+x_SY_f\left[
+   \frac{C_{P,f}}{Hp_f}\delta\Lambda_f
+   +\frac{\Lambda_f}{Hp_f}\delta C_{P,f}
+   -\frac{\Lambda_f C_{P,f}}{Hp_f^2}\delta Hp_f\right].
+\end{align}
+This form remains regular at $Y_f=0$ and retains the response for either
+sign of Y. Nonlinear hydro and RSP2 LNA use the same \code{PII_ad}; face
+weights are held fixed during the perturbation. There is no local inversion
+of luminosity to recover Y.
+\end{equationblock}
+
+\subsection{Radiative, convective, and turbulent fluxes}
+
+The gradient is now evaluated directly:
+\begin{equation}
+ \nabla_f=\nabla_{L,\rm eff,f}+Y_f,\qquad
+ \delta\nabla_f=\delta\nabla_{L,\rm eff,f}+\delta Y_f.
+\end{equation}
+\code{compute_Lrad_coeff}, \code{compute_Lc_terms}, and \code{compute_Lt}
+then supply
+\begin{align}
+ L_{r,f}&=\mathrm{Lrad\_coeff}_f\nabla_f,
+ &\mathrm{Lrad\_coeff}_f&=
+ \mathcal A_f\frac{4acT_f^4}{3\kappa_f\rho_f Hp_f},\\
+ L_{c,f}&=\mathcal A_fw_f\frac{x_C}{x_S}(\rho T)_f\mathrm{PII}_f,
+ \label{eq:rsp2lc}\\
+ L_{t,k}&=-\alpha_t\mathcal A_k^2(\rho^2)_f\Lambda_fw_f
+                  \frac{w_{k-1}^2-w_k^2}{\code{dm_bar(k)}}.
+\end{align}
+The products $(\rho T)_f$ and $(\rho^2)_f$ are interpolated products,
+not products of separately averaged quantities. The inward turbulent flux at
+the physical inner boundary and the surface turbulent flux are zero.
+The existing forced-nonturbulent masks are retained. The flux residual
+differentiates these expressions directly. For example,
+\begin{equation}
+ \delta L_r=\mathrm{Lrad\_coeff}\,(\delta\nabla_{L,\rm eff}+\delta Y)
+              +\nabla\,\delta\mathrm{Lrad\_coeff}.
+\end{equation}
+At fixed structure and nonnegative w, convective luminosity has a
+nonnegative Y derivative and the radiative term has a positive Y derivative.
+This local property does not prove convergence of the coupled stellar solve.
+TDC retains its own convection relation and viscosity routines.
+
+\subsection{Cell source and damping}
+
+Using the actual cell EOS quantities, the buoyant source is
+\begin{equation}
+ \mathrm{Source}_k=(w_k+w_{\rm seed})
+ \left\langle\frac{\mathrm{PII}}{Hp}\right\rangle_k
+ \frac{P_{{\rm eos},k}\chi_{T,k}}{\rho_k\chi_{\rho,k}C_{P,k}},
+ \label{eq:rsp2source}
+\end{equation}
+where the bracket is half the sum at the two bounding faces for $k<N$,
+and the single available ratio at $k=N$. The source uses cell w after
+averaging the face PII/Hp. It does not average $w\,\mathrm{PII}/Hp$
+from faces; with zero seed it vanishes when the cell w is zero, even if an
+adjacent cell carries convection. With
+$x_D=(8/3)\sqrt{2/3}$ and $x_R=2\sqrt3$, the damping terms are
+\begin{align}
+ D_k&=\alpha_d x_D\frac{w_k^3}{\Lambda_{\mathrm{cell},k}},
+ \label{eq:rsp2damp}\\
+ D_{r,k}&=4\sigma_{\rm SB}(\alpha_r x_R)^2
+ \frac{w_k^2T_k^3}{\rho_k^2 C_{P,k}\kappa_k\Lambda_{\mathrm{cell},k}^2}.
+ \label{eq:rsp2raddamp}
+\end{align}
+These are \code{compute_Source}, \code{compute_D}, and \code{compute_Dr}.
+The LNA coupling wrapper uses those routines and returns
+$C=\mathrm{COUPL}=\mathrm{Source}-D-D_r$.
+The former independently calculated cell Hp is not used in damping.
+
+\section{Eddy viscosity: both grids and both work forms}
+\label{app:viscosity}
+
+TDC viscosity is implemented in \code{tdc_hydro.f90}; RSP2 viscosity is in
+\code{hydro_rsp2.f90}.
+Only the scale-height and mixing-length functions are shared. This keeps
+RSP2 cell w separate from TDC face $v_c/\sqrt{2/3}$.
+The static LNA uses the equilibrium stress coefficients described below.
+
+\subsection{Face velocity: cell stress}
+
+For face velocity v, both models use $\Lambda_{\mathrm{cell},k}$, but the
+stress velocity is $w_k$ in RSP2 and
+$(v_{c,k}+v_{c,k+1})/(2\sqrt{2/3})$ in TDC. Only half the available TDC face
+value is used at the innermost cell. The cell stress is
+\begin{equation}
+ Chi_k=\frac{16\pi}{3}\frac{\alpha_m\rho_k^2}{\Delta m_k}
+       \frac{r_k^6+r_{k+1}^6}{2}\Lambda_{\mathrm{cell},k}w_{\mathrm{stress},k}
+       \left(\frac{v_k}{r_k}-\frac{v_{k+1}}{r_{k+1}}\right).
+\end{equation}
+Here $w_{\mathrm{stress}}$ denotes the placement just specified; it is not a
+new solver variable. Since the background strain is zero, only the velocity
+variation contributes to $\delta Chi$ at first order. Then
+\begin{equation}
+ \delta Uq_k=\frac{4\pi}{r_k\Delta m_{\mathrm{face},k}}
+                  (\delta Chi_{k-1}-\delta Chi_k).
+\end{equation}
+The dual mass is $(\Delta m_{k-1}+\Delta m_k)/2$ for $k>1$ and
+$\Delta m_1/2$ at the surface. The exterior stress is zero. Nonlinear
+RSP2 also retains the native mass-correction factors in this dual mass;
+LNA does not support those factors.
+\textit{Code:} \code{compute_Chi_cell}, \code{compute_Uq_face}, and the
+LNA \code{static_eddy_Chi_cell_for_star_LNA}/\code{static_eddy_Uq_face_for_star_LNA}.
+
+\subsection{Cell velocity: face stress}
+
+For \code{u_flag}, RSP2 interpolates its cell w to the face using its own
+face weights. TDC uses its stored face $v_c/\sqrt{2/3}$. The face stress is
+\begin{equation}
+ Chi_{f,k}=\frac{16\pi}{3}
+ \frac{\alpha_m\rho_{f,k}^2r_k^6\Lambda_{f,k}w_{f,k}}
+      {\Delta m_{\mathrm{face},k}}
+ \left(\frac{u_{k-1}}{r_{\mathrm{mid,start},k-1}}
+       -\frac{u_k}{r_{\mathrm{mid,start},k}}\right).
+\end{equation}
+The nonlinear force is
+\begin{equation}
+ \Delta m_k Uq_k=\frac{4\pi}{r_{\mathrm{mid,start},k}}
+                         (Chi_{f,k}-Chi_{f,k+1}).
+\end{equation}
+RSP2 \code{compute_Uq_dm_cell} returns this force. The Riemann momentum
+row divides it by dm exactly once; it is not added to the contact velocity.
+On the static background, the corresponding LNA term is
+\begin{equation}
+ \delta Uq_k=\frac{4\pi}{r_{\mathrm{mid},k}\Delta m_k}
+                         (\delta Chi_{f,k}-\delta Chi_{f,k+1}).
+ \label{eq:uqcell}
+\end{equation}
+\textit{Code:} \code{static_eddy_Chi_face_for_star_LNA} and
+\code{Uq_cell_for_star_LNA}. Density, length, and w perturbations multiply
+zero background strain, so their products have no first-order contribution.
+
+The surface face stress is zero. A positive \code{R_center} permits an inner
+boundary stress when \path{TDC_include_inner_boundary_eddy_viscosity} is true.
+RSP2 also requires an empty inner forced-nonturbulent region.
+It uses $R_{\rm center}$, $\rho_N$, $\Lambda_{f,N}$, and mass
+$\Delta m_N/2$. Its turbulent velocity is the innermost cell w for RSP2,
+and $v_{c,N}/\sqrt{2/3}$ for TDC. The strain is
+$u_N/r_{\mathrm{mid,start},N}-v_{\rm center}/R_{\rm center}$; the prescribed
+inner velocity has zero perturbation. A temperature-selected LNA domain does
+not create this physical boundary.
+
+\subsection{Nonlinear heating and the work identity}
+
+Use the same stress in momentum and heating. On the v grid,
+\begin{equation}
+ Eq_k=\frac{4\pi Chi_k}{\Delta m_k}
+ \left(\frac{v_k^{\rm work}}{r_k^{\rm work}}
+       -\frac{v_{k+1}^{\rm work}}{r_{k+1}^{\rm work}}\right).
+\end{equation}
+On the u grid, first evaluate the face-specific heating,
+\begin{align}
+ Eq_{f,k}&=\frac{4\pi Chi_{f,k}}{\Delta m_{\mathrm{face},k}}
+ \left(\frac{u_{k-1}^{\rm work}}{r_{\mathrm{mid,start},k-1}}
+       -\frac{u_k^{\rm work}}{r_{\mathrm{mid,start},k}}\right),\\
+ Eq_k&=\tfrac12(Eq_{f,k}+Eq_{f,k+1}).
+\end{align}
+The half-face allocation sums to the full dual mass on an unequal-mass mesh.
+The inner-boundary face has its own half-cell mass and prescribed velocity.
+Summation by parts gives
+\begin{align}
+ \sum_k\Delta m_{\mathrm{face},k}v_k^{\rm work}Uq_k
+  +\sum_k\Delta m_k Eq_k
+  &=-4\pi Chi_N v_{\rm center}/R_{\rm center},&&v\text{ grid},\\
+ \sum_k\Delta m_k u_k^{\rm work}Uq_k
+  +\sum_k\Delta m_k Eq_k
+  &=-4\pi Chi_{f,N+1}v_{\rm center}/R_{\rm center},&&u\text{ grid}.
+\end{align}
+The right sides vanish for zero boundary stress or velocity. For a full center,
+these expressions are understood by the zero-stress limit, not division by zero.
+RSP2 masks stresses at the selected forced regions and retains their force
+divergence at the interface. TDC retains its existing additional momentum
+masks; the unrestricted identity is not asserted across those masks.
+
+The four \code{dedt} cases have distinct energy-source terms:
+\begin{center}
+\small
+\begin{tabular}{@{}llll@{}}
+\toprule
+Grid & Local PdV & Energy source from viscosity & Explicit mechanical inertia\\
+\midrule
+v & true  & $Eq_k$ & none\\
+v & false & $Eq_k+\tfrac12(\bar v_kUq_k+\bar v_{k+1}Uq_{k+1})$ & $K+\Phi$\\
+u & true  & $Eq_k$ & none\\
+u & false & $Eq_k+\bar u_kUq_k$ & $K+\Phi$\\
+\bottomrule
+\end{tabular}
+\end{center}
+Here $\bar v=(v+v_{\rm start})/2$ and similarly for u. The v-grid power
+also includes the native cell mass-correction factor when enabled in nonlinear
+hydro. Conservative work always uses these averaged velocities, including
+when optional velocity time centering is off. For local PdV work, heating uses
+the average only if velocity time centering is on; otherwise it uses the current
+velocity. The latter is a current-velocity power identity, not exact
+finite-step kinetic-energy change. RSP2 \code{eps_grav} retains Eq but no
+explicit Uq power or mechanical inertia, for either setting of the work control.
+
+TDC's explicit-momentum option uses old convective velocity in momentum and
+current velocity in heating. This intentionally distinct choice is unchanged;
+same-stress cancellation then has a lag difference. RSP2 uses current cell w
+in both terms and does not inherit that TDC option.
+
+\subsection{Static energy order}
+
+On a zero-velocity background, $Uq=O(\delta)$ and
+$Eq=O(\delta^2)$. Thus
+\begin{equation}
+ \delta(vUq)=\delta(uUq)=0,\qquad \delta Eq=0.
+\end{equation}
+\code{turbulent_viscous_heating_for_star_LNA} returns zero, while the
+first-order Uq response remains in momentum. The nonlinear work comparisons
+above therefore explain conservation without introducing additional LNA rows.
+
+\subsection{Optional three equation closure and discretization}
+\label{app:rsp2-moments}
+
+\paragraph{Pi and PII.}
+PII has units of specific entropy. Pi has units of specific entropy times
+velocity. The old luminosity is
+$L_{c,f}=\mathcal A_f(\rho T)_fw_f\mathrm{PII}_f$, whereas the new closure is
+\begin{align}
+ L_{c,f}&=\mathcal A_f\rho_fT_f\mathrm{Pi}_f,\\
+ \delta L_{c,f}&=\mathcal A_f\rho_fT_f\delta\mathrm{Pi}_f
+ +\mathrm{Pi}_f\delta(\mathcal A_f\rho_fT_f).
+\end{align}
+Pi replaces the algebraic heat transport closure. PII is not another solver
+variable in this mode. Its retained diagnostic is $\mathrm{Pi}_f/w_f$ when
+$w_f>0$, and zero when both vanish. When creating missing moments at an
+unforced, unstable face with positive old $L_c$, the initial Pi is that
+luminosity divided by the new $\mathcal A_f\rho_fT_f$; different face
+interpolations mean this need not equal the old $w_f\mathrm{PII}_f$.
+The initial variance is $3\mathrm{Pi}_f^2/(2e_{t,f})$ for positive face energy.
+Other faces start with zero Pi and Phi, retaining their turbulent energy.
+This initial-state assumption preserves the imported heat flux only at the
+selected unstable faces; it does not assert moment equilibrium or modify
+an existing three equation restart state.
+
+\paragraph{Face state, source and cooling.}
+The new closure uses the common reconstructed face EOS when enabled, or
+the selected RSP2 face weights for each EOS quantity. Buoyancy uses the
+resolved cell pressure difference:
+\begin{equation}
+ \left(-\frac{\partial_r P}{\rho}\right)_f
+ =\frac{\mathcal A_f(P_k-P_{k-1})}{(\Delta m_{k-1}+\Delta m_k)/2}.
+\end{equation}
+The cell source reconstructs the correlation with the local cell velocity:
+\begin{equation}
+ S_k=\frac12\sum_{f=k,k+1}
+ \frac{w_k}{\sqrt{e_{t,f}}}
+ \left(-\frac{\partial_r P}{\rho}\right)_f
+ \frac{\chi_{T,f}}{\chi_{\rho,f}C_{P,f}}\mathrm{Pi}_f .
+\end{equation}
+Forced faces contribute zero. A zero energy face with zero Pi contributes
+zero without division; nonzero Pi at zero face energy is invalid.
+The reconstruction makes the source vanish in an empty cell without
+removing moment evolution at its interface with a turbulent neighbor.
+The cooling rate and two new coefficients are
+\begin{equation}
+ \tau_{{\rm rad},f}^{-1}=
+ \frac{4\sigma_{\rm SB}(\alpha_Rx_R)^2T_f^3}
+ {C_{P,f}\kappa_f\rho_f^2\Lambda_f^2},\qquad
+ \alpha_{\mathrm{Pi}}=6\sqrt{2/3},\quad
+ \alpha_{\mathrm{Phi}}=4\sqrt{2/3}.
+\end{equation}
+The alpha symbols are the effective coefficients. In source they are
+\code{RSP2_alfa_pi*x_ALFAPI} and \code{RSP2_alfa_phi*x_ALFAPHI};
+the two controls default to one, and the fixed factors above are stored
+in \code{hydro_rsp2}. These are the local MLT calibration listed in
+\href{https://arxiv.org/html/2604.06151v1#S2}{Braun et al. (2026), section 2},
+not that paper's fitted solar coefficients. The factor of two
+in variance cooling follows from evolving the full $\langle s'^2\rangle$.
+
+The normalization of the two existing controls is
+\begin{equation}
+ \gamma_r=2\sqrt3\,\code{RSP2_alfar},\qquad
+ \alpha_\omega=\code{RSP2_alfat}.
+\end{equation}
+Braun et al. (2026), Table 1, list $\gamma_r=3.46$ and
+$\alpha_\omega=0.25$. These correspond to \code{RSP2_alfar=1d0}
+and \code{RSP2_alfat=0.25d0}; the present defaults are both zero.
+The cooling rate scales as \code{RSP2_alfar} squared. Its physical role changes
+with the model: the default model loses cell turbulent energy through
+$D_r=e_t/\tau_{\rm rad}$, while the three equation model cools face Pi and Phi
+at rates $1/\tau_{\rm rad}$ and $2/\tau_{\rm rad}$ and has no direct $D_r$.
+Alfat controls kinetic energy diffusion with coefficient
+$\alpha_\omega\Lambda\sqrt{e_t}$ in both models. There is no extra
+$\sqrt{2/3}$ in its coefficient and no added transport of Pi or Phi.
+Matching coefficients does not make the face interpolation, mixing length
+prescription or complete models identical.
+
+\paragraph{Entropy driving and the temperature row.}
+\code{get_rsp2_thermal_gradient} maps the selected temperature relation to
+its radial thermal differential. At uniform composition,
+\begin{equation}
+ (-\partial_r s)_f=C_{P,f}\left[
+    (-\partial_r\ln T)_{{\rm row},f}
+       -\nabla_{{\rm ad},f}(-\partial_r\ln P)_{{\rm actual},f}\right].
+\end{equation}
+The QHSE and radiation pressure forms use the EOS differential
+\begin{equation}
+ (-\partial_r\ln P)_{{\rm actual},f}
+ =\frac{\mathcal A_f\rho_f(P_k-P_{k-1})}{\Delta m_{c,f}P_f}.
+\end{equation}
+The logarithmic row uses its actual logarithmic pressure difference instead.
+For QHSE, the coefficient multiplying $\nabla_T$ is
+$-\mathcal A_f\rho_f h_fT_{*,f}/T_f$; for radiation pressure it is
+$\rho_f\kappa_fL_{r,\mathrm{coeff},f}/
+(4c\mathcal A_f\lambda_fP_{{\rm rad},f})$.
+The logarithmic row uses
+$\mathcal A_f\rho_f\ln(P_k/P_{k-1})/\Delta m_{c,f}$.
+The radiation coefficient, opacity floor and boundary spacing are shared
+with the actual temperature row.
+
+For the first two forms, define the neutral gradient using the selected
+reference pressure differential and the temperature coefficient just given.
+Dynamic gradL uses the actual pressure differential; static gradL uses the
+HSE pressure differential. The algebraically equivalent evaluation is
+\begin{equation}
+\begin{aligned}
+ (-\partial_r s)_f=C_{P,f}\big[&
+ (-\partial_r\ln T)_{\nabla_T=1,f}\,Y_f
+ +B_f(-\partial_r\ln P)_{{\rm ref},f}\\
+ &+\nabla_{{\rm ad},f}\{
+ (-\partial_r\ln P)_{{\rm ref},f}
+ -(-\partial_r\ln P)_{{\rm actual},f}\}\big].
+\end{aligned}
+\end{equation}
+Here $B_f$ is the existing composition contribution to gradL. The dynamic
+branch cancels the last difference analytically. The logarithmic form uses
+$\nabla_L=\nabla_{\rm ad}+B$ and
+$(-\partial_r s)=C_P(-\partial_r\ln P)_{\rm log}(Y+B)$.
+All current structure derivatives are retained; the existing composition
+coefficient is held fixed in thermal AD. These algebraic cancellations
+change neither implicitness nor luminosity time weights. Nonlinear
+\code{constant_L} retains a measured entropy differential; LNA still excludes
+that temperature row.
+
+\paragraph{Mean velocity strain.}
+For cell velocity, the face strain is
+$\mathcal A_f\rho_f(u_{k-1}-u_k)/\Delta m_{c,f}$.
+For face velocity it is
+\begin{equation}
+ (\partial_r v)_f=a_f\frac{v_k-v_{k+1}}{r_k-r_{k+1}}
+ +(1-a_f)\frac{v_{k-1}-v_k}{r_{k-1}-r_k}.
+\end{equation}
+The latter is exact for an affine radial velocity on an unequal grid.
+It is a deformation term in Pi evolution, with no new viscosity coefficient.
+
+\paragraph{Nonlinear residuals and normalization.}
+Each moment row is its current value minus its accepted value minus
+$\Delta t$ times its current rhs, divided by a fixed start scale.
+Using the same positive luminosity scale $L_{\rm scale}$ as the flux row,
+\begin{align}
+ \mathrm{Pi}_{\rm ref}&=L_{\rm scale}/(\mathcal A\rho T),
+ &v_{\rm ref}&=[L_{\rm scale}/(\mathcal A\rho)]^{1/3},\\
+ \mathrm{Pi}_{\rm scale}&=\max(|\mathrm{Pi}_{\rm start}|,\mathrm{Pi}_{\rm ref}),
+ &\mathrm{Phi}_{\rm scale}&=\max(\mathrm{Phi}_{\rm start},
+                \tfrac32[\mathrm{Pi}_{\rm ref}/v_{\rm ref}]^2).
+\end{align}
+These also scale the new solver columns. They impose no bound on Pi.
+The one-equation RSP2 model retains the original normalized turbulent energy
+residual for nonzero accepted energy. The three-equation model multiplies
+that residual by $\max(1,c_s/w)$. For $0<w<c_s$, known factors of $w$
+are canceled term by term before differentiation. In particular,
+$(w^2-w_{\rm start}^2)/w=w-w_{\rm start}^2/w$ retains its derivative
+$1+(w_{\rm start}/w)^2$, and the explicit numerator $w$ cancels from
+the buoyancy source. Face energy and all remaining state derivatives are
+retained. Face transport and $u$ grid stress use the exact ratio
+$[a w+(1-a)w_{\rm neighbor}]/w=a+(1-a)w_{\rm neighbor}/w$;
+accepted energy, pressure and flux terms remain divided by current $w$.
+Remaining quotients use $q=x/w$, $\delta q=(\delta x-q\delta w)/w$,
+avoiding an intermediate $1/w^2$ that can overflow at tiny $w$.
+Physical equations and time weights are unchanged. At a stationary positive
+energy background, scaling both stiffness and inertia preserves the LNA
+eigenvalues. The zero energy branch is selected as described with the
+moment equations.
+The companion RSP3 manuscript gives the complete divided row.
+At a factorizable zero accepted energy, the analytic canceled row selects the zero
+or positive branch in either model. The three-equation divided row retains
+a positive trial value when accepted energy or surviving moments require it.
+The energy test includes exact underflow of $w_{\rm start}^2$ to zero;
+positive representable history is retained. No denominator floor is used.
+The positive multiplier is at least one, so meeting the scaled residual
+tolerance also meets the original normalized energy tolerance.
+
+The local isotropic closure does not guarantee
+$\mathrm{Pi}_f^2\leq(2/3)e_{t,f}\mathrm{Phi}_f$.
+Independent interpolation and kinetic energy transport do not establish that
+bound either. The covariance excess profile reports the difference; it does
+not limit heat flux. The two new moment perturbations are included in LNA
+eigenfunction output, and setup reports their dimensional equilibrium defects.
+
+\section{Mode and work conventions}
+
+Finite positive frequency roots are sorted by increasing $\omega$.  The
+selected list applies the frequency floor and the existing growth controls
+to
+\begin{equation}
+  g_{\ln K}=\code{logKE_per_cycle}
+  =\frac{4\pi\gamma}{\omega}.
+  \label{eq:logke}
+\end{equation}
+This is logarithmic kinetic energy growth per cycle, not a generic GYRE
+$\eta$.  Derived output quantities are
+\begin{align}
+  \frac{\Delta K}{K} &=\exp(g_{\ln K})-1,\\
+  \mathrm{GREKM} &=2\tanh(g_{\ln K}/2),\\
+  \frac{\Delta a}{a} &=\exp(g_{\ln K}/2)-1.
+\end{align}
+The old \code{star_LNA_*_eta} identifiers are retained for inlist
+compatibility, but comments and files state that they filter
+\code{logKE_per_cycle}.
+
+The optional velocity initialization combines the selected complex velocity
+eigenfunctions.  For mode $j$, the surface-phase normalization is
+\begin{equation}
+  \widehat{\delta v}_{j,k}=\frac{\delta v_{j,k}}{\delta v_{j,1}}.
+\end{equation}
+The requested fractions are applied to these normalized eigenfunctions, and
+the real velocity is scaled to \code{star_LNA_kick_vsurf_km_per_sec} at the
+surface.  This preserves the computed velocity phase and amplitude instead of
+constructing a velocity profile from displacement amplitudes.
+With \code{u_flag}, the active eigenfunction is cell velocity. The kick
+updates its solver state and rebuilds the Riemann face velocities and their
+start values. Only the velocity state is initialized.
+
+Pressure work is reported with the RSP phase convention
+\begin{equation}
+  W_{P,k}=-\pi\Delta m_k
+  \operatorname{Im}\left(\delta P_k^*\delta\nu_k\right),
+\end{equation}
+where $\nu=1/\rho$ is specific volume and
+$\delta\nu_k=-\delta\ln\rho_k/\rho_k$. The result is divided by the modal
+kinetic energy normalization. EOS and RSP2 turbulent
+pressure perturbations use the same closure as the operator.  The eddy viscosity
+and luminosity terms have not been compared with RSP/RSP2 work output.  The
+reported \code{total_work} is an arithmetic sum of six diagnostics: EOS
+pressure, turbulent pressure, eddy viscosity, and radiative, convective,
+and turbulent luminosity work. These six quantities have not been derived
+and validated as one discrete work balance against Equation~\eqref{eq:logke}.
+Pressure work and luminosity-based thermal diagnostics need not represent
+independent energy exchanges, so their simple addition is not an established
+decomposition of net modal driving. A consistent work identity should provide
+an independent check of the eigenvalue growth. This limitation of the
+postprocessing does not itself establish an error in the eigenvalue.
+
+Routine \code{eddy_viscous_work_for_star_LNA} uses the acceleration from the
+same momentum operator. Before division by modal kinetic energy,
+\begin{equation}
+  W_{q,k}=\frac{\pi\Delta m_k}{|\omega|}
+  \begin{cases}
+    \operatorname{Re}(\delta u_k^*\delta U_{q,k}),&\code{u_flag},\\
+    \tfrac12\operatorname{Re}(\delta v_k^*\delta U_{q,k}
+       +\delta v_{k+1}^*\delta U_{q,k+1}),&\text{face velocity}.
+  \end{cases}
+\end{equation}
+Perturbations below the active domain are zero. The normalization is
+$K=\tfrac12\sum_k\Delta m_{v,k}|\delta v_{{\rm rad},k}|^2$, using cell
+masses for $u$ and \code{star_LNA_dm_face} for $v$.
+
+
+\section{Schema 130 TDC background export}
+
+When \code{gyre_data_schema = 130} and
+\code{gyre_write_tdc_lna_background = .true.},
+\sourcefile{star/private/pulse_gyre.f90} writes the standard schema-120 columns
+1 through 19 followed by the columns in Table~\ref{tab:schema130}.  The exporter
+writes background data only; it does not run GYRE or define GYRE's perturbation
+equations.
+
+Schema 130 does not carry the harmonic TDC mixing length. When
+\path{harmonic_dissipation_length_beta} is positive, MESA writes a warning and
+still exports the legacy \code{mixing_length_alpha} and \code{Hp_face} fields.
+The legacy length represented by these fields is
+\begin{equation}
+  \Lambda_{\mathrm{GYRE}}=\alpha_{\mathrm{MLT}}H_P,
+\end{equation}
+which differs from the harmonic $\Lambda$ used by MESA. This describes the
+MESA exporter; changes in a separate GYRE checkout do not change the STAR LNA
+operator or this file schema.
+
+\begin{table}[htbp]
+\centering
+\footnotesize
+\caption{Additional schema 130 point columns.}\label{tab:schema130}
+\begin{tabular}{@{}rll@{}}
+\toprule
+Column & Source quantity & Meaning \\
+\midrule
+20 & \code{L_conv} & background convective luminosity $L_{c,0}$ \\
+21 & \code{mlt_vc/sqrt_2_div_3} & TDC amplitude $A_0$ \\
+22 & \code{i_tdc_d_conv_h} & inferred diffusivity $D_{\mathrm{conv}}$ \\
+23 & \code{Hp_face} & face pressure scale height \\
+24 & \code{mixing_length_alpha} & $\alpha_{\mathrm{MLT}}$ \\
+25 & \code{Cp_face} & face specific heat \\
+26 & \code{chiT_face} & $\chi_T$ \\
+27 & \code{chiRho_face} & $\chi_\rho$ \\
+28 & \code{gradL} & Ledoux gradient \\
+29 & \code{gradT} & actual temperature gradient \\
+30 through 35 & TDC controls & $\alpha_C,\alpha_S,\alpha_D,\alpha_R,\alpha_{Pt},\alpha_M$ \\
+36 & logical as real & include the MLT correction \\
+37 & \code{mlt_Pturb_factor} & MLT turbulent pressure factor \\
+38 & inferred & background MLT turbulent pressure \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The exported diffusivity is inferred by \code{store_tdc_lna_point_env} from
+\begin{equation}
+  F_{\mathrm{conv}}
+  =\rho TC_P D_{\mathrm{conv}}
+  \frac{\nabla_T-\nabla_L}{H_P},
+\end{equation}
+so
+\begin{equation}
+  D_{\mathrm{conv}}
+  =\frac{L_{\mathrm{conv}}H_P}
+  {4\pi r^2\rho TC_P(\nabla_T-\nabla_L)}
+\end{equation}
+when the denominator and $L_{\mathrm{conv}}$ are positive. Its units are
+$\mathrm{cm^2\,s^{-1}}$; the earlier label $D_{\mathrm{conv}}H_P$ was
+inconsistent with this equation and the exporter. The exported
+turbulent pressure is
+\begin{equation}
+  P_{\mathrm{t,MLT},0}
+  =f_{\mathrm{Pt}}\frac{\rho_fv_c^2}{3}.
+\end{equation}
+
+
+\section{Audit files and restrictions}
+
+With \code{star_LNA_write_matrix_summary = .true.}, the source writes
+\begin{itemize}
+\item \code{<prefix>_matrix_summary.data}, including matrix dimensions, nonzero
+      counts, norm ranges, residuals, and equation counts;
+\item \code{<prefix>_row_structure.data}, including the equation name, nonzero
+      counts, and dominant A/B variable for every row;
+\item \code{<prefix>_rsp2_term_audit.data} on RSP2 backgrounds, including
+      PII, $L_c$, $L_t$, source, damping, radiative damping, turbulent pressure
+      work coefficient, divergences, RHS, and inertia; and
+\item \code{<prefix>_tdc_face_audit.data} for active TDC, including active and
+      stored face states, background convection quantities, closure
+      luminosities, velocity RHS, and inertia.
+\end{itemize}
+When the full-pencil residual rejects a root that otherwise passes the mode
+heuristics, the terminal output identifies the first such period and its
+maximum-residual row, zone, and row variable.
+
+The source has the following restrictions:\par
+\begin{itemize}
+\setlength{\itemsep}{1pt}
+\setlength{\parsep}{0pt}
+\item no rotation, RTI, mass correction, or velocity drag;
+\item no \path{use_compression_outer_BC}, \code{constant_L}, user
+      \code{other_*};
+\item \code{eps_grav} is supported only for RSP2; no nonzero \code{mstar_dot};
+\item active RSP2 or MLT turbulent pressure with \code{u_flag} requires
+      \path{star_LNA_perturb_turbulent_pressure} to be true;
+\item the optional initial velocity kick requires \code{v_flag} or
+      \code{u_flag}; the \code{u_flag} path rebuilds the Riemann face velocity
+      and initializes its start-of-step state;
+\item RSP2 requires \code{star_LNA_convection_treatment = 'perturbed'};
+\item no derivative of the nonlinear enthalpy flux limiter in the TDC
+      operator;
+\item dense all roots scaling with model zone count;
+\item the six-column \code{total_work} diagnostic is not a derived discrete
+      work balance against the eigenvalue growth.
+\end{itemize}
+
+\code{check_star_LNA_model} rejects incompatible controls. Setup output lists
+accepted controls that alter the linearization. The existing three-zone AD
+stencil can drop farther-neighbor derivatives after shifts; the assembled
+operator retains that supported stencil, rather than an unrestricted
+full-band derivative of every composite closure.
+
+
+\section{Surface boundary details and source map}
+\label{app:surface-details}
+
+\subsection{Atmospheric boundary offsets}
+
+The ordinary atmospheric temperature condition uses
+\begin{align}
+  T_{\rm bc}&=T_{\rm atm}+\Delta T_0,\qquad
+  \Delta T_0=\Delta P_0\frac{\nabla_1T_1}{P_{{\rm eos},1}},\\
+  \Delta P_0&=\frac{G_1m_{g,1}\Delta m_1}{8\pi r_1^4}.
+\end{align}
+The offset is retained for both choices of \code{use_momentum_outer_BC}
+and differentiated with AD. At fixed mass and composition,
+\begin{align}
+  \delta\Delta T_0
+  &=\frac{\Delta P_0T_1}{P_{{\rm eos},1}}\,\delta\nabla_1
+    +\Delta T_0\left[-4\delta\ln r_1
+       +(1-\chi_{T,1})\delta\ln T_1-\chi_{\rho,1}\delta\ln\rho_1\right],\\
+  \delta\ln T_{\rm bc}
+  &=\frac{T_{\rm atm}\delta\ln T_{\rm atm}+\delta\Delta T_0}
+          {T_{\rm atm}+\Delta T_0}.
+\end{align}
+The atmosphere supplies $\delta\ln T_{\rm atm}$, including its supported
+opacity, luminosity, and radius responses. This is the boundary variation
+used in the surface-temperature row in Section~\ref{sec:thermal-boundary}.
+
+When \code{use_momentum_outer_BC} and
+\path{floor_momentum_outer_BC_at_Prad} are true, the momentum boundary uses
+\begin{equation}
+  P_{\rm bc}=\max\left(P_{\rm bc}^{\rm raw},\,aT_{\rm atm}^4/3\right).
+\end{equation}
+On the floored branch, $\delta\ln P_{\rm bc}=4\delta\ln T_{\rm atm}$;
+otherwise the pre-floor pressure response is retained. Momentum pressure
+remains at the outer face, while the temperature offset places the
+temperature at the center of cell 1. The luminosity boundary in
+Section~\ref{sec:thermal-boundary} uses no atmospheric temperature offset.
+
+
+\paragraph{Nonlinear surface-row details.}
+The RSP2-specific switch defaults to true; the shared switch defaults to false.
+With both off, the normal atmosphere temperature condition applies. The
+separate \code{constant_L} override is rejected by STAR LNA.
+The nonlinear RSP2 row, \code{do1_rsp2_L_eqn}, uses current area
+$4\pi r_1^2$ and normalizes by
+$\max(|L_{r,1}|,|L_1|,1\,\mathrm{erg\,s^{-1}})$; $L_{c,1}=L_{t,1}=0$.
+The shared \code{set_RSP_Lsurf_BC} uses \code{maxval(L_start)} and, when
+velocity time centering is active, the area
+\begin{equation}
+ \mathcal A_1^{\rm hydro}=\frac{4\pi}{3}
+ \left(r_1^2+r_1r_{1,\rm start}+r_{1,\rm start}^2\right).
+\end{equation}
+Thus the two nonlinear rows can differ during a step. Their static boundary
+values agree; the continuous LNA uses current area and the linearized row
+above, without finite-step centering. The additional RSP2 surface row remains
+$Y_1=0$ and does not duplicate this luminosity boundary.
+
+\subsection{Source files}
+
+The row routines cited in the main text are in the following files:
+
+\begin{itemize}
+\setlength{\itemsep}{1pt}
+\setlength{\parsep}{0pt}
+\item \sourcefile{star/private/star_LNA.f90}, for the public solve flow and row
+      assembly order;
+\item \sourcefile{star/private/star_LNA_support.f90}, for rows, matrix
+      construction, algebraic elimination, mode output, work output, and
+      audits;
+\item \sourcefile{star/private/star_LNA_turbulence_closures.f90}, for RSP2 and
+      TDC pressure, luminosity, turbulent energy, and eddy viscosity closures;
+\item \sourcefile{star/private/hydro_rsp2.f90}, for the independent-Y residual,
+      PII closure, shared-length calls, and RSP2 viscosity;
+\item \sourcefile{star/private/tdc_hydro.f90}, for the shared lengths and
+      unchanged TDC viscosity;
+\item \sourcefile{star/private/turb_support.f90}, for the shared dynamical
+      neutral gradient;
+\item \sourcefile{star/private/hydro_temperature.f90} and
+      \sourcefile{star/private/hydro_eqns.f90}, for nonlinear temperature rows
+      and surface-boundary selection;
+\item \sourcefile{star/private/hydro_energy.f90} and
+      \sourcefile{star/private/eps_grav.f90}, for nonlinear energy forms;
+\item \sourcefile{star/private/hydro_riemann.f90} and
+      \sourcefile{star/private/auto_diff_support.f90}, for cell momentum
+      and reconstructed face variables;
+\item \sourcefile{star/private/star_utils.f90}, for discrete mechanical
+      energies;
+\item \sourcefile{turb/public/turb.f90}, routine \code{set_TDC_LNA}, for the
+      local TDC relation; and
+\item \sourcefile{star/private/pulse_gyre.f90}, for the schema 130 TDC
+      background export.
+\end{itemize}
+
+
+\end{document}

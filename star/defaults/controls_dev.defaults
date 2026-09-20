@@ -41,7 +41,7 @@
       !|   RSP2_alfap =     0.0d0         ! turbulent pressure; Pt ~ alfap
       !|   RSP2_alfat =     0.0d0         ! turbulent flux; Lt ~ RSP2_alfat
       !|   RSP2_alfam =     0.25d0        ! turbulent viscosity; Eq and Uq ~ RSP2_alfam
-      !|   RSP2_alfar =     0.0d0         ! radiative dissipation of turbulent energy; Dr ~ RSP2_alfar
+      !|   RSP2_alfar =     0.0d0         ! radiative losses; rate ~ RSP2_alfar**2
       !
       ! RSP2 time weighting is determined by the velocity_time_centering controls.
       !
@@ -60,14 +60,73 @@
 
       ! ::
 
+    ! RSP2_use_3equation_model
+    ! ~~~~~~~~~~~~~~~~~~~~~~~~
+    ! Evolve face entropy flux <v_r*s> and full entropy variance <s*s>.
+    ! Uses local turnover relaxation, without transport of these moments.
+    ! Radiative cooling acts on the entropy moments instead of directly on w**2.
+    ! This experimental isotropic closure does not enforce the covariance bound.
+    ! RSP2 must be enabled separately. Stored moments are retained on restart;
+    ! enabling this option on a one-equation model initializes them once.
+    ! Stable faces start with zero Pi and Phi and retain their turbulent energy.
+    ! Unstable faces retain positive convective flux and its correlated variance.
+    !
+    ! ::
+
+    RSP2_use_3equation_model = .false.
+
+    ! RSP2_alfa_pi, RSP2_alfa_phi
+    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ! Multipliers of local entropy flux and variance relaxation.
+    ! Unit values give the Kuhfuss MLT calibration listed by Braun et al. (2026).
+    ! The fixed coefficients 6*sqrt(2/3) and 4*sqrt(2/3) are in hydro_rsp2.
+    ! Her fiducial solar coefficients 2.155 and 2.0 multiply nonlocal transport,
+    ! not these local decay terms. Her outer local case A instead uses 2.88 and 2.0.
+    ! Neither calibration establishes parameters for this fully local pulsation model.
+    ! ::
+
+    RSP2_alfa_pi = 1d0
+    RSP2_alfa_phi = 1d0
+
     RSP2_alfad = 1.0d0
     RSP2_alfap = 0.0d0
+
+    ! RSP2_alfat
+    ! ~~~~~~~~~~
+    ! Coefficient of turbulent kinetic energy transport in both RSP2 models.
+    ! With e_t = w**2, the diffusion coefficient is RSP2_alfat*Lambda*sqrt(e_t).
+    ! Braun et al. (2026), Table 1, use alpha_omega = 0.25, which corresponds
+    ! to RSP2_alfat = 0.25d0. There is no extra sqrt(2/3) normalization factor.
+    ! This control does not add transport to the local Pi or Phi equations.
+    ! Zero sets Lt to zero; existing turbulence and entropy moments still evolve.
+    ! ::
+
     RSP2_alfat = 0.0d0
     RSP2_alfam = 0.25d0
+
+    ! RSP2_alfar
+    ! ~~~~~~~~~~
+    ! Sets gamma_r = RSP2_alfar*2*sqrt(3), so the cooling rate scales as alfar**2.
+    ! The one equation model applies Dr = e_t/tau_rad using cell quantities.
+    ! With RSP2_use_3equation_model, Dr is absent. Face quantities set tau_rad,
+    ! and cooling enters as -Pi/tau_rad and -2*Phi/tau_rad instead.
+    ! Braun et al. (2026), Table 1, use gamma_r = 2*sqrt(3), listed as 3.46.
+    ! This corresponds to RSP2_alfar = 1d0, not 3.46d0. Zero disables cooling.
+    ! ::
+
     RSP2_alfar = 0.0d0
 
-    RSP2_min_Lt_div_L_for_overshooting_mixing_type = 1d-4
-    RSP2_min_Lc_div_L_for_convective_mixing_type = 1d-4
+    ! RSP2_min_conv_vel_for_mixing_type
+    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ! Minimum face convective velocity (cm/s) for RSP2 mixing labels.
+    ! With positive D_mix and velocity above this threshold, Y_face < 0
+    ! is labeled overshoot and Y_face >= 0 is labeled convection.
+    ! Y_face = gradT - gradL includes the enabled composition and dynamical
+    ! corrections. No condition on Lc or Lt is imposed in either RSP2 model.
+    ! This threshold does not change the velocity or diffusion coefficient.
+    ! ::
+
+    RSP2_min_conv_vel_for_mixing_type = 1d0
 
     RSP2_Lsurf_factor = 0.5d0
 
@@ -93,6 +152,7 @@
     RSP2_num_outermost_cells_forced_nonturbulent = 0
     RSP2_num_innermost_cells_forced_nonturbulent = 0
 
+   ! Retained for inlist compatibility. Negative w is rejected, not replaced.
    RSP2_w_fix_if_neg = 1d-12
    RSP2_source_seed = 0d0
 
@@ -229,8 +289,9 @@
       ! Maximum componentwise backward error accepted for a selected mode. The
       ! residual is evaluated against the original full generalized eigenproblem
       ! after reconstructing and unscaling the eigenvector. Candidate modes with
-      ! an initial residual no larger than 1d-1 are refined against the full
-      ! block-banded pencil before this limit is applied. This must be > 0.
+      ! an initial componentwise residual <= 1d-1 or balanced normwise residual
+      ! <= 1d-6 are refined against the full block-banded pencil. This final
+      ! componentwise limit is unchanged by refinement and must be > 0.
       !
       ! star_LNA_output_file_prefix
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~

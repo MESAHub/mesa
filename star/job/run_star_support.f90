@@ -478,6 +478,9 @@
          call do_star_job_controls_after(id, s, restart, pgstar_ok, ierr)
          if (failed('do_star_job_controls_after',ierr)) return
 
+         call star_set_RSP2_flag(id, s% RSP2_flag, ierr)
+         if (failed('set RSP2 convection model',ierr)) return
+
          if (s% steps_before_remesh_for_TDC_pulsations == 0 .and. &
                s% job% load_saved_model .and. .not. restart) then
             call remesh_for_TDC_pulsation(id, ierr)

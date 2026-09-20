@@ -59,6 +59,10 @@
                if (i <= nvar_hydro) then  ! structure variable
                   if (i == s% i_j_rot) then
                      s% x_scale(i,k) = 10d0*sqrt(s% cgrav(k)*s% m(k)*s% r_start(k))
+                  else if (i == s% i_Pi) then
+                     s% x_scale(i,k) = s% Pi_scale(k)
+                  else if (i == s% i_Phi) then
+                     s% x_scale(i,k) = s% Phi_scale(k)
                   else
                      s% x_scale(i,k) = max(xscale_min, abs(s% xh_start(i,k)))
                   end if
@@ -379,6 +383,14 @@
          else
             skip3 = s% i_w
          end if
+         if (s% RSP2_3equation_flag) then
+            do k=1,nz
+               s% correction_weight(s% i_Pi,k) = &
+                  1d0/max(s% Pi_scale(k), abs(s% Pi(k)))
+               s% correction_weight(s% i_Phi,k) = &
+                  1d0/max(s% Phi_scale(k), abs(s% Phi(k)))
+            end do
+         end if
          ! Include signed Y with the default dimensionless x_scale.
          skip4 = 0
 
@@ -627,6 +639,7 @@
          use const_def, only: dp
          use chem_def, only: chem_isos
          use star_utils, only: current_min_xa_hard_limit, rand
+         use hydro_rsp2, only: rsp2_local_w_equation
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
          real(dp), pointer, dimension(:,:) :: B  ! (nvar, nz)
@@ -642,6 +655,8 @@
 
          if (s% RSP2_flag) &  ! clip change in w to maintain non-negativity.
             call clip_so_non_negative(s% i_w, 0d0)
+         if (s% RSP2_3equation_flag) &
+            call clip_so_non_negative(s% i_Phi, 0d0)
 
          if (s% RTI_flag) &  ! clip change in alpha_RTI to maintain non-negativity.
             call clip_so_non_negative(s% i_alpha_RTI, 0d0)
@@ -718,15 +733,30 @@
          subroutine clip_so_non_negative(i,minval)
             integer, intent(in) :: i
             real(dp), intent(in) :: minval
-            real(dp) :: dval, old_val, new_val
+            real(dp) :: dval, old_val, new_val, lower, scale, dx_lower
             do k = 1, s% nz
-               dval = B(i,k)*s% x_scale(i,k)*correction_factor
+               scale = correction_factor*s% x_scale(i,k)
+               dval = scale*B(i,k)
                old_val = s% xh_start(i,k) + s% solver_dx(i,k)
-               new_val = old_val + dval
+               new_val = s% xh_start(i,k) + (s% solver_dx(i,k) + dval)
                if (dval >= 0) cycle
-               if (new_val >= 0d0) cycle
-               dval = minval - old_val
-               B(i,k) = dval/(s% x_scale(i,k)*correction_factor)
+               lower = minval
+               if (i == s% i_w .and. s% RSP2_3equation_flag .and. &
+                     old_val > 0d0 .and. s% mixing_length_alpha > 0d0 .and. &
+                     k > s% RSP2_num_outermost_cells_forced_nonturbulent .and. &
+                     k <= s% nz - int(s% nz/s% RSP2_nz_div_IBOTOM)) then
+                  ! The divided energy row requires a positive trial w.
+                  if (.not. rsp2_local_w_equation(s,k)) lower = 0.1d0*old_val
+                  if (any(s% xh_start(s% i_Phi,k:min(k+1,s% nz)) > 0d0)) lower = 0.1d0*old_val
+               end if
+               if (new_val >= lower) cycle
+               dx_lower = lower - s% xh_start(i,k)
+               if (s% xh_start(i,k) + dx_lower < lower) dx_lower = nearest(dx_lower,1d0)
+               B(i,k) = (dx_lower - s% solver_dx(i,k))/scale
+               ! Match apply_coeff, including the scaled correction roundoff.
+               do while (s% xh_start(i,k) + (s% solver_dx(i,k) + scale*B(i,k)) < lower)
+                  B(i,k) = nearest(B(i,k),1d0)
+               end do
             end do
          end subroutine clip_so_non_negative
 
@@ -1205,9 +1235,9 @@
             if (do_w) then
                s% w(k) = x(i_w)
                if (s% w(k) < 0d0) then
-                  !write(*,4) 'set_vars_for_solver: fix w < 0', k, &
-                  !   s% solver_iter, s% model_number, s% w(k)
-                  s% w(k) = s% RSP2_w_fix_if_neg
+                  s% retry_message = 'negative RSP2 w'
+                  ierr = -1
+                  return
                end if
                if (is_bad_num(s% w(k))) then
                   s% retry_message = 'bad num for w'
@@ -1227,6 +1257,17 @@
                      call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
                   end if
                   if (report) write(*,2) 'bad num Y_face', k, s% Y_face(k)
+               end if
+            end if
+
+            if (s% i_Pi > 0 .and. s% i_Pi <= nvar) then
+               s% Pi(k) = x(s% i_Pi)
+               s% Phi(k) = x(s% i_Phi)
+               if (is_bad_num(s% Pi(k)) .or. &
+                     is_bad_num(s% Phi(k)) .or. s% Phi(k) < 0d0) then
+                  s% retry_message = 'bad RSP2 entropy moment'
+                  ierr = -1
+                  return
                end if
             end if
 

@@ -432,13 +432,14 @@
     solver_epsder_chem, solver_epsder_struct, solver_numerical_jacobian, energy_conservation_dump_model_number, &
     solver_jacobian_nzlo, solver_jacobian_nzhi, solver_check_everything, solver_inspect_soln_flag, &
     solver_test_partials_dx_0, solver_test_partials_k, solver_show_correction_info, eps_mdot_leak_frac_factor, &
-    solver_test_partials_write_eos_call_info, solver_save_photo_call_number, RSP2_min_Lc_div_L_for_convective_mixing_type, &
-    solver_test_partials_var_name, solver_test_partials_equ_name, RSP2_min_Lt_div_L_for_overshooting_mixing_type, &
+    solver_test_partials_write_eos_call_info, solver_save_photo_call_number, RSP2_min_conv_vel_for_mixing_type, &
+    solver_test_partials_var_name, solver_test_partials_equ_name, &
     solver_test_eos_partials, solver_test_kap_partials, solver_test_net_partials, solver_test_atm_partials, &
     fill_arrays_with_NaNs, zero_when_allocate, warn_when_large_rel_run_E_err, &
     absolute_cumulative_energy_err, solver_test_partials_k_low, &
     warn_when_large_virial_thm_rel_err, warn_when_get_a_bad_eos_result, warn_rates_for_high_temp, max_safe_logT_for_rates, &
     RSP2_alfap, RSP2_alfat, RSP2_alfam, RSP2_alfar, RSP2_Lsurf_factor, RSP2_use_Stellingwerf_Lr, RSP2_remesh_when_load, &
+    RSP2_use_3equation_model, RSP2_alfa_pi, RSP2_alfa_phi, &
     RSP2_alfad, RSP2_num_outermost_cells_forced_nonturbulent, RSP2_num_innermost_cells_forced_nonturbulent, &
     RSP2_target_steps_per_cycle, RSP2_max_num_periods, RSP2_work_period, RSP2_map_first_period, RSP2_map_last_period, &
     RSP2_min_max_R_for_periods, RSP2_GREKM_avg_abs_frac_new, RSP2_GREKM_avg_abs_limit, RSP2_map_zone_interval, &
@@ -2208,12 +2209,14 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% remesh_for_TDC_pulsations_log_core_zoning = remesh_for_TDC_pulsations_log_core_zoning
 
  s% RSP2_alfap = RSP2_alfap
+ s% RSP2_use_3equation_model = RSP2_use_3equation_model
+ s% RSP2_alfa_pi = RSP2_alfa_pi
+ s% RSP2_alfa_phi = RSP2_alfa_phi
  s% RSP2_alfad = RSP2_alfad
  s% RSP2_alfat = RSP2_alfat
  s% RSP2_alfam = RSP2_alfam
  s% RSP2_alfar = RSP2_alfar
- s% RSP2_min_Lt_div_L_for_overshooting_mixing_type = RSP2_min_Lt_div_L_for_overshooting_mixing_type
- s% RSP2_min_Lc_div_L_for_convective_mixing_type = RSP2_min_Lc_div_L_for_convective_mixing_type
+ s% RSP2_min_conv_vel_for_mixing_type = RSP2_min_conv_vel_for_mixing_type
  s% RSP2_Lsurf_factor = RSP2_Lsurf_factor
  s% RSP2_use_Stellingwerf_Lr = RSP2_use_Stellingwerf_Lr
  s% RSP2_remesh_when_load = RSP2_remesh_when_load
@@ -3978,12 +3981,14 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  remesh_for_TDC_pulsations_log_core_zoning = s% remesh_for_TDC_pulsations_log_core_zoning
 
  RSP2_alfap= s% RSP2_alfap
+ RSP2_use_3equation_model = s% RSP2_use_3equation_model
+ RSP2_alfa_pi = s% RSP2_alfa_pi
+ RSP2_alfa_phi = s% RSP2_alfa_phi
  RSP2_alfad = s% RSP2_alfad
  RSP2_alfat= s% RSP2_alfat
  RSP2_alfam= s% RSP2_alfam
  RSP2_alfar= s% RSP2_alfar
- RSP2_min_Lt_div_L_for_overshooting_mixing_type = s% RSP2_min_Lt_div_L_for_overshooting_mixing_type
- RSP2_min_Lc_div_L_for_convective_mixing_type = s% RSP2_min_Lc_div_L_for_convective_mixing_type
+ RSP2_min_conv_vel_for_mixing_type = s% RSP2_min_conv_vel_for_mixing_type
  RSP2_Lsurf_factor= s% RSP2_Lsurf_factor
  RSP2_use_Stellingwerf_Lr = s% RSP2_use_Stellingwerf_Lr
  RSP2_remesh_when_load = s% RSP2_remesh_when_load
