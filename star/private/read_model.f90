@@ -42,6 +42,7 @@
       integer, parameter :: bit_for_RSP = 15
       integer, parameter :: bit_for_no_L_basic_variable = 16
       integer, parameter :: bit_for_RSP2_3equation = 17
+      integer, parameter :: bit_for_RSP2_face_w = 18
 
       integer, parameter :: increment_for_rotation_flag = 1
       integer, parameter :: increment_for_have_j_rot = 1
@@ -261,6 +262,12 @@
 
          read(iounit, *, iostat=ierr)  ! skip the blank line after the file type
          if (ierr /= 0) then
+            return
+         end if
+
+         if (BTEST(file_type,bit_for_RSP2) .and. .not. BTEST(file_type,bit_for_RSP2_face_w)) then
+            write(*,'(a)') 'RSP2 requires a model with face turbulent energy.'
+            ierr = -1
             return
          end if
 

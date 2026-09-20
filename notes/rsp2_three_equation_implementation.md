@@ -2,30 +2,20 @@
 
 Started 2026-09-19 on `EbF/star_lna`, base `4b5e4e999`.
 
-**Current status: remesh startup checks pass, but the evolved RSP3 restart has an unresolved variance closure failure.**
-The 2026-09-20 restart below completes 1500 steps with 80 retries at alfat=0
-and 87 at alfat=0.1. Every retry stalls on the variance equation. A proposed
-covariance-consistent correction is derived in
-[rsp3_covariance_closure.md](rsp3_covariance_closure.md); it is not implemented.
-The later [placement audit](rsp3_layout_audit.md) favors colocated face
-moments for the eventual nonlocal RSP3 design, with a conservative cell
-energy projection. This requires a full derivation and validation, and
-does not change the current cell w plus face Pi/Phi implementation.
-The optional mode includes nonlinear moment rows, common face thermodynamics,
-mode conversion, both saved state formats, all three mesh paths, LNA and
-profile output. Shared zero turbulence handling was revised for both RSP2
-modes as requested. Standalone algebra, source wiring and Fortitude checks
-pass. The isolated coupled tests below establish convergence for this case;
-they do not establish robustness for every stellar regime.
+**Current status: the cell-w implementation is checkpointed in `d28e05018`.**
+The subsequent face-w implementation for RSP2 and RSP3 is tracked in
+[rsp2_face_w_implementation.md](rsp2_face_w_implementation.md). It remains
+uncommitted, is compiled and installed, and has its first stellar test recorded there. That record supersedes the
+cell/face placement and remapping descriptions below.
 
-The user subsequently authorized installation. The installation record below
-supersedes earlier statements that no compilation had occurred. The later
-authorized crash audit ran isolated copies, preserving the user's case.
-No user case was relinked, and no push has occurred. The shared gradient helpers and their checks were committed as
-`1700f15ac` before completing the optional mode. Subsequent changes remain
-uncommitted. Existing untracked notes, outputs and user cases are retained.
-The earlier planning audit is retained below with its historical status
-identified; the current checklist and implementation record are authoritative.
+The cell-w run history below includes an unresolved variance closure failure.
+The separate [covariance correction](rsp3_covariance_closure.md) remains
+unimplemented. Moving w to faces changes placement, not that closure.
+Prior installation and run records apply to the cell-w checkpoint. The shared
+gradient helpers were committed as `1700f15ac` before the optional mode.
+No user case was relinked and no push has occurred.
+
+The remaining record documents the earlier implementation and its checks.
 
 ## 1. Scope and invariants
 

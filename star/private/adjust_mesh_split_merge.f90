@@ -38,7 +38,6 @@
       ! makes new mesh and sets new values for xh and xa.
       integer function remesh_split_merge(s)
          use star_utils, only: total_angular_momentum, set_dm_bar
-         use hydro_rsp2, only: remesh_rsp2_moments
 
          type (star_info), pointer :: s
          real(dp) :: old_J, new_J
@@ -54,11 +53,6 @@
          if (s% rotation_flag) old_J = total_angular_momentum(s)
 
          call amr(s,ierr)
-         if (ierr == 0 .and. s% RSP2_3equation_flag) then
-            call remesh_rsp2_moments(s, s% nz, s% dq, s% xh, ierr)
-            s% Pi(1:s% nz) = s% xh(s% i_Pi,1:s% nz)
-            s% Phi(1:s% nz) = s% xh(s% i_Phi,1:s% nz)
-         end if
          if (ierr /= 0) then
             s% retry_message = 'remesh_split_merge failed'
             if (s% report_ierr) write(*, *) s% retry_message
@@ -859,7 +853,7 @@
       subroutine do_merge(s, i_merge, species, new_xa, bypass_repeated_remesh, ierr)
          use mesh_adjust, only: set_lnT_for_energy
          use star_utils, only: set_rmid
-         use hydro_rsp2, only: rsp2_remesh_w_face
+         use hydro_rsp2, only: remap_rsp2
          type (star_info), pointer :: s
          integer, intent(in) :: i_merge, species
          real(dp), intent(inout) :: new_xa(species)
@@ -869,12 +863,13 @@
          real(dp) :: &
             v, momentum, delta_KE, &
             dm, dm_i, dm_ip, star_PE0, star_PE1, &
-            cell_ie, cell_etrb, &
+            cell_ie, &
             Esum_i, KE_i, PE_i, IE_i, Etrb_i, &
             Esum_ip, KE_ip, PE_ip, IE_ip, Etrb_ip, &
             j_rot_new, j_rot_p1_new, J_old, &
             dmbar_old, dmbar_p1_old, dmbar_p2_old, &
-            dmbar_new, dmbar_p1_new, Pi_div_wL, Pi_div_wR, w_face
+            dmbar_new, dmbar_p1_new
+         real(dp), allocatable :: dq_old(:), xh_old(:,:)
          include 'formats'
 
          ierr = 0
@@ -898,13 +893,9 @@
          ! get energies for i and ip before merge
          call get_cell_energies(s, i, Esum_i, KE_i, PE_i, IE_i, Etrb_i)
          call get_cell_energies(s, ip, Esum_ip, KE_ip, PE_ip, IE_ip, Etrb_ip)
-         if (s% RSP2_3equation_flag) then
-            Pi_div_wR = 0d0
-            Pi_div_wL = 0d0
-            w_face = rsp2_remesh_w_face(s,i,nz,s% dq,s% w)
-            if (w_face > 0d0) Pi_div_wR = s% Pi(i)/w_face
-            w_face = rsp2_remesh_w_face(s,ip+1,nz,s% dq,s% w)
-            if (w_face > 0d0) Pi_div_wL = s% Pi(ip+1)/w_face
+         if (s% RSP2_flag) then
+            dq_old = s% dq(1:nz)
+            xh_old = s% xh(:,1:nz)
          end if
 
          if (s% rotation_flag) then
@@ -984,11 +975,6 @@
 
          s% energy(i) = cell_ie/dm
 
-         if (s% RSP2_flag) then
-            cell_etrb = Etrb_i + Etrb_ip
-            s% w(i) = sqrt(cell_etrb/dm)
-         end if
-
          if (s% rotation_flag) then
             s% j_rot(i) = j_rot_new
             if (ip/=nz) then
@@ -1054,15 +1040,13 @@
          if (s% RTI_flag) s% xh(s% i_alpha_RTI,i) = s% alpha_RTI(i)
 
          if (s% RSP2_flag) then
-            s% xh(s% i_w,i) = s% w(i)
             s% xh(s% i_Y,i) = s% Y_face(i)
+            call remap_rsp2(s,nz+1,dq_old,xh_old,nz,s% dq,s% xh,ierr)
+            if (ierr /= 0) return
+            s% w(1:nz) = s% xh(s% i_w,1:nz)
             if (s% RSP2_3equation_flag) then
-               s% Pi(i) = Pi_div_wR*rsp2_remesh_w_face(s,i,nz,s% dq,s% w)
-               s% xh(s% i_Pi,i) = s% Pi(i)
-               if (ip <= nz) then
-                  s% Pi(ip) = Pi_div_wL*rsp2_remesh_w_face(s,ip,nz,s% dq,s% w)
-                  s% xh(s% i_Pi,ip) = s% Pi(ip)
-               end if
+               s% Pi(1:nz) = s% xh(s% i_Pi,1:nz)
+               s% Phi(1:nz) = s% xh(s% i_Phi,1:nz)
             end if
          end if
 
@@ -1229,7 +1213,7 @@
          end if
          IE = s% energy(k)*dm
          if (s% RSP2_flag) then
-            Etrb = pow2(s% w(k))*dm
+            Etrb = get_etrb_cell(s,k)*dm
          else
             Etrb = 0d0
          end if
@@ -1310,7 +1294,7 @@
       subroutine do_split(s, i_split, species, tau_center, grad_xa, new_xa, ierr)
          use alloc, only: reallocate_star_info_arrays
          use star_utils, only: set_rmid, store_r_in_xh
-         use hydro_rsp2, only: rsp2_remesh_w_face
+         use hydro_rsp2, only: remap_rsp2
          type (star_info), pointer :: s
          integer, intent(in) :: i_split, species
          real(dp) :: tau_center, grad_xa(species), new_xa(species)
@@ -1324,14 +1308,14 @@
             dLeft, dRght, dCntr, grad_rho, grad_energy, grad_v, &
             sumx, sumxp, new_xaL, new_xaR, star_PE0, star_PE1, &
             grad_alpha, min_alpha, max_alpha, f, new_alphaL, new_alphaR, v_R, v_C, v_L, min_dm, &
-            mlt_vcL, mlt_vcR, tauL, tauR, etrb, etrb_L, etrb_C, etrb_R, grad_etrb, &
+            mlt_vcL, mlt_vcR, tauL, tauR, &
             j_rot_new, dmbar_old, dmbar_p1_old, dmbar_new, dmbar_p1_new, dmbar_p2_new, J_old, &
             u_R, u_L, delta_u, delta_KE, delta_KE_div_dm, &
             min_stencil_energy, max_stencil_energy, max_delta_KE_div_dm, &
             pressure_R, pressure_C, pressure_L, grad_pressure, pressure_difference_target, &
             min_stencil_pressure, max_stencil_pressure, min_stencil_lnT, max_stencil_lnT, &
-            superad_reduction_factorL, superad_reduction_factorR, Y_faceL, Y_faceR, &
-            Pi_div_wL, Pi_div_wR, PhiL, PhiR, w_face
+            superad_reduction_factorL, superad_reduction_factorR, Y_faceL, Y_faceR
+         real(dp), allocatable :: dq_old(:), xh_old(:,:)
          logical :: done, use_new_grad_rho, pressure_reconstructed
          include 'formats'
 
@@ -1342,6 +1326,10 @@
          s% num_hydro_splits = s% num_hydro_splits + 1
          done = .false.
          nz_old = nz
+         if (s% RSP2_flag) then
+            dq_old = s% dq(1:nz)
+            xh_old = s% xh(:,1:nz)
+         end if
 
          i = i_split
          ip = i+1
@@ -1389,21 +1377,6 @@
             if (i < nz) Y_faceL = s% Y_face(ip)
          end if
 
-         Pi_div_wL = 0d0
-         Pi_div_wR = 0d0
-         PhiL = 0d0
-         PhiR = 0d0
-         if (s% RSP2_3equation_flag) then
-            w_face = rsp2_remesh_w_face(s,i,nz,s% dq,s% w)
-            if (w_face > 0d0) Pi_div_wR = s% Pi(i)/w_face
-            PhiR = s% Phi(i)
-            if (i < nz) then
-               w_face = rsp2_remesh_w_face(s,ip,nz,s% dq,s% w)
-               if (w_face > 0d0) Pi_div_wL = s% Pi(ip)/w_face
-               PhiL = s% Phi(ip)
-            end if
-         end if
-
          tauR = s% tau(i)
          if (i == nz) then
             tauL = tau_center
@@ -1437,8 +1410,6 @@
          end if
 
          energy = s% energy(i)
-         etrb = 0d0
-         if (s% RSP2_flag) etrb = pow2(s% w(i))
 
          ! use iR, iC, and iL for getting values to determine slopes
          if (i > 1 .and. i < nz_old) then
@@ -1508,14 +1479,6 @@
             min_alpha = max(0d0, min( &
                s% alpha_RTI(iL), s% alpha_RTI(iC), s% alpha_RTI(iR)))
             max_alpha = max(s% alpha_RTI(iL), s% alpha_RTI(iC), s% alpha_RTI(iR))
-         end if
-
-         grad_etrb = 0d0
-         if (s% RSP2_flag) then
-            etrb_R = pow2(s% w(iR))
-            etrb_C = pow2(s% w(iC))
-            etrb_L = pow2(s% w(iL))
-            grad_etrb = get1_grad(etrb_L, etrb_C, etrb_R, dLeft, dCntr, dRght)
          end if
 
          if (s% u_flag) then
@@ -1683,17 +1646,6 @@
          s% energy(i) = energy_R
          s% energy(ip) = energy_L
 
-         if (s% RSP2_flag) then
-            etrb_R = etrb + grad_etrb*dr/4
-            etrb_L = (dm*etrb - dmR*etrb_R)/dmL
-            if (etrb_R < 0d0 .or. etrb_L < 0d0) then
-               etrb_R = etrb
-               etrb_L = etrb
-            end if
-            s% w(i) = sqrt(max(0d0,etrb_R))
-            s% w(ip) = sqrt(max(0d0,etrb_L))
-         end if
-
          if (s% u_flag) then
             ! Preserve momentum and take the resolved velocity variance from internal energy.
             delta_u = 0.5d0*grad_v*dr
@@ -1744,24 +1696,9 @@
          end if
 
          if (s% RSP2_flag) then
-            if (s% RSP2_3equation_flag) then
-               s% Pi(i) = Pi_div_wR*rsp2_remesh_w_face(s,i,nz,s% dq,s% w)
-               s% Pi(ip) = (Pi_div_wR + (Pi_div_wL - Pi_div_wR)*dMR/dM)* &
-                  rsp2_remesh_w_face(s,ip,nz,s% dq,s% w)
-               s% xh(s% i_Pi,i) = s% Pi(i)
-               if (ip < nz) then
-                  s% Pi(ip+1) = Pi_div_wL*rsp2_remesh_w_face(s,ip+1,nz,s% dq,s% w)
-                  s% xh(s% i_Pi,ip+1) = s% Pi(ip+1)
-               end if
-               s% Phi(ip) = (1d0-dMR/dM)*PhiR + (dMR/dM)*PhiL
-               s% xh(s% i_Pi,ip) = s% Pi(ip)
-               s% xh(s% i_Phi,ip) = s% Phi(ip)
-            end if
             s% Y_face(ip) = Y_faceR + (Y_faceL - Y_faceR)*dMR/dM
             s% xh(s% i_Y,i) = s% Y_face(i)
             s% xh(s% i_Y,ip) = s% Y_face(ip)
-            s% xh(s% i_w,i) = s% w(i)
-            s% xh(s% i_w,ip) = s% w(ip)
          end if
 
          ! These are face-based, so a split creates new interior face values here.
@@ -1906,6 +1843,16 @@
          if (s% RTI_flag) then
             s% xh(s% i_alpha_RTI,i) = s% alpha_RTI(i)
             s% xh(s% i_alpha_RTI,ip) = s% alpha_RTI(ip)
+         end if
+
+         if (s% RSP2_flag) then
+            call remap_rsp2(s,nz_old,dq_old,xh_old,nz,s% dq,s% xh,ierr)
+            if (ierr /= 0) return
+            s% w(1:nz) = s% xh(s% i_w,1:nz)
+            if (s% RSP2_3equation_flag) then
+               s% Pi(1:nz) = s% xh(s% i_Pi,1:nz)
+               s% Phi(1:nz) = s% xh(s% i_Phi,1:nz)
+            end if
          end if
 
          call update_xh_eos_and_kap(s,i,species,new_xa,ierr)
@@ -2128,7 +2075,7 @@
             if (s% mixing_length_alpha == 0d0 .or. &
                   k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
                   k > s% nz - int(s% nz/s% RSP2_nz_div_IBOTOM)) return
-            Pturb = (2d0/3d0)*s% RSP2_alfap*(s% dm(k)/get_dV(s,k))*pow2(s% w(k))
+            Pturb = (2d0/3d0)*s% RSP2_alfap*(s% dm(k)/get_dV(s,k))*get_etrb_cell(s,k)
             return
          end if
          if (s% mlt_Pturb_factor <= 0d0 .or. k <= 1) return

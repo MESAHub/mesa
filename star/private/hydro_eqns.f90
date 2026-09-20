@@ -162,6 +162,7 @@
 
 !$OMP PARALLEL DO PRIVATE(op_err,k) SCHEDULE(dynamic,2)
          do k = nzlo, nzhi
+            if (s% RSP2_flag) s% d_hydro_d_p2(:,:,k) = 0d0
             s% dblk(:,:,k) = 0
             s% ublk(:,:,k) = 0
             s% lblk(:,:,k) = 0

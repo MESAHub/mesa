@@ -314,12 +314,14 @@
       subroutine set_RSP2_flag(id, RSP2_flag, ierr)
          use const_def, only: sqrt_2_div_3
          use hydro_vars, only: set_vars
+         use auto_diff_support, only: rsp2_zero_w
          integer, intent(in) :: id
          logical, intent(in) :: RSP2_flag
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          real(dp), allocatable :: gradT_old(:)
-         integer :: nvar_hydro_old, i, k, nz
+         real(dp) :: energy, dm_face
+         integer :: nvar_hydro_old, i, k, j, first, last, nz
          logical, parameter :: dbg = .false.
 
          include 'formats'
@@ -369,14 +371,33 @@
          if (RSP2_flag) then
             call insert1(s% i_w)
             if (s% RSP_flag) then
-               do k=1,nz
-                  s% xh(s% i_w,k) = sqrt(max(0d0,s% xh(s% i_Et_RSP,k)))
-               end do
+               ! Deposit each RSP cell energy into its adjoining face volumes.
+               first = max(2,s% RSP2_num_outermost_cells_forced_nonturbulent+2)
+               last = nz-int(nz/s% RSP2_nz_div_IBOTOM)
+               if (s% mixing_length_alpha == 0d0) last = 0
+               s% xh(s% i_w,1:nz) = 0d0
+               if (first <= last) then
+                  do k=1,nz
+                     energy = 0.5d0*s% dm(k)*max(0d0,s% xh(s% i_Et_RSP,k))
+                     do i=k,k+1
+                        j = min(last,max(first,i))
+                        s% xh(s% i_w,j) = s% xh(s% i_w,j) + energy
+                     end do
+                  end do
+                  do k=first,last
+                     dm_face = 0.5d0*(s% dm(k-1) + s% dm(k))
+                     s% xh(s% i_w,k) = sqrt(s% xh(s% i_w,k)/dm_face)
+                  end do
+               else if (any(s% xh(s% i_Et_RSP,1:nz) > 0d0)) then
+                  write(*,*) 'no active face for RSP turbulent energy'
+                  ierr = -1
+                  return
+               end if
             else if (s% have_mlt_vc) then
-               do k=1,nz-1
-                  s% xh(s% i_w,k) = 0.5d0*(s% mlt_vc(k) + s% mlt_vc(k+1))/sqrt_2_div_3
+               do k=1,nz
+                  s% xh(s% i_w,k) = s% mlt_vc(k)/sqrt_2_div_3
+                  if (rsp2_zero_w(s,k)) s% xh(s% i_w,k) = 0d0
                end do
-               s% xh(s% i_w,nz) = 0.5d0*s% mlt_vc(nz)/sqrt_2_div_3
             else
                write(*,*) 'set_rsp2_flag true requires mlt_vc'
                ierr = -1

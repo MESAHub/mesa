@@ -31,7 +31,7 @@
 \numberwithin{equation}{section}
 \title{RSP3 in MESA/star\\Local Entropy Moments in RSP2}
 \author{}
-\date{2026-09-19}
+\date{2026-09-20}
 \begin{document}
 \maketitle
 \vspace{-1.5em}
@@ -55,7 +55,7 @@ There is no separate RSP3 solver or \code{star_job} action.
 \toprule
 Variable & Location & Definition and role\\
 \midrule
-$w$ & Cell & $e_t=w^2=\tfrac12\langle|\boldsymbol v'|^2\rangle$;
+$w$ & Face & $e_t=w^2=\tfrac12\langle|\boldsymbol v'|^2\rangle$;
  $w\geq0$, in cm\,s$^{-1}$.\\
 $\Pi$ (\code{Pi}) & Face & $\langle v_r's'\rangle$, signed entropy flux,
  in erg\,cm\,g$^{-1}$\,K$^{-1}$\,s$^{-1}$.\\
@@ -74,17 +74,18 @@ The full variance here is twice the $\Phi$ used by Flaskamp and Braun et al.
 The old \code{PII} has entropy units and factors out turbulent velocity;
 it is not the new $\Pi$.
 
-MESA indexes inward: cell $k$ lies between outer face $k$ and inner face
-$k+1$, with $k=1$ at the surface. At the face between cells $k-1$ and $k$,
+MESA indexes inward: cell $k$ lies between faces $k$ and $k+1$.
+The turbulent variables share face control volumes:
 \begin{equation}
- \area_f=4\pi r_f^2,\quad
- \dmf=\frac{\Delta m_{k-1}+\Delta m_k}{2},\quad
- e_{t,f}=a_fw_k^2+(1-a_f)w_{k-1}^2 .
+ e_{t,f}=w_f^2,\qquad e_{t,c,k}=\tfrac12(w_k^2+w_{k+1}^2),\qquad
+ \Delta m_{f,k}=\tfrac12(\Delta m_{k-1}+\Delta m_k).
 \end{equation}
-The weight is $a_f=\Delta m_{k-1}/(\Delta m_{k-1}+\Delta m_k)$ for mass
-interpolation, or $1/2$ otherwise. The interpolated speed
-$\langle w\rangle_f=a_fw_k+(1-a_f)w_{k-1}$ differs from $\sqrt{e_{t,f}}$.
-Face EOS quantities use the selected reconstruction or RSP2 interpolation.
+The surface volume has mass $\Delta m_1/2$. The mathematical inner face
+$N+1$ has $w=\Pi=\Phi=0$ and mass $\Delta m_N/2$.
+Thus $\sum_k\Delta m_k e_{t,c,k}=\sum_f\Delta m_f w_f^2$ exactly.
+Thermodynamic face values retain the selected reconstruction or RSP2
+weights $a_f=\Delta m_{k-1}/(\Delta m_{k-1}+\Delta m_k)$, or $1/2$.
+These weights do not average the independent face turbulent variables.
 
 \textcolor{Dynamic}{Blue boxes} contain time dependent rows.
 \textcolor{Algebraic}{Brown boxes} contain algebraic rows.
@@ -93,68 +94,75 @@ The physical rows are followed by their residuals and static linearizations.
 Perturbations vary as $\exp(\sigma t)$; positive $\Re(\sigma)$ means growth.
 
 \clearpage
-\section{Cell turbulent energy}
-The existing RSP2 energy equation remains the first turbulence equation.
-The three equation mode changes its buoyant source and removes the direct
-radiative sink $D_r$:
+\section{Face turbulent energy}
+Both RSP2 and RSP3 evolve face $w$. In RSP3 the buoyant source is local to
+Pi and the direct radiative sink $D_r$ is absent. Write the face pressure
+work increment as
+\begin{equation}
+ W_{f,k}=\frac{\alpha_p}{3\Delta m_{f,k}}
+ \sum_{j=k-1,k}\Delta m_j
+ [\theta_P\rho_jw_k^2+(1-\theta_P)\rho_{j,0}w_{k,0}^2]
+ (\rho_j^{-1}-\rho_{j,0}^{-1}).
+ \label{eq:face-pressure}
+\end{equation}
+Here $0$ denotes accepted state and $\alpha_p=\code{RSP2_alfap}$.
+Forced faces have $W_f=0$.
 \begin{solved}{Dynamic}{Turbulent energy and finite timestep residual}
 \begin{align}
- \dot e_{t,k}+P_{t,k}\frac{\dd}{\dd t}\frac1{\rho_k}
-   &=-\frac{L_{t,k}-L_{t,k+1}}{\Delta m_k}+S_k-D_k+Eq_k ,
-   \label{eq:et}\\
- R_{E,k}={}&w_k^2-w_{k,\mathrm{start}}^2
- +P_{t,k}^{\theta}\left(\frac1{\rho_k}-\frac1{\rho_{k,\mathrm{start}}}\right)
- \notag\\
- &+\Delta t\left[
- \frac{L_{t,k}^{\theta}-L_{t,k+1}^{\theta}}{\Delta m_k}
- -S_k+D_k-Eq_k\right]=0 .
+ \frac{\mathrm d(w_k^2)}{\mathrm d t}+\dot W_{f,k}
+  &=-\frac{L_{t,c,k-1}-L_{t,c,k}}{\Delta m_{f,k}}+S_k-D_k+Eq_{f,k},
+ \label{eq:et}\\
+ R_{E,k}={}&(w_k-w_{k,0})(w_k+w_{k,0})+W_{f,k}\notag\\
+ &+\Delta t\left[\frac{L_{t,c,k-1}^{\theta}-L_{t,c,k}^{\theta}}
+ {\Delta m_{f,k}}-S_k+D_k-Eq_{f,k}\right]=0.
  \label{eq:energy-residual}
 \end{align}
 \linear
-On a static background, $\delta Eq=0$ and
+On a static background $\delta Eq=0$:
 \begin{equation}
- \sigma\left(2w_k\delta w_k-\frac{P_{t,k}}{\rho_k}\delta\ln\rho_k\right)
- =-\frac{\delta L_{t,k}-\delta L_{t,k+1}}{\Delta m_k}
-   +\delta S_k-\delta D_k .
+ \begin{aligned}
+ \sigma\left[2w_k\delta w_k-
+ \frac{\alpha_pw_k^2}{3\Delta m_{f,k}}
+ \sum_{j=k-1,k}\Delta m_j\delta\ln\rho_j\right]
+ =-\frac{\delta L_{t,c,k-1}-\delta L_{t,c,k}}{\Delta m_{f,k}}
+ +\delta S_k-\delta D_k.
+ \end{aligned}
 \end{equation}
 \end{solved}
-The superscript $\theta$ denotes the existing RSP2 pressure or luminosity
-time weight, applied separately to each quantity. The source, dissipation
-and stress heating use their existing implicit evaluation.
-Adding the moments does not change these time weights.
+The superscript $\theta$ retains the existing pressure and luminosity time
+weights. Sources, damping and viscosity retain current-state derivatives.
+The continuous $\dot W_f$ is the limit of equation~\eqref{eq:face-pressure}.
+LNA puts its density derivative in the inertia matrix.
 
-The turbulent pressure, dissipation and kinetic energy luminosity are
+The cell turbulent pressure and face dissipation are
+\begin{equation}
+ P_{t,c,k}=\frac23\alpha_p\rho_ke_{t,c,k},\qquad
+ D_f=\code{RSP2_alfad}\frac83\sqrt{\frac23}\frac{w_f^3}{\Lambda_f}.
+\end{equation}
+Turbulent transport crosses gas cell centers between face volumes:
 \begin{align}
- P_{t,k}&=\frac23\,\code{RSP2_alfap}\,\rho_kw_k^2,\\
- D_k&=\code{RSP2_alfad}\,\frac83\sqrt{\frac23}\,
-                   \frac{w_k^3}{\Lambda_k},\\
- L_{t,f}&=-\code{RSP2_alfat}\,\area_f^2
-   \langle\rho^2\rangle_f\Lambda_f\langle w\rangle_f
-       \frac{w_{k-1}^2-w_k^2}{\dmf}.
- \label{eq:Lt}
+ L_{t,c,k}&=-\alpha_t\area_{c,k}^2\rho_k^2\Lambda_{c,k}
+ \frac{w_k+w_{k+1}}2\frac{w_k^2-w_{k+1}^2}{\Delta m_k},
+ \label{eq:Lt}\\
+ L_{t,f,k}&=\frac{\Delta m_kL_{t,c,k-1}+\Delta m_{k-1}L_{t,c,k}}
+ {\Delta m_{k-1}+\Delta m_k}.
 \end{align}
-Here $\langle\rho^2\rangle_f$ is the interpolated squared density.
-The physical surface and inner boundary have zero $L_t$.
-Existing forced nonturbulent masks also apply.
+Here $r_c^3=(r_k^3+r_{k+1}^3)/2$, $\area_c=4\pi r_c^2$ and
+$\alpha_t=\code{RSP2_alfat}$. The second expression is the gas-face Lt
+used in the luminosity equation and profile output. Its divergence is the
+half sum of adjacent face-energy divergences. Transport is zero across a
+forced moment boundary, at the surface and at the physical inner boundary.
 
-The face pressure acceleration and cell source are
-\begin{align}
- \buo_f&=\frac{\area_f(P_k-P_{k-1})}{\dmf},\\
- S_k&=\frac12\sum_{f=k,k+1}
- \buo_f\,\frac{\chi_{T,f}}{\chi_{\rho,f}C_{P,f}}\,
- \frac{w_k\Pi_f}{\sqrt{e_{t,f}}} .
+The face pressure acceleration and source are
+\begin{equation}
+ \buo_f=\frac{\area_f(P_k-P_{k-1})}{\Delta m_{f,k}},\qquad
+ S_f=\buo_f\frac{\chi_{T,f}}{\chi_{\rho,f}C_{P,f}}\Pi_f.
  \label{eq:source}
-\end{align}
-The factor $w_k/\sqrt{e_{t,f}}$ reconstructs the correlation for the cell
-whose energy is evolved. It makes its buoyant source vanish when $w_k=0$,
-even beside a turbulent neighbor. Forced faces contribute zero.
-A face with $e_{t,f}=\Pi_f=0$ contributes zero without division.
-Nonzero $\Pi_f$ at zero $e_{t,f}$ is rejected as inconsistent state.
-The positive energy linearization differentiates the entire reconstruction.
-
-\textit{Source:} \code{hydro_rsp2:do1_turbulent_energy_eqn},
-\code{rsp2_moment_source}, \code{compute_D}, \code{compute_Lt}.
-Section~\ref{sec:numerics} specifies the residual treatment at zero $w$.
+\end{equation}
+There is no cell/face correlation reconstruction. Neighboring Pi values
+cannot cancel through an average before entering their energy equations.
+This placement does not alter the physical moment closure or guarantee
+that it preserves the covariance bound.
 
 \clearpage
 \section{Face entropy flux}
@@ -467,6 +475,18 @@ nuclear, neutrino and other heating terms.
                     \quad\text{on a static background}.
 \end{align}
 \end{solved}
+In every gas row $e_t$ means $e_{t,c}=\tfrac12(w_k^2+w_{k+1}^2)$.
+The work includes the conservative redistribution
+\begin{equation}
+ \mathcal W_k\ \longleftarrow\ \mathcal W_k+
+ \frac{\tfrac12(W_{f,k}+W_{f,k+1})
+       -P_{t,c,k}^{\theta}\Delta(1/\rho_k)}{\Delta t}.
+\end{equation}
+Its mass integral is zero. It matches the cell projection of turbulent
+storage and makes local gas/turbulent work cancel when the rows are
+combined. Both work forms and \code{eps_grav} use it. In LNA the added
+work is a density inertia term, with the same zero integral.
+
 The finite step equation is written before the native row normalization.
 The work control selects both the pressure work and stored energy:
 \begin{align}
@@ -519,39 +539,50 @@ This option always uses local work, with no explicit $K$, $E_{\rm grav}$
 or $vUq$ storage/power branch. At fixed composition and consistent EOS,
 $\epsilon_{\rm grav}=-\dot e-P_{\rm EOS}\,\dd(1/\rho)/\dd t$.
 Its static inertia, for the ordinary thermal coefficients, is
-$2w\delta w+TC_P[(1-\nabla_{\rm ad}\chi_T)\delta\ln T
+$\delta e_{t,c}+TC_P[(1-\nabla_{\rm ad}\chi_T)\delta\ln T
 -\nabla_{\rm ad}\chi_\rho\delta\ln\rho]$.
 Native latent heat, entropy blending and energy factors retain their
 existing treatment. Adding EOS pressure work again would double count it.
 
-\clearpage
 \section{Eddy viscosity on the two velocity grids}
 The new moment rows retain the RSP2 $Eq$ and $Uq$ discretization.
-TDC uses separate hydro viscosity routines because its turbulent velocity
-is a face quantity. Only the public length functions are shared.
+TDC keeps separate hydro viscosity routines. Both models now use a face
+turbulent velocity and the same spatial work identities, with their own
+normalizations and time weights.
 The following formulas use native masses without optional mass corrections.
 
 \textbf{Face mean velocity $v$: cell stress.}
 \begin{align}
- Chi_k&=\frac{16\pi}{3}\frac{\alpha_m\rho_k^2\Lambda_kw_k}{\Delta m_k}
+ Chi_k&=\frac{16\pi}{3}\frac{\alpha_m\rho_k^2\Lambda_k(w_k+w_{k+1})/2}{\Delta m_k}
        \frac{r_k^6+r_{k+1}^6}{2}
        \left(\frac{v_k}{r_k}-\frac{v_{k+1}}{r_{k+1}}\right),\\
  Uq_k&=\frac{4\pi}{r_k^{\rm work}\Delta m_{\rm face,k}}
                           (Chi_{k-1}-Chi_k),\\
- Eq_k&=\frac{4\pi Chi_k}{\Delta m_k}
+ Eq_{\mathrm{stress},k}&=\frac{4\pi Chi_k}{\Delta m_k}
        \left(\frac{v_k^{\rm work}}{r_k^{\rm work}}
               -\frac{v_{k+1}^{\rm work}}{r_{k+1}^{\rm work}}\right).
 \end{align}
 Here $\alpha_m=\code{RSP2_alfam}$,
 $\Delta m_{\rm face,k}=(\Delta m_{k-1}+\Delta m_k)/2$ internally,
 and $\Delta m_{\rm face,1}=\Delta m_1/2$.
+The face energy row receives
+\begin{equation}
+ Eq_{f,k}=w_k\frac{\Delta m_{k-1}(Eq/w)_{c,k-1}+\Delta m_k(Eq/w)_{c,k}}
+ {\Delta m_{k-1}+\Delta m_k}.
+\end{equation}
+Here $(Eq/w)_c$ is evaluated from the stress coefficient before multiplying
+by $(w_k+w_{k+1})/2$. This division is analytic, including at zero w.
+The gas row uses the direct cell stress heating $Eq_{c,k}=Eq_{\mathrm{stress},k}$,
+as in TDC. Its mass integral equals the face heating integral. This preserves
+the cell heating stencil; projecting face heating back into cells would
+unnecessarily introduce a second inner neighbor.
 The stress uses current geometry and velocity; the force and work use the
 native optional time centered radii. The exterior stress is zero.
 
 \textbf{Cell mean velocity $u$: face stress.}
 \begin{align}
  Chi_{f,k}&=\frac{16\pi}{3}
- \frac{\alpha_m\rho_{f,k}^2r_k^6\Lambda_{f,k}\langle w\rangle_{f,k}}
+ \frac{\alpha_m\rho_{f,k}^2r_k^6\Lambda_{f,k}w_k}
       {\Delta m_{\rm face,k}}
  \left(\frac{u_{k-1}}{r_{\rm mid,start,k-1}}
                   -\frac{u_k}{r_{\rm mid,start,k}}\right),\\
@@ -562,8 +593,8 @@ native optional time centered radii. The exterior stress is zero.
                   -\frac{u_k^{\rm work}}{r_{\rm mid,start,k}}\right),\\
  Eq_k&=\tfrac12(Eq_{f,k}+Eq_{f,k+1}).
 \end{align}
-The density is the native viscosity face density, while $\langle w\rangle_f$
-uses the RSP2 weights. \code{compute_Uq_dm_cell} returns force:
+The density is the native viscosity face density and $w_k$ is local to that
+face. \code{compute_Uq_dm_cell} returns force:
 the momentum row divides by $\Delta m_k$ once.
 The half sum of face \emph{specific} heating is essential. On an unequal
 mesh, weighting each cell by $\Delta m_k$ allocates each face's full dual
@@ -584,15 +615,23 @@ With the same stress in force and heating, summation by parts gives
 \end{align}
 The boundary power is zero for zero boundary stress or velocity.
 An excised inner boundary can retain the native optional stress and its
-half cell mass. Forced regions mask stress while retaining its divergence
+half cell mass. Its dissipated power enters the last evolved face volume;
+the prescribed inner face retains zero turbulent energy. Forced regions
+mask stress while retaining its divergence
 at the interface. A full center uses the zero stress limit.
 
 For a static background, $\delta Chi$ contains the perturbed velocity
 strain times the background coefficient; $\delta Uq$ stays in momentum.
 $Eq$ and $vUq$ are second order, so they add no first order heating row.
-These power identities concern residual values. The existing
-block tridiagonal conservative energy Jacobian can omit a $k+2$ partial;
-the moment equations do not repair that separate stencil limitation.
+Conservative inner-face work can depend on zone $k+2$: the $vUq$ term
+reaches the next cell stress, and turbulent-pressure flux work can reach
+$w_{k+2}$ through the next cell pressure. The gas row retains these partials.
+The ordinary block tridiagonal solver is used when they vanish. Otherwise
+the banded matrix stores them directly or the block cyclic solver groups
+adjacent zone pairs. Direct cell heating remains compact. With \code{u_flag}, the Riemann
+contact pressure and velocity also depend on the inner cell turbulent
+pressure. Their $k+2$ terms are retained in momentum and in both work forms.
+For \code{v_flag}, local pressure work retains the ordinary three-zone stencil.
 
 \clearpage
 \section{Scales and the zero turbulence boundary}
@@ -619,7 +658,7 @@ The new correction weights are reciprocal to the larger of the scale and
 the current variable magnitude. The signed $Y$ correction weight remains
 $1/(1+|Y|)$; it neither changes sign nor caps $Y$.
 
-In the three-equation model, outside the local zero start branch below,
+In the three equation model, at positive w,
 the normalized energy row is
 \begin{equation}
  R_w=\frac{\mathrm{energy\_eqn\_scal}}{\Delta t}
@@ -647,101 +686,49 @@ The storage and local sinks give
  &\frac{D_r}{w}&=\frac{w}{\tau_{\rm rad}}.
 \end{align}
 Here $C_D=(8/3)\sqrt{2/3}\,\code{RSP2_alfad}$; $D_r=0$ in the
-three equation mode. Its buoyancy source becomes
-\begin{equation}
- \left[\frac{S_k}{w_k}\right]_{\rm analytic}
- =\frac12\sum_{f=k,k+1}
- \buo_f\frac{\chi_{T,f}}{\chi_{\rho,f}C_{P,f}}
- \frac{\Pi_f}{\sqrt{e_{t,f}}}.
-\end{equation}
-Only the explicit numerator $w_k$ in Equation~\eqref{eq:source} cancels.
-The face energy still depends on both neighboring cell velocities, and its
-derivatives remain. One-equation RSP2 uses the original energy residual
-when the source seed is nonzero.
+three equation mode. RSP3 instead has $S_f/w_f$ proportional to $\Pi_f/w_f$;
+there is no extra numerator w to cancel in this independent covariance.
+For each remaining quotient, evaluate $q=x/w$ and then
+$\delta q=(\delta x-q\,\delta w)/w$, avoiding an explicit $1/w^2$.
+No physical coefficient is frozen.
 
-The uncanceled source quotient subtracts derivative terms of order
-$\code{Source_div_w}/w$; their roundoff can overwhelm the storage derivative.
-Cancel that factor first. For each remaining numerator $x$, evaluate
-$q=x/w$ and then $\delta q=(\delta x-q\,\delta w)/w$.
-This avoids forming $1/w^2$, which can overflow even when $q$ and its
-derivatives are finite. No physical coefficient is frozen.
-
-\clearpage
 \paragraph{The complete divided balance.}
-For positive $w_k$, the implementation evaluates
-\begin{align}
- [R_{E,k}/w_k]_{\rm analytic}={}&w_k
- +\theta_P\frac23\code{RSP2_alfap}\,\rho_kw_k\Delta(1/\rho_k)
- \notag\\
- &+\frac{(1-\theta_P)P_{t,k,\rm start}\Delta(1/\rho_k)
-                -w_{k,\rm start}^2}{w_k}\notag\\
- &+\Delta t\biggl[
- \frac{[L_{t,k}^{\theta}/w_k]_{\rm analytic}
-       -[L_{t,k+1}^{\theta}/w_k]_{\rm analytic}}{\Delta m_k}
- \notag\\
- &\hspace{3em}-[S_k/w_k]_{\rm analytic}+\frac{C_Dw_k^2}{\Lambda_k}
- +\frac{w_k}{\tau_{\rm rad,k}}-[Eq_k/w_k]_{\rm analytic}\biggr].
+For positive w the code evaluates the same residual as
+\begin{equation}
+ \frac{R_{E,f}}{w_f}=w_f-\frac{w_{f,0}^2}{w_f}
+ +\frac{W_f}{w_f}
+ +\Delta t\left[\frac{D_mL_{t,c}}{w_f}
+ -\frac{S_f}{w_f}+\frac{D_f+D_{r,f}}{w_f}-\frac{Eq_f}{w_f}\right].
  \label{eq:factored-energy}
-\end{align}
-Here $\Delta(1/\rho_k)=1/\rho_k-1/\rho_{k,\rm start}$ and the radiative
-term is omitted in the three equation mode. Accepted energy and pressure
-remain in the second line; they cannot be canceled with current $w_k$.
-
-\paragraph{Face transport and viscosity.}
-$L_t$ and $u$ grid heating depend on neighboring turbulence and need not
-vanish at $w_k=0$. For face $f$ between cells $k-1,k$,
-\begin{equation}
- \frac{\langle w\rangle_f}{w_k}
-   =a_f+(1-a_f)\frac{w_{k-1}}{w_k},\qquad
- \frac{\langle w\rangle_f}{w_{k-1}}
-   =a_f\frac{w_k}{w_{k-1}}+(1-a_f).
 \end{equation}
-Only the interpolated velocity factor in $L_t$ and face stress is replaced;
-energy jumps, mass weights, strain and all derivatives remain.
-The $u$ grid retains half of each bounding face's specific heating.
-At an active inner boundary,
-$\langle w\rangle/w_N=w_N/w_N=1$ is canceled exactly.
-On the $v$ grid, cell stress and heating already have a common local $w$;
-the existing \code{Eq_div_w} supplies their divided form.
-
-The luminosity time weight is retained explicitly:
-\begin{equation}
- [L_{t,f}^{\theta}/w_k]_{\rm analytic}
- =\theta_L[L_{t,f}/w_k]_{\rm analytic}
- +(1-\theta_L)\frac{L_{t,f,\rm start}}{w_k}.
-\end{equation}
-This retains nonzero $\alpha_t$, both velocity grids and both work forms.
-Physical $L_t$, $Eq$, $Uq$ and the continuous LNA equations are unchanged.
+In $W_f/w_f$, the current $w_f^2$ in equation~\eqref{eq:face-pressure}
+is replaced by w before differentiation. The accepted $w_{f,0}^2/w_f$
+term remains. The face viscous heating has a common factor w on both
+velocity grids; \code{compute_Eq_div_w_face} evaluates its regular
+coefficient. The physical center transport generally has no such factor
+and is divided with its accepted/current weights and all derivatives intact.
 
 \paragraph{The zero state.}
-
-When $e_{t,\rm start}=0$, $\alpha_t=0$, the source seed is zero, and either
-$v$ is used or $\alpha_m=0$, the local row has a common factor $w$.
-The implementation cancels it analytically and solves the branch equation
+For one-equation RSP2 with zero accepted energy, zero source seed and
+$\alpha_t=0$, the local energy balance has a common factor w on either
+velocity grid. The code selects
 \begin{equation}
- \frac{c_s\,\mathrm{energy\_eqn\_scal}}{\Delta t}
-       \min\left(w,\left[R_E/w\right]_{\rm analytic}\right)=0.
+ \frac{c_s\,\mathrm{energy\_eqn\_scal}_f}{\Delta t}
+ \min(w_f,[R_{E,f}/w_f]_{\rm analytic})=0.
 \end{equation}
-The accepted energy test includes exact underflow of $w_{\rm start}^2$
-to zero; no positive representable energy is discarded.
-The dormant branch wins an equality tie; no small denominator is inserted.
-For a nonlocal row with $e_{t,\rm start}=w=R_E=0$, the dormant row is
-$w c_s\,\mathrm{energy\_eqn\_scal}/\Delta t=0$.
-If transport or heating supplies finite energy, the predictor supplies
-a positive trial state before solving the original energy balance.
+The dormant branch wins equality. No small denominator is inserted.
+RSP3 retains its independent Pi source and does not use this factorization.
+At $w=e_{t,0}=R_E=0$ the regular dormant constraint is used; finite incoming
+energy instead requires a positive predictor before solving the physical row.
 
-Accepted $w$ and $\Phi$ are nonnegative; $\Pi$ remains signed.
-An active positive $w$ correction leaves at least one tenth of its current
-value; local branch and forced cells may reach zero. No cached negative
-$w$ substitution is used.
-
-The predictor uses two directional sweeps and a positive quadratic storage
-estimate, including source, damping, $Eq$, accepted/current $L_t$, pressure
-work and surviving $\Phi$ at negligible face energy. The existing buoyancy
-guess also applies when both adjacent $w$ are below machine precision times
-$\Delta t\,|\buo_f\chi_{T,f}/(\chi_{\rho,f}C_{P,f})|\sqrt{\Phi_f}$.
-It changes trial guesses only. Accepted history and time weights remain
-fixed; timestep convergence still requires testing.
+Accepted w and Phi are nonnegative; Pi remains signed. An active RSP3
+positive w correction retains at least one tenth of its current value.
+The predictor uses two directional sweeps and the full source, dissipation,
+viscosity, transport and pressure work balance. Surviving Phi at negligible
+w supplies the local trial estimate
+$w=\Delta t\,|\buo_f\chi_T/(\chi_\rho C_P)|\sqrt{\Phi_f}$ and its Pi increment.
+Accepted state and time weights stay fixed. This is an initial guess,
+not a proof of closure realizability or timestep stability.
 
 \clearpage
 \section{Initialization, lengths and mesh state}
@@ -762,7 +749,7 @@ positive face energy, the missing moments are initialized as
  \Phi_{f,0}=\frac{3\Pi_{f,0}^2}{2e_{t,f}}.
 \end{equation}
 These faces retain their heat flux with a fully correlated parcel variance.
-Other faces start with $\Pi=\Phi=0$, retaining cell turbulent energy.
+Other faces start with $\Pi=\Phi=0$, retaining face turbulent energy.
 This changes their imported flux and avoids inferring finite variance
 from tiny inherited velocities in stable layers. The entropy gradient
 generates moments when turbulent energy is present. This initial state
@@ -775,15 +762,17 @@ existing three equation restarts, Newton iterations and retries.
 Accepted moments use the native \code{xh_start} state.
 
 \textbf{Boundary and dormant rows.}
-Moments vanish at faces $k=1,N$, for zero mixing length parameter, and
-in the selected outer and inner forced nonturbulent regions. Their rows are
+Moments vanish at the surface and mathematical inner face $N+1$.
+Outer forced cells also constrain their inner bounding face. The last
+stored face N is active unless the inner forced region includes it.
+Zero mixing length and the selected forced regions use the same mask for w,
+Pi and Phi. Their rows are
 \begin{equation}
  R_{\Pi,f}=\Pi_f/\Pi_{\rm scale,f}=0,\qquad
  R_{\Phi,f}=\Phi_f/\Phi_{\rm scale,f}=0 .
 \end{equation}
-A face with both adjacent energies and current and accepted moments zero
-also uses this branch. Finite adjacent turbulent energy retains the
-moment evolution equations.
+A face with local energy and current and accepted moments zero also uses
+this branch. Nonzero local energy or moments retain their evolution rows.
 
 \textbf{Public TDC length functions.}
 RSP2 calls \code{get_TDC_Hp_face},
@@ -799,36 +788,23 @@ $\Lambda_k=(\Lambda_{0,k}^{-1}+(\beta_h r_k^{\rm cell})^{-1})^{-1}$
 when $\beta_h>0$, with the native cell radius. The same helpers support
 the other length choices and face reconstruction.
 
-\begin{center}
-\small
-\begin{tabularx}{\linewidth}{@{}l X X@{}}
-\toprule
-Mesh path & Cell $w^2$ & Face $Y,\Pi/w_f,\Phi$\\
-\midrule
-Normal remesh & Conservative energy remap &
-Existing monotonic cubic face interpolation, \code{interp_pm}.\\
-Envelope remesh & Conservative energy remap &
-Existing envelope face interpolation.\\
-Split and merge & Preserve cell integrated turbulent energy &
-Split: interpolate a new interior face in mass; merge: retain surviving values of these quantities.\\
-\bottomrule
-\end{tabularx}
-\end{center}
-Moments are face point values. All three paths first retain the old ratio
-$\Pi_f/w_f$, with $w_f=\sqrt{a_fw_k^2+(1-a_f)w_{k-1}^2}$, and take
-the ratio as zero at zero old face energy. After the conservative cell
-energy remap, they reconstruct
-\begin{equation}
- \Pi_{f,\mathrm{new}}=w_{f,\mathrm{new}}\,
- \mathcal I_f\!\left[\frac{\Pi_{\mathrm{old}}}{w_{\mathrm{old}}}\right].
-\end{equation}
-Here $\mathcal I_f$ is the face interpolation in the table. This prevents
-a new face inside a quiet cell from inheriting a finite boundary flux
-without the turbulent energy that carried it. Surviving faces in split
-and merge also use the new face energy. If $w_{f,\mathrm{new}}=0$, Pi is
-zero while Phi retains its entropy variance reservoir. This mesh transfer
-does not cap Pi at positive energy or change its evolution equation.
-Remeshing reapplies forced masks and rejects negative variance.
+\textbf{Moment remapping.}
+Normal remesh, envelope remesh and each split/merge operation call
+\code{hydro_rsp2:remap_rsp2}. They integrate the same positive piecewise
+constant overlap weights for $(w^2,\Pi,\Phi)$ over face control volumes,
+then recover w by a square root. This conserves all three mass integrals
+and preserves the covariance bound if the donor moments satisfy it.
+It does not repair a donor state that already violates that bound.
+Integrals landing in prescribed zero boundary volumes are transferred
+together to the nearest active face. With no active receiver a nonzero
+moment state is rejected. Quadruple precision mass coordinates protect
+small overlap widths. Gas internal energy keeps its separate conservative
+remap; face Y uses monotonic point interpolation, with linear interpolation
+for a new split face.
+
+Photos at version 22 and model files with the face-w format bit store this
+layout. Older RSP2/RSP3 cell-w photos and models are rejected.
+There is no backward conversion mode.
 
 The ordinary RSP2 thermal remap reconstructs cell averages with the native
 monotonic polynomials. With \code{mesh_adjust_get_T_from_E} false it
@@ -842,9 +818,8 @@ last cell uses a one-sided slope; the actual center retains zero slope.
 The energy slope is bounded to keep its endpoint values nonnegative.
 Temperature remapping does not itself conserve internal energy.
 
-Photo version 21 stores the mode and moments; version 20
-without moments remains readable. Saved models use bit 17 and Pi/Phi columns.
-Retries and old models use the generic hydro state machinery.
+Saved models also use bit 17 and Pi/Phi columns for RSP3.
+Retries and same-layout photos use the generic hydro state machinery.
 
 \section{Linear nonadiabatic operator and physical limits}
 The radial LNA system is
@@ -859,7 +834,7 @@ No finite timestep, Newton scale or predictor enters this operator.
 The entropy mapping uses instantaneous coefficients, including dynamic
 gradL when selected.
 
-The turbulent energy row is the continuous linearization on page 2.
+The turbulent energy row is the continuous linearization of equation~\eqref{eq:et}.
 The luminosity row includes $\delta L_c=\delta(\area\rho T\Pi)$.
 The chosen frozen convective flux option instead holds that luminosity
 perturbation fixed, while retaining the moment equations.
@@ -867,15 +842,14 @@ The two cases therefore define different operators.
 
 Forced or fully dormant moment rows impose
 $\delta\Pi=\delta\Phi=0$ with zero inertia.
-A fully dormant cell similarly uses $\delta w=0$. At zero represented
-cell energy, including underflow of $w^2$, a local row without a source
+A fully dormant face similarly uses $\delta w=0$. At zero represented
+face energy, including underflow of $w^2$, a local row without a source
 seed or kinetic transport also uses this constraint when
 $S_k/w_k\leq0$. The source ratio is evaluated in its factored form.
 This is the zero branch of $\min(w_k,R_{E,k}/w_k)=0$ at a static background;
 it uses current energy, not accepted timestep history.
 Positive driving or nonlocal coupling retains the physical energy row.
-An interface with finite face energy retains the dynamic moment rows,
-even when an adjacent cell has $\delta w=0$.
+A face with finite turbulent energy retains its dynamic moment rows.
 Active moments at exactly zero face energy have no regular linearization
 in these variables; LNA reports an error for that background.
 This is a linearization of the selected dormant branch and does not
@@ -940,7 +914,8 @@ Controls and constants &
 Energy and moment rows &
 \path{star/private/hydro_rsp2.f90}:
 \code{do1_turbulent_energy_eqn}, \code{do1_rsp2_moment_eqns},
-\code{rsp2_moment_rhs}, \code{rsp2_moment_source}.\\
+\code{rsp2_moment_rhs}, \code{rsp2_moment_source},
+\code{compute_Lt_center}; \code{star_utils:calc_Ptrb_work_face}.\\
 Face EOS and gradients &
 \path{star/private/hydro_gradient_support.f90}:
 \code{get_rsp2_face_eos}, \code{get_rsp2_thermal_gradient},
@@ -961,7 +936,7 @@ Mode conversion &
 \path{star/private/set_flags.f90}: \code{set_RSP2_3equation_flag};
 \path{star/private/hydro_rsp2.f90}: \code{init_rsp2_moments}.\\
 Mesh and saved state &
-\code{star/private/hydro_rsp2.f90}: \code{remesh_rsp2_moments};
+\code{star/private/hydro_rsp2.f90}: \code{remap_rsp2};
 \path{star/private/mesh_adjust.f90},
 \path{star/private/adjust_mesh_split_merge.f90},
 \path{star/private/struct_burn_mix.f90},

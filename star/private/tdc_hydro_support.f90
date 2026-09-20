@@ -45,13 +45,14 @@ contains
       use interp_1d_def, only: pm_work_size
       use interp_1d_lib, only: interpolate_vector_pm
       use hydro_vars, only: set_cgrav
-      use hydro_rsp2, only: remesh_rsp2_moments, interpolate_rsp2_face, rsp2_remesh_w_face
+      use hydro_rsp2, only: remap_rsp2, interpolate_rsp2_face
       type(star_info), pointer :: s
       integer, intent(out) :: ierr
       integer :: k, j, nz_old, nz
       real(dp) :: xm_anchor, P_surf, T_surf, old_L1, old_r1, old_J, old_abs_J
       real(dp), allocatable, dimension(:) :: &
          xm_old, xm, xm_mid_old, xm_mid, v_old, v_new, dq_old
+      real(dp), allocatable :: xh_old(:,:)
       real(dp), pointer :: work1(:)  ! =(nz_old+1, pm_work_size)
       include 'formats'
       ierr = 0
@@ -77,6 +78,7 @@ contains
          xm(nz + 1), xm_mid(nz), v_new(nz + 1), work1((nz_old + 1)*pm_work_size))
       call set_xm_old2
       dq_old = s%dq(1:nz_old)
+      if (s%RSP2_flag) xh_old = s%xh(:,1:nz_old)
       call find_xm_anchor2
       if (ierr /= 0) then
          deallocate(work1)
@@ -112,24 +114,12 @@ contains
       if (s%RSP2_flag) then
          call interpolate1_face_val2(s%i_Y, s%xh(s%i_Y,nz_old))
          s%xh(s%i_Y,1) = 0d0
-         if (s%RSP2_3equation_flag) then
-            call interpolate1_face_val2(s%i_Pi, 0d0)
-            call interpolate1_face_val2(s%i_Phi, 0d0)
+         call remap_rsp2(s,nz_old,dq_old,xh_old,nz,s%dq,s%xh,ierr)
+         if (ierr /= 0) then
+            deallocate(work1)
+            return
          end if
-         v_old(1:nz_old) = pow2(s%xh(s%i_w,1:nz_old))
-         call remap1_cell_average2
-         s%xh(s%i_w,1:nz) = sqrt(max(0d0, v_new(1:nz)))
          s%w(1:nz) = s%xh(s%i_w,1:nz)
-         if (s%RSP2_3equation_flag) then
-            do k=1,nz
-               s%xh(s%i_Pi,k) = s%xh(s%i_Pi,k)*rsp2_remesh_w_face(s,k,nz,s%dq,s%w)
-            end do
-            call remesh_rsp2_moments(s, nz, s%dq, s%xh, ierr)
-            if (ierr /= 0) then
-               deallocate(work1)
-               return
-            end if
-         end if
       end if
       do j = 1, s%species
          call remap1_xa2(j)
@@ -638,19 +628,13 @@ contains
       subroutine interpolate1_face_val2(i, cntr_val)
          integer, intent(in) :: i
          real(dp), intent(in) :: cntr_val
-         real(dp) :: w_face
          do k = 1, nz_old
             v_old(k) = s%xh(i, k)
-            if (s%RSP2_3equation_flag .and. i == s%i_Pi) then
-               w_face = rsp2_remesh_w_face(s,k,nz_old,dq_old,s%xh(s%i_w,:))
-               v_old(k) = 0d0
-               if (w_face > 0d0) v_old(k) = s%xh(i,k)/w_face
-            end if
          end do
          v_old(nz_old + 1) = cntr_val
-         if (s%RSP2_flag .and. (i == s%i_Y .or. i == s%i_Pi .or. i == s%i_Phi)) then
+         if (s%RSP2_flag .and. i == s%i_Y) then
             call interpolate_rsp2_face( &
-               s, i, nz_old + 1, xm_old, nz + 1, xm, v_old, v_new, work1, ierr)
+               nz_old + 1, xm_old, nz + 1, xm, v_old, v_new, work1, ierr)
          else
             call interpolate_vector_pm( &
                nz_old + 1, xm_old, nz + 1, xm, v_old, v_new, work1, 'remesh_for_TDC', ierr)
@@ -871,7 +855,7 @@ contains
             if (s%RSP2_flag .and. s%mixing_length_alpha /= 0d0 .and. &
                   k > s%RSP2_num_outermost_cells_forced_nonturbulent .and. &
                   k <= nz - int(nz/s%RSP2_nz_div_IBOTOM)) &
-               s%Peos(k) = s%Peos(k) - (2d0/3d0)*s%RSP2_alfap*s%rho(k)*pow2(s%w(k))
+               s%Peos(k) = s%Peos(k) - (2d0/3d0)*s%RSP2_alfap*s%rho(k)*get_etrb_cell(s,k)
             if (s%Peos(k) <= 0d0) then
                ierr = -1
                return

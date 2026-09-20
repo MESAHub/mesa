@@ -150,6 +150,7 @@
       public :: eval_integrated_total_energy_profile
       public :: use_xh_to_set_rho_to_dm_div_dv
       public :: cell_specific_total_energy
+      public :: calc_Ptrb_work_face
       public :: store_lnr_in_xh
       public :: interp_q
       public :: set_zero_alpha_rti
@@ -2463,7 +2464,7 @@
          cell_total = cell_total + cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)
          if (s% rotation_flag .and. s% include_rotation_in_total_energy) &
                cell_total = cell_total + cell_specific_rotational_energy(s,k)
-         if (s% RSP2_flag) cell_total = cell_total + pow2(s% w(k))
+         if (s% RSP2_flag) cell_total = cell_total + get_etrb_cell(s,k)
          if (.not. s%RSP2_flag .and. s%MLT_option == 'TDC' .and. &
                s%TDC_include_eturb_in_energy_equation) then
             cell_total = cell_total + &
@@ -2559,7 +2560,7 @@
                   cell_total = cell_total + cell1
             end if
             if (s% RSP2_flag) then
-               cell1 = dm*pow2(s% w(k))
+               cell1 = dm*get_etrb_cell(s,k)
                cell_total = cell_total + cell1
                total_turbulent_energy = total_turbulent_energy + cell1
             else if ( s% MLT_option == 'TDC' .and. &
@@ -2613,7 +2614,7 @@
                   cell_total = cell_total + cell1
             end if
             if (s% RSP2_flag) then
-               cell1 = dm*pow2(s% w(k))
+               cell1 = dm*get_etrb_cell(s,k)
                cell_total = cell_total + cell1
             end if
             if (.not. s%RSP2_flag .and. s%MLT_option == 'TDC' .and. &
@@ -3414,13 +3415,13 @@
             return
          end if
          rho = wrap_d_00(s,k)
-         etrb = wrap_etrb_00(s,k)
+         etrb = wrap_etrb_cell(s,k)
          Ptrb_div_etrb = s% RSP2_alfap*x_ALFAP*rho
          Ptrb = Ptrb_div_etrb*etrb  ! cm^2 s^-2 g cm^-3 = erg cm^-3
          time_center = (do_time_centering .and. s% using_velocity_time_centering .and. &
                   s% include_P_in_velocity_time_centering)
          if (time_center) then
-            Ptrb_start = s% RSP2_alfap*x_ALFAP*get_etrb_start(s,k)*s% rho_start(k)
+            Ptrb_start = s% RSP2_alfap*x_ALFAP*get_etrb_cell_start(s,k)*s% rho_start(k)
             Ptrb = s% P_theta_for_velocity_time_centering*Ptrb + &
                (1d0 - s% P_theta_for_velocity_time_centering)*Ptrb_start
          end if
@@ -3442,6 +3443,47 @@
          end if
 
       end subroutine calc_Ptrb_ad_tw
+
+      function calc_Ptrb_work_face(s,k,divide_by_w) result(work)
+         use auto_diff_support
+         type(star_info), pointer :: s
+         integer, intent(in) :: k
+         logical, intent(in), optional :: divide_by_w
+         type(auto_diff_real_star_order1) :: work, w, energy, rho, dV, pressure, old_energy_div_w
+         real(dp) :: theta, dm_face, old_energy
+         integer :: j
+
+         work = 0d0
+         if (rsp2_zero_w(s,k) .or. s% RSP2_alfap == 0d0) return
+         theta = 1d0
+         if (s% using_velocity_time_centering .and. s% include_P_in_velocity_time_centering) &
+            theta = s% P_theta_for_velocity_time_centering
+         w = wrap_w_00(s,k)
+         energy = pow2(w)
+         old_energy = pow2(s% w_start(k))
+         dm_face = 0.5d0*(s% dm(k-1) + s% dm(k))
+         do j=k-1,k
+            if (j == k) then
+               rho = wrap_d_00(s,k)
+            else
+               rho = wrap_d_m1(s,k)
+            end if
+            dV = 1d0/rho - 1d0/s% rho_start(j)
+            pressure = theta*rho*energy + (1d0-theta)*s% rho_start(j)*old_energy
+            if (present(divide_by_w)) then
+               if (divide_by_w) then
+                  pressure = theta*rho*w
+                  if (old_energy > 0d0 .and. theta /= 1d0) then
+                     old_energy_div_w = 0d0
+                     old_energy_div_w%val = old_energy/w%val
+                     old_energy_div_w%d1Array = -old_energy_div_w%val*(w%d1Array/w%val)
+                     pressure = pressure + (1d0-theta)*s% rho_start(j)*old_energy_div_w
+                  end if
+               end if
+            end if
+            work = work + (s% RSP2_alfap/3d0)*s% dm(j)*pressure*dV/dm_face
+         end do
+      end function calc_Ptrb_work_face
 
 
       ! Ptot_ad = Peos_ad + Pvsc_ad + Ptrb_ad + mlt_Pturb_ad.

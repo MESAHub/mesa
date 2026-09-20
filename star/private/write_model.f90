@@ -80,7 +80,7 @@
          if (rotation_flag) file_type = file_type + 2**bit_for_rotation
          if (rotation_flag) file_type = file_type + 2**bit_for_j_rot
          if (RSP_flag) file_type = file_type + 2**bit_for_RSP
-         if (RSP2_flag) file_type = file_type + 2**bit_for_RSP2
+         if (RSP2_flag) file_type = file_type + 2**bit_for_RSP2 + 2**bit_for_RSP2_face_w
          if (s% RSP2_3equation_flag) file_type = file_type + 2**bit_for_RSP2_3equation
          if (write_mlt_vc) file_type = file_type + 2**bit_for_mlt_vc
 
@@ -105,7 +105,7 @@
          if (BTEST(file_type, bit_for_RSP)) &
             write(iounit,'(a)',advance='no') ', RSP luminosity (L), turbulent energy (et_RSP), and radiative flux (erad_RSP)'
          if (BTEST(file_type, bit_for_RSP2)) &
-            write(iounit,'(a)',advance='no') ', RSP2 turbulent velocity (w) and superadiabaticity (Y_face)'
+            write(iounit,'(a)',advance='no') ', RSP2 face turbulent velocity (w) and superadiabaticity (Y_face)'
          write(iounit,'(a)',advance='no') &
             '. cgs units. lnd=ln(density), lnT=ln(temperature), lnR=ln(radius)'
          if (s% i_lum /= 0) then

@@ -32,7 +32,7 @@
          leftover_convective_mixing
       use star_utils
       use utils_lib
-      use auto_diff_support, only: get_w, get_etrb
+      use auto_diff_support, only: get_w, get_etrb, get_etrb_cell
 
       implicit none
 
@@ -261,7 +261,6 @@
 
 
       subroutine getval_for_profile(s, c, k, val, int_flag, int_val)
-         use hydro_rsp2, only: get_RSP2_alfa_beta_face_weights
          use chem_def
          use hydro_riemann, only: get_Riemann_shock_diagnostics
          use rates_def
@@ -280,7 +279,7 @@
             r00_start, rp1_start, dr3, dr3_start, &
             d_dlnR00, d_dlnRp1, d_dv00, d_dvp1
          integer :: j, nz, ionization_k, klo, khi, i, ii, ierr
-         real(dp) :: f, lgT, full_on, full_off, am_nu_factor, alfa_rsp2, beta_rsp2, etrb_face
+         real(dp) :: f, lgT, full_on, full_off, am_nu_factor, etrb_face
          logical :: rsp_or_w, reconstructed_face_state_active
          include 'formats'
 
@@ -1857,13 +1856,13 @@
 
             case(p_Ptrb)
                if (s% RSP2_flag) then
-                  val = get_etrb(s,k)*s% rho(k)
+                  val = (2d0/3d0)*s% RSP2_alfap*get_etrb_cell(s,k)*s% rho(k)
                else if (s% RSP_flag) then
                   val = s% RSP_Et(k)*s% rho(k)
                end if
             case(p_log_Ptrb)
                if (s% RSP2_flag) then
-                  val = safe_log10(get_etrb(s,k)*s% rho(k))
+                  val = safe_log10((2d0/3d0)*s% RSP2_alfap*get_etrb_cell(s,k)*s% rho(k))
                else if (s% RSP_flag) then
                   val = safe_log10(s% RSP_Et(k)*s% rho(k))
                end if
@@ -1916,9 +1915,7 @@
                if (s% RSP2_3equation_flag) val = s% Phi(k)
             case(p_Pi_covariance_excess)
                if (s% RSP2_3equation_flag) then
-                  call get_RSP2_alfa_beta_face_weights(s,k,alfa_rsp2,beta_rsp2)
-                  etrb_face = alfa_rsp2*pow2(s% w(k))
-                  if (k > 1) etrb_face = etrb_face + beta_rsp2*pow2(s% w(k-1))
+                  etrb_face = get_etrb(s,k)
                   val = pow2(s% Pi(k)) - (2d0/3d0)*etrb_face*s% Phi(k)
                end if
             case(p_PII_face)

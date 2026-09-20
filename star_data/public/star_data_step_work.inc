@@ -39,7 +39,7 @@
       real(dp), pointer :: L(:) ! L(k) is luminosity at outer edge of cell k
       real(dp), pointer :: r(:) ! r(k) is radius at outer edge of cell k
       real(dp), pointer :: lnR(:) ! lnR(k) is log(r(k))
-      real(dp), pointer :: w(:) ! cell turbulent velocity.  only used when RSP2_flag is true
+      real(dp), pointer :: w(:) ! face sqrt(specific turbulent energy), used when RSP2_flag is true
       real(dp), pointer :: v(:) ! only used when v_flag is true
          ! v(k) is velocity at outer edge of cell k
       real(dp), pointer :: u(:) ! only used when u_flag is true
@@ -399,7 +399,8 @@
             PII_ad, Chi_ad, Eq_ad, COUPL_ad, Lr_ad, Lc_ad, Lt_ad
          real(dp), pointer, dimension(:) :: &
             Ptrb, Pvsc, Pvsc_start, Hp_face, Y_face, Y_face_start, PII, Chi, Eq, Uq, &
-            SOURCE, DAMP, DAMPR, COUPL, Lr, Lc, Lt, Lt_start
+            SOURCE, DAMP, DAMPR, COUPL, Lr, Lc, Lt, Lt_start, Lt_center_start
+         real(dp), pointer :: d_hydro_d_p2(:,:,:) ! scaled hydro partials at zone k+2
          integer :: RSP2_num_periods
          real(dp) :: RSP2_period, &
             RSP2_DeltaR, RSP2_DeltaMag, RSP2_GRPDV, RSP2_GREKM, RSP2_GREKM_avg_abs

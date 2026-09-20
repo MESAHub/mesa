@@ -434,7 +434,7 @@
 
    !dE
 
-   !etrb
+   !etrb ! RSP2 specific turbulent energy at the face, erg/g
    !log_etrb
    !extra_grav
    !log_rel_E_err

@@ -57,6 +57,7 @@
       subroutine get1_energy_eqn( &
             s, k, do_chem, nvar, d_dm1, d_d00, d_dp1, ierr)
          use eos_def, only: i_grad_ad, i_lnPgas, i_lnE
+         use star_utils, only: unpack_residual_partials
          use eps_grav, only: eval_eps_grav_and_partials
          use accurate_sum_auto_diff_star_order1
          use auto_diff_support
@@ -68,9 +69,10 @@
 
          type(auto_diff_real_star_order1) :: resid_ad, &
             dL_dm_ad, sources_ad, others_ad, d_turbulent_energy_dt_ad, &
-            dwork_dm_ad, eps_grav_ad, dke_dt_ad, dpe_dt_ad, de_dt_ad
+            dwork_dm_ad, eps_grav_ad, dke_dt_ad, dpe_dt_ad, de_dt_ad, energy_inner_ad
          type(accurate_auto_diff_real_star_order1) :: esum_ad
          real(dp) :: residual, dm, dt, scal
+         real(dp) :: unused_m1(nvar), unused_00(nvar), d_dp2(nvar)
          real(dp), dimension(s% species) :: &
             d_dwork_dxam1, d_dwork_dxa00, d_dwork_dxap1
          integer :: nz, i_dlnE_dt, i_lum, i_v
@@ -136,6 +138,18 @@
             s% solver_test_partials_val = residual
          end if
          call unpack_res18(s% species, resid_ad)
+         if (s% RSP2_flag .and. k < nz-1) then
+            ! Inner-face terms retain their original AD origin until this extraction.
+            call unpack_residual_partials(s,k+1,nvar,i_dlnE_dt, &
+               energy_inner_ad,unused_m1,unused_00,d_dp2)
+            if (any(is_bad(d_dp2))) then
+               ierr = -1
+               s% retry_message = 'invalid RSP2 energy partial at k+2'
+               return
+            end if
+            s% d_hydro_d_p2(i_dlnE_dt,1:s% nvar_hydro,k) = &
+               scal*d_dp2(1:s% nvar_hydro)*s% x_scale(1:s% nvar_hydro,k+2)
+         end if
 
          if (test_partials) then
             s% solver_test_partials_var = s% i_u
@@ -174,10 +188,14 @@
             doing_op_split_burn = s% op_split_burn .and. &
                s% T_start(k) >= s% op_split_burn_min_T
             d_dm1 = 0d0; d_d00 = 0d0; d_dp1 = 0d0
+            energy_inner_ad = 0d0
+            if (s% RSP2_flag) s% d_hydro_d_p2(i_dlnE_dt,:,k) = 0d0
          end subroutine init
 
          subroutine setup_dwork_dm(ierr)
+            use star_utils, only: calc_Ptrb_ad_tw, calc_Ptrb_work_face
             integer, intent(out) :: ierr
+            type(auto_diff_real_star_order1) :: work_inner, work_face, Ptrb, Ptrb_div_etrb
             real(dp) :: dwork
             logical :: skip_P
             include 'formats'
@@ -186,7 +204,8 @@
             if (s% use_P_d_1_div_rho_form_of_work .or. &
                   (s% RSP2_flag .and. eps_grav_form)) then
                call eval_simple_PdV_work(s, k, skip_P, dwork_dm_ad, dwork, &
-                  d_dwork_dxa00, ierr)
+                  d_dwork_dxa00, ierr, work_inner)
+               if (s% RSP2_flag) energy_inner_ad = energy_inner_ad - work_inner/dm
                d_dwork_dxam1 = 0
                d_dwork_dxap1 = 0
                if (k == s% nz) then
@@ -201,13 +220,23 @@
                end if
             else
                call eval_dwork(s, k, skip_P, dwork_dm_ad, dwork, &
-                  d_dwork_dxam1, d_dwork_dxa00, d_dwork_dxap1, ierr)
+                  d_dwork_dxam1, d_dwork_dxa00, d_dwork_dxap1, ierr, work_inner)
+               if (s% RSP2_flag) energy_inner_ad = energy_inner_ad - work_inner/dm
             end if
             if (ierr /= 0) then
                if (s% report_ierr) write(*,*) 'failed in setup_dwork_dm', k
                return
             end if
             dwork_dm_ad = dwork_dm_ad/dm
+            if (s% RSP2_flag) then
+               call calc_Ptrb_ad_tw(s,k,Ptrb,Ptrb_div_etrb,ierr)
+               if (ierr /= 0) return
+               work_face = 0.5d0*calc_Ptrb_work_face(s,k)
+               if (k < nz) work_face = work_face + 0.5d0*shift_p1(calc_Ptrb_work_face(s,k+1))
+               ! Redistribute turbulent work with the same quadrature as stored energy.
+               dwork_dm_ad = dwork_dm_ad + &
+                  (work_face - Ptrb*(1d0/wrap_d_00(s,k)-1d0/s% rho_start(k)))/dt
+            end if
          end subroutine setup_dwork_dm
 
          subroutine setup_dL_dm(ierr)
@@ -231,7 +260,7 @@
 
 
          subroutine setup_sources_and_others(ierr) ! sources_ad, others_ad
-            use hydro_rsp2, only: compute_Uq_face, compute_Uq_dm_cell
+            use hydro_rsp2, only: compute_Uq_face, compute_Uq_dm_cell, compute_Eq_cell
             use hydro_riemann, only: get_RTI_momentum_diffusion
             use tdc_hydro, only: &
                compute_tdc_Eq_cell, compute_tdc_Eq_div_w_face, &
@@ -240,7 +269,7 @@
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: &
                eps_nuc_ad, non_nuc_neu_ad, extra_heat_ad, Eq_ad, Eq_00, Eq_p1, &
-               viscous_work_ad, &
+               viscous_work_ad, Eq_inner, Uq_inner, &
                Uq_00, Uq_p1, RTI_diffusion_ad, RTI_momentum_energy_ad, &
                RTI_force_ad, RTI_dissipation_ad, v_00, v_p1, drag_force, drag_energy
             type(accurate_auto_diff_real_star_order1) :: sources_sum_ad
@@ -286,19 +315,22 @@
                others_ad%val = others_ad%val + s% eps_phase_separation(k)
 
             Eq_ad = 0d0
+            Uq_inner = 0d0
             viscous_work_ad = 0d0
             Uq_00 = 0d0
             Uq_p1 = 0d0
             have_v_viscous_work = .false.
             if (s% RSP2_flag) then
-               Eq_ad = s% Eq_ad(k)  ! compute_Eq_cell(s, k, ierr)
+               Eq_ad = compute_Eq_cell(s,k,ierr,Eq_inner)
                if (ierr /= 0) return
+               energy_inner_ad = energy_inner_ad + Eq_inner
                if (include_dke_dt .and. s% v_flag) then
                   Uq_00 = compute_Uq_face(s, k, ierr)
                   if (ierr /= 0) return
                   if (k < s% nz) then
-                     Uq_p1 = shift_p1(compute_Uq_face(s, k+1, ierr))
+                     Uq_inner = compute_Uq_face(s,k+1,ierr)
                      if (ierr /= 0) return
+                     Uq_p1 = shift_p1(Uq_inner)
                   end if
                   have_v_viscous_work = .true.
                else if (include_dke_dt .and. s% u_flag) then
@@ -360,6 +392,8 @@
                ! Match the half-cell kinetic-energy quadrature.
                viscous_work_ad = 0.5d0*kinetic_mass_factor* &
                   (v_00*Uq_00 + v_p1*Uq_p1)
+               if (s% RSP2_flag) energy_inner_ad = energy_inner_ad + &
+                  0.5d0*kinetic_mass_factor*v_p1%val*Uq_inner
             end if
 
             call setup_RTI_diffusion(RTI_diffusion_ad)
@@ -463,7 +497,7 @@
             include 'formats'
             ierr = 0
             if (s% RSP2_flag) then
-               d_turbulent_energy_dt_ad = (wrap_etrb_00(s,k) - get_etrb_start(s,k))/dt
+               d_turbulent_energy_dt_ad = (wrap_etrb_cell(s,k) - get_etrb_cell_start(s,k))/dt
             else if (s% MLT_option == 'TDC' .and. s% TDC_include_eturb_in_energy_equation) then
                ! write a wrapper for this.
                   if (k < s% nz) then
@@ -660,7 +694,7 @@
 
 
       subroutine eval_dwork(s, k, skip_P, dwork_ad, dwork, &
-            d_dwork_dxam1, d_dwork_dxa00, d_dwork_dxap1, ierr)
+            d_dwork_dxam1, d_dwork_dxa00, d_dwork_dxap1, ierr, work_inner)
          use auto_diff_support
          use star_utils, only: calc_Ptot_ad_tw
          type (star_info), pointer :: s
@@ -672,6 +706,7 @@
             d_dwork_dxam1, d_dwork_dxa00, d_dwork_dxap1
          integer, intent(out) :: ierr
 
+         type(auto_diff_real_star_order1), intent(out), optional :: work_inner
          real(dp) :: work_00, work_p1
          real(dp), dimension(s% species) :: &
             d_work_00_dxa00, d_work_00_dxam1, &
@@ -688,6 +723,7 @@
          call eval1_work(s, k+1, skip_P, &
             work_p1_ad, work_p1, d_work_p1_dxap1, d_work_p1_dxa00, ierr)
          if (ierr /= 0) return
+         if (present(work_inner)) work_inner = -work_p1_ad
          work_p1_ad = shift_p1(work_p1_ad)  ! shift the partials
          dwork_ad = work_00_ad - work_p1_ad
          dwork = dwork_ad%val
@@ -923,7 +959,7 @@
 
 
       subroutine eval_simple_PdV_work( &
-            s, k, skip_P, dwork_ad, dwork, d_dwork_dxa00, ierr)
+            s, k, skip_P, dwork_ad, dwork, d_dwork_dxa00, ierr, work_inner)
          use auto_diff_support
          use star_utils, only: calc_Ptot_ad_tw
          type (star_info), pointer :: s
@@ -933,6 +969,7 @@
          real(dp), intent(out) :: dwork
          real(dp), intent(out), dimension(s% species) :: d_dwork_dxa00
          integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1), intent(out), optional :: work_inner
 
          type(auto_diff_real_star_order1) :: &
             Av_face00_ad, Av_facep1_ad, Ptot_ad, dV
@@ -943,6 +980,7 @@
 
          include 'formats'
          ierr = 0
+         if (present(work_inner)) work_inner = 0d0
 
          ! dV = 1/rho - 1/rho_start
          call eval1_A_times_v_face_ad(s, k, Av_face00_ad, ierr)
@@ -950,6 +988,7 @@
          if (k < s% nz) then
             call eval1_A_times_v_face_ad(s, k+1, Av_facep1_ad, ierr)
             if (ierr /= 0) return
+            if (present(work_inner)) work_inner = -Av_facep1_ad
             Av_facep1_ad = shift_p1(Av_facep1_ad)
          else
             Av_facep1_ad = 0d0
@@ -971,6 +1010,7 @@
          end do
          if (k == 1) s% work_outward_at_surface = Ptot_ad%val*Av_face00
 
+         if (present(work_inner)) work_inner = Ptot_ad%val*work_inner
          dwork_ad = Ptot_ad*dV
          dwork = dwork_ad%val
 

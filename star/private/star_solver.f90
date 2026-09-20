@@ -141,7 +141,7 @@
             band_kl, band_ku, band_ldab, band_diag
          integer(i8) :: time0
          character (len=strlen) :: err_msg
-         logical :: first_try, dbg_msg, passed_tol_tests, &
+         logical :: first_try, dbg_msg, passed_tol_tests, have_hydro_p2, &
             doing_extra, disabled_resid_tests, pass_resid_tests, &
             pass_corr_tests_without_coeff, pass_corr_tests_with_coeff
 
@@ -436,6 +436,12 @@
                   ! compute gradient of f = equ<dot>jacobian
                   ! NOTE: NOT jacobian<dot>equ
                   call block_multiply_xa(nvar, nz, lblk1, dblk1, ublk1, equ1, grad_f1)
+                  if (s% RSP2_flag) then
+                     do i=1,nz-2
+                        grad_f(1:s% nvar_hydro,i+2) = grad_f(1:s% nvar_hydro,i+2) + &
+                           matmul(transpose(s% d_hydro_d_p2(:,:,i)),equ(1:s% nvar_hydro,i))
+                     end do
+                  end if
 
                   slope = eval_slope(nvar, nz, grad_f, soln)
                   if (is_bad_num(slope) .or. slope > 0d0) then  ! a very bad sign
@@ -834,10 +840,9 @@
                call apply_coeff(nvar, nz, dxsave, soln, coeff, skip_eval_f)
 
                if (s% RSP2_3equation_flag) then
-                  do k=2,nz-1
+                  do k=2,nz
                      if (s% xh_start(s% i_Pi,k) /= 0d0 .or. s% xh_start(s% i_Phi,k) /= 0d0) cycle
-                     if (pow2(s% xh_start(s% i_w,k) + s% solver_dx(s% i_w,k)) /= 0d0 .or. &
-                           pow2(s% xh_start(s% i_w,k-1) + s% solver_dx(s% i_w,k-1)) /= 0d0) cycle
+                     if (s% xh_start(s% i_w,k) + s% solver_dx(s% i_w,k) /= 0d0) cycle
                      ! The zero energy face has homogeneous zero moment equations.
                      s% solver_dx(s% i_Pi,k) = 0d0
                      s% solver_dx(s% i_Phi,k) = 0d0
@@ -1053,10 +1058,17 @@
                !$OMP END PARALLEL DO SIMD
             end if
 
+            have_hydro_p2 = .false.
+            if (s% RSP2_flag .and. nz > 2) &
+               have_hydro_p2 = any(s% d_hydro_d_p2(:,:,1:nz-2) /= 0d0)
             select case (trim(s% hydro_matrix_solver))
             case ('bcyclic')
-               call factor_bcyclic_mtx(ierr)
-               if (ierr == 0) call solve_bcyclic_mtx(ierr)
+               if (have_hydro_p2) then
+                  call solve_bcyclic_pairs(ierr)
+               else
+                  call factor_bcyclic_mtx(ierr)
+                  if (ierr == 0) call solve_bcyclic_mtx(ierr)
+               end if
             case ('banded')
                call solve_banded_mtx(ierr)
             case default
@@ -1106,6 +1118,75 @@
          end subroutine solve_bcyclic_mtx
 
 
+         subroutine solve_bcyclic_pairs(ierr)
+            use star_bcyclic, only: bcyclic_factor, bcyclic_solve
+            integer, intent(out) :: ierr
+            integer :: pair_nvar, pair_nz, pair_neq, k, j, group, row0, col0
+            real(dp), pointer :: pair_l1(:), pair_d1(:), pair_u1(:), &
+               pair_lf1(:), pair_df1(:), pair_uf1(:), pair_b(:), pair_soln(:), &
+               pair_row_scale(:), pair_col_scale(:)
+            real(dp), pointer :: pair_l(:,:,:), pair_d(:,:,:), pair_u(:,:,:)
+            integer, pointer :: pair_pivot(:)
+            character(len=(nz+1)/2) :: pair_equed
+
+            ! Two adjacent zones per block retain RSP2 partials at k+2.
+            pair_nvar = 2*nvar
+            pair_nz = (nz+1)/2
+            pair_neq = pair_nvar*pair_nz
+            allocate(pair_l1(pair_nvar*pair_neq), pair_d1(pair_nvar*pair_neq), &
+               pair_u1(pair_nvar*pair_neq), pair_lf1(pair_nvar*pair_neq), &
+               pair_df1(pair_nvar*pair_neq), pair_uf1(pair_nvar*pair_neq), &
+               pair_b(pair_neq), pair_soln(pair_neq), pair_pivot(pair_neq), &
+               pair_row_scale(pair_neq), pair_col_scale(pair_neq))
+            pair_l(1:pair_nvar,1:pair_nvar,1:pair_nz) => pair_l1
+            pair_d(1:pair_nvar,1:pair_nvar,1:pair_nz) => pair_d1
+            pair_u(1:pair_nvar,1:pair_nvar,1:pair_nz) => pair_u1
+            pair_l1 = 0d0
+            pair_d1 = 0d0
+            pair_u1 = 0d0
+            pair_b = 0d0
+            pair_b(1:neq) = B1(1:neq)
+            do k=1,nz
+               group = (k+1)/2
+               row0 = mod(k-1,2)*nvar
+               pair_d(row0+1:row0+nvar,row0+1:row0+nvar,group) = dblk(:,:,k)
+               if (k > 1) then
+                  if (row0 == 0) then
+                     pair_l(1:nvar,nvar+1:pair_nvar,group) = lblk(:,:,k)
+                  else
+                     pair_d(nvar+1:pair_nvar,1:nvar,group) = lblk(:,:,k)
+                  end if
+               end if
+               if (k < nz) then
+                  if (row0 == 0) then
+                     pair_d(1:nvar,nvar+1:pair_nvar,group) = ublk(:,:,k)
+                  else
+                     pair_u(nvar+1:pair_nvar,1:nvar,group) = ublk(:,:,k)
+                  end if
+               end if
+               if (k < nz-1) then
+                  col0 = mod(k+1,2)*nvar
+                  pair_u(row0+1:row0+s% nvar_hydro,col0+1:col0+s% nvar_hydro,group) = &
+                     s% d_hydro_d_p2(:,:,k)
+               end if
+            end do
+            if (mod(nz,2) /= 0) then
+               do j=nvar+1,pair_nvar
+                  pair_d(j,j,pair_nz) = 1d0
+               end do
+            end if
+            call bcyclic_factor(s,pair_nvar,pair_nz,pair_l1,pair_d1,pair_u1, &
+               pair_lf1,pair_df1,pair_uf1,pair_pivot,pair_b,pair_row_scale, &
+               pair_col_scale,pair_equed,iter,ierr)
+            if (ierr == 0) call bcyclic_solve(s,pair_nvar,pair_nz,pair_l1,pair_d1,pair_u1, &
+               pair_lf1,pair_df1,pair_uf1,pair_pivot,pair_b,pair_soln,pair_row_scale, &
+               pair_col_scale,pair_equed,iter,ierr)
+            if (ierr == 0) soln1(1:neq) = pair_soln(1:neq)
+            deallocate(pair_l1,pair_d1,pair_u1,pair_lf1,pair_df1,pair_uf1, &
+               pair_b,pair_soln,pair_pivot,pair_row_scale,pair_col_scale)
+         end subroutine solve_bcyclic_pairs
+
+
          subroutine solve_banded_mtx(ierr)
             integer, intent(out) :: ierr
             integer :: info, k, i_equ, i_var, irow, jcol, row0, col0, iband
@@ -1117,6 +1198,9 @@
                return
             end if
 
+            band_ku = 2*nvar
+            if (have_hydro_p2) band_ku = 3*nvar
+            band_diag = band_kl + band_ku + 1
             band(1:band_ldab,1:neq) = 0d0
             soln1(1:neq) = B1(1:neq)
 
@@ -1169,6 +1253,18 @@
                end do
             end do
 
+            if (have_hydro_p2) then
+               do k=1,nz-2
+                  do i_equ=1,s% nvar_hydro
+                     irow = nvar*(k-1) + i_equ
+                     do i_var=1,s% nvar_hydro
+                        jcol = nvar*(k+1) + i_var
+                        iband = band_diag + irow - jcol
+                        band(iband,jcol) = s% d_hydro_d_p2(i_equ,i_var,k)
+                     end do
+                  end do
+               end do
+            end if
             call DGBTRF(neq, neq, band_kl, band_ku, band, band_ldab, ipiv1, info)
             if (info /= 0) then
                write(*,*) 'hydro banded DGBTRF failed', info
@@ -1480,7 +1576,11 @@
                i_equ, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, k
             real(dp), pointer, dimension(:,:) :: save_dx, save_equ
             integer, intent(out) :: ierr
-            real(dp) :: dvardx0_m1, dvardx0_00, dvardx0_p1
+            real(dp) :: dvardx0_m1, dvardx0_00, dvardx0_p1, dvardx0_p2
+            dvardx0_p2 = 0d0
+            if (s% RSP2_flag .and. i_equ > 0 .and. i_equ <= s% nvar_hydro .and. &
+                  k < nz-1 .and. i_var <= s% nvar_hydro) &
+               dvardx0_p2 = s% d_hydro_d_p2(i_equ,i_var,k)/s% x_scale(i_var,k+2)
             dvardx0_m1 = 0d0
             dvardx0_00 = 0d0
             dvardx0_p1 = 0d0
@@ -1546,6 +1646,12 @@
                   k, 1, dvardx0_p1, save_dx, save_equ, ierr)
                if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'test3_partials')
             end if
+            if (s% RSP2_flag .and. i_equ == s% i_dlnE_dt .and. k < nz-1) then
+               call test1_partial(s, &
+                  i_equ,i_var,i_var_sink,i_var_xa_index,i_var_sink_xa_index, &
+                  k,2,dvardx0_p2,save_dx,save_equ,ierr)
+               if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'test3_partials')
+            end if
          end subroutine test3_partials
 
 
@@ -1601,6 +1707,8 @@
                   k_off_str = '-1)'
                else if (k_off == 1) then
                   k_off_str = '+1)'
+               else if (k_off == 2) then
+                  k_off_str = '+2)'
                end if
                if (dvardx /= 0d0) then
                   uncertainty = abs(err/dvardx)
@@ -2060,6 +2168,7 @@
 
             band_kl = 2*nvar
             band_ku = 2*nvar
+            if (s% RSP2_flag) band_ku = 3*nvar
             band_ldab = 2*band_kl + band_ku + 1
             band_diag = band_kl + band_ku + 1
             if (trim(s% hydro_matrix_solver) == 'banded') then

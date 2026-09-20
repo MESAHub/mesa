@@ -200,6 +200,10 @@
          call realloc_double2(s% xh_start, nvar_hydro, (nz + nz_alloc_extra), ierr)
          if (ierr /= 0) return
 
+         call realloc_double3(s% d_hydro_d_p2, nvar_hydro, nvar_hydro, nz + nz_alloc_extra, ierr)
+         if (ierr /= 0) return
+         s% d_hydro_d_p2 = 0d0
+
          call realloc_double(s% xa_removed, species, ierr)
          if (ierr /= 0) return
 
@@ -1120,6 +1124,8 @@
             if (failed('PII_ad')) exit
             call do1_ad(s% Chi_ad, c% Chi_ad)
             if (failed('Chi_ad')) exit
+            call do3(s% d_hydro_d_p2, c% d_hydro_d_p2, nvar_hydro, nvar_hydro)
+            if (failed('d_hydro_d_p2')) exit
             call do1_ad(s% Eq_ad, c% Eq_ad)
             if (failed('Eq_ad')) exit
             call do1_ad(s% COUPL_ad, c% COUPL_ad)
@@ -1372,6 +1378,7 @@
             call do1(s% Lc_start, c% Lc_start); if (failed('Lc_start')) exit
             call do1(s% Lt, c% Lt); if (failed('Lt')) exit
             call do1(s% Lt_start, c% Lt_start); if (failed('Lt_start')) exit
+            call do1(s% Lt_center_start, c% Lt_center_start); if (failed('Lt_center_start')) exit
 
             call do1(s% Fr, c% Fr); if (failed('Fr')) exit
             call do1(s% Fr_start, c% Fr_start); if (failed('Fr_start')) exit

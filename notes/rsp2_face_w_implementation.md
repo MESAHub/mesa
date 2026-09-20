@@ -1,9 +1,179 @@
 # RSP2 and RSP3 face turbulent energy plan
 
-2026-09-20. Design and source audit, not an implemented layout change.
-Audited on `EbF/star_lna`, after checkpoint `6d6bc2848`, with the current
-uncommitted RSP2 and LNA corrections. No MESA compilation or stellar run
-is part of this update.
+2026-09-20. Face implementation compiled and installed; first stellar test stopped by the user.
+Implemented on `EbF/star_lna` after checkpoint `d28e05018`. The user has authorized
+installation with MESA_DIR set to this checkout. Broader stellar validation remains pending.
+
+## Active implementation
+
+The pre-conversion corrections and this design were amended into checkpoint
+`d28e05018` at the user's request. The conversion now targets both RSP2 and
+RSP3, with distinct PII versus Pi/Phi closures and separate TDC hydro.
+
+- [x] Amend the current RSP checkpoint, excluding test-case settings and unrelated files.
+- [x] Add explicit cell projections of face energy and a common face boundary mask.
+- [x] Complete face residuals, Eq/Uq, pressure work and transport.
+- [x] Preserve second-neighbor derivatives required by energy work and Riemann pressure.
+- [x] Complete mesh, initialization and face saved-state format checks.
+- [x] Update LNA, outputs and source documentation.
+- [x] Complete static and mathematical checks.
+- [x] Compile and install with MESA_DIR set to this checkout; leave case relinking to the user.
+
+The common boundary convention uses a zero turbulent-energy value at the
+mathematical inner face nz+1. Outer forced cells also constrain their inner
+bounding face. Boundary eddy stress and conservative remap must account
+explicitly for this convention. The installed library now uses the face layout.
+Existing case executables require relinking by the user.
+
+### Installation
+
+The final LNA review also restored the unshifted inner pressure-work derivative
+in the conservative branch; both work forms now pass it to the extra matrix column.
+The install uses `/Applications/mesasdk`, `NPROCS=10`, an unset `GYRE_DIR`, and
+`MESA_DIR=/Users/owner/Documents/Software/dev/test/mesa`, set after SDK initialization.
+Output is recorded in `output/review/rsp3_face_w_plan_20260920/install.log`.
+Compilation found a mixed-kind `max` in the quadruple-precision remap diagnostic
+and a missing `get_etrb_cell` import in profile output. Both are corrected.
+The earlier build logs are retained as `install_attempt1.log` and `install_attempt2.log`.
+Unused interpolation weights were removed from the nonlinear and LNA routines.
+The final full installation passed, including the standard package checks.
+All 19 changed Fortran objects are newer than their sources and match their
+installed members in `build/star/lib/libstar.a` byte for byte, including both
+LNA modules. Hashes are recorded in `install_check.json` beside the log.
+The user case was neither relinked nor run. This establishes build integration;
+it does not establish convergence or stability of the new face formulation.
+
+### First stellar validation
+
+The user authorized running the Cepheid case after installation. The copied
+case is `output/review/rsp3_face_w_run_20260920/baseline`; its physics settings
+match `dev_TDC_RSP2_Cepheid`. It starts from the native RSP model, remeshes at
+step 100, and runs LNA at step 200. Only the stop at model 2000, profile
+interval 1 and disabled PGSTAR differ. Eight threads and the checkout MESA_DIR
+are used. The copy builds its own executable; the user's case and outputs
+are preserved. Run outcome and any source corrections will be recorded here.
+
+The first run failed before its first step: `check_sizes` rejected
+`d_hydro_d_p2` when enabling RSP2. The array was in the zone allocation path
+but missing from `update_nvar_allocs`, which resizes the hydro dimensions on
+flag changes. It now uses the existing `realloc_double3` there and clears
+these solver work entries. This covers RSP2, RSP3 and velocity-variable changes.
+
+After installing this correction (`rsp3_face_w_run_20260920/install_alloc.log`),
+the identical copied run in `alloc_fix` passed startup, the 350-zone envelope
+remesh, LNA at model 200, and the velocity kick. The user stopped it around
+model 1655. Seven retries occurred at model 101 after remeshing; none occurred
+later. Post-kick iterations had median 5, 95th percentile 5 and maximum 10.
+The final timestep was 64.5 seconds, limited by the case's maximum timestep.
+The intended 2000-step endpoint was not reached because of the user stop.
+The terminal log, every-step profiles and `run_summary.json` are retained.
+The allocation correction is installed, and the original case inputs are unchanged.
+
+## Implementation record
+
+Both RSP2 and RSP3 now store face w. The nonlinear routines are still in
+`star/private/hydro_rsp2.f90`; TDC hydro is unchanged. The gas energy row
+uses `wrap_etrb_cell`, direct cell stress heating for v, and the half sum
+of face heating for u. Its pressure correction
+is `(projected face work - native cell turbulent work)/dt`, whose mass
+integral is zero. This correction applies to dedt and eps_grav, and to
+both velocity grids and work forms.
+
+Hydro saves additional k+2 partials from its inner face before
+shifting AD origins, in `d_hydro_d_p2`. The conservative v*Uq term can
+reach k+2. Conservative turbulent-pressure work can also reach k+2 because
+its inner cell pressure contains w(k+2). The v_flag local work and the moment equations do not acquire that
+dependence merely from moving w to faces. For u_flag, the Riemann solver
+uses the inner cell pressure in both its contact velocity and pressure.
+Because this cell pressure includes w(k+2), the cell momentum and both
+work forms can also require that derivative. Those terms are retained in
+hydro and in the LNA matrix. This is pressure reconstruction, not viscosity.
+
+An initial version projected face Eq back into gas cells for v_flag. That
+unnecessarily widened cell heating. It has been replaced by direct cell
+stress heating, as in TDC; the gas and face heating integrals still match.
+For u_flag, stress and heating start on faces and retain their half-sum
+cell allocation.
+
+`star_solver` uses its ordinary block tridiagonal solve when the extra
+partials are zero. Otherwise the banded solve includes the extra column,
+or bcyclic groups pairs of adjacent zones. Odd counts have a padded
+identity block. The line-search transpose and native partial tester include
+the extra entries. TDC solver storage and its existing derivative treatment
+are unchanged.
+
+`remap_rsp2` uses one positive overlap for `(w^2,Pi,Phi)` on face volumes.
+Ordinary mesh adjustment, each AMR split/merge, and envelope remeshing call
+it. Integrated moments entering prescribed zero volumes are transferred
+together to the nearest active face. This preserves their global integrals
+and preserves donor realizability when present. It does not repair an
+already nonrealizable donor closure. Thermal energy is remapped separately;
+local gas-plus-turbulent energy need not retain its previous distribution,
+although both integrals are conserved. Y stays a point interpolation.
+
+Photo version 22 and model bit 18 identify face w. Old RSP2/RSP3 cell-w
+photos and models are rejected; there is no backward conversion support.
+Same-layout restart does not remap or reset moments. Native RSP initialization
+still deposits each gas-cell turbulent energy into its two adjoining face
+volumes, and MLT initialization takes its face velocity directly.
+
+The mesh helper remains in `hydro_rsp2` and accepts the old and new dq/xh
+arrays. Mesh geometry stays with each caller. The shared overlap replaces
+the separate energy and Pi/w interpolation paths; no remesh controls or
+generic remapping framework are added. Obsolete Phi interpolation guards
+and the duplicate moment boundary wrapper have been removed.
+LNA uses local face buoyancy, face-center Lt divergence, projected gas
+storage and the new viscosity coefficients. It represents the turbulent
+pressure work as density inertia, directly differentiating the nonlinear
+accepted/current density increment. The corresponding gas inertia receives
+the zero-integral work redistribution. No time weight or implicitness
+control changes. Profiles report face w, etrb, Pi and Phi; Ptrb uses the
+projected cell energy with its actual alpha coefficient.
+
+Validation to date:
+
+- `notes/check_rsp2_face_w_implementation.py`: 72 algebra, overlap and matrix
+  checks passed; largest scaled error 9.51e-15. Includes nonzero alfat
+  placement identities in the companion plan check, both viscosity grids,
+  mass corrections, moving-wall stress power, unequal mass grids, RSP
+  initialization, both Riemann pressure/work derivatives, ordinary/expanded
+  bandwidth, odd/even matrix grouping and line-search transpose.
+- Fortran 2008 syntax parser passed all 19 changed Fortran modules. This is
+  syntax parsing only, not module/type checking or compilation.
+- Both manuscripts were rebuilt without LaTeX warnings and visually inspected.
+  RSP3 is 15 pages; star_LNA is 36 pages. The PDFs in notes match the sources.
+- Source diff whitespace checks pass, excluding unchanged user-owned case edits.
+- Full installation and standard package checks pass with the checkout MESA_DIR.
+  Installed archive members match all 19 changed Fortran objects. The subsequent
+  allocation correction was reinstalled and its archive member verified.
+- The copied RSP3 case reached approximately model 1655 before the user stop,
+  including ordinary remeshing, envelope remeshing and LNA. This is one control
+  combination, not validation of every velocity, energy, transport or mesh option.
+
+Required native validation remains the matrix partial test, fresh MLT/RSP
+initialization, old-layout rejection, a new face photo, retries, all three remesh
+paths, alfat zero/nonzero, alfap zero/nonzero, v/u, both energy/work forms,
+and each temperature-gradient form. The standalone algebra tests establish
+identities; they do not establish stellar-run convergence or stability.
+
+## Solver stencil
+
+The extra storage follows the usual `(equation, variable, zone)` indexing.
+`hydro_eqns` clears it with the ordinary blocks. `hydro_energy` extracts
+inner-face work derivatives before shifting; `hydro_riemann` does the same
+for inner pressure force. `star_solver` uses the usual blocks if all extra
+entries vanish. It expands only the linear algebra storage otherwise.
+
+| Term | v_flag | u_flag |
+| --- | --- | --- |
+| Direct cell Eq | Adjacent faces, compact | Half-sum of face heating, compact |
+| Conservative v*Uq or u*Uq | Inner cell stress can reach k+2 | Local u*Uq remains compact |
+| Turbulent pressure in conservative work | Inner cell pressure can reach w(k+2) | Riemann pressure and velocity can reach w(k+2) |
+| Turbulent pressure in local work | Compact cell pressure and face velocities | Riemann contact velocity can reach w(k+2) |
+| Riemann momentum | Not used | Inner face pressure can reach w(k+2) |
+
+This table describes the face-w contributions. Existing reconstruction
+approximations are not claimed to be made exact by the extra storage.
 
 ## Decision and scope
 
@@ -14,13 +184,10 @@ another physical alpha. Gas density, temperature and composition stay in
 cells. `v_flag` velocities stay on faces and `u_flag` velocities stay in
 cells.
 
-The preferred eventual architecture is one face energy implementation for
-both RSP2 and RSP3, with different convection closures. Validate the RSP3
-conversion first and compare a face RSP2 implementation against the current
-cell RSP2 before adopting it. The current RSP2 calculation is a useful
-reference. Its lack of independent Pi/Phi means that the demonstrated RSP3
-averaging defect is not evidence that ordinary RSP2 needs the same repair.
-
+The implemented architecture shares face energy between RSP2 and RSP3,
+with different convection closures. Both need validation against the cell
+checkpoint. Its lack of independent Pi/Phi means that the demonstrated
+RSP3 averaging defect is not evidence that ordinary RSP2 had the same defect.
 This is a substantial discretization change. It includes energy storage,
 pressure work, viscosity, turbulent transport, boundaries and saved state.
 It is not a substitution of `w(k)` into routines that currently expect a
@@ -390,8 +557,8 @@ solver w. Preserve RSP2's current dependence and derivatives. Check masked
 stress at the edge of a turbulent region, retained boundary force, inner
 stress, pressure/radius time states and mass corrections explicitly. Those
 details can differ even when interior formulas agree. Also distinguish the
-native cell stress heating from the projected cell heating required by the
-new turbulent storage below; their equality is an integrated identity,
+native cell stress heating from a projection of face heating back into
+gas cells; their equality is an integrated identity,
 not generally a pointwise one.
 
 For v_flag, the stress remains in gas cells. A useful TDC precedent is
@@ -429,13 +596,19 @@ current code averages heating into cells. Use local face w directly in
 its existing meaning. Check the inner-boundary stress separately, including
 `TDC_include_inner_boundary_eddy_viscosity`.
 
-In the combined gas/turbulent equation use
-`Eq_cell = 0.5*(Eq_face(k)+Eq_face(k+1))`, matching the energy actually added
-to the face equations. For v_flag this need not equal the native cell
-stress dissipation point by point, although the integrated identity holds.
-Retain the momentum work from the actual Uq in conservative dedt, including
-the v_flag half-cell kinetic masses and optional mass corrections. Derive
-and check the local stress-work redistribution as well as the global sum.
+In the combined gas/turbulent equation, retain direct cell stress heating
+for v_flag, as in TDC. Project the analytically divided cell heating to the
+face energy row using the formula above. Their integrals agree. Their
+local difference is the existing TDC spatial allocation; it does not change
+the global viscous energy budget. Averaging the face heating back into the
+gas cell would introduce a needless second-neighbor derivative.
+
+For u_flag use `Eq_cell = 0.5*(Eq_face(k)+Eq_face(k+1))`, since both stress
+and heating already live on faces. Retain the actual Uq work in conservative
+dedt, including v_flag half-cell kinetic masses and mass corrections.
+Conservative inner-face work can require the extra k+2 Jacobian entry.
+With u_flag, Riemann contact velocity also carries turbulent pressure
+through the local-work form; retain that dependence as described above.
 
 Do not assume the discrete Eq is nonnegative merely because continuum
 viscosity dissipates energy: the present new-strain times midpoint-strain
@@ -556,34 +729,18 @@ needs specified moment content of material entering/leaving the domain.
 
 ## 11. Saved models, photos and flag changes
 
-The same `i_w` array cannot silently change from cell to face meaning.
-The current photo layout records `RSP2_3equation_flag` from version 21;
-the model file uses a separate RSP3 bit. Neither by itself identifies a
-new face-w layout. Add versioned stored layout information to both formats
-and restore it before interpreting xh. A stored flag is state metadata,
-not a new user physics control. Inspect the current format version before
-choosing a new value.
+Photo version 22 and model bit 18 identify face w. The readers reject
+old RSP2/RSP3 layouts rather than convert them, as requested. New face
+photos preserve moments and history through the generic hydro state
+machinery. No transitional layout control or old-cell remap mode remains.
 
-Keep exact restart of a new face photo distinct from conversion of an old
-cell model/photo. Same-layout restart preserves moments and history.
-Conversion maps energy onto the new control volumes and then rebuilds
-dependent state. It cannot in general preserve every old cell energy,
-every old Lc and every moment simultaneously. Match integrated energy,
-report the local change and reject incompatible inputs rather than silently
-clipping Pi or Phi. A conversion round trip can smooth a profile even
-when its total energy is conserved.
-
-When the selected layout changes, invalidate temporal extrapolation through
-the existing generation machinery; initialize xh_start and w_start from
-the converted state. The present RSP2/RSP3 flag-change routine preserves
-gradT and redefines Y against the new gradL. Retain that ordering. If only
-RSP3 is migrated initially, turning its flag off also requires a face-to-cell
-energy conversion. Once both use faces, that extra conversion disappears.
-
-No support for the obsolete Hp-equation layout is added. If old cell-w
-restart conversion is deferred, fail with a clear layout diagnostic rather
-than reading an old photo as face data. The known test photos are cell-w
-snapshots and need this decision before any restart comparison.
+Native RSP is still a supported initializer. `set_RSP2_flag` deposits
+half of each RSP cell's integrated turbulent energy on each adjoining
+face volume, assigning prescribed zero volumes to the nearest active face.
+It then divides by face mass and takes the square root. MLT supplies a
+face convective velocity directly. Turning RSP3 on or off retains face w;
+no spatial conversion is needed. Preserve gradT and redefine Y against
+the new gradL in the existing flag-change order.
 
 ## 12. LNA, Jacobian and diagnostics
 
@@ -641,7 +798,7 @@ These are current code locations; proposed formulas above are not new APIs.
 | `star/private/hydro_vars.f90` | Unpack xh, rebuild derived face/cell state |
 | `star/private/solver_support.f90` | Scales, trial domain, zero-w handling and variable access |
 | `star/private/alloc.f90`, `star_data/public/star_data_step_input.inc`, `star_data_step_work.inc` | Stored layout, arrays, current/old copies and any required cache |
-| `star/private/photo_in.f90`, `photo_out.f90`, `read_model.f90`, `write_model.f90` | Versioned location and explicit old-layout conversion |
+| `star/private/photo_in.f90`, `photo_out.f90`, `read_model.f90`, `write_model.f90` | Face format identifiers and rejection of old layouts |
 | `star/private/mesh_adjust.f90` | Common face-moment remap and both temperature recovery paths |
 | `star/private/adjust_mesh_split_merge.f90` | Conservative affected-patch remap and total-energy subtraction |
 | `star/private/tdc_hydro_support.f90` | Envelope remap, inner half-volume, QHSE and caches |
@@ -661,25 +818,23 @@ layers that only rename existing calls.
 - [x] Record the pressure-work redistribution and boundary requirements.
 - [x] Check fixed-mass storage, Lt, Eq, pressure allocation and common overlap
       on unequal masses without MESA.
-- [ ] Finish local work identities for u/v, both energy forms and all masks.
-- [ ] Select the boundary contract and old-photo conversion behavior.
-- [ ] Derive the face zero-state predictor and audit the complete AD stencil.
-- [ ] Match the TDC viscosity spatial discretization in separate RSP2 routines,
+- [x] Derive local work identities for u/v and both energy forms; native checks remain.
+- [x] Select the zero boundary contract and reject old RSP2/RSP3 layouts.
+- [x] Derive the face zero-state predictor and retain the extra gas energy derivative.
+- [x] Match the TDC viscosity spatial discretization in separate RSP2 routines,
       with coefficient, time-state, boundary and Eq/Uq identity checks.
-- [ ] Implement RSP3 face storage, its closures, fluxes and gas projection.
-- [ ] Wire every mesh, state, output and LNA path before stellar testing.
+- [x] Implement RSP2/RSP3 face storage, its closures, fluxes and gas projection.
+- [x] Wire every mesh, state, output and LNA path before stellar testing.
 - [ ] Validate placement alone against the current closure on admissible states.
 - [ ] Validate the separately derived local covariance correction.
 - [ ] Compare RSP2 cell and face layouts with the same physical coefficients.
-- [ ] Adopt a common face implementation only after both comparisons pass.
-- [ ] Update the RSP3 and star_LNA manuscripts to the implemented equations.
+- [ ] Establish native convergence and conservation before accepting the implementation.
+- [x] Update the RSP3 and star_LNA manuscripts to the implemented equations.
 
-Use a reviewable implementation checkpoint before replacing the current
-layout. The existing checkpoint and current uncommitted corrections are
-distinct states; do not discard either. No commit is made by this plan.
-Prefer a branch comparison over adding a permanent experimental layout
-control. If two layouts temporarily coexist, keep one clear stored layout
-decision and remove transitional branches after validation.
+The previous changes were amended into checkpoint `d28e05018` before
+implementation. Face changes are installed and remain uncommitted; user case
+settings and unrelated work are preserved. No experimental layout switch
+is added. The physical covariance correction remains a separate proposal.
 
 Mathematical checks, without MESA:
 
@@ -705,7 +860,7 @@ MESA checks require the user's run/build authorization:
 | alfap=0 and nonzero; alfam=0 and nonzero | Isolate storage, pressure and viscous terms |
 | Every temperature row/reconstruction choice | AD partials including dynamic gradL and composition |
 | Ordinary remesh, split/merge, envelope remesh | Before/after moment and total-energy budgets, both get_T_from_E settings |
-| New photos and converted old inputs | Exact same-layout restart, explicit conversion error, retry rollback |
+| New photos and old-layout rejection | Exact same-layout restart, clear format rejection, retry rollback |
 | Fixed 149/350/finer meshes | Tail sign changes, Pi/Phi phase, Lc, mode shape and mesh convergence |
 | Several pulsation cycles | Accepted physical time, retries, timestep recovery, iterations and growth |
 | Evolution beyond turnover times | Thermal diffusion limit, moving convective boundaries and composition gradients |
@@ -717,6 +872,19 @@ comparison. Report cell/face conversion, local closure and added damping
 as separate changes so their effects remain identifiable.
 
 ## Reproducible algebra checks
+
+The subsequent [face profile audit](rsp3_face_profile_audit.md) traces the
+inner w/Phi bumps to the first ordinary mesh adjustment and hydro step,
+with positive Eq supplying the initial increase and very slow subsequent
+decay. It also identifies the selected extra LNA roots as a local moment
+sequence in different, more external stable layers. This is saved-output
+evidence; placement alone has not been validated as a cure for these
+patterns. No new run, physical correction or case change was made.
+
+The subsequent star/work2 trace and photos also reproduce the Phi=0,
+Pi>0 boundary failure at face 451. This confirms that collocation alone
+does not remove the outstanding local covariance defect. See the updated
+run evidence in [rsp3_covariance_closure.md](rsp3_covariance_closure.md).
 
 `notes/check_rsp2_face_w_plan.py` writes
 `output/review/rsp3_face_w_plan_20260920/checks.json`. All assertions pass

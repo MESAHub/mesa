@@ -1,14 +1,15 @@
 # RSP3 moment placement audit
 
-2026-09-20. Design audit and standalone checks only. No production source,
-inlists or saved models changed. No MESA compilation or new stellar run.
+2026-09-20. Historical design audit and standalone checks. The subsequent
+face implementation is recorded in the linked plan; it is compiled and installed
+and has an initial stellar run recorded there; broader validation remains pending.
 
 The comprehensive conversion plan is now in
 [rsp2_face_w_implementation.md](rsp2_face_w_implementation.md). It covers
 the residuals, gas energy projection, TDC-style eddy-viscosity discretization
 in separate routines, all mesh paths, saved state, LNA and validation. The
-eventual target is common face energy machinery for RSP2 and RSP3, after
-separate validation; the evidence below first motivates RSP3 collocation.
+source now uses common face energy for RSP2 and RSP3. Separate native
+validation remains pending; the evidence below motivates RSP3 collocation.
 
 ## Recommendation and limits
 
@@ -16,8 +17,8 @@ For a three-equation model intended for pulsation and stellar evolution,
 including later nonlocal moment transport, the preferred simple design from
 this audit places all three moments on faces: e_t=w^2, Pi and Phi. The gas
 thermodynamic state remains in cells. Y and total luminosity remain on faces.
-This is a recommendation for the eventual RSP3 formulation, not an approved
-or implemented change to RSP2's existing cell w.
+The user subsequently approved face w for both RSP2 and RSP3. The equations
+and comparisons below record the reasoning behind that change.
 
 The reasons are coupled, not a general rule that faces are better:
 

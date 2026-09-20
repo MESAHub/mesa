@@ -71,7 +71,7 @@
          integer :: i_u ! Lagrangian velocity at center of cell
          integer :: i_alpha_RTI ! alpha for Rayleigh-Taylor instabilities
          integer :: i_Et_RSP, i_erad_RSP, i_Fr_RSP ! only when RSP_flag is true
-         integer :: i_w ! cell turbulent velocity. only when RSP2_flag is true.
+         integer :: i_w ! face sqrt(turbulent energy). only when RSP2_flag is true.
          integer :: i_Y ! signed face superadiabaticity. only when RSP2_flag is true.
          integer :: i_Pi ! face <v_r*s>
          integer :: i_Phi ! face <s*s>

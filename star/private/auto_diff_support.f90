@@ -399,21 +399,34 @@
          get_etrb_start = pow2(s% w_start(k))
       end function get_etrb_start
 
+      real(dp) function get_etrb_cell(s,k) result(etrb)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         etrb = 0.5d0*pow2(s% w(k))
+         if (k < s% nz) etrb = etrb + 0.5d0*pow2(s% w(k+1))
+      end function get_etrb_cell
+
+      real(dp) function get_etrb_cell_start(s,k) result(etrb)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         etrb = 0.5d0*pow2(s% w_start(k))
+         if (k < s% nz) etrb = etrb + 0.5d0*pow2(s% w_start(k+1))
+      end function get_etrb_cell_start
+
+      logical function rsp2_zero_w(s,k) result(zero_w)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         zero_w = k <= max(1, s% RSP2_num_outermost_cells_forced_nonturbulent+1) .or. &
+            k > s% nz - int(s% nz/s% RSP2_nz_div_IBOTOM) .or. s% mixing_length_alpha == 0d0
+      end function rsp2_zero_w
+
       real(dp) function get_RSP2_conv_velocity(s,k) result (cv)  ! at face k
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp) :: alfa, beta
-         if (k == 1) then
+         if (rsp2_zero_w(s,k)) then
             cv = 0d0
          else
-            if (s% RSP2_use_mass_interp_face_values) then
-               alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
-               beta = 1d0 - alfa
-            else
-               alfa = 0.5d0
-               beta = 0.5d0
-            end if
-            cv = sqrt_2_div_3*(alfa*s% w(k) + beta*s% w(k-1))
+            cv = sqrt_2_div_3*s% w(k)
          end if
       end function get_RSP2_conv_velocity
 
@@ -449,6 +462,13 @@
          integer, intent(in) :: k
          etrb_p1 = pow2(wrap_w_p1(s,k))
       end function wrap_etrb_p1
+
+      function wrap_etrb_cell(s, k) result(etrb)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1) :: etrb
+         etrb = 0.5d0*(pow2(wrap_w_00(s,k)) + pow2(wrap_w_p1(s,k)))
+      end function wrap_etrb_cell
 
       function wrap_kap_m1(s, k) result(kap_m1)
          type (star_info), pointer :: s

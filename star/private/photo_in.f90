@@ -57,7 +57,7 @@
 
          read(iounit, iostat=ierr) version
          if (failed('version')) return
-         if (version /= star_def_version .and. version /= 20) then
+         if (version /= star_def_version .and. version /= 21 .and. version /= 20) then
             write(*,'(/,a,/)') ' FAILURE: the restart data' // &
                ' is from a previous version of the code and is no longer usable.'
             ierr = -1
@@ -90,6 +90,11 @@
             s% crystal_core_boundary_mass
 
          if (failed('initial_y')) return
+         if (s% RSP2_flag .and. version /= star_def_version) then
+            write(*,'(a)') 'RSP2 requires a photo with face turbulent energy.'
+            ierr = -1
+            return
+         end if
          s% RSP2_3equation_flag = .false.
          if (version >= 21) then
             read(iounit, iostat=ierr) s% RSP2_3equation_flag

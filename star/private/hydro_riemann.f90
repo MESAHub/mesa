@@ -72,7 +72,7 @@
 
       subroutine do1_dudt_eqn( &
             s, k, P_surf_ad, nvar, ierr)
-         use star_utils, only: save_eqn_residual_info
+         use star_utils, only: save_eqn_residual_info, unpack_residual_partials
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(in) :: P_surf_ad  ! only for k=1
@@ -80,8 +80,9 @@
          integer, intent(out) :: ierr
          integer :: i_du_dt
          type(auto_diff_real_star_order1) :: &
-            dudt_expected_ad, dudt_actual_ad, resid_ad
+            dudt_expected_ad, dudt_actual_ad, resid_ad, rhs_inner
          real(dp) :: dt, ie_plus_ke, scal, residual
+         real(dp) :: unused_m1(nvar), unused_00(nvar), d_dp2(nvar)
          logical :: test_partials
 
          include 'formats'
@@ -100,7 +101,7 @@
          i_du_dt = s% i_du_dt
          dt = s% dt
          call eval_Riemann_dudt_rhs( &
-            s, k, P_surf_ad, .true., .true., dudt_expected_ad, ierr)
+            s, k, P_surf_ad, .true., .true., dudt_expected_ad, ierr, rhs_inner)
          if (ierr /= 0) return
 
          ! make residual units be relative difference in energy
@@ -126,6 +127,17 @@
          end if
 
          call save_eqn_residual_info(s, k, nvar, i_du_dt, resid_ad, 'do1_dudt_eqn', ierr)
+         if (ierr /= 0) return
+         if (s% RSP2_flag .and. k < s% nz-1) then
+            call unpack_residual_partials(s,k+1,nvar,i_du_dt,rhs_inner,unused_m1,unused_00,d_dp2)
+            if (any(is_bad(d_dp2))) then
+               ierr = -1
+               s% retry_message = 'invalid RSP2 momentum partial at k+2'
+               return
+            end if
+            s% d_hydro_d_p2(i_du_dt,:,k) = &
+               scal*d_dp2(1:s% nvar_hydro)*s% x_scale(1:s% nvar_hydro,k+2)
+         end if
 
          if (test_partials) then
             s% solver_test_partials_val = resid_ad% val
@@ -142,7 +154,7 @@
 
       subroutine eval_Riemann_dudt_rhs( &
             s, k, P_surf_ad, use_time_centering, include_tdc_Uq, &
-            dudt_expected_ad, ierr)
+            dudt_expected_ad, ierr, rhs_inner)
          use accurate_sum_auto_diff_star_order1
          use star_utils, only: get_area_info_opt_time_center
          use tdc_hydro, only: compute_tdc_Uq_dm_cell
@@ -153,6 +165,7 @@
          logical, intent(in) :: use_time_centering, include_tdc_Uq
          type(auto_diff_real_star_order1), intent(out) :: dudt_expected_ad
          integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1), intent(out), optional :: rhs_inner
          integer :: nz
          type(auto_diff_real_star_order1) :: &
             flux_in_ad, flux_out_ad, diffusion_source_ad, &
@@ -162,6 +175,7 @@
          real(dp) :: dm, v_drag, drag_factor, drag_fraction
 
          ierr = 0
+         if (present(rhs_inner)) rhs_inner = 0d0
          nz = s% nz
          dm = s% dm(k)
 
@@ -259,7 +273,9 @@
                flux_out_ad = get_Pface(k)*area_00
             end if
             if (k < nz) then
-               flux_in_ad = shift_p1(get_Pface(k+1))*area_p1
+               flux_in_ad = get_Pface(k+1)
+               if (present(rhs_inner)) rhs_inner = flux_in_ad*area_p1%val/dm
+               flux_in_ad = shift_p1(flux_in_ad)*area_p1
             else
                flux_in_ad = 0d0
             end if

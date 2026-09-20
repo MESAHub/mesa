@@ -9,10 +9,107 @@ The subsequent [placement audit](rsp3_layout_audit.md) compares the current
 staggering, cell moments and face moments. Its preferred simple long-term
 RSP3 design places all three moments on faces, after rederiving the energy
 projection. It identifies a thermal coupling defect in the simple cell
-averaging candidate below. Neither layout change is implemented. The local
-closure derivation remains applicable to moments evaluated together.
+averaging candidate below. The face layout has since been implemented and
+installed; the local covariance correction below remains unimplemented.
+The local closure derivation remains applicable to moments evaluated together.
+The subsequent saved-output audit is in [rsp3_face_profile_audit.md](rsp3_face_profile_audit.md).
+The current finite-step derivation, local/nonlocal design and validation record
+are in [rsp3_covariance_discretization.md](rsp3_covariance_discretization.md).
+The user has clarified that both local and nonlocal operation are required,
+including long evolutionary timesteps and moving convective boundaries.
+
+## Current recommendation
+
+Retain the common face placement of w, Pi and Phi. It keeps Pi at the
+enthalpy-flux interface and lets local sources use colocated moments.
+The placement audit demonstrates the lost alternating thermal response
+of the simple all-cell averaging alternative. It does not prove that
+faces outperform every possible cell formulation. The present local
+closure failure also exists without any mesh.
+
+Proceed with the native implementation design specified in
+[rsp3_covariance_discretization.md](rsp3_covariance_discretization.md).
+Treat the one-third buoyancy proposal as a
+candidate, not as a recovered literature coefficient or a verified fix
+for every stellar failure. Establish the pressure/entropy approximation,
+decay and compression together, then verify the complete residual and AD
+derivatives, initialization, work and transport. The agreed scope includes
+both local and nonlocal operation. Nonzero alfat uses common transport of
+all three moments. Preserve the current radiative and convective heat-flux
+time weighting; the finite-step proposal treats moment transport implicitly
+and matches that Lt time level in gas energy. Enhanced stable-layer
+dissipation is deferred.
+
+Native comparisons must distinguish moment-domain preservation, residual
+convergence, total energy conservation and pulsation growth. Passing the
+first property alone does not establish the other three. Update LNA and
+the manuscript from the accepted equations after that derivation.
 
 ## Run evidence
+
+### Face layout in star/work2, 2026-09-20
+
+The user's later 15 Msun pre-main-sequence run provides an independent
+recurrence after the face conversion. The supplied terminal trace ends
+after 576 accepted models, with 111 retries. The largest final residual
+on rejected attempts is dPhi_dt 34 times, dPi_dt 69 times, detrb_d 6 times
+and rsp2_fl twice. The run advances to about 925.85 years; it is not
+permanently stalled, but repeatedly spends 25 iterations on fixed residuals.
+Median accepted iterations are five; the 90th percentile is ten.
+
+The current case uses v_flag, dedt with conservative work, dynamical gradL,
+alfa_pi=alfa_phi=1, and alfat=alfam=0. The defaults leave alfar=0.
+The face conversion did not apply the local covariance correction below.
+
+At model 56, solver call 391, dPhi_dt at face 451 stalls at 1.3278e-3
+through iteration 25. At models 100, 150 and 200, the same face is accepted
+at iteration 10 only after the maximum residual tolerance becomes 1e-4.
+Its residuals remain 5.6777e-5, 5.4364e-5 and 5.9869e-5 respectively.
+
+The saved version-22 photos independently show:
+
+| Model | Face | Y | w, cm/s | Pi | Phi |
+| --- | --- | --- | --- | --- | --- |
+| 50 | 451 | 1.79026e-4 | 1.03633e4 | 6.46942e7 | 5.19206e7 |
+| 100 | 451 | -2.19960e-4 | 1.17728e4 | 2.40284e7 | 0 |
+| 150 | 451 | -1.94475e-4 | 1.18051e4 | 1.80749e7 | 0 |
+| 200 | 451 | -1.31935e-4 | 1.18203e4 | 8.47659e6 | 0 |
+
+Pi and Phi have the units defined below. Nonzero Pi with zero full entropy
+variance is inadmissible regardless of the isotropic velocity assumption.
+Here composition is initially uniform and dynamical gradL is enabled,
+so `get_rsp2_thermal_gradient` gives the sign of -ds/dr from the signed Y
+times its positive temperature-gradient coefficient. The negative Y and
+positive Pi therefore drive Phi further negative when Phi is already zero.
+`solver_support:Bdomain` clips the negative Phi update. Additional Newton
+iterations cannot repair the underlying source/domain conflict at this state.
+
+Holding the other coefficients at a trial state, the variance row asks for
+
+```math
+\Phi=\frac{\Phi_{\rm start}-2\Delta t\Pi\,\partial s/\partial r}
+ {1+\Delta t[C_\Phi w/\Lambda+2/\tau_{\rm rad}]}.
+```
+
+A negative numerator gives an inadmissible trial variance. Changing a
+positive residual normalization cannot change that sign. Additional decay
+proportional to Phi, including radiative cooling or a buoyancy decay rate,
+vanishes at Phi=0 and does not by itself fix this boundary failure.
+
+Later stalled dPi_dt attempts are a separate unresolved part of this run.
+At model 575, face 428 stays at 4.9254e-3 while corrections are approximately
+1e-11; the smaller-timestep retry converges in five iterations. At model
+576 the corresponding plateau is 3.3876e-3 at face 444. Saved accepted
+photos do not contain those failed trial states. Do not assert that all
+69 dPi_dt retries are proved to have the same cause as the early Phi failure.
+
+Reproducible parser, copied inputs/photos, full attempt records and summary:
+`output/review/rsp3_work2_moments_20260920`. Photo record markers, variable
+indices, model numbers and layout version are checked. The read-only audit
+did not compile or run MESA, change the case, change tolerances or implement
+a closure correction.
+
+### Earlier staggered layout restarts
 
 Both runs restart the user's executable and photo x00115000 in isolated
 copies, stop at model 116500, and save every accepted profile. The mesh is
@@ -49,6 +146,28 @@ reconstruction, local ODE checks and figure are in
 `output/review/rsp3_restart_115000_20260920`. `analyze.py` reproduces the
 analysis. These runs do not establish how a corrected model will behave.
 
+### Face layout in the pulsation case, 2026-09-20
+
+The later pasted trace covers models 6319--6463. Of these 145 attempts,
+73 take five iterations and 72 take ten. Models 6336--6407 all stall on
+dPhi_dt at face 198. For example, model 6337 stays at 1.5920e-5, and model
+6372 at 6.8780e-6, from iteration two through ten. They are accepted when
+the maximum tolerance becomes 1e-4. There is no new retry in this excerpt;
+the printed cumulative count remains 14.
+
+The exact failed/intermediate trial states are not saved. However, the
+subsequent photo at model 7000 independently demonstrates the same domain
+failure at that face: w=1.32363e5 cm/s, Y=-0.0226495, Pi=3.92819e9, Phi=0,
+and Lc/L=5.50423e-5. The photos at 5000 and 8000 have covariance ratios
+Pi^2/[(2/3)w^2 Phi] of 1.3138 and 1.2553 at face 198. Thus the pulsation
+model also leaves the moment domain; the trace alone was not used to infer
+the value of Phi at model 6337. Its current run differs from the earlier
+model-1000 profile audit, and copied inputs are kept separate.
+
+The parser and copied photos are in
+`output/review/rsp3_work2_moments_20260920/pulsation`; the parent directory's
+`analyze_pulsation.py` reproduces the summary without MESA.
+
 ## What must remain possible
 
 Pi is a signed velocity/entropy covariance. Negative Pi is allowed.
@@ -67,6 +186,29 @@ convective luminosity. Changing the representation of Phi cannot make
 an evolution law that leaves this domain physically consistent.
 
 ## Local source correction
+
+### Published coefficients and the implemented normalization
+
+A direct check against Braun et al. (2026), section 2, equations (2)--(4)
+and (11), confirms that the implemented isotropy factors were not omitted.
+The same factors appear in Kupka, Ahlborn and Weiss (2022), Appendix A.
+Their kinetic energy omega is our w^2. Their Phi is half our full variance.
+Consequently their `2*(grad_ad*T/Hp)*Phi` becomes
+`(grad_ad*T/Hp)*Phi` in our Pi equation, and their variance source doubles.
+The implemented entropy-gradient source in Pi is already
+`(2/3)*w^2*(-ds/dr)`. The local decay constants `6*sqrt(2/3)` and
+`4*sqrt(2/3)` also match the published local MLT calibration.
+
+The factor one third proposed below is therefore a new closure choice.
+It is not a recovered isotropy factor, a correction for the full-variance
+normalization, or a demonstrated transcription error in the published
+buoyancy term. Isotropy alone does not select this modified pressure/entropy
+closure. The moment-domain counterexample motivates investigating such a
+closure, but does not establish that this particular choice is the best
+physical model for pulsation. The earlier statement that the production
+term simply needed to be made isotropic was too categorical.
+
+### Proposed modified closure
 
 For this derivation, all three moments are evaluated at the same location.
 The buoyancy coefficient is the existing EOS expression
@@ -183,6 +325,131 @@ verify the determinant identity, including compression, radiative cooling,
 nonnegative viscous heating and extra decorrelation; maximum scaled error
 is 4.76e-14. These are local checks only.
 
+## Implicit step and implementation contract
+
+This section specifies the numerical work required in addition to the
+continuous closure. It is a proposal, not an implemented or stellar-tested
+fix. The source, gas energy equation and case controls remain unchanged.
+
+The covariance matrix is a mathematical representation of the existing
+three moments, not an additional solver variable:
+
+```math
+\begin{pmatrix}(2/3)w^2&\Pi\\\Pi&\Phi\end{pmatrix}\succeq0.
+```
+
+The corrected local sources evolve this matrix by a common linear drift
+at fixed trial gas state and turnover rates, plus a nonnegative variance
+source from Eq. The off-diagonal drift coefficients are the existing
+`-(dP/dr)*chiT/(3*rho*chiRho*Cp)` and the existing mapped `-ds/dr`.
+The diagonal amplitude decay rates are half the respective variance
+decay rates. This is why the same production and loss cannot be chosen
+independently in the three equations.
+
+For stable stratification, no expansive drift from compression and
+nonnegative Eq, the fixed-coefficient drift is stable. Its backward Euler
+resolvent is an integral of positive covariance evolutions, so it preserves
+the domain for every positive timestep. Nonlinear turnover damping can
+still be evaluated implicitly. This does not require making L fully
+implicit or changing its theta weighting.
+
+The standalone `check_closure.py` in
+`output/review/rsp3_work2_moments_20260920` now checks:
+
+- The old continuous ODE crosses Phi=0 at time 1.41658460065 with Pi=0.0631542;
+  the corrected ODE remains admissible through time 10.
+- 3000 stable backward Euler blocks, timesteps from 1e-6 to 1e6 and
+  nonnegative driving and decorrelation. The smallest relative covariance
+  eigenvalue is 4.96e-8; maximum scaled linear-equation error is 2.40e-16.
+- 300 nonlinear stable backward Euler problems with the rates proportional
+  to the new w. The energy consistency error is at most 1.07e-11 relative.
+- A fixed-coefficient unstable example in which backward Euler at too large
+  a timestep gives negative variances. Continuous realizability alone is
+  therefore not an unconditional guarantee for every flow and timestep.
+- A two-zone energy-only diffusion counterexample and the admissible result
+  obtained with one common implicit diffusion operator.
+- The unchanged unit-control, uniform convective stationary state.
+
+The local scalar root calculation used in the nonlinear check is a test,
+not a proposal to replace the global MESA solver. These tests establish
+the stated local properties, not global Newton convergence in a star.
+
+The actual `do1_turbulent_energy_eqn` uses `w^2-w_start^2`.
+Its divided row is the same energy equation divided by the new positive w;
+it is not backward Euler on w itself. Thus the local backward Euler checks
+use the correct conserved moment. `calc_Ptrb_work_face` additionally contains
+both new and old energy when pressure time centering is enabled. The
+continuous compression formula alone does not cover that discrete work.
+
+There is also a startup predictor inconsistency. In
+`RSP2_adjust_vars_before_call_solver`, starting from w=Pi=0 and Phi>0,
+the current predictor sets w=dt*abs(buoyancy)*sqrt(Phi) and
+Pi=dt*buoyancy*Phi. Its covariance ratio is exactly 3/2, above the allowed
+value one. This is a trial-state defect, not evidence that this branch
+caused the later face-198 plateau. It must be corrected along with the
+source. A coupled moment predictor can remain admissible; changing only
+the source coefficients while keeping this predictor is incomplete.
+
+The implementation contract is:
+
+1. Keep w, Pi and Phi on faces. Change the Pi buoyancy coefficient, turnover
+   decay and deformation consistently with the energy and variance rows.
+   The default alfa_pi remains one, but its documented normalization becomes
+   a multiplier of the minimum compatible decay. Enforce alfa_pi>=1 for
+   this interpretation, with nonnegative alfad and alfa_phi. This is a new
+   isotropic closure, not a claim that the old physical model had a missing
+   factor in its Fortran transcription.
+2. Retain the implicit moment time level and the current heat-flux formula.
+   Preserve all gas-state and w derivatives. Check the complete three-row
+   Newton block against finite differences. An algebraically equivalent
+   local block preconditioner is available if stiffness remains, but changing
+   residual units alone cannot correct an inadmissible physical source.
+3. Use admissible predictors and check the full covariance domain in Newton
+   globalization and before accepting a model. Independent clipping of Phi
+   is not a complete domain treatment. The exact-zero state and rank-one
+   covariance boundary need explicit tests; do not introduce a numerical
+   variance floor. A rejected physical branch must trigger a changed trial
+   or retry, not become accepted solely because tol3 is looser. Do not cap
+   all evolutionary steps at the turnover time: use the nonlinear saturated
+   branch where it exists, with admissibility checked at the trial state.
+4. For turbulent pressure, use the same fractional energy compression as
+   the actual discrete w row, with half that rate in the Pi amplitude.
+   The continuum alpha_p*div(u)/3 expression is its limiting form. Reusing
+   an unrelated radial strain would invalidate the paired source proof.
+   Check both u/v and both gas-energy work forms with their existing
+   cell/face projection; do not change total energy accounting independently.
+5. Nonnegative viscous energy input is part of the covariance proof.
+   Current Eq uses new strain times time-centered strain and can be negative
+   during a reversal. A general dissipative design must use the same strain
+   in the stress and its work, updating Uq and Eq together so that work is
+   nonnegative and the discrete mechanical-energy identity still holds.
+   This temporal choice requires validation; simply clipping negative Eq
+   would violate energy conservation. TDC must remain separate. This issue
+   cannot explain work2's alfam=0 failure.
+6. For nonzero alfat, use the common moment transport closure described
+   below. Leaving energy-only diffusion enabled while claiming general
+   covariance preservation is not a complete solution. The user has since
+   clarified that both local and nonlocal operation are required; the
+   finite-step proposal specifies their shared operator and time level.
+7. The common positive overlap remap already preserves admissibility when
+   the donor moments are admissible. Test ordinary remesh, split/merge and
+   envelope remesh after the source change. Invalid old photos must not
+   silently pass as valid corrected initial states or be silently repaired;
+   prepare and relax a consistent background explicitly.
+8. Update star_LNA from these same physical source derivatives. The local
+   stable oscillation frequency changes from approximately sqrt(8/3)*N to
+   sqrt(4/3)*N before damping. Physical moment modes need not disappear;
+   mode selection and eigenvector accuracy remain separate checks. Validate
+   the radial fundamental by shape and convergence, not table index alone.
+
+This is a complete set of design obligations, not proof that every listed
+numerical choice has passed a stellar test. In particular, compression,
+viscous time weighting, full Newton globalization and nonlocal transport
+cannot be certified by the local ODE checks. Compare both supplied cases
+at fixed physics and successively smaller timesteps, verify the covariance
+bound and actual residuals, and measure energy error and pulsation growth
+before accepting the change. A physical closure choice precedes coding.
+
 ## Nonzero alfat
 
 Transporting only energy does not preserve the covariance domain. If a
@@ -214,9 +481,9 @@ operator mixes admissible covariance matrices with nonnegative weights.
 Different independent diffusion coefficients do not give this guarantee.
 This is sufficient, not the only possible realizable transport closure.
 
-This proposal adds Pi and Phi transport, contrary to the earlier requested
-local-only approximation. It requires a scope decision before coding.
-It also does not guarantee the absence of a negative mean temperature
+This proposal adds Pi and Phi transport. The earlier local-only scope was
+superseded by the user's request to support both local and nonlocal models.
+Common moment transport does not guarantee the absence of a negative mean temperature
 gradient; realizability and thermal stratification are different tests.
 
 ## Cell and face placement

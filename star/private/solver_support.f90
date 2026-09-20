@@ -636,6 +636,7 @@
       ! edit correction_factor and/or B as necessary so that the new dx will be valid.
       ! set ierr nonzero if things are beyond repair.
       subroutine Bdomain(s, nvar, B, correction_factor, ierr)
+         use auto_diff_support, only: rsp2_zero_w
          use const_def, only: dp
          use chem_def, only: chem_isos
          use star_utils, only: current_min_xa_hard_limit, rand
@@ -742,12 +743,10 @@
                if (dval >= 0) cycle
                lower = minval
                if (i == s% i_w .and. s% RSP2_3equation_flag .and. &
-                     old_val > 0d0 .and. s% mixing_length_alpha > 0d0 .and. &
-                     k > s% RSP2_num_outermost_cells_forced_nonturbulent .and. &
-                     k <= s% nz - int(s% nz/s% RSP2_nz_div_IBOTOM)) then
+                     old_val > 0d0 .and. .not. rsp2_zero_w(s,k)) then
                   ! The divided energy row requires a positive trial w.
                   if (.not. rsp2_local_w_equation(s,k)) lower = 0.1d0*old_val
-                  if (any(s% xh_start(s% i_Phi,k:min(k+1,s% nz)) > 0d0)) lower = 0.1d0*old_val
+                  if (s% xh_start(s% i_Phi,k) > 0d0) lower = 0.1d0*old_val
                end if
                if (new_val >= lower) cycle
                dx_lower = lower - s% xh_start(i,k)

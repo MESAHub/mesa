@@ -24,7 +24,7 @@
          d_mlt_Pturb_face_for_star_LNA, &
          frozen_flux_luminosity_resid_for_star_LNA, Ptot_for_star_LNA, &
          pressure_components_for_star_LNA, &
-         rsp2_forces_non_turbulent_cell, &
+         rsp2_forces_non_turbulent_cell, rsp2_pressure_inertia_for_star_LNA, &
          rsp2_luminosity_terms_for_star_LNA, &
          rsp2_terms_for_star_LNA_audit, &
          rsp2_turbulent_energy_inertia_for_star_LNA, rsp2_turbulent_energy_rhs_for_star_LNA, &
@@ -42,14 +42,14 @@
       use math_lib, only: pow2, pow4
       use auto_diff
       use auto_diff_support, only: &
-         shift_m1, wrap, wrap_d_00, wrap_L_00, wrap_L_p1, &
+         shift_m1, shift_p1, rsp2_zero_w, wrap, wrap_d_00, wrap_L_00, wrap_L_p1, &
          wrap_lnd_00, wrap_lnPeos_00, wrap_lnPeos_m1, wrap_Peos_00, &
          wrap_lnT_00, wrap_lnT_m1, wrap_r_00, wrap_r_p1, wrap_r_m1, &
          wrap_T_00, wrap_T_m1, wrap_v_00, wrap_v_p1, wrap_s_00, get_etrb
       use hydro_vars, only: set_Teff_info_for_eqns
       use hydro_riemann, only: do_uface_and_Pface, eval_Riemann_dudt_rhs
       use hydro_rsp2, only: rsp2_flux_residual, rsp2_moment_rhs, &
-         rsp2_zero_moments, rsp2_dormant_moments, compute_Source_div_w, get_RSP2_alfa_beta_face_weights
+         rsp2_dormant_moments, compute_Source_div_w, get_RSP2_alfa_beta_face_weights
       use hydro_gradient_support, only: eval_dlnPdm_qhse, get_rsp2_Lrad_coeff
       use reconstructed_face_support, only: &
          get_effective_gradr_factor_ad, get_Lrad_per_gradT_face_ad, &
@@ -741,7 +741,7 @@
          type(star_LNA_matrix), intent(inout) :: mtx
          integer, intent(out) :: ierr
          integer :: k, row, col_velocity, velocity_var
-         type(auto_diff_real_star_order1) :: velocity_rhs_ad
+         type(auto_diff_real_star_order1) :: velocity_rhs_ad, rhs_inner
 
          ierr = 0
          velocity_var = velocity_var_for_star_LNA(map)
@@ -760,10 +760,14 @@
                cycle
             end if
 
-            call momentum_rhs_for_star_LNA(s, k, velocity_rhs_ad, ierr)
+            call momentum_rhs_for_star_LNA(s, k, velocity_rhs_ad, ierr, rhs_inner)
             if (ierr /= 0) return
             call add_ad_partials_to_A(map, mtx, row, k, 1d0, velocity_rhs_ad, ierr)
             if (ierr /= 0) return
+            if (s% RSP2_flag .and. s% u_flag .and. k < map%nz-1) then
+               call add_ad_partials_to_A(map,mtx,row,k+1,1d0,rhs_inner,ierr,only_k=k+2)
+               if (ierr /= 0) return
+            end if
             mtx%B(row, col_velocity) = 1d0
          end do
       end subroutine assemble_momentum_rows
@@ -780,7 +784,7 @@
          integer, intent(in) :: row, col_velocity
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: &
-            P_bc_ad, lnP_bc_ad, resid_ad, velocity_rhs_ad
+            P_bc_ad, lnP_bc_ad, resid_ad, velocity_rhs_ad, rhs_inner
 
          ierr = 0
 
@@ -793,10 +797,14 @@
          if (ierr /= 0) return
 
          if (use_surface_momentum_row_for_star_LNA(s)) then
-            call surface_momentum_rhs_for_star_LNA(s, P_bc_ad, velocity_rhs_ad, ierr)
+            call surface_momentum_rhs_for_star_LNA(s, P_bc_ad, velocity_rhs_ad, ierr, rhs_inner)
             if (ierr /= 0) return
             call add_ad_partials_to_A(map, mtx, row, 1, 1d0, velocity_rhs_ad, ierr)
             if (ierr /= 0) return
+            if (s% RSP2_flag .and. s% u_flag .and. map%nz > 2) then
+               call add_ad_partials_to_A(map,mtx,row,2,1d0,rhs_inner,ierr,only_k=3)
+               if (ierr /= 0) return
+            end if
             mtx%B(row, col_velocity) = 1d0
          else
             resid_ad = lnP_bc_ad - wrap_lnPeos_00(s, 1)
@@ -817,22 +825,24 @@
       ! Interior momentum RHS in acceleration units. The face-velocity path
       ! follows hydro_momentum.get1_momentum_eqn; u_flag reuses
       ! hydro_riemann.eval_Riemann_dudt_rhs.
-      subroutine momentum_rhs_for_star_LNA(s, k, velocity_rhs_ad, ierr)
+      subroutine momentum_rhs_for_star_LNA(s, k, velocity_rhs_ad, ierr, rhs_inner)
          type(star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(out) :: velocity_rhs_ad
          integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1), intent(out), optional :: rhs_inner
          type(auto_diff_real_star_order1) :: grav_ad, area_ad, dm_div_A_ad, &
             dPtot_ad, d_mlt_Pturb_ad, Uq_ad, P_surf_ad
 
          ierr = 0
+         if (present(rhs_inner)) rhs_inner = 0d0
 
          if (s% u_flag) then
             P_surf_ad = 0d0
             ! Omit finite-step centering and add the static LNA Uq below.
             call eval_Riemann_dudt_rhs( &
                s, k, P_surf_ad, use_time_centering=.false., &
-               include_tdc_Uq=.false., dudt_expected_ad=velocity_rhs_ad, ierr=ierr)
+               include_tdc_Uq=.false., dudt_expected_ad=velocity_rhs_ad, ierr=ierr, rhs_inner=rhs_inner)
             if (ierr /= 0) return
             call Uq_cell_for_star_LNA(s, k, Uq_ad, ierr)
             if (ierr /= 0) return
@@ -856,19 +866,21 @@
       end subroutine momentum_rhs_for_star_LNA
 
 
-      subroutine surface_momentum_rhs_for_star_LNA(s, P_bc_ad, velocity_rhs_ad, ierr)
+      subroutine surface_momentum_rhs_for_star_LNA(s, P_bc_ad, velocity_rhs_ad, ierr, rhs_inner)
          type(star_info), pointer :: s
          type(auto_diff_real_star_order1), intent(in) :: P_bc_ad
          type(auto_diff_real_star_order1), intent(out) :: velocity_rhs_ad
          integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1), intent(out), optional :: rhs_inner
          type(auto_diff_real_star_order1) :: grav_ad, area_ad, dm_div_A_ad, &
             Ptot00_ad, dPtot_ad, d_mlt_Pturb_ad, Uq_ad
 
          ierr = 0
+         if (present(rhs_inner)) rhs_inner = 0d0
          if (s% u_flag) then
             call eval_Riemann_dudt_rhs( &
                s, 1, P_bc_ad, use_time_centering=.false., &
-               include_tdc_Uq=.false., dudt_expected_ad=velocity_rhs_ad, ierr=ierr)
+               include_tdc_Uq=.false., dudt_expected_ad=velocity_rhs_ad, ierr=ierr, rhs_inner=rhs_inner)
             if (ierr /= 0) return
             call Uq_cell_for_star_LNA(s, 1, Uq_ad, ierr)
             if (ierr /= 0) return
@@ -1065,7 +1077,7 @@
          type(star_LNA_matrix), intent(inout) :: mtx
          integer, intent(out) :: ierr
          integer :: k, row
-         type(auto_diff_real_star_order1) :: energy_rhs_ad, energy_inertia_ad
+         type(auto_diff_real_star_order1) :: energy_rhs_ad, energy_inertia_ad, rhs_inner
 
          ierr = 0
          do k = 1, map%nz
@@ -1076,11 +1088,15 @@
                return
             end if
 
-            call energy_rhs_for_star_LNA(s, k, energy_rhs_ad, ierr)
+            call energy_rhs_for_star_LNA(s, k, energy_rhs_ad, ierr, rhs_inner)
             if (ierr /= 0) return
             call add_ad_partials_to_A(map, mtx, row, k, 1d0, energy_rhs_ad, ierr)
             if (ierr /= 0) return
 
+            if (s% RSP2_flag .and. s% u_flag .and. k < map%nz-1) then
+               call add_ad_partials_to_A(map,mtx,row,k+1,1d0,rhs_inner,ierr,only_k=k+2)
+               if (ierr /= 0) return
+            end if
             call energy_inertia_for_star_LNA(s, k, energy_inertia_ad, ierr)
             if (ierr /= 0) return
             call add_ad_partials_to_B(map, mtx, row, k, 1d0, energy_inertia_ad, ierr)
@@ -1089,20 +1105,22 @@
       end subroutine assemble_energy_rows
 
 
-      subroutine energy_rhs_for_star_LNA(s, k, energy_rhs_ad, ierr)
+      subroutine energy_rhs_for_star_LNA(s, k, energy_rhs_ad, ierr, rhs_inner)
          type(star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(out) :: energy_rhs_ad
          integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1), intent(out), optional :: rhs_inner
          type(auto_diff_real_star_order1) :: dL_dm_ad, sources_ad, dwork_dm_ad
 
          ierr = 0
          call dL_dm_for_star_LNA(s, k, dL_dm_ad)
          call energy_sources_for_star_LNA(s, k, sources_ad, ierr)
          if (ierr /= 0) return
-         call dwork_dm_for_star_LNA(s, k, dwork_dm_ad, ierr)
+         call dwork_dm_for_star_LNA(s, k, dwork_dm_ad, ierr, rhs_inner)
          if (ierr /= 0) return
 
+         if (present(rhs_inner)) rhs_inner = -rhs_inner
          energy_rhs_ad = -dL_dm_ad + sources_ad - dwork_dm_ad
       end subroutine energy_rhs_for_star_LNA
 
@@ -1156,15 +1174,17 @@
       ! The total-energy branch uses
       !   ([P*A*v]_k - [P*A*v]_{k+1})/dm_k.
       ! Terms proportional to delta(P)*A*v0 vanish on the static background.
-      subroutine dwork_dm_for_star_LNA(s, k, dwork_dm_ad, ierr)
+      subroutine dwork_dm_for_star_LNA(s, k, dwork_dm_ad, ierr, work_inner)
          type(star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(out) :: dwork_dm_ad
          integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1), intent(out), optional :: work_inner
          real(dp) :: P_cell, P_out, P_in
          type(auto_diff_real_star_order1) :: P_cell_ad, rho_face_ad
 
          ierr = 0
+         if (present(work_inner)) work_inner = 0d0
          if (s% use_P_d_1_div_rho_form_of_work .or. s% eps_grav_form_for_energy_eqn) then
             call Ptot_for_star_LNA(s, k, P_cell_ad, ierr)
             if (ierr /= 0) return
@@ -1176,6 +1196,8 @@
                   s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*rho_face_ad%val/3d0
             end if
             if (k < s% nz) then
+               if (present(work_inner)) work_inner = &
+                  -4d0*pi*P_cell*pow2(s% r(k+1))*wrap_v_00(s,k+1)/s% dm(k)
                dwork_dm_ad = 4d0*pi*P_cell*( &
                   s% r(k)*s% r(k)*wrap_v_00(s, k) - &
                   s% r(k + 1)*s% r(k + 1)*wrap_v_p1(s, k))/s% dm(k)
@@ -1199,6 +1221,8 @@
                call static_face_pressure_for_star_LNA(s, k + 1, P_in, ierr)
                if (ierr /= 0) return
             end if
+            if (present(work_inner)) work_inner = &
+               -4d0*pi*P_in*pow2(s% r(k+1))*wrap_v_00(s,k+1)/s% dm(k)
             dwork_dm_ad = 4d0*pi*( &
                P_out*s% r(k)*s% r(k)*wrap_v_00(s, k) - &
                P_in*s% r(k + 1)*s% r(k + 1)*wrap_v_p1(s, k))/s% dm(k)
@@ -1217,6 +1241,8 @@
          type(auto_diff_real_star_order1) :: turbulent_inertia_ad, &
             mechanical_inertia_ad, entropy_inertia_ad
          real(dp) :: entropy_weight
+
+         type(auto_diff_real_star_order1) :: pressure_inertia, pressure_inner, Peos_ad, Ptrb_ad
 
          ierr = 0
          energy_inertia_ad = 0d0
@@ -1244,6 +1270,18 @@
          call turbulent_energy_inertia_for_star_LNA(s, k, turbulent_inertia_ad, ierr)
          if (ierr /= 0) return
          energy_inertia_ad = energy_inertia_ad + turbulent_inertia_ad
+         if (s% RSP2_flag .and. s% star_LNA_perturb_turbulent_pressure) then
+            call rsp2_pressure_inertia_for_star_LNA(s,k,pressure_inertia)
+            pressure_inertia = 0.5d0*pressure_inertia
+            if (k < s% nz) then
+               call rsp2_pressure_inertia_for_star_LNA(s,k+1,pressure_inner)
+               pressure_inertia = pressure_inertia + 0.5d0*shift_p1(pressure_inner)
+            end if
+            call pressure_components_for_star_LNA(s,k,Peos_ad,Ptrb_ad,ierr)
+            if (ierr /= 0) return
+            energy_inertia_ad = energy_inertia_ad + pressure_inertia + &
+               (Ptrb_ad%val/s% rho(k))*(wrap_lnd_00(s,k)-s% lnd(k))
+         end if
 
          call mechanical_energy_inertia_for_star_LNA(s, k, mechanical_inertia_ad, ierr)
          if (ierr /= 0) return
@@ -1574,7 +1612,6 @@
          integer, intent(in) :: k
          integer, intent(out) :: ierr
          integer :: row_Pi, row_Phi
-         real(dp) :: alfa, beta
          type(auto_diff_real_star_order1) :: Pi_rhs, Phi_rhs
 
          ierr = 0
@@ -1585,8 +1622,7 @@
             mtx%A(row_Phi,row_Phi) = 1d0
             return
          end if
-         call get_RSP2_alfa_beta_face_weights(s,k,alfa,beta)
-         if (alfa*get_etrb(s,k) + beta*get_etrb(s,k-1) == 0d0) then
+         if (get_etrb(s,k) == 0d0) then
             write(*,'(a,i0)') 'star_LNA cannot linearize active RSP2 moments at zero face energy, k = ', k
             ierr = -1
             return
@@ -1609,10 +1645,10 @@
          type(auto_diff_real_star_order1) :: source_div_w
 
          ierr = 0
-         zero_w = rsp2_forces_non_turbulent_cell(s,k)
+         zero_w = rsp2_zero_w(s,k)
          if (zero_w .or. get_etrb(s,k) /= 0d0) return
          if (s% RSP2_3equation_flag) then
-            zero_w = rsp2_dormant_moments(s,k) .and. rsp2_dormant_moments(s,k+1)
+            zero_w = rsp2_dormant_moments(s,k)
             if (zero_w) return
          end if
          if (s% RSP2_source_seed /= 0d0 .or. s% RSP2_alfat /= 0d0) return
@@ -1628,7 +1664,8 @@
       !   d etrb_k/dt = COUPL_k - dLt_k/dm - Ptrb_k*dVdt_k/dm
       !
       ! Static background linearized form:
-      !   delta[COUPL - dLt/dm - Ptrb0*dVdt/dm] = sigma*delta etrb.
+      !   delta[COUPL - dLt/dm] = sigma*(delta etrb + pressure work inertia).
+      ! Pressure work uses density perturbations from both adjacent cells.
       ! The nonlinear hydro residual has an Eq term, but Eq is quadratic in the
       ! velocity gradient perturbation and is omitted from the static LNA.
       ! Forced nonturbulent cells use delta w = 0.
@@ -1760,15 +1797,16 @@
       end subroutine assemble_tdc_w_row
 
       ! Automatic differentiation to matrix plumbing.
-      subroutine add_ad_partials_to_A(map, mtx, row, k, scale, ad, ierr)
+      subroutine add_ad_partials_to_A(map, mtx, row, k, scale, ad, ierr, only_k)
          type(star_LNA_var_map), intent(in) :: map
          type(star_LNA_matrix), intent(inout) :: mtx
          integer, intent(in) :: row, k
          real(dp), intent(in) :: scale
          type(auto_diff_real_star_order1), intent(in) :: ad
          integer, intent(out) :: ierr
+         integer, intent(in), optional :: only_k
 
-         call add_ad_partials_to_matrix(map, mtx%A, row, k, scale, ad, ierr)
+         call add_ad_partials_to_matrix(map, mtx%A, row, k, scale, ad, ierr, only_k)
       end subroutine add_ad_partials_to_A
 
 
@@ -1784,13 +1822,14 @@
       end subroutine add_ad_partials_to_B
 
 
-      subroutine add_ad_partials_to_matrix(map, mat, row, k, scale, ad, ierr)
+      subroutine add_ad_partials_to_matrix(map, mat, row, k, scale, ad, ierr, only_k)
          type(star_LNA_var_map), intent(in) :: map
          real(dp), intent(inout) :: mat(:,:)
          integer, intent(in) :: row, k
          real(dp), intent(in) :: scale
          type(auto_diff_real_star_order1), intent(in) :: ad
          integer, intent(out) :: ierr
+         integer, intent(in), optional :: only_k
          integer :: iad, kk, var_id, col
          real(dp) :: coeff
 
@@ -1805,6 +1844,9 @@
                   trim(auto_diff_star_d1_names(iad)), ' into the LNA matrix.'
                ierr = -1
                return
+            end if
+            if (present(only_k)) then
+               if (kk /= only_k) cycle
             end if
             ! State below an envelope cut supplies background values only.
             if (kk < 1 .or. kk > map%nz) cycle
