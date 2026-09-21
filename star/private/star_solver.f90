@@ -904,7 +904,7 @@
 
                ! reduce alam and try again
                if (first_time) then
-                  tmplam = -slope/(2*(f-fold-slope))
+                  tmplam = -slope*alam*alam/(2*(f-fold-alam*slope))
                   first_time = .false.
                   if (dbg_adjust) then
                      write(*,5) 'slope', k, iter, s% solver_iter, &
@@ -913,8 +913,8 @@
                         s% model_number, f
                      write(*,5) 'fold', k, iter, s% solver_iter, &
                         s% model_number, fold
-                     write(*,5) '2*(f-fold-slope)', k, iter, s% solver_iter, &
-                        s% model_number, 2*(f-fold-slope)
+                     write(*,5) '2*(f-fold-alam*slope)', k, iter, s% solver_iter, &
+                        s% model_number, 2*(f-fold-alam*slope)
                   end if
                else  ! have two prior f values to work with
                   rhs1 = f - fold - alam*slope

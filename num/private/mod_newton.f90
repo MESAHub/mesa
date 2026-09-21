@@ -912,7 +912,7 @@ contains
 
             ! reduce alam and try again
             if (first_time) then
-               tmplam = -slope/(2*(f - fold - slope))
+               tmplam = -slope*alam*alam/(2*(f - fold - alam*slope))
                first_time = .false.
             else ! have two prior f values to work with
                rhs1 = f - fold - alam*slope
