@@ -23,6 +23,14 @@
 / ! end of kap namelist
 
 
+&colors
+
+      read_extra_colors_inlist(2) = .true.
+      extra_colors_inlist_name(2) = 'inlist_pulses'
+
+/ ! end of colors namelist
+
+
 &controls
 
       read_extra_controls_inlist(2) = .true.

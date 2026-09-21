@@ -181,9 +181,9 @@ Profile_Panels1_title = ''
 Profile_Panels1_txt_scale = 0.7
 Profile_Panels1_num_panels = 4
 
-Profile_Panels1_yaxis_name(1) = 'Eq'
+Profile_Panels1_yaxis_name(1) = 'Phi'
 !Profile_Panels1_dymin(1) = 0.14
-Profile_Panels1_other_yaxis_name(1) = 'Uq'!'lum_conv'
+Profile_Panels1_other_yaxis_name(1) = 'Pi'!'lum_conv'
 !Profile_Panels1_other_dymin(1) = 0.14
 
 Profile_Panels1_yaxis_name(2) = 'logT'!'logdq'!'radius'!'entropy'
@@ -194,7 +194,7 @@ Profile_Panels1_other_yaxis_log(2) = .false.
 !Profile_Panels1_ymin(2) = 160
 
 Profile_Panels1_yaxis_name(3) = 'Lc_div_L'!'gradT'
-Profile_Panels1_other_yaxis_name(3) = 'conv_vel'!'lum_div_Ledd'!'grada'
+Profile_Panels1_other_yaxis_name(3) = 'etrb'!'lum_div_Ledd'!'grada'
 Profile_Panels1_same_yaxis_range(3) = .false.
 Profile_Panels1_other_dymin(3) = 0.08
 !Profile_Panels1_yaxis_log(3) = .false.
@@ -615,8 +615,8 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
 
       ! ::
 
-    History_Panels1_yaxis_name(2) = 'growth'!'lum_div_Ledd'
-    History_Panels1_yaxis_reversed(2) = .false.
+    History_Panels1_yaxis_name(2) = 'I'
+    History_Panels1_yaxis_reversed(2) = .true.
     History_Panels1_ymin(2) = -101d0
     History_Panels1_ymax(2) = -101d0
     !History_Panels1_dymin(2) = 0.14

@@ -19,6 +19,11 @@
 &eos
 /
 
+&colors
+   use_colors = .true.
+   instrument = 'data/colors_data/filters/Generic/Johnson'
+/
+
 &star_job
    load_saved_model = .true.
    load_model_filename = 'rsp_RR_Lyrae_cycle0.mod' !'standard_he_dep.mod'
@@ -34,7 +39,7 @@
 
    set_initial_dt = .true.
    years_for_initial_dt = -1
-   seconds_for_initial_dt = 1d2!1d7
+   seconds_for_initial_dt = 1d7
 
    set_initial_cumulative_energy_error = .true.
    new_cumulative_energy_error = 0d0
@@ -67,7 +72,7 @@ new_rsp2_flag = .true.
     RSP2_use_3equation_model = .true.
     RSP2_alfa_pi = 1d0
     RSP2_alfa_phi = 1d0
-    rsp2_alfat = 0d0
+    rsp2_alfat = 0.01d0
     rsp2_alfam= 0.25d0
 
 
@@ -78,7 +83,7 @@ new_rsp2_flag = .true.
    star_LNA_model_number = 200
    star_LNA_stop_after_run = .false.
    star_LNA_T_inner = 0d0 ! inner envelope temperature in K; <= 0 uses the complete model
-   star_LNA_num_modes = 15
+   star_LNA_num_modes = 30
    star_LNA_solver = 'dense'
 
    ! Heuristics used to build the selected mode list. The dense solve still
@@ -97,9 +102,9 @@ new_rsp2_flag = .true.
    star_LNA_write_work_integrals = .true.
 
    star_LNA_set_initial_velocity = .true.
-   star_LNA_mode_for_period = 0 ! zero-based terminal-table mode used for the reported period
-   star_LNA_kick_vsurf_km_per_sec = 5d0
-   star_LNA_kick_mode_1 = 1 ! one-based index in the selected mode list
+   star_LNA_mode_for_period = 11 ! zero-based terminal-table mode used for the reported period
+   star_LNA_kick_vsurf_km_per_sec = 10d0
+   star_LNA_kick_mode_1 = 12 ! one-based index in the selected mode list
    star_LNA_kick_fraction_1 = 1d0
    star_LNA_kick_mode_2 = 0
    star_LNA_kick_fraction_2 = 0d0
@@ -124,11 +129,11 @@ new_rsp2_flag = .true.
 
    ! TDC Pulsation timestepping.
    x_ctrl(13) = 100 ! model number to drop timestep
-   x_ctrl(17) = 1d5 ! 1d5 ! dt before pulse, seconds
+   x_ctrl(17) = 1d7 ! 1d5 ! dt before pulse, seconds
    x_ctrl(18) = 1d6 ! fallback timestep ceiling after pulsations begin, seconds
    x_integer_ctrl(8) = 600 ! requested timesteps per pulsation period
 
-   dt_div_min_dr_div_cs_limit = 4d0
+   dt_div_min_dr_div_cs_limit = 2d0
    dt_div_min_dr_div_cs_hard_limit = -1d0 !100d0
    min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit = 0.8d0
    min_q_for_dt_div_min_dr_div_cs_limit = 0d0
@@ -138,7 +143,7 @@ new_rsp2_flag = .true.
 
    ! One-time TDC envelope remesh; -1 disables, 0 is before the first step,
    ! and a positive value waits for that many accepted steps.
-   steps_before_remesh_for_TDC_pulsations = 100
+   steps_before_remesh_for_TDC_pulsations = 100 !-1
    TDC_hydro_use_mass_interp_face_values = .true.
    TDC_hydro_nz = 350 !190 ! 150-zone base grid + 20 inner + 20 T-gradient
    TDC_hydro_nz_outer = 140 !40
@@ -190,7 +195,6 @@ new_rsp2_flag = .true.
    mlt_Pturb_factor = 0d0
    include_mlt_Pturb_in_thermodynamic_gradients = .false.
    TDC_num_innermost_cells_forced_nonturbulent = 0
-   RSP2_report_flux_solver = .false.
 
    ! Temperature-gradient equation
    use_dPrad_dm_form_of_T_gradient_eqn = .true.
@@ -207,7 +211,7 @@ new_rsp2_flag = .true.
    no_dedt_form_during_relax = .false.
    set_rho_to_dm_div_dV = .false.
 
-   ! Velocity time centering applies only to v_flag hydrodynamics.
+   ! Time center velocity, pressure and luminosity.
    steps_before_use_velocity_time_centering = 300
    use_P_d_1_div_rho_form_of_work = .true.
    include_P_in_velocity_time_centering = .true.
@@ -273,7 +277,7 @@ hard_limit_for_rel_error_in_energy_conservation = 1d99 !1d-3
    terminal_show_log_dt = .false.
    terminal_show_log_age = .false.
 
-   report_solver_progress = .true.
+   report_solver_progress = .false.
    report_ierr = .false.
 
    ! u_flag
