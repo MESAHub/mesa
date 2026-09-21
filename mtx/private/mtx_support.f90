@@ -761,14 +761,14 @@
             p3(1:nvar) => b1(shift+1:shift+nvar)
             call do_multiply_xa(nvar,p1,p2,p3)
             if (k > 1) then
-               p1(1:nvar2) => ublk1(shift2+1:shift2+nvar2)
-               p2(1:nvar) => x1(shift+1:shift+nvar)
+               p1(1:nvar2) => ublk1(shift2+1-nvar2:shift2)
+               p2(1:nvar) => x1(shift+1-nvar:shift)
                p3(1:nvar) => b1(shift+1:shift+nvar)
                p4(1:nvar) => b1(shift+1:shift+nvar)
                call do_multiply_xa_plus_c(nvar,p1,p2,p3,p4)
             end if
             if (k < nz) then
-               p1(1:nvar2) => lblk1(shift2+1:shift2+nvar2)
+               p1(1:nvar2) => lblk1(shift2+1+nvar2:shift2+2*nvar2)
                p2(1:nvar) => x1(shift+1+nvar:shift+2*nvar)
                p3(1:nvar) => b1(shift+1:shift+nvar)
                p4(1:nvar) => b1(shift+1:shift+nvar)

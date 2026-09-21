@@ -27,6 +27,45 @@ module test_mtx_support
 
 contains
 
+   subroutine test_block_multiply_xa
+      integer :: nvar, nz, n, k, i, j, row, col, loc
+      real(dp), pointer :: lblk(:), dblk(:), ublk(:), x(:), b(:)
+      real(dp), allocatable :: a(:,:), expected(:)
+
+      do nvar = 1, 3
+         do nz = 1, 4
+            n = nvar*nz
+            allocate(lblk(nvar*n), dblk(nvar*n), ublk(nvar*n), x(n), b(n), a(n,n), expected(n))
+            do i = 1, nvar*n
+               lblk(i) = mod(3*i,17) - 8
+               dblk(i) = mod(5*i,19) - 9
+               ublk(i) = mod(7*i,23) - 11
+            end do
+            do i = 1, n
+               x(i) = mod(2*i,13) - 6
+            end do
+            a = 0d0
+            do k = 1, nz
+               do j = 1, nvar
+                  do i = 1, nvar
+                     row = (k-1)*nvar + i
+                     col = (k-1)*nvar + j
+                     loc = (k-1)*nvar*nvar + (j-1)*nvar + i
+                     a(row,col) = dblk(loc)
+                     if (k > 1) a(row,col-nvar) = lblk(loc)
+                     if (k < nz) a(row,col+nvar) = ublk(loc)
+                  end do
+               end do
+            end do
+            expected = matmul(transpose(a),x)
+            call block_multiply_xa(nvar, nz, lblk, dblk, ublk, x, b)
+            ! All products and sums are exactly representable integers.
+            if (any(b /= expected)) call mesa_error(__FILE__, __LINE__, 'block_multiply_xa')
+            deallocate(lblk, dblk, ublk, x, b, a, expected)
+         end do
+      end do
+   end subroutine test_block_multiply_xa
+
    subroutine test_format_conversion
       use mtx_def
       integer, parameter :: n = 6

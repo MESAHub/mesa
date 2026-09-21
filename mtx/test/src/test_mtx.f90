@@ -44,5 +44,6 @@ program test_mtx
    call do_test_square
    call do_test_block_tri_dble
    call test_format_conversion
+   call test_block_multiply_xa
 
 end program test_mtx
