@@ -1437,9 +1437,9 @@
          min_stencil_energy = min(energy_R, energy_C, energy_L)
          max_stencil_energy = max(energy_R, energy_C, energy_L)
 
-         pressure_R = s% Peos(iR) + get_split_mlt_Pturb(s, iR, s% lnT(iR))
-         pressure_C = s% Peos(iC) + get_split_mlt_Pturb(s, iC, s% lnT(iC))
-         pressure_L = s% Peos(iL) + get_split_mlt_Pturb(s, iL, s% lnT(iL))
+         pressure_R = s% Peos(iR) + get_split_mlt_Pturb(s, iR)
+         pressure_C = s% Peos(iC) + get_split_mlt_Pturb(s, iC)
+         pressure_L = s% Peos(iL) + get_split_mlt_Pturb(s, iL)
          min_stencil_pressure = min(pressure_R, pressure_C, pressure_L)
          max_stencil_pressure = max(pressure_R, pressure_C, pressure_L)
          min_stencil_lnT = min(s% lnT(iR), s% lnT(iC), s% lnT(iL))
@@ -2019,8 +2019,8 @@
                ip, rho_inner, energy_inner, s% lnT(ip), P_inner, lnT_in, eos_ierr)
             if (eos_ierr /= 0) return
 
-            P_outer = P_outer + get_split_mlt_Pturb(s, i, lnT_out)
-            P_inner = P_inner + get_split_mlt_Pturb(s, ip, lnT_in)
+            P_outer = P_outer + get_split_mlt_Pturb(s, i)
+            P_inner = P_inner + get_split_mlt_Pturb(s, ip)
 
             mismatch = P_inner - P_outer - pressure_difference_target
             valid = .not. is_bad(mismatch + P_outer + P_inner + lnT_out + lnT_in)
@@ -2063,11 +2063,10 @@
       end subroutine reconstruct_split_pressure
 
 
-      real(dp) function get_split_mlt_Pturb(s, k, lnT) result(Pturb)
+      real(dp) function get_split_mlt_Pturb(s, k) result(Pturb)
          use star_utils, only: get_face_weights
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp), intent(in) :: lnT
          real(dp) :: alfa, beta, rho_00, rho_m1, rho_face, theta
 
          Pturb = 0d0
@@ -2086,8 +2085,7 @@
          rho_face = alfa*rho_00 + beta*rho_m1
 
          if (s% using_velocity_time_centering .and. &
-               s% include_P_in_velocity_time_centering .and. &
-               lnT/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) then
+               s% include_P_in_velocity_time_centering) then
             theta = s% P_theta_for_velocity_time_centering
             rho_face = theta*rho_face + (1d0 - theta)*0.5d0*(rho_00 + rho_m1)
          end if

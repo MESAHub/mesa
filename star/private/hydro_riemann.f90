@@ -20,7 +20,7 @@
       module hydro_riemann
 
       use star_private_def
-      use const_def, only: dp, pi, ln10
+      use const_def, only: dp, pi
       use star_utils, only: em1, e00, ep1
       use utils_lib
       use auto_diff
@@ -260,8 +260,7 @@
 
             Pface = s% P_face_ad(kk)
             if (use_time_centering .and. s% using_velocity_time_centering .and. &
-                  s% include_P_in_velocity_time_centering .and. &
-                  s% lnT(kk)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) &
+                  s% include_P_in_velocity_time_centering) &
                Pface = s% P_theta_for_velocity_time_centering*Pface + &
                   (1d0 - s% P_theta_for_velocity_time_centering)*s% P_face_start(kk)
          end function get_Pface

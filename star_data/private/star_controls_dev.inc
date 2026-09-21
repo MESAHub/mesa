@@ -33,7 +33,6 @@
          real(dp) :: RSP2_w_fix_if_neg, RSP2_source_seed
 
          logical :: RSP2_use_L_eqn_at_surface, RSP2_report_adjust_w
-         logical :: RSP2_report_flux_solver
          logical :: RSP2_use_mass_interp_face_values
          logical :: RSP2_use_Stellingwerf_Lr
          integer :: RSP2_num_outermost_cells_forced_nonturbulent, &

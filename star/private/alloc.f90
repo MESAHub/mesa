@@ -1365,6 +1365,10 @@
             if (failed('Pi_scale')) exit
             call do1(s% Phi_scale, c% Phi_scale)
             if (failed('Phi_scale')) exit
+            call do1(s% Pi_rate_scale, c% Pi_rate_scale)
+            if (failed('Pi_rate_scale')) exit
+            call do1(s% Phi_rate_scale, c% Phi_rate_scale)
+            if (failed('Phi_rate_scale')) exit
             call do1(s% Y_face, c% Y_face); if (failed('Y_face')) exit
             call do1(s% Y_face_start, c% Y_face_start); if (failed('Y_face_start')) exit
 

@@ -3444,16 +3444,19 @@
 
       end subroutine calc_Ptrb_ad_tw
 
-      function calc_Ptrb_work_face(s,k,divide_by_w) result(work)
+      function calc_Ptrb_work_face(s,k,divide_by_w,work_new,work_start) result(work)
          use auto_diff_support
          type(star_info), pointer :: s
          integer, intent(in) :: k
          logical, intent(in), optional :: divide_by_w
+         type(auto_diff_real_star_order1), intent(out), optional :: work_new, work_start
          type(auto_diff_real_star_order1) :: work, w, energy, rho, dV, pressure, old_energy_div_w
          real(dp) :: theta, dm_face, old_energy
          integer :: j
 
          work = 0d0
+         if (present(work_new)) work_new = 0d0
+         if (present(work_start)) work_start = 0d0
          if (rsp2_zero_w(s,k) .or. s% RSP2_alfap == 0d0) return
          theta = 1d0
          if (s% using_velocity_time_centering .and. s% include_P_in_velocity_time_centering) &
@@ -3468,6 +3471,10 @@
             else
                rho = wrap_d_m1(s,k)
             end if
+            if (present(work_new)) work_new = work_new + &
+               (s% RSP2_alfap/3d0)*s% dm(j)*theta*(1d0-rho/s% rho_start(j))/dm_face
+            if (present(work_start)) work_start = work_start + &
+               (s% RSP2_alfap/3d0)*s% dm(j)*(1d0-theta)*(s% rho_start(j)/rho-1d0)/dm_face
             dV = 1d0/rho - 1d0/s% rho_start(j)
             pressure = theta*rho*energy + (1d0-theta)*s% rho_start(j)*old_energy
             if (present(divide_by_w)) then
@@ -3513,8 +3520,7 @@
          d_Ptot_dxa = 0d0
 
          time_center = (do_time_centering .and. s% using_velocity_time_centering .and. &
-                  s% include_P_in_velocity_time_centering .and. &
-                  s% lnT(k)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering)
+                  s% include_P_in_velocity_time_centering)
          if (time_center) then
             alfa = s% P_theta_for_velocity_time_centering
          else
@@ -4113,8 +4119,7 @@
          if (s% include_mlt_in_velocity_time_centering) then
             ! consider building a wrapper : wrap_opt_time_center_L_00(s,k)
             if (s% using_velocity_time_centering .and. &
-              s% include_L_in_velocity_time_centering .and. &
-              s% lnT(k)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) then
+              s% include_L_in_velocity_time_centering) then
                L_theta = s% L_theta_for_velocity_time_centering
             else
                L_theta = 1d0

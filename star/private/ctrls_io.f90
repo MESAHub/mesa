@@ -377,7 +377,6 @@
     RTI_D_mix_floor, RTI_min_m_for_D_mix_floor, RTI_log_max_boost, RTI_m_full_boost, RTI_m_no_boost, &
     include_P_in_velocity_time_centering, include_L_in_velocity_time_centering, &
     P_theta_for_velocity_time_centering, L_theta_for_velocity_time_centering, &
-    max_logT_for_include_P_and_L_in_velocity_time_centering, &
     steps_before_use_TDC, use_P_d_1_div_rho_form_of_work, compare_TDC_to_MLT, &
     use_TDC_Y_face_seeded_newton, &
     hydro_matrix_solver, &
@@ -444,7 +443,7 @@
     RSP2_target_steps_per_cycle, RSP2_max_num_periods, RSP2_work_period, RSP2_map_first_period, RSP2_map_last_period, &
     RSP2_min_max_R_for_periods, RSP2_GREKM_avg_abs_frac_new, RSP2_GREKM_avg_abs_limit, RSP2_map_zone_interval, &
     RSP2_work_filename, RSP2_map_columns_filename, RSP2_map_filename, RSP2_map_history_filename, RSP2_write_map, &
-    RSP2_nz_div_IBOTOM, RSP2_report_adjust_w, RSP2_report_flux_solver, &
+    RSP2_nz_div_IBOTOM, RSP2_report_adjust_w, &
     RSP2_source_seed, RSP2_w_fix_if_neg, &
     star_LNA_flag, star_LNA_model_number, star_LNA_stop_after_run, star_LNA_T_inner, &
     star_LNA_num_modes, &
@@ -1965,7 +1964,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% steps_before_use_velocity_time_centering = steps_before_use_velocity_time_centering
  s% P_theta_for_velocity_time_centering = P_theta_for_velocity_time_centering
  s% L_theta_for_velocity_time_centering = L_theta_for_velocity_time_centering
- s% max_logT_for_include_P_and_L_in_velocity_time_centering = max_logT_for_include_P_and_L_in_velocity_time_centering
 
  s% RTI_A = RTI_A
  s% RTI_B = RTI_B
@@ -2222,7 +2220,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% RSP2_remesh_when_load = RSP2_remesh_when_load
  s% RSP2_use_L_eqn_at_surface = RSP2_use_L_eqn_at_surface
  s% RSP2_report_adjust_w = RSP2_report_adjust_w
- s% RSP2_report_flux_solver = RSP2_report_flux_solver
  s% RSP2_use_mass_interp_face_values = RSP2_use_mass_interp_face_values
  s% RSP2_num_outermost_cells_forced_nonturbulent = RSP2_num_outermost_cells_forced_nonturbulent
  s% RSP2_num_innermost_cells_forced_nonturbulent = RSP2_num_innermost_cells_forced_nonturbulent
@@ -3737,7 +3734,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  include_L_in_velocity_time_centering = s% include_L_in_velocity_time_centering
  P_theta_for_velocity_time_centering = s% P_theta_for_velocity_time_centering
  L_theta_for_velocity_time_centering = s% L_theta_for_velocity_time_centering
- max_logT_for_include_P_and_L_in_velocity_time_centering = s% max_logT_for_include_P_and_L_in_velocity_time_centering
  use_P_d_1_div_rho_form_of_work = s% use_P_d_1_div_rho_form_of_work
 
  RTI_A = s% RTI_A
@@ -3994,7 +3990,6 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  RSP2_remesh_when_load = s% RSP2_remesh_when_load
  RSP2_use_L_eqn_at_surface = s% RSP2_use_L_eqn_at_surface
  RSP2_report_adjust_w = s% RSP2_report_adjust_w
- RSP2_report_flux_solver = s% RSP2_report_flux_solver
  RSP2_use_mass_interp_face_values = s% RSP2_use_mass_interp_face_values
  RSP2_num_outermost_cells_forced_nonturbulent = s% RSP2_num_outermost_cells_forced_nonturbulent
  RSP2_num_innermost_cells_forced_nonturbulent = s% RSP2_num_innermost_cells_forced_nonturbulent

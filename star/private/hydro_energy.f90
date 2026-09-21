@@ -138,13 +138,14 @@
             s% solver_test_partials_val = residual
          end if
          call unpack_res18(s% species, resid_ad)
-         if (s% RSP2_flag .and. k < nz-1) then
+         if ((s% RSP2_flag .or. (s% MLT_option == 'TDC' .and. &
+               s% hydro_matrix_solver == 'banded')) .and. k < nz-1) then
             ! Inner-face terms retain their original AD origin until this extraction.
             call unpack_residual_partials(s,k+1,nvar,i_dlnE_dt, &
                energy_inner_ad,unused_m1,unused_00,d_dp2)
             if (any(is_bad(d_dp2))) then
                ierr = -1
-               s% retry_message = 'invalid RSP2 energy partial at k+2'
+               s% retry_message = 'invalid energy partial at k+2'
                return
             end if
             s% d_hydro_d_p2(i_dlnE_dt,1:s% nvar_hydro,k) = &
@@ -189,7 +190,7 @@
                s% T_start(k) >= s% op_split_burn_min_T
             d_dm1 = 0d0; d_d00 = 0d0; d_dp1 = 0d0
             energy_inner_ad = 0d0
-            if (s% RSP2_flag) s% d_hydro_d_p2(i_dlnE_dt,:,k) = 0d0
+            s% d_hydro_d_p2(i_dlnE_dt,:,k) = 0d0
          end subroutine init
 
          subroutine setup_dwork_dm(ierr)
@@ -241,13 +242,12 @@
 
          subroutine setup_dL_dm(ierr)
             integer, intent(out) :: ierr
-            type(auto_diff_real_star_order1) :: L00_ad, Lp1_ad
+            type(auto_diff_real_star_order1) :: L00_ad, Lp1_ad, Lt_inner
             real(dp) :: L_theta
             include 'formats'
             ierr = 0
             if (s% using_velocity_time_centering .and. &
-                     s% include_L_in_velocity_time_centering &
-                     .and. s% lnT(k)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) then
+                     s% include_L_in_velocity_time_centering) then
                L_theta = s% L_theta_for_velocity_time_centering
             else
                L_theta = 1d0
@@ -255,6 +255,15 @@
             L00_ad = L_theta*wrap_L_00(s, k) + (1d0 - L_theta)*s% L_start(k)
             Lp1_ad = wrap_L_p1(s, k)
             if (k < s% nz) Lp1_ad = L_theta*Lp1_ad + (1d0 - L_theta)*s% L_start(k+1)
+            if (s% RSP2_3equation_flag) then
+               ! Match implicit moment transport while retaining the Lr and Lc time weights.
+               L00_ad = L00_ad + (1d0-L_theta)*(s% Lt_ad(k)-s% Lt_start(k))
+               if (k < nz) then
+                  Lt_inner = (1d0-L_theta)*(s% Lt_ad(k+1)-s% Lt_start(k+1))
+                  Lp1_ad = Lp1_ad + shift_p1(Lt_inner)
+                  energy_inner_ad = energy_inner_ad + Lt_inner/dm
+               end if
+            end if
             dL_dm_ad = (L00_ad - Lp1_ad)/dm
          end subroutine setup_dL_dm
 
@@ -348,10 +357,10 @@
                      Uq_00 = compute_tdc_Uq_face(s, k, ierr)
                      if (ierr /= 0) return
                      if (k < s% nz) then
-                        ! Drop the zone k+2 partial to retain the block-tridiagonal
-                        ! Jacobian. The current residual value remains conservative.
-                        Uq_p1 = shift_p1(compute_tdc_Uq_face(s, k+1, ierr))
+                        ! Retain the k+2 partial separately for the banded solver.
+                        Uq_inner = compute_tdc_Uq_face(s,k+1,ierr)
                         if (ierr /= 0) return
+                        Uq_p1 = shift_p1(Uq_inner)
                      end if
                      have_v_viscous_work = .true.
                   end if
@@ -392,7 +401,10 @@
                ! Match the half-cell kinetic-energy quadrature.
                viscous_work_ad = 0.5d0*kinetic_mass_factor* &
                   (v_00*Uq_00 + v_p1*Uq_p1)
-               if (s% RSP2_flag) energy_inner_ad = energy_inner_ad + &
+               ! RSP2 retains k+2 with either solver; TDC does so only with banded.
+               if (s% RSP2_flag .or. (s% MLT_option == 'TDC' .and. &
+                     s% hydro_matrix_solver == 'banded')) &
+                  energy_inner_ad = energy_inner_ad + &
                   0.5d0*kinetic_mass_factor*v_p1%val*Uq_inner
             end if
 
@@ -802,8 +814,7 @@
          beta = 1d0 - alfa
 
          if (s% using_velocity_time_centering .and. &
-                  s% include_P_in_velocity_time_centering .and. &
-                  s% lnT(k)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) then
+                  s% include_P_in_velocity_time_centering) then
             P_theta = s% P_theta_for_velocity_time_centering
          else
             P_theta = 1d0 ! try 1 - q(k)

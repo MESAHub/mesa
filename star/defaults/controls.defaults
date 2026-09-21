@@ -8660,19 +8660,15 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! L_theta_for_velocity_time_centering
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! max_logT_for_include_P_and_L_in_velocity_time_centering
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! for time weighting in energy and momentum equations
       ! to give intrinsic conservation of total energy (conservation -> perfect as residuals -> 0),
       ! and to minimize numerical damping.
       ! as discussed in the 3rd mesa instrument paper (2015).
       ! time centering applies to velocities, pressures, and luminosities.
-      ! not for u_flag.
       ! steps_before_use_velocity_time_centering < 0 means no time centering.
       ! P_theta and L_theta = 0.5 for time centered, = 1.0 for fully implicit.
-      ! Above ``max_logT_for_include_P_and_L_in_velocity_time_centering``, P and L are not time centered
-      ! to aid in damping spurious modes in the core.
+      ! The selected pressure and luminosity time weights apply at every temperature.
 
       ! If ``use_P_d_1_div_rho_form_of_work`` is true, use the internal-energy
       ! form with local ``P d(1/rho)`` work. This choice is independent of
@@ -8687,7 +8683,6 @@
     include_L_in_velocity_time_centering = .false.
     L_theta_for_velocity_time_centering = 0.5d0
     use_P_d_1_div_rho_form_of_work = .false.
-    max_logT_for_include_P_and_L_in_velocity_time_centering = 1d99
 
       ! use_dPrad_dm_form_of_T_gradient_eqn
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

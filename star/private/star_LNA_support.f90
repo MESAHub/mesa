@@ -1611,7 +1611,8 @@
          type(star_LNA_matrix), intent(inout) :: mtx
          integer, intent(in) :: k
          integer, intent(out) :: ierr
-         integer :: row_Pi, row_Phi
+         integer :: row_Pi, row_Phi, col_rho
+         real(dp) :: pressure_inertia, dm_face
          type(auto_diff_real_star_order1) :: Pi_rhs, Phi_rhs
 
          ierr = 0
@@ -1635,6 +1636,15 @@
          if (ierr /= 0) return
          mtx%B(row_Pi,row_Pi) = 1d0
          mtx%B(row_Phi,row_Phi) = 1d0
+         if (s% star_LNA_perturb_turbulent_pressure) then
+            ! Match the pressure work retained in the w row.
+            dm_face = 0.5d0*(s% dm(k-1)+s% dm(k))
+            pressure_inertia = -s% RSP2_alfap*s% Pi(k)/(6d0*dm_face)
+            col_rho = matrix_index(map,k-1,lna_var_lnd)
+            if (col_rho > 0) mtx%B(row_Pi,col_rho) = pressure_inertia*s% dm(k-1)
+            col_rho = matrix_index(map,k,lna_var_lnd)
+            if (col_rho > 0) mtx%B(row_Pi,col_rho) = pressure_inertia*s% dm(k)
+         end if
       end subroutine assemble_rsp2_moment_rows
 
 
@@ -1729,7 +1739,7 @@
          end if
 
          flux_resid_ad = rsp2_flux_residual(s, k)
-         if (s% RSP2_3equation_flag .and. k > 1) then
+         if (k > 1) then
             call rsp2_luminosity_terms_for_star_LNA(s,k,Lr_ad,Lc_ad,Lt_ad,ierr)
             if (ierr /= 0) return
             flux_resid_ad = (Lr_ad + Lc_ad + Lt_ad - wrap_L_00(s,k))/ &

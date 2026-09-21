@@ -20,7 +20,7 @@
 module reconstructed_face_support
 
   use star_private_def
-  use const_def, only: dp, ln10, pi4, clight, crad
+  use const_def, only: dp, pi4, clight, crad
   use auto_diff
   use kap_support, only: get_kap
 
@@ -486,8 +486,7 @@ contains
 
     if (s%include_mlt_in_velocity_time_centering) then
        if (s%using_velocity_time_centering .and. &
-             s%include_L_in_velocity_time_centering .and. &
-             s%lnT(k) <= s%max_logT_for_include_P_and_L_in_velocity_time_centering*ln10) then
+             s%include_L_in_velocity_time_centering) then
           L_theta = s%L_theta_for_velocity_time_centering
        else
           L_theta = 1d0

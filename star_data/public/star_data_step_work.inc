@@ -392,6 +392,7 @@
 
          real(dp), pointer :: Pi(:), Phi(:) ! face entropy flux and full variance
          real(dp), pointer :: Pi_scale(:), Phi_scale(:)
+         real(dp), pointer :: Pi_rate_scale(:), Phi_rate_scale(:)
 
       ! Convective turbulent velocity w -- when RSP2_flag is true
 

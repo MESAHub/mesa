@@ -20,7 +20,7 @@
       module hydro_gradient_support
 
       use star_private_def
-      use const_def, only: dp, pi4, ln10, crad, clight
+      use const_def, only: dp, pi4, crad, clight
       use auto_diff
       use auto_diff_support
       use reconstructed_face_support, only: get_reconstructed_face_eos_kap_ad
@@ -103,8 +103,7 @@
          if (ierr /= 0) return
 
          if (time_centering .and. s% using_velocity_time_centering .and. &
-               s% include_P_in_velocity_time_centering .and. &
-               s% lnT(k)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) then
+               s% include_P_in_velocity_time_centering) then
             P_theta = s% P_theta_for_velocity_time_centering
          else
             P_theta = 1d0

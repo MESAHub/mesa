@@ -46,7 +46,7 @@
       public :: RSP2_adjust_vars_before_call_solver
       public :: get_RSP2_alfa_beta_face_weights
       public :: do1_rsp2_moment_eqns, rsp2_moment_rhs
-      public :: init_rsp2_moments
+      public :: init_rsp2_moments, check_rsp2_moments
       public :: rsp2_dormant_moments, rsp2_local_w_equation
       public :: remap_rsp2, interpolate_rsp2_face
 
@@ -57,12 +57,9 @@
          x_CEDE  = (8.d0/3.d0)*sqrt_2_div_3, &  ! DAMP
          x_GAMMAR = 2.d0*sqrt(3.d0)  ! DAMPR
 
-      ! Kuhfuss local MLT calibration, as in Braun et al. (2026), section 2.
-      ! Pi = <v_r*s>; Phi = <s*s>. Using the full variance does not change its decay rate.
-      ! RSP2_alfa_pi and RSP2_alfa_phi multiply these coefficients.
-      real(dp), parameter :: &
-         x_ALFAPI = 6d0*sqrt_2_div_3, &
-         x_ALFAPHI = 4d0*sqrt_2_div_3
+      ! Phi is the full entropy variance. Pi decays at half the sum of variance losses.
+      ! The unit Phi multiplier retains the Kuhfuss local variance decay coefficient.
+      real(dp), parameter :: x_ALFAPHI = 4d0*sqrt_2_div_3
 
       contains
 
@@ -250,10 +247,43 @@
       logical function rsp2_dormant_moments(s, k) result(dormant)
          type(star_info), pointer :: s
          integer, intent(in) :: k
+         integer :: j
          dormant = .true.
          if (rsp2_zero_w(s,k)) return
          dormant = get_etrb(s,k) == 0d0 .and. s% Pi(k) == 0d0 .and. s% Phi(k) == 0d0
+         if (.not. dormant .or. s% RSP2_alfat == 0d0) return
+         ! An empty face can receive moments from either active neighbor.
+         do j=max(1,k-1),min(s% nz,k+1)
+            if (rsp2_zero_w(s,j)) cycle
+            if (s% w(j) /= 0d0 .or. s% Pi(j) /= 0d0 .or. s% Phi(j) /= 0d0) dormant = .false.
+         end do
       end function rsp2_dormant_moments
+
+
+      logical function rsp2_moments_valid(w, Pi_value, Phi_value) result(valid)
+         real(dp), intent(in) :: w, Pi_value, Phi_value
+         real(dp) :: limit
+         valid = .false.
+         if (is_bad(w) .or. is_bad(Pi_value) .or. is_bad(Phi_value)) return
+         if (w < 0d0 .or. Phi_value < 0d0) return
+         limit = sqrt_2_div_3*w*sqrt(Phi_value)
+         valid = abs(Pi_value) <= (1d0+64d0*epsilon(1d0))*limit
+      end function rsp2_moments_valid
+
+
+      subroutine check_rsp2_moments(s,ierr)
+         type(star_info), pointer :: s
+         integer, intent(out) :: ierr
+         integer :: k
+         ierr = 0
+         if (.not. s% RSP2_3equation_flag) return
+         do k=1,s% nz
+            if (rsp2_moments_valid(s% w(k),s% Pi(k),s% Phi(k))) cycle
+            ierr = -1
+            write(s% retry_message,'(a,i0)') 'invalid RSP3 moments at face ', k
+            return
+         end do
+      end subroutine check_rsp2_moments
 
 
       subroutine interpolate_rsp2_face( &
@@ -306,7 +336,7 @@
             return
          end if
          old_value = 0.0_qp
-         old_value(1,1:nz_old) = pow2(xh_old(s% i_w,1:nz_old))
+         old_value(1,1:nz_old) = real(xh_old(s% i_w,1:nz_old),qp)**2
          if (s% RSP2_3equation_flag) then
             old_value(2,1:nz_old) = xh_old(s% i_Pi,1:nz_old)
             old_value(3,1:nz_old) = xh_old(s% i_Phi,1:nz_old)
@@ -316,6 +346,14 @@
             ierr = -1
             s% retry_message = 'invalid moment in RSP2 remap'
             return
+         end if
+         if (s% RSP2_3equation_flag) then
+            do k=1,nz_old
+               if (rsp2_moments_valid(xh_old(s% i_w,k),xh_old(s% i_Pi,k),xh_old(s% i_Phi,k))) cycle
+               ierr = -1
+               s% retry_message = 'invalid covariance in RSP3 remap'
+               return
+            end do
          end if
          ! Quadruple coordinates retain overlap widths in very small zones.
          call face_edges(nz_old,dq_old,old_edge)
@@ -360,11 +398,16 @@
          do k=1,nz
             dm_face = 0.5d0*dq(k)
             if (k > 1) dm_face = dm_face + 0.5d0*dq(k-1)
-            xh(s% i_w,k) = sqrt(real(new_integral(1,k)/dm_face,dp))
-            energy1 = energy1 + real(dm_face,qp)*pow2(xh(s% i_w,k))
+            xh(s% i_w,k) = real(sqrt(new_integral(1,k)/dm_face),dp)
+            energy1 = energy1 + real(dm_face,qp)*real(xh(s% i_w,k),qp)**2
             if (s% RSP2_3equation_flag) then
                xh(s% i_Pi,k) = real(new_integral(2,k)/dm_face,dp)
                xh(s% i_Phi,k) = real(new_integral(3,k)/dm_face,dp)
+               if (.not. rsp2_moments_valid(xh(s% i_w,k),xh(s% i_Pi,k),xh(s% i_Phi,k))) then
+                  ierr = -1
+                  s% retry_message = 'invalid remapped RSP3 covariance'
+                  return
+               end if
             end if
          end do
          s% mesh_adjust_Eturb_conservation = real(abs(energy1-energy0)/max(energy0,tiny(energy0)),dp)
@@ -434,25 +477,23 @@
       end function rsp2_moment_source
 
 
-      subroutine rsp2_moment_rhs(s, k, Pi_rhs, Phi_rhs, ierr, use_time_centering)
-         type (star_info), pointer :: s
+      subroutine rsp2_moment_coefficients( &
+            s, k, buoyancy, entropy_gradient, Lambda_face, inverse_rad_time, ierr, use_time_centering)
+         type(star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_star_order1), intent(out) :: Pi_rhs, Phi_rhs
+         type(auto_diff_real_star_order1), intent(out) :: &
+            buoyancy, entropy_gradient, Lambda_face, inverse_rad_time
          integer, intent(out) :: ierr
          logical, intent(in), optional :: use_time_centering
-         type(auto_diff_real_star_order1) :: Pi_face, Phi_face, &
-            etrb_face, w_face, Cp_face, T_face, rho_face, kap_face, Lambda_face, &
-            entropy_gradient, inverse_rad_time, buoyancy, inverse_dr, strain, &
-            P_face, ChiRho_face, ChiT_face, grad_ad, gradL
-         real(dp) :: alfa, beta
+         type(auto_diff_real_star_order1) :: &
+            Cp_face, T_face, rho_face, kap_face, P_face, ChiRho_face, ChiT_face, grad_ad, gradL
 
          ierr = 0
-         Pi_rhs = 0d0
-         Phi_rhs = 0d0
+         buoyancy = 0d0
+         entropy_gradient = 0d0
+         Lambda_face = 1d0
+         inverse_rad_time = 0d0
          if (rsp2_zero_w(s,k)) return
-         call get_RSP2_alfa_beta_face_weights(s,k,alfa,beta)
-         w_face = wrap_w_00(s,k)
-         etrb_face = pow2(w_face)
          call get_rsp2_face_eos( &
             s, k, T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grad_ad, kap_face, ierr)
          if (ierr /= 0) return
@@ -462,26 +503,51 @@
             ierr = -1
             return
          end if
-         inverse_dr = 4d0*pi*pow2(wrap_r_00(s,k))*rho_face/(0.5d0*(s% dm(k-1) + s% dm(k)))
          call get_rsp2_thermal_gradient(s, k, grad_ad, gradL, entropy_gradient, ierr, use_time_centering)
          if (ierr /= 0) return
          buoyancy = rsp2_buoyancy_face(s,k,ierr)
          if (ierr /= 0) return
          inverse_rad_time = 4d0*boltz_sigma*pow2(s% RSP2_alfar*x_GAMMAR)*pow3(T_face)/ &
             (Cp_face*kap_face*pow2(rho_face)*pow2(Lambda_face))
-         if (s% u_flag) then
-            strain = inverse_dr*(wrap_u_m1(s,k) - wrap_u_00(s,k))
-         else
-            ! Interpolate the two cell velocity gradients to their common face.
-            strain = alfa*(wrap_v_00(s,k) - wrap_v_p1(s,k))/(wrap_r_00(s,k) - wrap_r_p1(s,k)) + &
-               beta*(wrap_v_m1(s,k) - wrap_v_00(s,k))/(wrap_r_m1(s,k) - wrap_r_00(s,k))
-         end if
+      end subroutine rsp2_moment_coefficients
+
+
+      subroutine rsp2_moment_rhs(s, k, Pi_rhs, Phi_rhs, ierr, use_time_centering)
+         type(star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1), intent(out) :: Pi_rhs, Phi_rhs
+         integer, intent(out) :: ierr
+         logical, intent(in), optional :: use_time_centering
+         type(auto_diff_real_star_order1) :: Pi_face, Phi_face, w_face, &
+            buoyancy, entropy_gradient, Lambda_face, inverse_rad_time, Lt, &
+            Pi_outer, Phi_outer, Pi_inner, Phi_inner
+         real(dp) :: C_Pi, C_Phi, dm_face
+
+         ierr = 0
+         Pi_rhs = 0d0
+         Phi_rhs = 0d0
+         if (rsp2_zero_w(s,k)) return
+         call rsp2_moment_coefficients( &
+            s,k,buoyancy,entropy_gradient,Lambda_face,inverse_rad_time,ierr,use_time_centering)
+         if (ierr /= 0) return
+         C_Phi = s% RSP2_alfa_phi*x_ALFAPHI
+         C_Pi = 0.5d0*(s% RSP2_alfad*x_CEDE + C_Phi)*s% RSP2_alfa_pi
+         w_face = wrap_w_00(s,k)
          Pi_face = wrap_Pi_00(s,k)
          Phi_face = wrap_Phi_00(s,k)
-         Pi_rhs = (2d0/3d0)*etrb_face*entropy_gradient + buoyancy*Phi_face - &
-            (s% RSP2_alfa_pi*x_ALFAPI*w_face/Lambda_face + inverse_rad_time + strain)*Pi_face
+         ! Pair buoyancy production and decay with the two isotropic variances.
+         Pi_rhs = (2d0/3d0)*pow2(w_face)*entropy_gradient + (buoyancy/3d0)*Phi_face - &
+            (C_Pi*w_face/Lambda_face + inverse_rad_time)*Pi_face
          Phi_rhs = 2d0*entropy_gradient*Pi_face - &
-            (s% RSP2_alfa_phi*x_ALFAPHI*w_face/Lambda_face + 2d0*inverse_rad_time)*Phi_face
+            (C_Phi*w_face/Lambda_face + 2d0*inverse_rad_time)*Phi_face
+         if (s% RSP2_alfat == 0d0) return
+         Lt = compute_Lt_center(s,k-1,ierr,Pi_outer,Phi_outer)
+         if (ierr /= 0) return
+         Lt = compute_Lt_center(s,k,ierr,Pi_inner,Phi_inner)
+         if (ierr /= 0) return
+         dm_face = 0.5d0*(s% dm(k-1) + s% dm(k))
+         Pi_rhs = Pi_rhs - (shift_m1(Pi_outer) - Pi_inner)/dm_face
+         Phi_rhs = Phi_rhs - (shift_m1(Phi_outer) - Phi_inner)/dm_face
       end subroutine rsp2_moment_rhs
 
 
@@ -490,7 +556,8 @@
          integer, intent(in) :: k, nvar
          integer, intent(out) :: ierr
          integer :: i_flux, i_variance
-         type(auto_diff_real_star_order1) :: Pi_rhs, Phi_rhs, Pi_resid, Phi_resid
+         type(auto_diff_real_star_order1) :: Pi_rhs, Phi_rhs, Pi_resid, Phi_resid, &
+            work, work_new, work_start
          real(dp) :: Pi_scale, Phi_scale
 
          ierr = 0
@@ -507,8 +574,18 @@
             call rsp2_moment_rhs(s,k,Pi_rhs,Phi_rhs,ierr)
             if (ierr /= 0) return
             ! Use the same implicit source time level as COUPL in the w equation.
-            Pi_resid = Pi_resid - s% xh_start(i_flux,k) - s% dt*Pi_rhs
+            work = calc_Ptrb_work_face(s,k,work_new=work_new,work_start=work_start)
+            if (work_start%val >= 1d0) then
+               ierr = -1
+               s% retry_message = 'RSP3 pressure work exceeds old turbulent energy'
+               return
+            end if
+            Pi_resid = Pi_resid - s% xh_start(i_flux,k) - s% dt*Pi_rhs + &
+               0.5d0*work_new*wrap_Pi_00(s,k) + &
+               work_start/(1d0 + sqrt(1d0-work_start))*s% xh_start(i_flux,k)
             Phi_resid = Phi_resid - s% xh_start(i_variance,k) - s% dt*Phi_rhs
+            Pi_scale = Pi_scale + s% dt*s% Pi_rate_scale(k)
+            Phi_scale = Phi_scale + s% dt*s% Phi_rate_scale(k)
          end if
          Pi_resid = Pi_resid/Pi_scale
          Phi_resid = Phi_resid/Phi_scale
@@ -525,7 +602,7 @@
          real(dp), intent(in) :: Lc_old(:)
          integer, intent(out) :: ierr
          integer :: k
-         real(dp) :: alfa, beta, etrb_face
+         real(dp) :: etrb_face
          type(auto_diff_real_star_order1) :: &
             T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grad_ad, kap_face, &
             gradL, entropy_gradient
@@ -539,7 +616,6 @@
                if (ierr /= 0) return
                ! Do not infer finite entropy fluctuations from a quiet stable layer.
                if (entropy_gradient%val > 0d0 .and. Lc_old(k) > 0d0) then
-                  call get_RSP2_alfa_beta_face_weights(s,k,alfa,beta)
                   etrb_face = pow2(s% w(k))
                   call get_rsp2_face_eos( &
                      s, k, T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grad_ad, kap_face, ierr)
@@ -583,9 +659,9 @@
          type(star_info), pointer :: s
          integer, intent(in) :: k, nvar
          integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: resid, w, source, damping, rad_damping, Eq_face, dLt_dm, work
+         type(auto_diff_real_star_order1) :: resid, w, source, damping, rad_damping, Eq_face, dLt_dm, work, old_energy
          type(accurate_auto_diff_real_star_order1) :: esum
-         real(dp) :: scal, scal_outer, dm_face
+         real(dp) :: scal, scal_outer, dm_face, w_start_over_w
          logical :: positive_branch, divided
 
          ierr = 0
@@ -616,7 +692,11 @@
                work = calc_Ptrb_work_face(s,k,.true.)
                esum = w + work - s% dt*(source - damping - rad_damping + Eq_face)
                if (.not. positive_branch) then
-                  esum = esum - div_by_w(0d0*w + pow2(s% w_start(k)),w)
+                  ! Form the old energy quotient without squaring a small velocity.
+                  w_start_over_w = s% w_start(k)/w%val
+                  old_energy%val = s% w_start(k)*w_start_over_w
+                  old_energy%d1Array = -pow2(w_start_over_w)*w%d1Array
+                  esum = esum - old_energy
                   dLt_dm = rsp2_dLt_dm_face(s,k,ierr)
                   if (ierr /= 0) return
                   esum = esum + s% dt*div_by_w(dLt_dm,w)
@@ -871,7 +951,7 @@
          if (ierr /= 0) return
          r6_cell = 0.5d0*(pow6(wrap_r_00(s,k)) + pow6(wrap_r_p1(s,k)))
          Chi_div_w = (16d0/3d0)*pi*s% RSP2_alfam*pow2(wrap_d_00(s,k))* &
-            r6_cell*Lambda_cell*compute_d_v_div_r(s, k, .false.)/s% dm(k)
+            r6_cell*Lambda_cell*compute_d_v_div_r(s, k, s% RSP2_3equation_flag)/s% dm(k)
       end function compute_Chi_div_w_cell
 
 
@@ -1022,7 +1102,7 @@
          end if
          if (ierr /= 0) return
          Chi_div_w = (16d0/3d0)*pi*s% RSP2_alfam*pow2(rho_face)*pow6(r_face)* &
-            Lambda_face*compute_d_u_div_r_face(s,k,.false.)/dm_face
+            Lambda_face*compute_d_u_div_r_face(s,k,s% RSP2_3equation_flag)/dm_face
       end function compute_Chi_div_w_face
 
       function compute_Chi_face(s,k,ierr) result(Chi_face)
@@ -1369,22 +1449,33 @@
          s% Lt(k) = Lt%val
       end function compute_Lt
 
-      function compute_Lt_center(s,k,ierr) result(Lt)
+      function compute_Lt_center(s,k,ierr,Pi_flux,Phi_flux,transport_coeff) result(Lt)
          type(star_info), pointer :: s
          integer, intent(in) :: k
          integer, intent(out) :: ierr
-         type(auto_diff_real_star_order1) :: Lt, Lambda_cell, r_cell, w_outer, w_inner
+         type(auto_diff_real_star_order1), intent(out), optional :: Pi_flux, Phi_flux, transport_coeff
+         type(auto_diff_real_star_order1) :: Lt, Lambda_cell, r_cell, w_outer, w_inner, coeff, w_cell
 
          ierr = 0
          Lt = 0d0
+         if (present(Pi_flux)) Pi_flux = 0d0
+         if (present(Phi_flux)) Phi_flux = 0d0
+         if (present(transport_coeff)) transport_coeff = 0d0
          if (s% RSP2_alfat == 0d0 .or. rsp2_zero_w(s,k) .or. rsp2_zero_w(s,k+1)) return
          Lambda_cell = get_TDC_mixing_length_cell(s,k,ierr)
          if (ierr /= 0) return
          r_cell = pow(0.5d0*(pow3(wrap_r_00(s,k)) + pow3(wrap_r_p1(s,k))),1d0/3d0)
          w_outer = wrap_w_00(s,k)
          w_inner = wrap_w_p1(s,k)
-         Lt = -s% RSP2_alfat*pow2(4d0*pi*pow2(r_cell))*pow2(wrap_d_00(s,k))*Lambda_cell* &
-            0.5d0*(w_outer + w_inner)*(pow2(w_outer) - pow2(w_inner))/s% dm(k)
+         coeff = s% RSP2_alfat*pow2(4d0*pi*pow2(r_cell))*pow2(wrap_d_00(s,k))*Lambda_cell/s% dm(k)
+         w_cell = 0.5d0*(w_outer + w_inner)
+         Lt = -coeff*w_cell*(pow2(w_outer) - pow2(w_inner))
+         if (present(transport_coeff)) transport_coeff = coeff
+         if (.not. s% RSP2_3equation_flag) return
+         if (present(Pi_flux)) Pi_flux = &
+            -coeff*w_cell*(wrap_Pi_00(s,k) - shift_p1(wrap_Pi_00(s,k+1)))
+         if (present(Phi_flux)) Phi_flux = &
+            -coeff*w_cell*(wrap_Phi_00(s,k) - shift_p1(wrap_Phi_00(s,k+1)))
       end function compute_Lt_center
 
       function rsp2_dLt_dm_face(s,k,ierr) result(dLt_dm)
@@ -1403,7 +1494,8 @@
          Lt_inner = compute_Lt_center(s,k,ierr)
          if (ierr /= 0) return
          theta = 1d0
-         if (s% using_velocity_time_centering .and. s% include_L_in_velocity_time_centering) &
+         if (.not. s% RSP2_3equation_flag .and. &
+               s% using_velocity_time_centering .and. s% include_L_in_velocity_time_centering) &
             theta = s% L_theta_for_velocity_time_centering
          dLt_dm = (theta*(Lt_outer - Lt_inner) + &
             (1d0-theta)*(s% Lt_center_start(k-1) - s% Lt_center_start(k)))/ &
@@ -1416,11 +1508,21 @@
          integer, intent(out) :: ierr
          integer :: k
          type(auto_diff_real_star_order1) :: Lt, &
-            T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grad_ad, kap_face
-         real(dp) :: L_scale, max_L, flux_reference, velocity_reference, area_rho
+            T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grad_ad, kap_face, &
+            buoyancy, entropy_gradient, Lambda_face, inverse_rad_time, transport_coeff
+         real(dp) :: L_scale, max_L, flux_reference, velocity_reference, area_rho, &
+            C_Pi, C_Phi, coeff, dm_face, energy_reference
+         real(dp) :: w_reference(s% nz)
          include 'formats'
          ierr = 0
+         if (s% RSP2_3equation_flag) then
+            call check_rsp2_moments(s,ierr)
+            if (ierr /= 0) return
+         end if
          max_L = maxval(abs(s% L(1:s% nz)))
+         w_reference = 0d0
+         s% Pi_rate_scale(1:s% nz) = 0d0
+         s% Phi_rate_scale(1:s% nz) = 0d0
          do k=1,s%nz
             s% Y_face_start(k) = s% Y_face(k)
             Lt = compute_Lt(s, k, ierr)
@@ -1439,20 +1541,276 @@
                area_rho = 4d0*pi*pow2(s% r(k))*rho_face%val
                flux_reference = L_scale/(area_rho*T_face%val)
                velocity_reference = pow(L_scale/area_rho,1d0/3d0)
+               w_reference(k) = max(s% w(k),velocity_reference)
                s% Pi_scale(k) = max(abs(s% Pi(k)), flux_reference)
                s% Phi_scale(k) = max(s% Phi(k), &
                   1.5d0*pow2(flux_reference/velocity_reference))
             end if
          end do
+         if (.not. s% RSP2_3equation_flag) return
+         C_Phi = s% RSP2_alfa_phi*x_ALFAPHI
+         C_Pi = 0.5d0*(s% RSP2_alfad*x_CEDE + C_Phi)*s% RSP2_alfa_pi
+         do k=2,s% nz
+            if (rsp2_zero_w(s,k)) cycle
+            call rsp2_moment_coefficients( &
+               s,k,buoyancy,entropy_gradient,Lambda_face,inverse_rad_time,ierr)
+            if (ierr /= 0) return
+            energy_reference = pow2(w_reference(k))
+            s% Pi_rate_scale(k) = (2d0/3d0)*abs(entropy_gradient%val)*energy_reference + &
+               abs(buoyancy%val)*s% Phi_scale(k)/3d0 + &
+               (C_Pi*w_reference(k)/Lambda_face%val + inverse_rad_time%val)*s% Pi_scale(k)
+            s% Phi_rate_scale(k) = 2d0*abs(entropy_gradient%val)*s% Pi_scale(k) + &
+               (C_Phi*w_reference(k)/Lambda_face%val + 2d0*inverse_rad_time%val)*s% Phi_scale(k)
+         end do
+         do k=2,s% nz-1
+            Lt = compute_Lt_center(s,k,ierr,transport_coeff=transport_coeff)
+            if (ierr /= 0) return
+            coeff = transport_coeff%val*0.5d0*(w_reference(k)+w_reference(k+1))
+            if (coeff == 0d0) cycle
+            dm_face = 0.5d0*(s% dm(k-1)+s% dm(k))
+            s% Pi_rate_scale(k) = s% Pi_rate_scale(k) + coeff*(s% Pi_scale(k)+s% Pi_scale(k+1))/dm_face
+            s% Phi_rate_scale(k) = s% Phi_rate_scale(k) + coeff*(s% Phi_scale(k)+s% Phi_scale(k+1))/dm_face
+            dm_face = 0.5d0*(s% dm(k)+s% dm(k+1))
+            s% Pi_rate_scale(k+1) = s% Pi_rate_scale(k+1) + coeff*(s% Pi_scale(k)+s% Pi_scale(k+1))/dm_face
+            s% Phi_rate_scale(k+1) = s% Phi_rate_scale(k+1) + coeff*(s% Phi_scale(k)+s% Phi_scale(k+1))/dm_face
+         end do
       end subroutine set_etrb_start_vars
+
+
+      subroutine rsp2_predict_moments(s,k_lo,k_hi,ierr)
+         type(star_info), pointer :: s
+         integer, intent(in) :: k_lo, k_hi
+         integer, intent(out) :: ierr
+         integer :: n, i, j, l, k, iter, row, col, n_eq, bracket_iter
+         integer, allocatable :: ipiv(:)
+         real(dp), allocatable :: moments(:,:), next(:,:), scale(:,:), band(:,:), rhs(:), &
+            buoyancy(:), entropy_gradient(:), Lambda(:), rad_time(:), Eq_div_w(:), &
+            work_new(:), work_start(:), transport_coeff(:), conductance(:), dm_face(:)
+         type(auto_diff_real_star_order1) :: b_ad, h_ad, Lambda_ad, rad_ad, &
+            Eq_ad, work_ad, work_new_ad, work_start_ad, Lt_ad, coeff_ad
+         real(dp) :: C_D, C_Pi, C_Phi, w, inverse_dt, entropy_per_velocity, &
+            energy_decay, Phi_decay, iteration_rate, outer_rate, inner_rate, &
+            block(3,3), rhs_face(3), row_scale, change, moment_norm, &
+            lower_w, upper_w, trial_w, entropy_ratio, linear_rate, discr
+         logical :: supported
+
+         ierr = 0
+         ! Outside the predictor's paired decay assumptions, keep the current guess.
+         if (s% RSP2_alfa_pi < 1d0 .or. &
+               (s% RSP2_alfad == 0d0 .and. s% RSP2_alfa_phi == 0d0)) return
+         n = k_hi-k_lo+1
+         n_eq = 3*n
+         allocate(moments(3,n),next(3,n),scale(3,n),band(10,n_eq),rhs(n_eq),ipiv(n_eq), &
+            buoyancy(n),entropy_gradient(n),Lambda(n),rad_time(n),Eq_div_w(n), &
+            work_new(n),work_start(n),transport_coeff(0:n),conductance(0:n),dm_face(n),stat=ierr)
+         if (ierr /= 0) return
+         C_D = s% RSP2_alfad*x_CEDE
+         C_Phi = s% RSP2_alfa_phi*x_ALFAPHI
+         C_Pi = 0.5d0*(C_D+C_Phi)*s% RSP2_alfa_pi
+         inverse_dt = 1d0/s% dt
+         transport_coeff = 0d0
+         do i=1,n
+            k = k_lo+i-1
+            call rsp2_moment_coefficients(s,k,b_ad,h_ad,Lambda_ad,rad_ad,ierr)
+            if (ierr /= 0) return
+            buoyancy(i) = b_ad%val
+            entropy_gradient(i) = h_ad%val
+            Lambda(i) = Lambda_ad%val
+            rad_time(i) = rad_ad%val
+            Eq_ad = compute_Eq_div_w_face(s,k,ierr)
+            if (ierr /= 0) return
+            Eq_div_w(i) = Eq_ad%val
+            work_ad = calc_Ptrb_work_face(s,k,work_new=work_new_ad,work_start=work_start_ad)
+            work_new(i) = work_new_ad%val
+            work_start(i) = work_start_ad%val
+            if (work_start(i) >= 1d0 .or. Eq_div_w(i) < 0d0) then
+               ierr = -1
+               s% retry_message = 'invalid RSP3 pressure or viscous work'
+               return
+            end if
+            dm_face(i) = 0.5d0*(s% dm(k-1)+s% dm(k))
+            if (.not. rsp2_moments_valid(s% w_start(k), &
+                  s% xh_start(s% i_Pi,k),s% xh_start(s% i_Phi,k))) then
+               ierr = -1
+               s% retry_message = 'invalid RSP3 starting moments'
+               return
+            end if
+            moments(:,i) = [pow2(s% w_start(k)),s% xh_start(s% i_Pi,k),s% xh_start(s% i_Phi,k)]
+            if (rsp2_moments_valid(s% w(k),s% Pi(k),s% Phi(k))) &
+               moments(:,i) = [pow2(s% w(k)),s% Pi(k),s% Phi(k)]
+            scale(:,i) = [max(pow2(s% w(k)),1.5d0*pow2(s% Pi_scale(k)/sqrt(s% Phi_scale(k)))), &
+               s% Pi_scale(k),s% Phi_scale(k)]
+            if (i == n) cycle
+            Lt_ad = compute_Lt_center(s,k,ierr,transport_coeff=coeff_ad)
+            if (ierr /= 0) return
+            transport_coeff(i) = coeff_ad%val
+         end do
+         do i=1,n
+            if (moments(1,i) == 0d0 .and. Eq_div_w(i) > 0d0) then
+               linear_rate = inverse_dt*(1d0+work_new(i))
+               w = s% dt*Eq_div_w(i)
+               if (C_D > 0d0) then
+                  discr = sqrt(pow2(linear_rate)+4d0*C_D*Eq_div_w(i)/Lambda(i))
+                  if (linear_rate >= 0d0) then
+                     w = 2d0*Eq_div_w(i)/(linear_rate+discr)
+                  else
+                     w = 0.5d0*(discr-linear_rate)*Lambda(i)/C_D
+                  end if
+               else if (linear_rate > 0d0) then
+                  w = Eq_div_w(i)/linear_rate
+               end if
+               moments(1,i) = pow2(w)
+            end if
+            supported = any(moments(:,i) /= 0d0)
+            if (i > 1) supported = supported .or. &
+               (transport_coeff(i-1) > 0d0 .and. any(moments(:,i-1) /= 0d0))
+            if (i < n) supported = supported .or. &
+               (transport_coeff(i) > 0d0 .and. any(moments(:,i+1) /= 0d0))
+            if (.not. supported .or. buoyancy(i)*entropy_gradient(i) <= 0d0) cycle
+            lower_w = sqrt(moments(1,i))
+            if (positive_local_resolvent(lower_w,i)) cycle
+            upper_w = max(2d0*lower_w,Lambda(i)* &
+               max(inverse_dt,abs(work_new(i))*inverse_dt,rad_time(i), &
+                  sqrt(abs(buoyancy(i)*entropy_gradient(i))))/max(C_D,C_Phi))
+            do bracket_iter=1,100
+               if (positive_local_resolvent(upper_w,i)) exit
+               upper_w = 2d0*upper_w
+            end do
+            if (bracket_iter > 100 .or. is_bad(upper_w)) then
+               ierr = -1
+               s% retry_message = 'no positive RSP3 moment guess'
+               return
+            end if
+            do bracket_iter=1,40
+               trial_w = 0.5d0*(lower_w+upper_w)
+               if (positive_local_resolvent(trial_w,i)) then
+                  upper_w = trial_w
+               else
+                  lower_w = trial_w
+               end if
+            end do
+            ! Select the positive nonlinear solution without changing the old state.
+            w = 2d0*upper_w
+            entropy_ratio = sqrt(3d0*abs(entropy_gradient(i)/buoyancy(i)))
+            moments(:,i) = [w*w,sign(1d0,entropy_gradient(i))*(2d0/3d0)*w*w*entropy_ratio, &
+               (2d0/3d0)*pow2(w*entropy_ratio)]
+         end do
+         ! One unit conversion gives a common covariance norm across the mesh.
+         entropy_per_velocity = sqrt(maxval(scale(3,:)))/sqrt((2d0/3d0)*maxval(scale(1,:)))
+         do iter=1,200
+            conductance = 0d0
+            do i=1,n-1
+               conductance(i) = transport_coeff(i)*0.5d0*(sqrt(moments(1,i))+sqrt(moments(1,i+1)))
+            end do
+            band = 0d0
+            do i=1,n
+               k = k_lo+i-1
+               w = sqrt(moments(1,i))
+               energy_decay = C_D*w/Lambda(i) + work_new(i)*inverse_dt
+               Phi_decay = C_Phi*w/Lambda(i) + 2d0*rad_time(i)
+               ! Keep this bound independent of the iterate's turnover damping.
+               ! Otherwise a weak growing solution can collapse onto the wrong root.
+               iteration_rate = max(0d0, &
+                  abs(buoyancy(i)*entropy_per_velocity/3d0 + entropy_gradient(i)/entropy_per_velocity) - &
+                  min(work_new(i)*inverse_dt,2d0*rad_time(i)))
+               outer_rate = conductance(i-1)/dm_face(i)
+               inner_rate = conductance(i)/dm_face(i)
+               block = 0d0
+               block(1,1) = inverse_dt + energy_decay
+               block(1,2) = -buoyancy(i)
+               block(2,1) = -(2d0/3d0)*entropy_gradient(i)
+               block(2,2) = inverse_dt + 0.5d0*work_new(i)*inverse_dt + C_Pi*w/Lambda(i) + rad_time(i)
+               block(2,3) = -buoyancy(i)/3d0
+               block(3,2) = -2d0*entropy_gradient(i)
+               block(3,3) = inverse_dt + Phi_decay
+               do j=1,3
+                  block(j,j) = block(j,j) + iteration_rate + outer_rate + inner_rate
+               end do
+               rhs_face(1) = (1d0-work_start(i))*pow2(s% w_start(k))*inverse_dt + Eq_div_w(i)*w
+               rhs_face(2) = sqrt(1d0-work_start(i))*s% xh_start(s% i_Pi,k)*inverse_dt
+               rhs_face(3) = s% xh_start(s% i_Phi,k)*inverse_dt
+               ! The iteration term cancels at a fixed point of the original three rows.
+               rhs_face = rhs_face + iteration_rate*moments(:,i)
+               do j=1,3
+                  row = 3*(i-1)+j
+                  row_scale = maxval(abs(block(j,:)*scale(:,i)))
+                  if (i > 1) row_scale = max(row_scale,outer_rate*scale(j,i-1))
+                  if (i < n) row_scale = max(row_scale,inner_rate*scale(j,i+1))
+                  if (row_scale <= 0d0 .or. is_bad(row_scale)) then
+                     ierr = -1
+                     s% retry_message = 'invalid RSP3 predictor scale'
+                     return
+                  end if
+                  rhs(row) = rhs_face(j)/row_scale
+                  do l=1,3
+                     col = 3*(i-1)+l
+                     band(7+row-col,col) = block(j,l)*scale(l,i)/row_scale
+                  end do
+                  if (i > 1) band(10,row-3) = -outer_rate*scale(j,i-1)/row_scale
+                  if (i < n) band(4,row+3) = -inner_rate*scale(j,i+1)/row_scale
+               end do
+            end do
+            ! The three-moment stencil has scalar lower and upper bandwidth three.
+            call DGBTRF(n_eq,n_eq,3,3,band,10,ipiv,ierr)
+            if (ierr /= 0) then
+               s% retry_message = 'RSP3 predictor factorization failed'
+               return
+            end if
+            call DGBTRS('N',n_eq,3,3,1,band,10,ipiv,rhs,n_eq,ierr)
+            if (ierr /= 0) then
+               s% retry_message = 'RSP3 predictor solve failed'
+               return
+            end if
+            next = reshape(rhs,[3,n])*scale
+            do i=1,n
+               if (is_bad(next(1,i)) .or. next(1,i) < 0d0) then
+                  ierr = -1
+               else if (.not. rsp2_moments_valid(sqrt(next(1,i)),next(2,i),next(3,i))) then
+                  ierr = -1
+               end if
+               if (ierr /= 0) then
+                  s% retry_message = 'invalid covariance in RSP3 predictor'
+                  return
+               end if
+            end do
+            change = 0d0
+            do i=1,n
+               moment_norm = max(maxval(abs(next(:,i))/scale(:,i)), &
+                  maxval(abs(moments(:,i))/scale(:,i)),tiny(1d0))
+               change = max(change,maxval(abs(next(:,i)-moments(:,i))/scale(:,i))/moment_norm)
+            end do
+            moments = next
+            if (change <= 1d-8) exit
+         end do
+         s% w(k_lo:k_hi) = sqrt(moments(1,:))
+         s% Pi(k_lo:k_hi) = moments(2,:)
+         s% Phi(k_lo:k_hi) = moments(3,:)
+         if (s% RSP2_report_adjust_w) &
+            write(*,'(a,i6,es16.7)') 'RSP3 moment predictor ', min(iter,200), change
+
+         contains
+
+         logical function positive_local_resolvent(w,i) result(positive)
+            real(dp), intent(in) :: w
+            integer, intent(in) :: i
+            real(dp) :: energy_rate, Pi_rate, Phi_rate, production
+            energy_rate = inverse_dt*(1d0+work_new(i)) + C_D*w/Lambda(i)
+            Pi_rate = inverse_dt*(1d0+0.5d0*work_new(i)) + C_Pi*w/Lambda(i) + rad_time(i)
+            Phi_rate = inverse_dt + C_Phi*w/Lambda(i) + 2d0*rad_time(i)
+            positive = .false.
+            if (energy_rate <= 0d0 .or. Phi_rate <= 0d0) return
+            production = (2d0/3d0)*buoyancy(i)*entropy_gradient(i)
+            positive = Pi_rate > production/energy_rate + production/Phi_rate
+         end function positive_local_resolvent
+      end subroutine rsp2_predict_moments
 
 
       subroutine RSP2_adjust_vars_before_call_solver(s,ierr)
          type(star_info), pointer :: s
          integer, intent(out) :: ierr
          integer :: k, pass, k_lo, k_hi, k_first, k_last, k_step
-         real(dp) :: velocity_guess, source_coeff, linear_coeff, available_energy, discr, soln, w_initial
-         type(auto_diff_real_star_order1) :: source, damping, rad_damping, Eq_face, dLt_dm, work, rhs, buoyancy
+         real(dp) :: source_coeff, linear_coeff, available_energy, discr, soln, w_initial
+         type(auto_diff_real_star_order1) :: source, damping, rad_damping, Eq_face, dLt_dm, work, rhs
 
          ierr = 0
          if (s% mixing_length_alpha == 0d0 .or. s% dt <= 0d0) return
@@ -1460,15 +1818,10 @@
          k_hi = s% nz - int(s% nz/s% RSP2_nz_div_IBOTOM)
          if (k_lo > k_hi) return
          if (s% RSP2_3equation_flag) then
-            do k=k_lo,k_hi
-               if (s% Phi(k) <= 0d0) cycle
-               buoyancy = rsp2_buoyancy_face(s,k,ierr)
-               if (ierr /= 0) return
-               velocity_guess = s% dt*abs(buoyancy%val)*sqrt(s% Phi(k))
-               if (velocity_guess == 0d0 .or. s% w(k) > epsilon(1d0)*velocity_guess) cycle
-               s% w(k) = velocity_guess
-               s% Pi(k) = s% Pi(k) + s% dt*buoyancy%val*s% Phi(k)
-            end do
+            call rsp2_predict_moments(s,k_lo,k_hi,ierr)
+            ! The first solver evaluation uses the current cached fluxes.
+            if (ierr == 0) call set_RSP2_vars(s,ierr)
+            return
          end if
          do k=k_lo,k_hi
             if (s% w(k) /= 0d0) cycle
@@ -1520,5 +1873,7 @@
                   write(*,'(a,i7,2es16.7)') 'RSP2 initial w ', k, w_initial, soln
             end do
          end do
+         ! Refresh fluxes after changing w, as on the three equation path.
+         call set_RSP2_vars(s,ierr)
       end subroutine RSP2_adjust_vars_before_call_solver
       end module hydro_rsp2

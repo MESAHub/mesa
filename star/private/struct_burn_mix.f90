@@ -267,6 +267,7 @@
 
       subroutine save_start_values(s, ierr)
          use hydro_rsp2, only: set_etrb_start_vars
+         use hydro_riemann, only: do_uface_and_Pface
          use star_utils, only: eval_total_energy_integrals, set_luminosity_by_category, get_Peos_face_val
          use reconstructed_face_support, only: get_reconstructed_face_eos_kap_ad
          type (star_info), pointer :: s
@@ -347,6 +348,12 @@
 
          if (s% RSP2_flag) then
             call set_etrb_start_vars(s,ierr)
+            if (ierr /= 0) return
+         end if
+
+         if (s% u_flag) then
+            ! Save the starting face state before changing the solver guess.
+            call do_uface_and_Pface(s,ierr)
             if (ierr /= 0) return
          end if
 

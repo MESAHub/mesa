@@ -499,16 +499,24 @@
          real(dp), allocatable :: xh_save(:,:), xh_old_save(:,:), Lc_old(:), gradT_old(:)
          integer :: nvar_old, i_Y, i_Pi, i_Phi, j, jj
          logical :: have_old
+         logical, save :: have_warned_about_rsp3_decay = .false.
 
          call get_star_ptr(id,s,ierr)
          if (ierr /= 0) return
          if (enabled) then
             if (.not. s% RSP2_flag .or. is_bad(s% RSP2_alfa_pi) .or. is_bad(s% RSP2_alfa_phi) .or. &
-                  s% RSP2_alfa_pi <= 0d0 .or. &
-                  s% RSP2_alfa_phi <= 0d0 .or. s% RSP2_source_seed /= 0d0) then
-               write(*,*) 'RSP2 three equation model requires RSP2, positive alfa coefficients and zero source seed'
+                  is_bad(s% RSP2_alfad) .or. is_bad(s% RSP2_alfat) .or. is_bad(s% RSP2_alfam) .or. &
+                  s% RSP2_alfa_pi < 0d0 .or. s% RSP2_alfa_phi < 0d0 .or. &
+                  s% RSP2_alfad < 0d0 .or. s% RSP2_alfat < 0d0 .or. s% RSP2_alfam < 0d0 .or. &
+                  s% RSP2_source_seed /= 0d0) then
+               write(*,*) 'RSP3 requires finite nonnegative alfa_pi/alfa_phi/alfad/alfat/alfam and zero source seed'
                ierr = -1
                return
+            end if
+            if ((s% RSP2_alfa_pi < 1d0 .or. s% RSP2_alfa_phi == 0d0) .and. &
+                  .not. have_warned_about_rsp3_decay) then
+               write(*,'(a)') 'WARNING: RSP3 recommends alfa_pi >= 1 and alfa_phi > 0; continuing with supplied values.'
+               have_warned_about_rsp3_decay = .true.
             end if
          end if
          if (s% RSP2_3equation_flag .eqv. enabled) return

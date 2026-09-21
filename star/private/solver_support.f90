@@ -656,8 +656,6 @@
 
          if (s% RSP2_flag) &  ! clip change in w to maintain non-negativity.
             call clip_so_non_negative(s% i_w, 0d0)
-         if (s% RSP2_3equation_flag) &
-            call clip_so_non_negative(s% i_Phi, 0d0)
 
          if (s% RTI_flag) &  ! clip change in alpha_RTI to maintain non-negativity.
             call clip_so_non_negative(s% i_alpha_RTI, 0d0)
@@ -1263,7 +1261,7 @@
                s% Pi(k) = x(s% i_Pi)
                s% Phi(k) = x(s% i_Phi)
                if (is_bad_num(s% Pi(k)) .or. &
-                     is_bad_num(s% Phi(k)) .or. s% Phi(k) < 0d0) then
+                     is_bad_num(s% Phi(k))) then
                   s% retry_message = 'bad RSP2 entropy moment'
                   ierr = -1
                   return

@@ -425,12 +425,8 @@
             if (ierr /= 0) return
             Lr_ad = Lrad_coeff*gradT
          end if
-         if (star_LNA_perturb_convective_luminosity(s)) then
-            call rsp2_convective_luminosity_for_star_LNA(s, k, Lc_ad)
-         else
-            call rsp2_convective_luminosity_for_star_LNA(s, k, Lc_ad)
-            Lc_ad = Lc_ad%val
-         end if
+         call rsp2_convective_luminosity_for_star_LNA(s, k, Lc_ad)
+         if (.not. star_LNA_perturb_convective_luminosity(s)) Lc_ad = Lc_ad%val
 
          Lt_ad = s% Lt_ad(k)
       end subroutine rsp2_luminosity_terms_for_star_LNA

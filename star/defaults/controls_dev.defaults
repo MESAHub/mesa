@@ -29,6 +29,9 @@
       ! hydro_matrix_solver selects the mesa-star hydro matrix solve.
       ! Options are 'bcyclic' for the existing block cyclic reduction solver
       ! and 'banded' for an RSP-like DGBTRF/DGBTRS banded solve.
+      ! RSP2 supports k+2 hydro partials with either solver. Bcyclic groups
+      ! adjacent zones when these partials are nonzero.
+      ! TDC retains the inner-face k+2 viscous-work partial with banded only.
       !
       ! ::
 
@@ -63,9 +66,9 @@
     ! RSP2_use_3equation_model
     ! ~~~~~~~~~~~~~~~~~~~~~~~~
     ! Evolve face entropy flux <v_r*s> and full entropy variance <s*s>.
-    ! Uses local turnover relaxation, without transport of these moments.
+    ! Uses paired local production and decay, with common transport when alfat > 0.
     ! Radiative cooling acts on the entropy moments instead of directly on w**2.
-    ! This experimental isotropic closure does not enforce the covariance bound.
+    ! Accepted moments satisfy Pi**2 <= (2/3)*w**2*Phi, with w and Phi nonnegative.
     ! RSP2 must be enabled separately. Stored moments are retained on restart;
     ! enabling this option on a one-equation model initializes them once.
     ! Stable faces start with zero Pi and Phi and retain their turbulent energy.
@@ -77,12 +80,18 @@
 
     ! RSP2_alfa_pi, RSP2_alfa_phi
     ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
-    ! Multipliers of local entropy flux and variance relaxation.
-    ! Unit values give the Kuhfuss MLT calibration listed by Braun et al. (2026).
-    ! The fixed coefficients 6*sqrt(2/3) and 4*sqrt(2/3) are in hydro_rsp2.
-    ! Her fiducial solar coefficients 2.155 and 2.0 multiply nonlocal transport,
-    ! not these local decay terms. Her outer local case A instead uses 2.88 and 2.0.
-    ! Neither calibration establishes parameters for this fully local pulsation model.
+    ! RSP3 entropy variance decay is 4*sqrt(2/3)*RSP2_alfa_phi*w/Lambda.
+    ! Pi decay is half the sum of kinetic-energy and variance decay rates,
+    ! multiplied by RSP2_alfa_pi. Use alfa_pi >= 1; one gives the paired rate.
+    ! Values 0 <= alfa_pi < 1 or alfa_phi = 0 are accepted with a warning.
+    ! Negative or nonfinite values are rejected.
+    ! Setting both to zero removes local turnover decay from Pi and Phi; transport and
+    ! radiative cooling remain controlled by RSP2_alfat and RSP2_alfar.
+    ! With alfa_pi >= 1, the local production and decay preserve the covariance
+    ! bound with the modified Pi buoyancy source. The Pi decay normalization
+    ! differs from the Kuhfuss local Pi coefficient.
+    ! Braun et al. (2026) use 2.155 and 2.0 for nonlocal Pi and Phi transport,
+    ! not for these local decay multipliers. Both controls default to one.
     ! ::
 
     RSP2_alfa_pi = 1d0
@@ -97,7 +106,9 @@
     ! With e_t = w**2, the diffusion coefficient is RSP2_alfat*Lambda*sqrt(e_t).
     ! Braun et al. (2026), Table 1, use alpha_omega = 0.25, which corresponds
     ! to RSP2_alfat = 0.25d0. There is no extra sqrt(2/3) normalization factor.
-    ! This control does not add transport to the local Pi or Phi equations.
+    ! In RSP3 the same coefficient also transports Pi and Phi. All three moment
+    ! fluxes are implicit; Lr and Lc retain their selected heat-flow time weight.
+    ! The local moment decay remains present when transport is enabled.
     ! Zero sets Lt to zero; existing turbulence and entropy moments still evolve.
     ! ::
 
@@ -131,17 +142,6 @@
     RSP2_Lsurf_factor = 0.5d0
 
     RSP2_report_adjust_w = .false.
-
-    ! RSP2_report_flux_solver
-    ! ~~~~~~~~~~~~~~~~~~~~~~~
-    ! Write RSP2_flux_* diagnostics to terminal output for each Newton trial.
-    ! Report the largest interior flux residual before and after the trial,
-    ! its luminosity scale, Y corrections, and the full Jacobian prediction.
-    ! Luminosities are in erg/s. No residuals or solver tolerances are changed.
-    !
-    ! ::
-
-    RSP2_report_flux_solver = .false.
 
     RSP2_use_L_eqn_at_surface = .true.
     RSP2_use_mass_interp_face_values = .true.
