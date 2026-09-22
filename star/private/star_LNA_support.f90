@@ -110,8 +110,9 @@
       integer, parameter :: num_lna_equations = lna_eq_mlt_static_temperature_gradient
 
       integer, parameter :: star_LNA_max_refinement_iterations = 4
-      ! Newton refinement is local; do not move roots with order-unity defects.
-      real(dp), parameter :: star_LNA_max_initial_refinement_residual = 1d-1
+      ! Refine poorly resolved eigenvectors before changing their eigenvalues.
+      real(dp), parameter :: star_LNA_max_residual_for_newton = 1d-1
+      real(dp), parameter :: star_LNA_max_normwise_residual_for_newton = 1d-6
 
       character(len=1), parameter :: star_LNA_backslash = achar(92)
 
@@ -1825,7 +1826,7 @@
             ndyn, ', algebraic variables eliminated = ', nalg
 
          Bred = Bred/time_scale
-         call scale_star_LNA_pencil(Ared, Bred, reduced_col_scale, ierr)
+         call scale_star_LNA_reduced_matrices(Ared, Bred, reduced_col_scale, ierr)
          if (ierr /= 0) then
             call free_star_LNA_matrix(scaled_mtx)
             deallocate(full_col_scale)
@@ -1965,7 +1966,7 @@
       end subroutine scale_star_LNA_matrix_for_solver
 
 
-      subroutine scale_star_LNA_pencil(A, B, col_scale, ierr)
+      subroutine scale_star_LNA_reduced_matrices(A, B, col_scale, ierr)
          real(dp), intent(inout) :: A(:,:), B(:,:)
          real(dp), allocatable, intent(out) :: col_scale(:)
          integer, intent(out) :: ierr
@@ -1998,7 +1999,7 @@
                end if
             end do
          end do
-      end subroutine scale_star_LNA_pencil
+      end subroutine scale_star_LNA_reduced_matrices
 
 
       ! Algebraic elimination:
@@ -2062,7 +2063,7 @@
          B_da = mtx%B(dyn_idx, alg_idx)
          alg_from_dyn = 0d0
 
-         ! Refine the algebraic solve before forming the Schur complement.
+         ! Refine the algebraic solve before forming the reduced matrices.
          call DGESVX( &
             'E', 'N', nalg, ndyn, Aaa, nalg, Aaa_fact, nalg, ipiv, &
             equed, row_scale, col_scale, A_ad, nalg, alg_from_dyn, nalg, &
@@ -2221,7 +2222,7 @@
             refined_eigenpairs, converged_eigenpairs, refinement_iterations, &
             refinement_iterations_total, initial_residual_row
          real(dp) :: sigma_re, sigma_im, omega, best_omega, frequency_uHz, &
-            logKE_per_cycle, eigenvector_residual, initial_residual, &
+            logKE_per_cycle, eigenvector_residual, initial_residual, refinement_target, &
             min_rejected_residual, max_rejected_residual, &
             first_rejected_residual, first_rejected_period_days
          complex(dp) :: sigma, initial_sigma
@@ -2258,6 +2259,7 @@
          call star_LNA_matrix_bandwidth(A_scaled, B_scaled, kl, ku)
          used = .false.
          mode_residuals = 0d0
+         refinement_target = min(s% star_LNA_max_eigenvector_residual, star_LNA_max_residual_for_newton)
          found_first_mode = .false.
          do
             if (num_modes >= size(mode_indices)) exit
@@ -2298,14 +2300,12 @@
             initial_residual = eigenvector_residual
             initial_residual_row = eigenvector_residual_row
 
-            if (op_err == 0 .and. &
-                  eigenvector_residual > s% star_LNA_max_eigenvector_residual .and. &
-                  eigenvector_residual <= star_LNA_max_initial_refinement_residual) then
+            if (op_err == 0 .and. eigenvector_residual > refinement_target) then
                refinement_attempts = refinement_attempts + 1
                initial_sigma = sigma
                initial_eigenvector = scaled_eigenvector
                call refine_star_LNA_eigenpair( &
-                  A_scaled, B_scaled, kl, ku, s% star_LNA_max_eigenvector_residual, &
+                  A_scaled, B_scaled, kl, ku, refinement_target, &
                   sigma, scaled_eigenvector, refinement_iterations, &
                   refinement_improved, op_err)
                if (op_err /= 0) then
@@ -2324,7 +2324,7 @@
                      eigenvector_residual_row, op_err)
                   if (op_err == 0 .and. eigenvector_residual < initial_residual) then
                      refined_eigenpairs = refined_eigenpairs + 1
-                     if (eigenvector_residual <= s% star_LNA_max_eigenvector_residual) &
+                     if (eigenvector_residual <= refinement_target) &
                         converged_eigenpairs = converged_eigenpairs + 1
                      call store_star_LNA_eigenpair( &
                         alphar, alphai, beta, vr, best, sigma, scaled_eigenvector, op_err)
@@ -2390,10 +2390,10 @@
                ', improved eigenpairs = ', refined_eigenpairs, &
                ', converged eigenpairs = ', converged_eigenpairs, &
                ', iterations = ', refinement_iterations_total, &
-               ', target = ', s% star_LNA_max_eigenvector_residual
+               ', target = ', refinement_target
          if (refinement_attempts > 0) &
             write(*,'(a,i0,a,i0)') &
-               'star_LNA: full-pencil lower bandwidth = ', kl, ', upper bandwidth = ', ku
+               'star_LNA: full matrix lower bandwidth = ', kl, ', upper bandwidth = ', ku
          if (rejected_residuals > 0) then
             write(*,'(a,i0,a,1pe12.4)') &
                'star_LNA: rejected roots with large eigenvector residual = ', &
@@ -2478,8 +2478,8 @@
          if (ierr /= 0) return
 
          write(io,'(a)') '# star_LNA raw finite positive frequency eigenvalues'
-         write(io,'(a)') '# sorted by increasing sigma_imag before acoustic branch selection'
-         write(io,'(a)') '# values are written before full-pencil eigenpair refinement'
+         write(io,'(a)') '# sorted by increasing sigma_imag before frequency, growth and residual selection'
+         write(io,'(a)') '# values are written before refinement against the full matrices'
          write(io,'(a,1x,i0)') '# nz', map%nz
          write(io,'(a,1x,i0)') '# model_nz', s% nz
          write(io,'(a,1x,1pe24.16)') '# star_LNA_T_inner', s% star_LNA_T_inner
@@ -2606,7 +2606,7 @@
             '# amplitude_fractional_growth_per_period is exp(logKE_per_cycle/2)-1'
          write(io,'(a)') '# eigen indices refer to the reduced generalized eigenproblem'
          write(io,'(a)') &
-            '# max_eigenvector_residual is evaluated after full-pencil refinement'
+            '# max_eigenvector_residual is evaluated after refinement against the full matrices'
          write(io,'(a)') &
             '# pulsation_constant_Q_days follows RSP LINA: P_days*sqrt((M/Msun)*(Rsun/R)^3)'
          write(io,'(a)') &
@@ -3013,7 +3013,7 @@
 
 
       subroutine star_LNA_eigenvector_residual_from_vector( &
-            A, B, kl, ku, sigma, eigenvector, max_residual, max_residual_row, ierr, Ax, Bx)
+            A, B, kl, ku, sigma, eigenvector, max_residual, max_residual_row, ierr, Ax, Bx, normwise_residual)
          real(dp), intent(in) :: A(:,:), B(:,:)
          integer, intent(in) :: kl, ku
          complex(dp), intent(in) :: sigma, eigenvector(:)
@@ -3021,6 +3021,7 @@
          integer, intent(out) :: max_residual_row
          integer, intent(out) :: ierr
          complex(dp), intent(out), optional :: Ax(:), Bx(:)
+         real(dp), intent(out), optional :: normwise_residual
          integer :: i, j, i_first, i_last
          real(dp) :: residual
          real(dp) :: row_scale(size(A, 1))
@@ -3028,6 +3029,7 @@
 
          ierr = 0
          max_residual = huge(1d0)
+         if (present(normwise_residual)) normwise_residual = huge(1d0)
          max_residual_row = 0
          Ax_local = (0d0, 0d0)
          Bx_local = (0d0, 0d0)
@@ -3051,12 +3053,21 @@
          do i = 1, size(A, 1)
             if (row_scale(i) <= tiny(1d0)) cycle
             residual = abs(Ax_local(i) - sigma*Bx_local(i))/row_scale(i)
+            if (is_bad(residual)) then
+               max_residual = huge(1d0)
+               ierr = -1
+               return
+            end if
+            ! The triangle inequality bounds this residual by one.
+            residual = min(1d0, residual)
             if (residual > max_residual) then
                max_residual = residual
                max_residual_row = i
             end if
          end do
          if (is_bad(max_residual)) ierr = -1
+         if (present(normwise_residual)) normwise_residual = &
+            maxval(abs(Ax_local - sigma*Bx_local))/maxval(row_scale)
          if (present(Ax)) Ax = Ax_local
          if (present(Bx)) Bx = Bx_local
       end subroutine star_LNA_eigenvector_residual_from_vector
@@ -3075,11 +3086,12 @@
          integer, intent(out) :: ierr
          integer :: i, j, i_first, i_last, ldab, lapack_info, line_search, n, norm_idx
          integer, allocatable :: ipiv(:)
-         real(dp) :: best_residual, current_residual, initial_residual, step, trial_residual
+         real(dp) :: best_residual, current_residual, initial_residual, step, trial_residual, normwise_residual
          complex(dp) :: current_sigma, delta_sigma, best_sigma, trial_sigma
          complex(dp), allocatable :: AB(:,:), Ax(:), Bx(:), correction(:), &
             current_vector(:), best_vector(:), rhs(:,:), trial_vector(:)
          integer :: residual_row
+         logical :: update_frequency
 
          ierr = 0
          iterations = 0
@@ -3113,7 +3125,7 @@
             current_vector = current_vector/current_vector(norm_idx)
             call star_LNA_eigenvector_residual_from_vector( &
                A, B, kl, ku, current_sigma, current_vector, current_residual, &
-               residual_row, ierr, Ax, Bx)
+               residual_row, ierr, Ax, Bx, normwise_residual)
             if (ierr /= 0) then
                ierr = 0
                exit
@@ -3135,12 +3147,25 @@
             call ZGBTRS('N', n, kl, ku, 2, AB, ldab, ipiv, rhs, n, lapack_info)
             if (lapack_info /= 0 .or. abs(rhs(norm_idx, 2)) <= tiny(1d0)) exit
 
-            delta_sigma = -rhs(norm_idx, 1)/rhs(norm_idx, 2)
-            correction = rhs(:, 1) + delta_sigma*rhs(:, 2)
+            update_frequency = current_residual <= star_LNA_max_residual_for_newton .or. &
+               normwise_residual <= star_LNA_max_normwise_residual_for_newton
+            if (update_frequency) then
+               delta_sigma = -rhs(norm_idx, 1)/rhs(norm_idx, 2)
+               correction = rhs(:, 1) + delta_sigma*rhs(:, 2)
+            else
+               ! Refine the eigenvector at fixed frequency.
+               delta_sigma = 0d0
+               correction = rhs(:, 2)/rhs(norm_idx, 2)
+            end if
             step = 1d0
             do line_search = 1, 4
                trial_sigma = current_sigma + step*delta_sigma
-               trial_vector = current_vector + step*correction
+               if (update_frequency) then
+                  trial_vector = current_vector + step*correction
+               else
+                  ! Avoid subtracting the old vector from small components.
+                  trial_vector = (1d0-step)*current_vector + step*correction
+               end if
                call star_LNA_eigenvector_residual_from_vector( &
                   A, B, kl, ku, trial_sigma, trial_vector, trial_residual, &
                   residual_row, ierr)
@@ -3823,9 +3848,9 @@
             return
          end if
          write(io,'(a,1x,1pe24.16)') 'max_abs_rsp2_flux_row_resid', diag
-         write(io,'(a)') '# full pencil is scaled before algebraic elimination'
+         write(io,'(a)') '# full matrices are scaled before algebraic elimination'
          write(io,'(a)') &
-            '# reduced pencil is timescale normalized and equilibrated before DGGEV'
+            '# reduced matrices are scaled by the dynamical timescale and by row and column norms before DGGEV'
          write(io,'(a)') '# eigenvalues still solve the original A*x = sigma*B*x problem'
          close(io)
 
@@ -4459,10 +4484,9 @@
          end if
          write(*,'(a,1pe12.4)') 'star_LNA: max eigenvector residual = ', &
             s% star_LNA_max_eigenvector_residual
-         write(*,'(a,i0,a,1pe12.4)') 'star_LNA: full-pencil refinement uses up to ', &
-            star_LNA_max_refinement_iterations, &
-            ' iterations for initial residuals <= ', &
-            star_LNA_max_initial_refinement_residual
+         write(*,'(a,i0,a)') 'star_LNA: eigenpair refinement uses up to ', &
+            star_LNA_max_refinement_iterations, ' iterations.'
+         write(*,'(a)') 'star_LNA: poorly resolved eigenvectors are first refined at fixed frequency.'
          call resolve_star_LNA_output_directory(s, output_directory)
          call resolve_star_LNA_output_file_prefix(s, file_prefix)
          write(*,'(a,a)') 'star_LNA: output directory = ', trim(output_directory)

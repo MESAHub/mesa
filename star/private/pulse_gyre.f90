@@ -104,6 +104,7 @@ contains
     integer                  :: j
     integer                  :: k
     integer                  :: sg
+    logical                  :: static_background
 
     ! Get model data for GYRE output
 
@@ -257,18 +258,22 @@ contains
 
     end select
 
-    ! If necessary, update the eps_grav data in the model
+    ! A static snapshot has no evolution interval for eps_grav.
 
+    static_background = s%gyre_write_tdc_lna_background .and. s%dt <= 0d0
     if (ASSOCIATED(eps_grav)) then
-
-       do k = 1, s%nz
-          call eval_eps_grav_and_partials(s, k, ierr)
-          if (ierr /= 0) then
-             write(*,*) 'failed in call to eval_eps_grav_and_partials'
-             return
-          end if
-       end do
-
+       if (static_background) then
+          eps_grav = 0d0
+          write(*,'(a)') 'GYRE TDC export: static snapshot; using eps_grav = 0.'
+       else
+          do k = 1, s%nz
+             call eval_eps_grav_and_partials(s, k, ierr)
+             if (ierr /= 0) then
+                write(*,*) 'failed in call to eval_eps_grav_and_partials'
+                return
+             end if
+          end do
+       end if
     end if
 
     ! Store global data
@@ -422,7 +427,8 @@ contains
       eps_nuc(j) = eval_face(s%dq, s%eps_nuc, k, k_a, k_b)
       eps_eps_T(j) = eval_face(s%dq, s%d_epsnuc_dlnT, k, k_a, k_b)
       eps_eps_rho(j) = eval_face(s%dq, s%d_epsnuc_dlnd, k, k_a, k_b)
-      if (ASSOCIATED(eps_grav)) eps_grav(j) = eval_face(s%dq, s%eps_grav_ad%val, k, k_a, k_b)
+      if (ASSOCIATED(eps_grav) .and. .not. static_background) &
+         eps_grav(j) = eval_face(s%dq, s%eps_grav_ad%val, k, k_a, k_b)
 
       if (s%rotation_flag) then
          Omega_rot(j) = s%omega(k)  ! Not quite right; omega can be discontinuous
@@ -475,7 +481,8 @@ contains
       eps_nuc(j) = eval_center(s%rmid, s%eps_nuc, k_a, k_b)
       eps_eps_T(j) = eval_center(s%rmid, s%d_epsnuc_dlnT, k_a, k_b)
       eps_eps_rho(j) = eval_center(s%rmid, s%d_epsnuc_dlnd, k_a, k_b)
-      if (ASSOCIATED(eps_grav)) eps_grav(j) = eval_center(s%rmid, s%eps_grav_ad%val, k_a, k_b)
+      if (ASSOCIATED(eps_grav) .and. .not. static_background) &
+         eps_grav(j) = eval_center(s%rmid, s%eps_grav_ad%val, k_a, k_b)
 
       if (s%rotation_flag) then
          Omega_rot(j) = eval_center(s%r, s%omega, k_a, k_b)
