@@ -28,6 +28,9 @@ For a more in-depth look at the new build system, see :doc:`developing/build-sys
 New Features
 ------------
 
+The ``ppisn`` and ``pisn`` test cases have been improved and now use
+time-dependent convection (TDC) during pulsations.
+
 MESA's documentation now includes a generated :ref:`Test Suite Gallery <tagoverview>` using metadata from test case ``README.rst`` files. The gallery groups test cases by module, physics, numerical method, workflow, and stellar object or phase. This change makes it easier to understand the purpose of each test case, and can help users more easily find a useful starting point for a MESA project. Details on the implementation can be found in :ref:`developing/test_suite:Gallery tags`.
 
 Diffusive overshooting (overmixing) prescriptions now support a
