@@ -142,7 +142,7 @@
 
       subroutine eval_Riemann_dudt_rhs( &
             s, k, P_surf_ad, use_time_centering, include_tdc_Uq, &
-            dudt_expected_ad, ierr)
+            dudt_expected_ad, ierr, mlt_vc_ad)
          use accurate_sum_auto_diff_star_order1
          use star_utils, only: get_area_info_opt_time_center
          use tdc_hydro, only: compute_tdc_Uq_dm_cell
@@ -153,6 +153,7 @@
          logical, intent(in) :: use_time_centering, include_tdc_Uq
          type(auto_diff_real_star_order1), intent(out) :: dudt_expected_ad
          integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1), intent(in), optional :: mlt_vc_ad
          integer :: nz
          type(auto_diff_real_star_order1) :: &
             flux_in_ad, flux_out_ad, diffusion_source_ad, &
@@ -275,7 +276,7 @@
             ! use same P here as the cell pressure in P_face calculation
             call calc_Ptot_ad_tw( &
                s, k, skip_Peos, skip_mlt_Pturb, P, d_Ptot_dxa, ierr, &
-               use_time_centering)
+               use_time_centering, mlt_vc_ad)
             if (ierr /= 0) return
             if (k == nz) then
                ! no flux in from left, so only have geometry source on right
@@ -363,16 +364,18 @@
       end subroutine get_RTI_momentum_diffusion
 
 
-      subroutine do_uface_and_Pface(s, ierr)
+      subroutine do_uface_and_Pface(s, ierr, mlt_vc_ad)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
+         ! LNA supplies the convective velocity and retains the outer density partial.
+         type(auto_diff_real_star_order1), intent(in), optional :: mlt_vc_ad(:)
          integer :: k, op_err
          include 'formats'
          ierr = 0
 !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
          do k = 1, s% nz
             op_err = 0
-            call do1_uface_and_Pface(s, k, op_err)
+            call do1_uface_and_Pface(s, k, op_err, mlt_vc_ad)
             if (op_err /= 0) ierr = op_err
          end do
 !$OMP END PARALLEL DO
@@ -476,22 +479,24 @@
       end subroutine get_Riemann_shock_diagnostics
 
 
-      subroutine do1_uface_and_Pface(s, k, ierr)
+      subroutine do1_uface_and_Pface(s, k, ierr, mlt_vc_ad)
          use eos_def, only: i_gamma1, i_lnfree_e, i_lnPgas
          use star_utils, only: calc_Ptot_ad_tw, get_face_weights
          type (star_info), pointer :: s
          integer, intent(in) :: k
          integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1), intent(in), optional :: mlt_vc_ad(:)
          logical :: test_partials
 
          type(auto_diff_real_star_order1) :: &
             r_ad, A_ad, PL_ad, PR_ad, uL_ad, uR_ad, rhoL_ad, rhoR_ad, &
             gamma1L_ad, gamma1R_ad, csL_ad, csR_ad, G_ad, dPdm_grav_ad, &
             Sl1_ad, Sl2_ad, Sr1_ad, Sr2_ad, numerator_ad, denominator_ad, &
-            Sl_ad, Sr_ad, Ss_ad, P_face_L_ad, P_face_R_ad, du_ad
+            Sl_ad, Sr_ad, Ss_ad, P_face_L_ad, P_face_R_ad, du_ad, &
+            conv_vel_00, conv_vel_m1
          real(dp), dimension(s% species) :: d_Ptot_dxa  ! skip this
          logical, parameter :: skip_Peos = .false., skip_mlt_Pturb = .false.
-         real(dp) :: delta_m, f
+         real(dp) :: delta_m, f, dPR_dlnd_m2
 
          include 'formats'
 
@@ -518,15 +523,29 @@
          A_ad = 4d0*pi*pow2(r_ad)
 
          ! The equations time center the reconstructed endpoint face state.
+         conv_vel_00 = 0d0
+         conv_vel_m1 = 0d0
+         if (s% mlt_Pturb_factor > 0d0) then
+            if (present(mlt_vc_ad)) then
+               conv_vel_00 = mlt_vc_ad(k)
+               conv_vel_m1 = mlt_vc_ad(k - 1)
+            else
+               conv_vel_00 = s% mlt_vc_old(k)
+               conv_vel_m1 = s% mlt_vc_old(k - 1)
+            end if
+         end if
          call calc_Ptot_ad_tw( &
             s, k, skip_Peos, skip_mlt_Pturb, PL_ad, d_Ptot_dxa, ierr, &
-            .false.)
+            .false., conv_vel_00)
          if (ierr /= 0) return
          call calc_Ptot_ad_tw( &
             s, k - 1, skip_Peos, skip_mlt_Pturb, PR_ad, d_Ptot_dxa, ierr, &
-            .false.)
+            .false., conv_vel_m1)
          if (ierr /= 0) return
+         dPR_dlnd_m2 = PR_ad%d1Array(i_lnd_m1)
          PR_ad = shift_m1(PR_ad)
+         ! LNA carries the k-2 density partial in the unused xtra2 triplet.
+         if (present(mlt_vc_ad)) PR_ad%d1Array(i_xtra2_m1) = dPR_dlnd_m2
 
          uL_ad = wrap_u_00(s,k)
          uR_ad = wrap_u_m1(s,k)

@@ -23,6 +23,7 @@
       use auto_diff
       use hydro_vars, only: set_vars_if_needed
       use hydro_riemann, only: do_uface_and_Pface
+      use star_lna_turbulence_closures, only: tdc_lna_active, tdc_conv_vel_for_star_LNA
       use star_lna_support, only: &
          star_LNA_problem, check_star_LNA_model, setup_star_LNA_problem, &
          report_star_LNA_setup, &
@@ -45,6 +46,9 @@
          type(star_info), pointer :: s
          integer, intent(out) :: ierr
          type(star_LNA_problem) :: problem
+         type(auto_diff_real_star_order1) :: mlt_vc_ad(s% nz)
+         integer :: k, op_err
+         logical :: Riemann_Pturb
 
          ierr = 0
 
@@ -54,14 +58,23 @@
          call check_star_LNA_model(s, ierr)
          if (ierr /= 0) return
 
+         Riemann_Pturb = s% u_flag .and. s% mlt_Pturb_factor > 0d0
          if (s% u_flag) then
-            ! Use the continuous Riemann face state.
+            ! Establish the nonlinear face and start state before the LNA derivatives.
             call do_uface_and_Pface(s, ierr)
             if (ierr /= 0) return
+            if (Riemann_Pturb) then
+               do k = 1, s% nz
+                  mlt_vc_ad(k) = s% mlt_vc_old(k)
+                  if (tdc_lna_active(s)) call tdc_conv_vel_for_star_LNA(s, k, mlt_vc_ad(k))
+               end do
+               call do_uface_and_Pface(s, ierr, mlt_vc_ad)
+            end if
+            if (ierr /= 0) goto 100
          end if
 
          call setup_star_LNA_problem(s, problem, ierr)
-         if (ierr /= 0) return
+         if (ierr /= 0) goto 100
 
          call report_star_LNA_setup(s, problem% map)
 
@@ -71,6 +84,13 @@
          if (ierr == 0) call solve_dense_star_LNA(s, problem% map, problem% mtx, ierr)
 
          call free_star_LNA_problem(problem)
+
+100      continue
+         if (Riemann_Pturb) then
+            ! Restore the nonlinear face derivatives.
+            call do_uface_and_Pface(s, op_err)
+            if (ierr == 0) ierr = op_err
+         end if
       end subroutine do_star_LNA
 
 
