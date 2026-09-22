@@ -246,7 +246,9 @@ def plot_recent_history(history: dict[str, np.ndarray], right: int) -> None:
     day = history["day"][start:stop]
     day = day - day[0]
 
-    fig, axes = plt.subplots(4, 1, figsize=(11, 9), sharex=True, constrained_layout=True)
+    fig, axes = plt.subplots(
+        4, 1, figsize=(11, 9), sharex=True, constrained_layout=True
+    )
     axes[0].plot(day, history["radius"][start:stop], label="surface")
     if "photosphere_r" in history:
         axes[0].plot(day, history["photosphere_r"][start:stop], label="photosphere")
@@ -255,7 +257,9 @@ def plot_recent_history(history: dict[str, np.ndarray], right: int) -> None:
 
     axes[1].plot(day, history["v_surf_km_s"][start:stop], label="surface")
     if "photosphere_v_km_s" in history:
-        axes[1].plot(day, history["photosphere_v_km_s"][start:stop], label="photosphere")
+        axes[1].plot(
+            day, history["photosphere_v_km_s"][start:stop], label="photosphere"
+        )
     axes[1].axhline(0, color="0.4", lw=0.8)
     axes[1].set_ylabel("velocity (km/s)")
 
@@ -335,7 +339,9 @@ def plot_phase_profiles(
         logt = data["logT"]
         outer = (logt >= 3.45) & (logt <= 5.3)
         pressure = 10 ** data["logP"]
-        axes[0, 0].plot(logt[outer], data["v_div_csound"][outer], color=color, label=label)
+        axes[0, 0].plot(
+            logt[outer], data["v_div_csound"][outer], color=color, label=label
+        )
         axes[0, 1].plot(logt[outer], data["lum_conv_div_L"][outer], color=color)
         axes[1, 0].plot(logt[outer], data["log_opacity"][outer], color=color)
         uq = np.maximum(np.abs(data["Uq"]) / pressure, 1e-20)
@@ -428,7 +434,9 @@ def plot_lna_work() -> tuple[float, float, float, float]:
     path = CASE / "LNA" / "star_LNA_work_1.data"
     work = np.loadtxt(path, comments="#")
     logt = work[:, 1]
-    fig, axes = plt.subplots(2, 1, figsize=(10, 8), sharex=True, constrained_layout=True)
+    fig, axes = plt.subplots(
+        2, 1, figsize=(10, 8), sharex=True, constrained_layout=True
+    )
     labels = [
         (3, "pressure"),
         (5, "eddy viscosity"),
@@ -487,7 +495,7 @@ def main() -> None:
     print(f"last completed cycle: {cycle}")
     print(f"nonlinear radius-amplitude growth/cycle: {growth:.6f}")
     print(f"nonlinear KE growth/cycle: {ke_growth:.6f}")
-    print(f"square-amplitude prediction: {(1 + growth)**2 - 1:.6f}")
+    print(f"square-amplitude prediction: {(1 + growth) ** 2 - 1:.6f}")
     print(f"LNA fundamental period: {lna_period:.3f} day")
     print(f"LNA amplitude growth/cycle: {lna_amp_growth:.6f}")
     print(f"LNA KE growth/cycle: {lna_ke_growth:.6f}")

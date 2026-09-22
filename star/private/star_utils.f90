@@ -3497,7 +3497,7 @@
       ! Nonlinear hydro time weighting is enabled by default.
       subroutine calc_Ptot_ad_tw( &
             s, k, skip_Peos, skip_mlt_Pturb, Ptot_ad, d_Ptot_dxa, ierr, &
-            allow_time_centering)
+            allow_time_centering, mlt_vc_ad)
          use auto_diff_support
           type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -3506,6 +3506,7 @@
          real(dp), dimension(s% species), intent(out) :: d_Ptot_dxa
          integer, intent(out) :: ierr
          logical, intent(in), optional :: allow_time_centering
+         type(auto_diff_real_star_order1), intent(in), optional :: mlt_vc_ad
          integer :: j
          real(dp) :: mlt_Pturb_start, alfa, beta
          type(auto_diff_real_star_order1) :: &
@@ -3555,7 +3556,11 @@
 
          mlt_Pturb_ad = 0d0
          if ((.not. skip_mlt_Pturb) .and. s% mlt_Pturb_factor > 0d0 .and. k > 1) then
-            mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*get_rho_face(s,k)/3d0
+            if (present(mlt_vc_ad)) then
+               mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(mlt_vc_ad)*get_rho_face(s,k)/3d0
+            else
+               mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*get_rho_face(s,k)/3d0
+            end if
             if (time_center) then
                mlt_Pturb_start = &
                   s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*(s% rho_start(k-1) + s% rho_start(k))/6d0

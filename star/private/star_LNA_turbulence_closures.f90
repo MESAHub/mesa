@@ -234,6 +234,8 @@
 
          if (s% use_dPrad_dm_form_of_T_gradient_eqn) then
             delm = s% dm_bar(k)
+            if (s% R_center > 0d0 .and. k == s% nz) &
+               delm = 0.5d0*(s% dm(k - 1) + s% dm(k))
             r_ad = wrap_r_00(s, k)
             area_ad = 4d0*pi*pow2(r_ad)
             kap_face_ad = opacity_face_ad
@@ -426,9 +428,11 @@
             Lr_ad = Lrad_coeff*gradT
          end if
          call rsp2_convective_luminosity_for_star_LNA(s, k, Lc_ad)
-         if (.not. star_LNA_perturb_convective_luminosity(s)) Lc_ad = Lc_ad%val
-
          Lt_ad = s% Lt_ad(k)
+         if (.not. star_LNA_perturb_convective_luminosity(s)) then
+            Lc_ad = Lc_ad%val
+            Lt_ad = Lt_ad%val
+         end if
       end subroutine rsp2_luminosity_terms_for_star_LNA
 
 
@@ -554,6 +558,7 @@
             velocity_rhs_ad, velocity_inertia_ad, L_rad_ad, L_conv_ad
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) :: A_ad, Eq_div_w_ad, gradT_actual_ad, tdc_gradL_ad, &
+            conv_vel_ad, &
             r_ad, grav_ad, T_face_ad, rho_face_ad, Peos_face_ad, energy_face_ad, &
             Cp_face_ad, chiRho_face_ad, chiT_face_ad, grada_face_ad, &
             opacity_face_ad, scale_height_face_ad, gradr_face_ad, Hp_for_mlt_ad, &
@@ -580,7 +585,8 @@
          if (ierr /= 0) return
          tdc_gradL_ad = s% gradL_ad(k)
          if (s% TDC_use_dynamical_gradL) then
-            call get_TDC_dynamical_gradL(s, k, s% gradL_ad(k), tdc_gradL_ad, ierr)
+            call tdc_conv_vel_for_star_LNA(s, k, conv_vel_ad)
+            call get_TDC_dynamical_gradL(s, k, s% gradL_ad(k), tdc_gradL_ad, ierr, conv_vel_ad)
             if (ierr /= 0) return
          end if
          call tdc_A_for_star_LNA(s, k, A_ad)
@@ -605,6 +611,11 @@
             s% TDC_alpha_C, s% TDC_alpha_S, .false., &
             energy_face_ad, luminosity_resid_ad, velocity_rhs_ad, &
             velocity_inertia_ad, L_rad_ad, L_conv_ad, ierr)
+         if (ierr /= 0) return
+         if (.not. star_LNA_perturb_convective_luminosity(s)) then
+            L_conv_ad = L_conv_ad%val
+            luminosity_resid_ad = L_rad_ad + L_conv_ad - wrap_L_00(s, k)
+         end if
       end subroutine tdc_relation_for_star_LNA
 
 
@@ -932,6 +943,7 @@
          Lt_inner = compute_Lt_center(s,k,ierr)
          if (ierr /= 0) return
          dLt_dm_ad = (shift_m1(Lt_outer)-Lt_inner)/(0.5d0*(s% dm(k-1)+s% dm(k)))
+         if (.not. star_LNA_perturb_convective_luminosity(s)) dLt_dm_ad = dLt_dm_ad%val
       end subroutine rsp2_dLt_dm_for_star_LNA
 
 

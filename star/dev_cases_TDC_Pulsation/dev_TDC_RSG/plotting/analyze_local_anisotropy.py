@@ -163,10 +163,9 @@ def compute_profile(path: Path, controls: dict[str, float]) -> dict[str, object]
         / np.maximum(4.0 * np.pi * r**2 * rho * hp, 1e-99)
     )
 
-    lambda_xi = (
-        (2.0 / 3.0) * (ALPHA1 * v_div_r + (2.0 * ALPHA1 - 1.0) * dvdr)
-        - 2.5 * np.divide(epsilon, omega, out=np.zeros_like(omega), where=omega > 0)
-    )
+    lambda_xi = (2.0 / 3.0) * (
+        ALPHA1 * v_div_r + (2.0 * ALPHA1 - 1.0) * dvdr
+    ) - 2.5 * np.divide(epsilon, omega, out=np.zeros_like(omega), where=omega > 0)
     b_term = -(2.0 * BETA5 + 1.0) * source + epsilon  # D_omega = 0.
     c_term = (ALPHA1 - 0.2) * dvdr - 2.0 * v_div_r
 
@@ -198,13 +197,7 @@ def compute_profile(path: Path, controls: dict[str, float]) -> dict[str, object]
     # Continuum estimate of the current Kuhfuss eddy-viscous stress.  The
     # profile Eq column remains the authoritative discrete MESA work term.
     shear = dvdr - v_div_r
-    q_kuhfuss = (
-        -(4.0 / 3.0)
-        * alpha_m
-        * mixing_length
-        * amplitude
-        * shear
-    )
+    q_kuhfuss = -(4.0 / 3.0) * alpha_m * mixing_length * amplitude * shear
     e_kuhfuss_cont = -q_kuhfuss * shear
     eq_mesa = np.asarray(p.Eq)
 
@@ -213,10 +206,16 @@ def compute_profile(path: Path, controls: dict[str, float]) -> dict[str, object]
     )
     scale_rate = turnover_rate + np.abs(dvdr) + np.abs(v_div_r)
     conditioning = np.divide(
-        np.abs(lambda_xi), scale_rate, out=np.full_like(lambda_xi, np.nan), where=scale_rate > 0
+        np.abs(lambda_xi),
+        scale_rate,
+        out=np.full_like(lambda_xi, np.nan),
+        where=scale_rate > 0,
     )
     tau_xi_days = np.divide(
-        1.0, np.abs(lambda_xi) * DAY, out=np.full_like(lambda_xi, np.nan), where=lambda_xi != 0
+        1.0,
+        np.abs(lambda_xi) * DAY,
+        out=np.full_like(lambda_xi, np.nan),
+        where=lambda_xi != 0,
     )
 
     star_mass = get_header_value(p, "star_mass")
@@ -270,7 +269,9 @@ def summarize(data: dict[str, object], period_days: float) -> dict[str, float]:
     finite = active & np.isfinite(xi_raw)
     weights = np.where(finite, tke_weight, 0.0)
     xi_q = weighted_quantile(xi_raw[finite], weights[finite], (0.05, 0.5, 0.95))
-    clipped_mean = np.sum(weights[finite] * xi_clip[finite]) / max(np.sum(weights[finite]), 1e-99)
+    clipped_mean = np.sum(weights[finite] * xi_clip[finite]) / max(
+        np.sum(weights[finite]), 1e-99
+    )
     oob = finite & ((xi_raw < 0.0) | (xi_raw > 1.0))
     near_singular = finite & (conditioning < 1e-2)
     backscatter = finite & (e_aniso < 0.0)
@@ -280,16 +281,16 @@ def summarize(data: dict[str, object], period_days: float) -> dict[str, float]:
     p_eq = float(np.sum(dm[finite] * eq_mesa[finite]))
     p_cont = float(np.sum(dm[finite] * e_kuhfuss_cont[finite]))
 
-    stress_floor = 1e-6 * float(np.nanmax(np.abs(q_kuhfuss[finite]))) if np.any(finite) else np.inf
+    stress_floor = (
+        1e-6 * float(np.nanmax(np.abs(q_kuhfuss[finite]))) if np.any(finite) else np.inf
+    )
     stress_good = finite & (np.abs(q_kuhfuss) > stress_floor)
     stress_ratio = weighted_quantile(
         np.abs(q_aniso[stress_good] / q_kuhfuss[stress_good]),
         tke_weight[stress_good],
         (0.5,),
     )[0]
-    tau_ratio = weighted_quantile(
-        tau[finite] / period_days, weights[finite], (0.5,)
-    )[0]
+    tau_ratio = weighted_quantile(tau[finite] / period_days, weights[finite], (0.5,))[0]
 
     return {
         "model_number": float(data["model"]),
@@ -300,9 +301,12 @@ def summarize(data: dict[str, object], period_days: float) -> dict[str, float]:
         "xi_raw_median": xi_q[1],
         "xi_raw_p95": xi_q[2],
         "xi_clipped_tke_mean": clipped_mean,
-        "raw_out_of_bounds_fraction": np.count_nonzero(oob) / max(np.count_nonzero(finite), 1),
-        "near_singular_fraction": np.count_nonzero(near_singular) / max(np.count_nonzero(finite), 1),
-        "backscatter_zone_fraction": np.count_nonzero(backscatter) / max(np.count_nonzero(finite), 1),
+        "raw_out_of_bounds_fraction": np.count_nonzero(oob)
+        / max(np.count_nonzero(finite), 1),
+        "near_singular_fraction": np.count_nonzero(near_singular)
+        / max(np.count_nonzero(finite), 1),
+        "backscatter_zone_fraction": np.count_nonzero(backscatter)
+        / max(np.count_nonzero(finite), 1),
         "anisotropy_power_erg_s": p_aniso,
         "raw_anisotropy_power_erg_s": p_aniso_raw,
         "mesa_Eq_power_erg_s": p_eq,
@@ -348,26 +352,50 @@ def plot_latest(data: dict[str, object], period_days: float) -> None:
     fig, axes = plt.subplots(2, 2, figsize=(13, 9), constrained_layout=True)
 
     ax = axes[0, 0]
-    ax.plot(logt[finite], np.asarray(data["xi_clip"])[finite], lw=1.5, label=r"$\xi$ (diagnostic clip)")
+    ax.plot(
+        logt[finite],
+        np.asarray(data["xi_clip"])[finite],
+        lw=1.5,
+        label=r"$\xi$ (diagnostic clip)",
+    )
     if np.any(oob):
         raw = np.asarray(data["xi_raw"])
-        ax.scatter(logt[oob], np.clip(raw[oob], 0.0, 1.0), s=10, color="tab:red", label="raw outside [0,1]")
+        ax.scatter(
+            logt[oob],
+            np.clip(raw[oob], 0.0, 1.0),
+            s=10,
+            color="tab:red",
+            label="raw outside [0,1]",
+        )
     ax.axhline(1.0 / 3.0, color="0.35", ls="--", lw=1, label="isotropic")
     ax.set_ylim(-0.05, 1.05)
     ax.set_ylabel(r"radial TKE fraction $\xi$")
     ax.legend(frameon=False, fontsize=9)
 
     ax = axes[0, 1]
-    ax.plot(logt[finite], np.sqrt(3.0 * np.asarray(data["xi_clip"])[finite]), label=r"$v_{r,\rm rms}/v_{r,\rm iso}$")
+    ax.plot(
+        logt[finite],
+        np.sqrt(3.0 * np.asarray(data["xi_clip"])[finite]),
+        label=r"$v_{r,\rm rms}/v_{r,\rm iso}$",
+    )
     ax.axhline(1.0, color="0.35", ls="--", lw=1)
     ax.set_ylabel("radial rms velocity factor")
     ax.legend(frameon=False)
 
     ax = axes[1, 0]
     ax.plot(logt[finite], np.asarray(data["q_aniso"])[finite], label="local anisotropy")
-    ax.plot(logt[finite], np.asarray(data["q_kuhfuss"])[finite], label="current eddy stress (continuum)")
+    ax.plot(
+        logt[finite],
+        np.asarray(data["q_kuhfuss"])[finite],
+        label="current eddy stress (continuum)",
+    )
     qscale = np.nanpercentile(
-        np.abs(np.r_[np.asarray(data["q_aniso"])[finite], np.asarray(data["q_kuhfuss"])[finite]]),
+        np.abs(
+            np.r_[
+                np.asarray(data["q_aniso"])[finite],
+                np.asarray(data["q_kuhfuss"])[finite],
+            ]
+        ),
         15,
     )
     ax.set_yscale("symlog", linthresh=max(qscale, 1.0))
@@ -377,10 +405,16 @@ def plot_latest(data: dict[str, object], period_days: float) -> None:
     ax.legend(frameon=False, fontsize=9)
 
     ax = axes[1, 1]
-    ax.plot(logt[finite], np.asarray(data["e_aniso"])[finite], label=r"anisotropy $E_\nu$")
+    ax.plot(
+        logt[finite], np.asarray(data["e_aniso"])[finite], label=r"anisotropy $E_\nu$"
+    )
     ax.plot(logt[finite], np.asarray(data["eq_mesa"])[finite], label="MESA Eq")
     escale = np.nanpercentile(
-        np.abs(np.r_[np.asarray(data["e_aniso"])[finite], np.asarray(data["eq_mesa"])[finite]]),
+        np.abs(
+            np.r_[
+                np.asarray(data["e_aniso"])[finite], np.asarray(data["eq_mesa"])[finite]
+            ]
+        ),
         15,
     )
     ax.set_yscale("symlog", linthresh=max(escale, 1e-12))
@@ -407,8 +441,20 @@ def plot_evolution(summaries: list[dict[str, float]]) -> None:
     ax.set_ylabel(r"TKE-weighted $\xi$ (clipped)")
 
     ax = axes[0, 1]
-    ax.plot(model, [row["raw_out_of_bounds_fraction"] for row in summaries], "o-", ms=3, label="raw outside [0,1]")
-    ax.plot(model, [row["near_singular_fraction"] for row in summaries], "o-", ms=3, label=r"$|\lambda_\xi|/$local rate $<10^{-2}$")
+    ax.plot(
+        model,
+        [row["raw_out_of_bounds_fraction"] for row in summaries],
+        "o-",
+        ms=3,
+        label="raw outside [0,1]",
+    )
+    ax.plot(
+        model,
+        [row["near_singular_fraction"] for row in summaries],
+        "o-",
+        ms=3,
+        label=r"$|\lambda_\xi|/$local rate $<10^{-2}$",
+    )
     ax.set_ylabel("active-zone fraction")
     ax.legend(frameon=False, fontsize=9)
 
@@ -420,8 +466,20 @@ def plot_evolution(summaries: list[dict[str, float]]) -> None:
     ax.set_ylabel(r"$\int E_\nu dm / \int Eq\,dm$")
 
     ax = axes[1, 1]
-    ax.plot(model, [row["backscatter_zone_fraction"] for row in summaries], "o-", ms=3, label=r"$E_\nu<0$")
-    ax.plot(model, [row["median_tau_xi_div_period"] for row in summaries], "o-", ms=3, label=r"median $|\tau_\xi|/P$")
+    ax.plot(
+        model,
+        [row["backscatter_zone_fraction"] for row in summaries],
+        "o-",
+        ms=3,
+        label=r"$E_\nu<0$",
+    )
+    ax.plot(
+        model,
+        [row["median_tau_xi_div_period"] for row in summaries],
+        "o-",
+        ms=3,
+        label=r"median $|\tau_\xi|/P$",
+    )
     ax.set_xlabel("model number")
     ax.set_ylabel("fraction or timescale ratio")
     ax.set_yscale("log")
@@ -449,22 +507,49 @@ def plot_fixed_epoch(summaries: list[dict[str, float]]) -> None:
     ax.set_ylabel(r"TKE-weighted $\xi$ (clipped)")
 
     ax = axes[0, 1]
-    ax.plot(model, [row["anisotropy_to_Eq_power"] for row in rows], "o-", label="diagnostic clip")
-    ax.plot(model, [row["raw_anisotropy_to_Eq_power"] for row in rows], "--", label="raw")
+    ax.plot(
+        model,
+        [row["anisotropy_to_Eq_power"] for row in rows],
+        "o-",
+        label="diagnostic clip",
+    )
+    ax.plot(
+        model, [row["raw_anisotropy_to_Eq_power"] for row in rows], "--", label="raw"
+    )
     ax.axhline(0, color="0.35", lw=0.8)
     ax.set_ylabel(r"$\int E_\nu dm / \int Eq\,dm$")
     ax.legend(frameon=False)
 
     ax = axes[1, 0]
-    ax.plot(model, [row["backscatter_zone_fraction"] for row in rows], "o-", label=r"$E_\nu<0$")
-    ax.plot(model, [row["raw_out_of_bounds_fraction"] for row in rows], "o-", label=r"raw $\xi\notin[0,1]$")
+    ax.plot(
+        model,
+        [row["backscatter_zone_fraction"] for row in rows],
+        "o-",
+        label=r"$E_\nu<0$",
+    )
+    ax.plot(
+        model,
+        [row["raw_out_of_bounds_fraction"] for row in rows],
+        "o-",
+        label=r"raw $\xi\notin[0,1]$",
+    )
     ax.set_xlabel("model number")
     ax.set_ylabel("active-zone fraction")
     ax.legend(frameon=False)
 
     ax = axes[1, 1]
-    ax.plot(model, [row["median_abs_stress_ratio"] for row in rows], "o-", label=r"median $|q_\nu/q_{\rm EV}|$")
-    ax.plot(model, [row["continuum_to_Eq_power"] for row in rows], "o-", label="continuum work / Eq")
+    ax.plot(
+        model,
+        [row["median_abs_stress_ratio"] for row in rows],
+        "o-",
+        label=r"median $|q_\nu/q_{\rm EV}|$",
+    )
+    ax.plot(
+        model,
+        [row["continuum_to_Eq_power"] for row in rows],
+        "o-",
+        label="continuum work / Eq",
+    )
     ax.axhline(1, color="0.35", ls="--", lw=0.8)
     ax.set_xlabel("model number")
     ax.set_ylabel("comparison ratio")
@@ -519,10 +604,9 @@ def write_outputs(
             "The saved Eq column already contains the value used during each model.",
         ]
     )
-    old_epoch = [
-        row for row in summaries if 41000 <= row["model_number"] <= 50000
-    ]
+    old_epoch = [row for row in summaries if 41000 <= row["model_number"] <= 50000]
     if old_epoch:
+
         def values(name: str) -> np.ndarray:
             return np.asarray([row[name] for row in old_epoch])
 

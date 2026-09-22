@@ -72,8 +72,7 @@ def read_history_tail(path: Path, models: set[int], nlines: int = 5000):
             model = int(float(fields[indices[0]]))
             if model in models:
                 rows[model] = {
-                    name: float(fields[index])
-                    for name, index in zip(wanted, indices)
+                    name: float(fields[index]) for name, index in zip(wanted, indices)
                 }
         except ValueError:
             continue
@@ -86,10 +85,7 @@ def infer_abs_total_energy(profile: mr.MesaData) -> float:
     error = np.asarray(profile.ergs_error)
     log_rel = np.asarray(profile.log_rel_E_err)
     good = (
-        np.isfinite(error)
-        & np.isfinite(log_rel)
-        & (error != 0.0)
-        & (log_rel > -300.0)
+        np.isfinite(error) & np.isfinite(log_rel) & (error != 0.0) & (log_rel > -300.0)
     )
     estimates = np.abs(error[good]) / np.power(10.0, log_rel[good])
     return float(np.median(estimates)) if estimates.size else np.nan
@@ -144,9 +140,13 @@ def mechanical_balance_cells(
         return 0.5 * (grav_face + grav_inner)
 
     delta_pe = dm * (specific_pe(profile) - specific_pe(previous))
-    delta_ke = 0.5 * dm * (
-        np.square(np.asarray(profile.velocity))
-        - np.square(np.asarray(previous.velocity))
+    delta_ke = (
+        0.5
+        * dm
+        * (
+            np.square(np.asarray(profile.velocity))
+            - np.square(np.asarray(previous.velocity))
+        )
     )
     work = dt_sec * dm * np.asarray(profile.dwork_dm)
     eq_face = np.asarray(profile.Eq)
@@ -190,17 +190,13 @@ def main() -> None:
         previous_dq = dq.copy()
         hrow = history.get(model, {})
         energies = integrated_energies(profile)
-        history_log_rel_error = hrow.get(
-            "log_rel_error_in_energy_conservation", np.nan
-        )
+        history_log_rel_error = hrow.get("log_rel_error_in_energy_conservation", np.nan)
         global_error_abs = (
             abs_total_energy * 10.0**history_log_rel_error
             if np.isfinite(history_log_rel_error)
             else np.nan
         )
-        dt_sec = hrow.get(
-            "time_step_sec", float(profile.time_step) * 365.25 * 86400.0
-        )
+        dt_sec = hrow.get("time_step_sec", float(profile.time_step) * 365.25 * 86400.0)
         if previous_profile is None:
             delta_internal = np.nan
             delta_potential = np.nan
@@ -240,8 +236,8 @@ def main() -> None:
                 * surface_speed
             )
             center_speed = (
-                (float(profile.R_center) - float(previous_profile.R_center)) / dt_sec
-            )
+                float(profile.R_center) - float(previous_profile.R_center)
+            ) / dt_sec
             center_pressure = 10.0 ** float(profile.logP[-1])
             center_work = (
                 dt_sec
@@ -256,9 +252,7 @@ def main() -> None:
             eq_face = np.asarray(profile.Eq)
             eq_cell = 0.5 * eq_face
             eq_cell[:-1] += 0.5 * eq_face[1:]
-            integrated_work = dt_sec * float(
-                np.sum(dm * np.asarray(profile.dwork_dm))
-            )
+            integrated_work = dt_sec * float(np.sum(dm * np.asarray(profile.dwork_dm)))
             integrated_eq = dt_sec * float(np.sum(dm * eq_cell))
             cell_energy_closure = (
                 delta_internal

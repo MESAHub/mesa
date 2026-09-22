@@ -29,8 +29,9 @@
          rsp2_terms_for_star_LNA_audit, &
          rsp2_turbulent_energy_inertia_for_star_LNA, rsp2_turbulent_energy_rhs_for_star_LNA, &
          star_LNA_eval_dlnPdm_qhse, star_LNA_HSE_grav_term, rsp2_gradT_for_star_LNA, &
+         star_LNA_perturb_convective_luminosity, &
          star_LNA_L_conv_closure_ad => star_LNA_L_conv_ad, &
-         tdc_face_state_for_star_LNA, &
+         tdc_face_state_for_star_LNA, tdc_conv_vel_for_star_LNA, &
          tdc_lna_active, tdc_luminosity_resid_for_star_LNA, &
          tdc_luminosity_terms_for_star_LNA, tdc_relation_for_star_LNA, &
          tdc_zero_w_for_star_LNA, static_face_pressure_for_star_LNA, &
@@ -127,6 +128,7 @@
          integer :: nz = 0
          integer :: nvar_per_zone = 0
          integer :: nvar_total = 0
+         logical :: Riemann_Pturb = .false.
          integer, allocatable :: var_id(:)
       end type star_LNA_var_map
 
@@ -439,6 +441,7 @@
 
          ierr = 0
          map%nz = s% nz
+         map%Riemann_Pturb = s% u_flag .and. s% mlt_Pturb_factor > 0d0
          if (s% star_LNA_T_inner > 0d0) then
             map%nz = 0
             do k = 1, s% nz
@@ -832,17 +835,20 @@
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1), intent(out), optional :: rhs_inner
          type(auto_diff_real_star_order1) :: grav_ad, area_ad, dm_div_A_ad, &
-            dPtot_ad, d_mlt_Pturb_ad, Uq_ad, P_surf_ad
+            dPtot_ad, d_mlt_Pturb_ad, Uq_ad, P_surf_ad, conv_vel_ad
 
          ierr = 0
          if (present(rhs_inner)) rhs_inner = 0d0
 
          if (s% u_flag) then
             P_surf_ad = 0d0
+            conv_vel_ad = s% mlt_vc_old(k)
+            if (tdc_lna_active(s)) call tdc_conv_vel_for_star_LNA(s, k, conv_vel_ad)
             ! Omit finite-step centering and add the static LNA Uq below.
             call eval_Riemann_dudt_rhs( &
                s, k, P_surf_ad, use_time_centering=.false., &
-               include_tdc_Uq=.false., dudt_expected_ad=velocity_rhs_ad, ierr=ierr, rhs_inner=rhs_inner)
+               include_tdc_Uq=.false., dudt_expected_ad=velocity_rhs_ad, ierr=ierr, &
+               rhs_inner=rhs_inner, mlt_vc_ad=conv_vel_ad)
             if (ierr /= 0) return
             call Uq_cell_for_star_LNA(s, k, Uq_ad, ierr)
             if (ierr /= 0) return
@@ -1156,9 +1162,9 @@
          end if
 
          non_nuc_neu_ad = 0d0
-         non_nuc_neu_ad%val = 0.5d0*(s% non_nuc_neu_start(k) + s% non_nuc_neu(k))
-         non_nuc_neu_ad%d1Array(i_lnd_00) = 0.5d0*s% d_nonnucneu_dlnd(k)
-         non_nuc_neu_ad%d1Array(i_lnT_00) = 0.5d0*s% d_nonnucneu_dlnT(k)
+         non_nuc_neu_ad%val = s% non_nuc_neu(k)
+         non_nuc_neu_ad%d1Array(i_lnd_00) = s% d_nonnucneu_dlnd(k)
+         non_nuc_neu_ad%d1Array(i_lnT_00) = s% d_nonnucneu_dlnT(k)
 
          extra_heat_ad = s% extra_heat(k) + s% irradiation_heat(k)
 
@@ -1181,7 +1187,7 @@
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1), intent(out), optional :: work_inner
          real(dp) :: P_cell, P_out, P_in
-         type(auto_diff_real_star_order1) :: P_cell_ad, rho_face_ad
+         type(auto_diff_real_star_order1) :: P_cell_ad, rho_face_ad, conv_vel_ad
 
          ierr = 0
          if (present(work_inner)) work_inner = 0d0
@@ -1190,10 +1196,12 @@
             if (ierr /= 0) return
             P_cell = P_cell_ad%val
             if (s% eps_grav_form_for_energy_eqn) P_cell = P_cell - s% Peos(k)
-            if (s% mlt_Pturb_factor > 0d0 .and. k > 1 .and. s% mlt_vc_old(k) > 0d0) then
+            if (s% mlt_Pturb_factor > 0d0 .and. k > 1) then
+               conv_vel_ad = s% mlt_vc_old(k)
+               if (tdc_lna_active(s)) call tdc_conv_vel_for_star_LNA(s, k, conv_vel_ad)
                rho_face_ad = get_rho_face(s, k)
-               P_cell = P_cell + &
-                  s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*rho_face_ad%val/3d0
+               if (conv_vel_ad%val > 0d0) P_cell = P_cell + &
+                  s% mlt_Pturb_factor*pow2(conv_vel_ad%val)*rho_face_ad%val/3d0
             end if
             if (k < s% nz) then
                if (present(work_inner)) work_inner = &
@@ -1738,7 +1746,7 @@
             return
          end if
 
-         flux_resid_ad = rsp2_flux_residual(s, k)
+         flux_resid_ad = rsp2_flux_residual(s, k, star_LNA_perturb_convective_luminosity(s))
          if (k > 1) then
             call rsp2_luminosity_terms_for_star_LNA(s,k,Lr_ad,Lc_ad,Lt_ad,ierr)
             if (ierr /= 0) return
@@ -1935,6 +1943,18 @@
             kk = k; var_id = lna_var_Phi
          case (i_xtra2_p1)
             kk = k + 1; var_id = lna_var_Phi
+         ! Riemann turbulent pressure also depends on rho(k-2). The rotation
+         ! triplet follows shift_p1 when the inner face enters a cell row.
+         case (i_jrot_m1)
+            if (map%Riemann_Pturb) then
+               kk = k - 2; var_id = lna_var_lnd
+            end if
+         case (i_jrot_00)
+            if (map%Riemann_Pturb) then
+               kk = k - 1; var_id = lna_var_lnd
+            end if
+         case (i_jrot_p1)
+            if (map%Riemann_Pturb) var_id = lna_var_lnd
          end select
       end subroutine ad_index_to_star_LNA_var
 
@@ -4436,7 +4456,7 @@
          max_resid = 0d0
          if (.not. s% RSP2_flag) return
          do k = 1, map%nz
-            resid_ad = rsp2_flux_residual(s, k)
+            resid_ad = rsp2_flux_residual(s, k, star_LNA_perturb_convective_luminosity(s))
             max_resid = max(max_resid, abs(resid_ad%val))
          end do
       end subroutine max_abs_rsp2_flux_row_resid_for_star_LNA
@@ -4818,6 +4838,7 @@
          map%nz = 0
          map%nvar_per_zone = 0
          map%nvar_total = 0
+         map%Riemann_Pturb = .false.
       end subroutine free_star_LNA_var_map
 
 

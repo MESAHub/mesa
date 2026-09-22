@@ -104,7 +104,9 @@ def plot_history(history, kick_model):
     axes[0].semilogy(time[use], history.time_step_sec[use], color="#1f4e79")
     axes[0].set_ylabel("Timestep (s)")
 
-    axes[1].plot(time[use], history.v_surf_km_s[use], color="#b33a3a", label=r"$v_{\rm surf}$")
+    axes[1].plot(
+        time[use], history.v_surf_km_s[use], color="#b33a3a", label=r"$v_{\rm surf}$"
+    )
     axes[1].plot(
         time[use],
         history.v_div_csound_surf[use],
@@ -116,7 +118,13 @@ def plot_history(history, kick_model):
     axes[1].legend(frameon=False, ncol=2)
 
     retry_increment = np.diff(history.num_retries, prepend=history.num_retries[0])
-    axes[2].step(time[use], history.num_retries[use], where="post", color="#6a3d9a", label="cumulative retries")
+    axes[2].step(
+        time[use],
+        history.num_retries[use],
+        where="post",
+        color="#6a3d9a",
+        label="cumulative retries",
+    )
     axes[2].scatter(
         time[use][retry_increment[use] > 0],
         history.num_retries[use][retry_increment[use] > 0],
@@ -149,17 +157,34 @@ def plot_kick_profile(kick_model, selected_mode):
 
     figure, axes = plt.subplots(2, 2, figsize=(11.0, 7.8))
 
-    axes[0, 0].plot(before.logT, requested_velocity * current, color="#b33a3a", label="current kick")
-    axes[0, 0].plot(before.logT, requested_velocity * real_slice, color="#1f4e79", linestyle="--", label="real displacement slice")
+    axes[0, 0].plot(
+        before.logT, requested_velocity * current, color="#b33a3a", label="current kick"
+    )
+    axes[0, 0].plot(
+        before.logT,
+        requested_velocity * real_slice,
+        color="#1f4e79",
+        linestyle="--",
+        label="real displacement slice",
+    )
     axes[0, 0].axhline(0.0, color="0.75", linewidth=0.8)
     axes[0, 0].set_ylabel("Velocity shape (km/s)")
     axes[0, 0].set_title("Selected eigenfunction")
     axes[0, 0].legend(frameon=False)
 
     outer = before.logT <= 4.2
-    axes[0, 1].plot(before.logT[outer], requested_velocity * current[outer], color="#b33a3a", label="imposed at model 200")
-    axes[0, 1].plot(after.logT[outer], after.vel_km_per_s[outer], color="#d17c00", label="model 210")
-    axes[0, 1].plot(later.logT[outer], later.vel_km_per_s[outer], color="#2e7d32", label="model 400")
+    axes[0, 1].plot(
+        before.logT[outer],
+        requested_velocity * current[outer],
+        color="#b33a3a",
+        label="imposed at model 200",
+    )
+    axes[0, 1].plot(
+        after.logT[outer], after.vel_km_per_s[outer], color="#d17c00", label="model 210"
+    )
+    axes[0, 1].plot(
+        later.logT[outer], later.vel_km_per_s[outer], color="#2e7d32", label="model 400"
+    )
     axes[0, 1].axhline(0.0, color="0.75", linewidth=0.8)
     axes[0, 1].set_ylabel("Velocity (km/s)")
     axes[0, 1].set_title("Near-surface response")
@@ -234,7 +259,15 @@ def plot_mode_quality(records):
 
     axes[2].plot(mode, growth, "o-", color="#2e7d32")
     axes[2].axhline(0.0, color="0.65", linewidth=0.8)
-    axes[2].scatter(mode[selected], growth[selected], s=55, facecolors="none", edgecolors="#b33a3a", linewidths=1.5, label="kick mode")
+    axes[2].scatter(
+        mode[selected],
+        growth[selected],
+        s=55,
+        facecolors="none",
+        edgecolors="#b33a3a",
+        linewidths=1.5,
+        label="kick mode",
+    )
     axes[2].set_ylabel("log KE per cycle")
     axes[2].set_xlabel("One-based selected mode")
     axes[2].legend(frameon=False)
@@ -274,21 +307,21 @@ def write_diagnostics(history, kick_model, selected_mode, records):
         f"surface Mach number after kick: {history.v_div_csound_surf[next_index]:.8g}",
         f"accepted timestep before kick: {history.time_step_sec[kick_index]:.8g} s",
         f"first accepted timestep after kick: {history.time_step_sec[next_index]:.8g} s",
-        f"timestep reduction factor: {history.time_step_sec[kick_index]/history.time_step_sec[next_index]:.8g}",
-        f"retries before first accepted post-kick step: {int(history.num_retries[next_index]-history.num_retries[kick_index])}",
-        f"elapsed simulated time after kick: {history.day[-1]-history.day[kick_index]:.8g} days",
+        f"timestep reduction factor: {history.time_step_sec[kick_index] / history.time_step_sec[next_index]:.8g}",
+        f"retries before first accepted post-kick step: {int(history.num_retries[next_index] - history.num_retries[kick_index])}",
+        f"elapsed simulated time after kick: {history.day[-1] - history.day[kick_index]:.8g} days",
         "",
         "Selected displacement shape",
         "---------------------------",
         f"all real-slice sign changes: {count_nodes(real_slice)}",
         f"sign changes above 1 percent of surface amplitude: {count_nodes(real_slice, threshold=1.0e-2)}",
         f"sign changes above 0.1 percent for logT < 5: {count_nodes(real_slice, threshold=1.0e-3, mask=background.logT < 5.0)}",
-        f"first current-kick sign change: zones {first_crossing+1} to {first_crossing+2}",
-        f"first sign-change logT interval: {background.logT[first_crossing]:.8g} to {background.logT[first_crossing+1]:.8g}",
+        f"first current-kick sign change: zones {first_crossing + 1} to {first_crossing + 2}",
+        f"first sign-change logT interval: {background.logT[first_crossing]:.8g} to {background.logT[first_crossing + 1]:.8g}",
         f"first sign-change velocities: "
-        f"{requested_velocity*current[first_crossing]:.8g} to "
-        f"{requested_velocity*current[first_crossing+1]:.8g} km/s",
-        f"maximum difference from the former GYRE real displacement slice: {np.max(np.abs(current-real_slice)):.8g}",
+        f"{requested_velocity * current[first_crossing]:.8g} to "
+        f"{requested_velocity * current[first_crossing + 1]:.8g} km/s",
+        f"maximum difference from the former GYRE real displacement slice: {np.max(np.abs(current - real_slice)):.8g}",
         "",
         "Kinematic eigenvector check",
         "---------------------------",

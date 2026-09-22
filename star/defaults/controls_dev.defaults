@@ -417,10 +417,11 @@
       !
       ! star_LNA_perturb_convective_flux
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! If true, perturb convective luminosity where the active TDC/RSP2 branch
-      ! supplies an automatic differentiation expression. If false, the convective luminosity
-      ! contribution is held fixed in the active branch rows and diagnostics.
-      ! This is a local "fixed Lconv" switch; by itself it does not choose the
+      ! If true, perturb convective luminosity in the active TDC/RSP2 branch.
+      ! If false, hold Lc and the RSP2 turbulent luminosity Lt fixed in the
+      ! equations and diagnostics. The luminosity row then has delta Lrad = delta L.
+      ! Turbulent velocity and pressure perturbations remain independently controlled.
+      ! This is a local "fixed Lconv and Lt" switch; by itself it does not choose the
       ! frozen flux luminosity row used by models without RSP2.
       !
       ! star_LNA_perturb_turbulent_pressure
