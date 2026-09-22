@@ -23,6 +23,7 @@
       use auto_diff
       use hydro_vars, only: set_vars_if_needed
       use hydro_riemann, only: do_uface_and_Pface
+      use star_lna_turbulence_closures, only: tdc_lna_active, tdc_conv_vel_for_star_LNA
       use star_lna_support, only: &
          star_LNA_problem, check_star_LNA_model, setup_star_LNA_problem, &
          report_star_LNA_setup, &
@@ -45,23 +46,46 @@
          type(star_info), pointer :: s
          integer, intent(out) :: ierr
          type(star_LNA_problem) :: problem
+         type(auto_diff_real_star_order1) :: mlt_vc_ad(s% nz)
+         integer :: k, op_err
+         logical :: Riemann_Pturb, was_holding_background, had_superad_reduction_factor, &
+            could_set_superad_reduction_factor
 
          ierr = 0
+         Riemann_Pturb = .false.
+         was_holding_background = s% hold_pulsation_background
+         had_superad_reduction_factor = s% have_superad_reduction_factor
+         could_set_superad_reduction_factor = s% okay_to_set_superad_reduction_factor
+         s% hold_pulsation_background = .true.
+         s% have_superad_reduction_factor = .true.
+         s% okay_to_set_superad_reduction_factor = .false.
+         ! Regenerate derivatives with the enhancement held at its saved value.
+         s% need_to_setvars = .true.
+         s% have_mixing_info = .false.
 
          call set_vars_if_needed(s, 0d0, 'star_LNA', ierr)
-         if (ierr /= 0) return
+         if (ierr /= 0) goto 100
 
          call check_star_LNA_model(s, ierr)
-         if (ierr /= 0) return
+         if (ierr /= 0) goto 100
 
+         Riemann_Pturb = s% u_flag .and. s% mlt_Pturb_factor > 0d0
          if (s% u_flag) then
-            ! Use the continuous Riemann face state.
+            ! Establish the nonlinear face and start state before the LNA derivatives.
             call do_uface_and_Pface(s, ierr)
-            if (ierr /= 0) return
+            if (ierr /= 0) goto 100
+            if (Riemann_Pturb) then
+               do k = 1, s% nz
+                  mlt_vc_ad(k) = s% mlt_vc_old(k)
+                  if (tdc_lna_active(s)) call tdc_conv_vel_for_star_LNA(s, k, mlt_vc_ad(k))
+               end do
+               call do_uface_and_Pface(s, ierr, mlt_vc_ad)
+            end if
+            if (ierr /= 0) goto 100
          end if
 
          call setup_star_LNA_problem(s, problem, ierr)
-         if (ierr /= 0) return
+         if (ierr /= 0) goto 100
 
          call report_star_LNA_setup(s, problem% map)
 
@@ -71,6 +95,18 @@
          if (ierr == 0) call solve_dense_star_LNA(s, problem% map, problem% mtx, ierr)
 
          call free_star_LNA_problem(problem)
+
+100      continue
+         s% hold_pulsation_background = was_holding_background
+         s% have_superad_reduction_factor = had_superad_reduction_factor
+         s% okay_to_set_superad_reduction_factor = could_set_superad_reduction_factor
+         if (Riemann_Pturb) then
+            ! Restore the nonlinear face derivatives.
+            call do_uface_and_Pface(s, op_err)
+            if (ierr == 0) ierr = op_err
+         end if
+         s% need_to_setvars = .true.
+         s% have_mixing_info = .false.
       end subroutine do_star_LNA
 
 

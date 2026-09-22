@@ -83,7 +83,8 @@ Set ``show_HR_radius_lines = .true.`` in ``&pgstar`` to enable them (default
 `gh-1091 <https://github.com/MESAHub/mesa/pull/1091>`_.
 
 Pulsation envelope remeshing now interpolates the applied superadiabatic
-enhancement and starts fresh turnover history from it.
+enhancement and starts fresh turnover history from it. ``star_LNA`` holds the
+saved enhancement fixed when calculating the modes.
 
 Additional ``pgstar`` plots to visualize residuals of equations:
 

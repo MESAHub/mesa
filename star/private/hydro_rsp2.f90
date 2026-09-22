@@ -208,10 +208,11 @@
       end subroutine do1_rsp2_L_eqn
 
 
-      function rsp2_flux_residual(s, k) result(resid)
+      function rsp2_flux_residual(s, k, perturb_convective_flux) result(resid)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_star_order1) :: resid, L_expected, L_actual
+         logical, intent(in), optional :: perturb_convective_flux
+         type(auto_diff_real_star_order1) :: resid, L_expected, L_actual, Lc, Lt
          type(accurate_auto_diff_real_star_order1) :: L_sum
          real(dp) :: scale
 
@@ -220,9 +221,17 @@
             resid = wrap_Y_00(s, k)
             return
          end if
+         Lc = s% Lc_ad(k)
+         Lt = s% Lt_ad(k)
+         if (present(perturb_convective_flux)) then
+            if (.not. perturb_convective_flux) then
+               Lc = Lc%val
+               Lt = Lt%val
+            end if
+         end if
          L_sum = s% Lr_ad(k)
-         L_sum = L_sum + s% Lc_ad(k)
-         L_sum = L_sum + s% Lt_ad(k)
+         L_sum = L_sum + Lc
+         L_sum = L_sum + Lt
          L_expected = L_sum
          L_actual = wrap_L_00(s, k)
          ! Use the TDC luminosity scale, fixed during solver iterations.

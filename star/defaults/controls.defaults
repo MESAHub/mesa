@@ -2610,7 +2610,8 @@
       ! enabling it initializes the history to the current eta.
       ! Loading a saved model recomputes eta before initializing the history.
       ! The special TDC/RSP2 pulsation mesh instead interpolates the current eta
-      ! and starts fresh history from that value.
+      ! and starts fresh history from that value. ``star_LNA`` holds the applied
+      ! enhancement fixed during the mode calculation.
 
       ! superad_reduction_max_logT
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~

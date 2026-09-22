@@ -58,16 +58,17 @@ contains
    end function check_if_must_fall_back_to_MLT
 
 
-   subroutine get_TDC_dynamical_gradL(s, k, gradL, tdc_gradL, ierr)
+   subroutine get_TDC_dynamical_gradL(s, k, gradL, tdc_gradL, ierr, mlt_vc_ad)
       type(star_info), pointer :: s
       integer, intent(in) :: k
       type(auto_diff_real_star_order1), intent(in) :: gradL
       type(auto_diff_real_star_order1), intent(out) :: tdc_gradL
       integer, intent(out) :: ierr
+      type(auto_diff_real_star_order1), intent(in), optional :: mlt_vc_ad
 
       real(dp) :: dm_face
       type(auto_diff_real_star_order1) :: r_00, inv_R2, area, grav, P00, Pm1, &
-         Ptrb00, Ptrbm1, delta_P_qhse, pressure_gradient_factor
+         Ptrb00, Ptrbm1, delta_P_qhse, pressure_gradient_factor, conv_vel
 
       ierr = 0
       tdc_gradL = gradL
@@ -94,8 +95,10 @@ contains
       if (s% have_mlt_vc .and. s% okay_to_set_mlt_vc .and. &
             s% include_mlt_Pturb_in_thermodynamic_gradients .and. &
             s% mlt_Pturb_factor > 0d0) then
-         Ptrb00 = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*wrap_d_00(s, k)/3d0
-         Ptrbm1 = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*wrap_d_m1(s, k)/3d0
+         conv_vel = s% mlt_vc_old(k)
+         if (present(mlt_vc_ad)) conv_vel = mlt_vc_ad
+         Ptrb00 = s% mlt_Pturb_factor*pow2(conv_vel)*wrap_d_00(s, k)/3d0
+         Ptrbm1 = s% mlt_Pturb_factor*pow2(conv_vel)*wrap_d_m1(s, k)/3d0
          P00 = P00 + Ptrb00
          Pm1 = Pm1 + Ptrbm1
       end if
