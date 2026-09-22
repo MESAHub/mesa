@@ -20,7 +20,7 @@
 /
 
 &colors
-   use_colors = .true.
+   use_colors = .false.
    instrument = 'data/colors_data/filters/Generic/Johnson'
 /
 
@@ -70,9 +70,11 @@ new_rsp2_flag = .true.
    !RSP2_num_outermost_cells_forced_nonturbulent = 1
 
     RSP2_use_3equation_model = .true.
+    !RSP2_alfap = 1d0
     RSP2_alfa_pi = 1d0
     RSP2_alfa_phi = 1d0
     rsp2_alfat = 0.01d0
+    rsp2_alfar = 1d0
     rsp2_alfam= 0.25d0
 
 
@@ -206,7 +208,7 @@ new_rsp2_flag = .true.
 
    ! Hydrodynamics
    use_TDC_Y_face_seeded_newton = .true.
-   use_face_reconstruction = .false. ! incompatible with use_rsp_form_of_scale_height
+   use_face_reconstruction = .true. ! incompatible with use_rsp_form_of_scale_height
    hydro_matrix_solver = 'banded'
    no_dedt_form_during_relax = .false.
    set_rho_to_dm_div_dV = .false.
@@ -312,7 +314,7 @@ hard_limit_for_rel_error_in_energy_conservation = 1d99 !1d-3
    pgstar_interval = 100 !100
 
     History_Panels1_xaxis_name = 'day'!'model_number'
-    History_Panels1_max_width = 3 !50 !2000! 10000
+    History_Panels1_max_width = 2 !50 !2000! 10000
 
 
 /

@@ -403,9 +403,9 @@
    Lc
    Lc_div_L
    Lr
-   !Lr_div_L
+   Lr_div_L
    Lt
-   !Lt_div_L
+   Lt_div_L
 
 !# Energetics
    !total_energy ! specific total energy of cell (ergs/g). internal+potential+kinetic+rotation.
@@ -493,12 +493,12 @@
    !gradT_excess_effect
    !gradT_rel_err
    !gradT_sub_a
-   !grada_face
+   grada_face
    !grada_sub_gradr
    !diff_grads
    !log_diff_grads
 
-   !mlt_D
+   mlt_D
    !mlt_Gamma
    mlt_Y_face
    !mlt_Zeta
@@ -535,7 +535,7 @@
 
    !dominant_isoA_for_thermohaline
    !dominant_isoZ_for_thermohaline
-   !gradL_composition_term
+   gradL_composition_term
 
    !mix_type
 
@@ -733,7 +733,10 @@
    Eq
    Hp_face
    PII_face
-   !Ptrb
+   Pi
+   Phi
+   Pi_covariance_excess
+   Ptrb
    Pvsc
    Uq
    Y_face
@@ -874,7 +877,7 @@
    !dm_eps_grav
    !dr_ratio
    !dt_cs_div_dr
-   !dt_div_tau_conv
+   dt_div_tau_conv
    !dt_times_conv_vel_div_mixing_length
    log_dt_cs_div_dr
    !log_dt_div_tau_conv
@@ -884,7 +887,7 @@
    !dvdt_dPdm
    !dvdt_grav
 
-   !tau_conv
+   tau_conv
    !tau_cool
    !tau_epsnuc
    !tau_qhse

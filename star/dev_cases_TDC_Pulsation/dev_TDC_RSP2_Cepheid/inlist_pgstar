@@ -207,7 +207,7 @@ Profile_Panels1_other_yaxis_name(4) = 'gradr'
 Profile_Panels1_other_dymin(4) = 0.14
 
 ! x-axis limits and properties
-Profile_Panels1_xaxis_name = 'logtau'!'zone'
+Profile_Panels1_xaxis_name = 'logxm'!'zone'
 Profile_Panels1_xmin = -101d0!-101d0
 Profile_Panels1_xmax = -101d0!9d0 !-101d0 !8.1
 Profile_Panels1_xaxis_reversed = .true.
@@ -615,7 +615,7 @@ Mixing_file_aspect_ratio = -1 ! negative means use same value as for window
 
       ! ::
 
-    History_Panels1_yaxis_name(2) = 'I'
+    History_Panels1_yaxis_name(2) = 'growth'!'I'
     History_Panels1_yaxis_reversed(2) = .true.
     History_Panels1_ymin(2) = -101d0
     History_Panels1_ymax(2) = -101d0
