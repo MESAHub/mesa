@@ -109,10 +109,6 @@ contains
       ! Convert the neutral gradient to the gravity-normalized TDC coordinate.
       pressure_gradient_factor = (Pm1 - P00)/delta_P_qhse
       if (is_bad_num(pressure_gradient_factor% val)) return
-      ! Do not reverse the neutral gradient at the innermost resolved face
-      ! next to an excised center.
-      if (s% R_center > 0d0 .and. k == s% nz .and. &
-            pressure_gradient_factor% val <= 0d0) return
       tdc_gradL = pressure_gradient_factor*gradL
    end subroutine get_TDC_dynamical_gradL
 

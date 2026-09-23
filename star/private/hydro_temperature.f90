@@ -439,7 +439,8 @@
          integer, intent(out) :: ierr
 
          real(dp) :: alfa, P_theta
-         type(auto_diff_real_star_order1) :: grav, area, P00, Pm1, inv_R2, mlt_Ptrb00, mlt_Ptrbm1, mlt_Ptrb_face
+         logical :: time_center_mlt
+         type(auto_diff_real_star_order1) :: grav, area, r_00, P00, Pm1, inv_R2, mlt_Ptrb00, mlt_Ptrbm1, mlt_Ptrb_face
          type(auto_diff_real_star_order1) :: T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grada_face, opacity_face
          include 'formats'
 
@@ -448,10 +449,22 @@
          ! basic eqn is dP/dm = -G m / (4 pi r^4)
          ! divide by Ppoint to make it unitless
 
-         ! for rotation, multiply gravity by factor fp.  MESA 2, eqn 22.
-         call expected_HSE_grav_term(s, k, grav, area, ierr) ! note that expected_HSE_grav_term is negative
+         time_center_mlt = s% using_velocity_time_centering .and. &
+            s% include_mlt_in_velocity_time_centering .and. .not. s% RSP2_flag
+         if (time_center_mlt) then
+            call expected_HSE_grav_term(s, k, grav, area, ierr)
+            if (ierr /= 0) return
+         else
+            ! Match the current spatial state used by the transport closure.
+            r_00 = wrap_r_00(s, k)
+            inv_R2 = 1d0/pow2(r_00)
+            area = pi4*pow2(r_00)
+            grav = -s% cgrav(k)*s% m_grav(k)*inv_R2
+            if (s% rotation_flag .and. s% use_gravity_rotation_correction) &
+               grav = grav*s% fp_rot(k)
+         end if
 
-         if (s% using_velocity_time_centering .and. &
+         if (time_center_mlt .and. &
                s% include_P_in_velocity_time_centering .and. &
                s% lnT(k)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) then
             P_theta = s% P_theta_for_velocity_time_centering
