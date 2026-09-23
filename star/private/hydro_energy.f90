@@ -906,9 +906,7 @@
             u_face_ad%val = s% vc(k)
             u_face_ad%d1Array(i_v_00) = s% d_vc_dv
          else if (s% u_flag) then
-            u_face_ad = s% u_face_ad(k)
-            if (s% using_velocity_time_centering) &
-               u_face_ad = 0.5d0*(u_face_ad + s% u_face_start(k))
+            u_face_ad = wrap_opt_time_center_v_00(s,k)
          else if (s% using_velocity_time_centering) then
             u_face_ad%val = 0.5d0*(s% r(k) - s% r_start(k))/s% dt
             u_face_ad%d1Array(i_lnR_00) = 0.5d0*s% r(k)/s% dt

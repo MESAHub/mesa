@@ -485,6 +485,8 @@
       ! for Riemann solver
       type(auto_diff_real_star_order1), pointer, dimension(:) :: &
          u_face_ad, P_face_ad ! 'ad' for auto_diff
+      type(auto_diff_real_star_order1), pointer :: u_face_P_ad(:) ! pressure jump contribution to u_face
+      real(dp), pointer :: u_face_P_start(:)
       real(dp), pointer, dimension(:) :: &
          u_face_val, &
          d_uface_domega, &

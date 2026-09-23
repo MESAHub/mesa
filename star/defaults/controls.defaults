@@ -8668,9 +8668,12 @@
       ! and to minimize numerical damping.
       ! as discussed in the 3rd mesa instrument paper (2015).
       ! time centering applies to velocities, pressures, and luminosities.
-      ! not for u_flag.
       ! steps_before_use_velocity_time_centering < 0 means no time centering.
       ! P_theta and L_theta = 0.5 for time centered, = 1.0 for fully implicit.
+      ! With u_flag, P_theta also weights the pressure jump contribution to the
+      ! Riemann face velocity in radius motion and energy work. The fluid velocity
+      ! contribution remains centered. If pressure time centering is disabled,
+      ! the pressure jump contribution uses the current state.
       ! Above ``max_logT_for_include_P_and_L_in_velocity_time_centering``, P and L are not time centered
       ! to aid in damping spurious modes in the core.
 

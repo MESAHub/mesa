@@ -510,10 +510,12 @@
          if (k == 1) then
             ! Surface energy work uses the cell pressure, not the momentum BC pressure.
             s% u_face_ad(k) = wrap_u_00(s,k)
+            s% u_face_P_ad(k) = 0d0
             s% P_face_ad(k) = wrap_Peos_00(s,k)
             s% u_face_val(k) = s% u_face_ad(k)%val
             if (s% P_face_start(k) < 0d0) then
                s% u_face_start(k) = s% u_start(k)
+               s% u_face_P_start(k) = 0d0
                s% P_face_start(k) = s% Peos_start(k)
             end if
             return
@@ -606,6 +608,7 @@
          Ss_ad = numerator_ad/denominator_ad
 
          s% u_face_ad(k) = Ss_ad
+         s% u_face_P_ad(k) = (PL_ad - PR_ad)/denominator_ad
          s% d_uface_domega(k) = s% u_face_ad(k)%d1Array(i_L_00)
 
          ! contact pressure (eqn 2.19)
@@ -629,6 +632,7 @@
 
          if (s% P_face_start(k) < 0d0) then
             s% u_face_start(k) = s% u_face_val(k)
+            s% u_face_P_start(k) = s% u_face_P_ad(k)%val
             s% P_face_start(k) = s% P_face_ad(k)%val
          end if
 

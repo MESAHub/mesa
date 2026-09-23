@@ -20,7 +20,7 @@
       module auto_diff_support
 
       use star_private_def
-      use const_def, only: dp, sqrt_2_div_3
+      use const_def, only: dp, sqrt_2_div_3, ln10
       use auto_diff
 
       implicit none
@@ -1167,9 +1167,7 @@
             if (s% using_velocity_time_centering) &
                v_tc = 0.5d0*(v_tc + s% v_start(k-1))
          else if (s% u_flag) then
-            v_tc = wrap_u_face_m1(s,k)
-            if (s% using_velocity_time_centering) &
-               v_tc = 0.5d0*(v_tc + s% u_face_start(k-1))
+            v_tc = shift_m1(wrap_opt_time_center_v_00(s,k-1))
          end if
       end function wrap_opt_time_center_v_m1
 
@@ -1177,6 +1175,7 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: v_tc
+         real(dp) :: P_theta
          v_tc = 0
          if (s% v_flag) then
             v_tc = wrap_v_00(s,k)
@@ -1184,8 +1183,15 @@
                v_tc = 0.5d0*(v_tc + s% v_start(k))
          else if (s% u_flag) then
             v_tc = wrap_u_face_00(s,k)
-            if (s% using_velocity_time_centering) &
+            if (s% using_velocity_time_centering) then
                v_tc = 0.5d0*(v_tc + s% u_face_start(k))
+               P_theta = 1d0
+               if (s% include_P_in_velocity_time_centering .and. &
+                     s% lnT(k)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) &
+                  P_theta = s% P_theta_for_velocity_time_centering
+               ! Use the pressure weight for the pressure jump, keeping fluid velocity centered.
+               v_tc = v_tc + (P_theta - 0.5d0)*(s% u_face_P_ad(k) - s% u_face_P_start(k))
+            end if
          end if
       end function wrap_opt_time_center_v_00
 
@@ -1200,9 +1206,7 @@
             if (s% using_velocity_time_centering) &
                v_tc = 0.5d0*(v_tc + s% v_start(k+1))
          else if (s% u_flag) then
-            v_tc = wrap_u_face_p1(s,k)
-            if (s% using_velocity_time_centering) &
-               v_tc = 0.5d0*(v_tc + s% u_face_start(k+1))
+            v_tc = shift_p1(wrap_opt_time_center_v_00(s,k+1))
          end if
       end function wrap_opt_time_center_v_p1
 
