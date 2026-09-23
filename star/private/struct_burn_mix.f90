@@ -319,6 +319,7 @@
             s% lnR_start(k) = s% lnR(k)
             s% u_start(k) = s% u(k)
             s% u_face_start(k) = 0d0  ! s% u_face_ad(k)%val
+            s% u_face_P_start(k) = 0d0
             s% P_face_start(k) = -1d0  ! mark as unset s% P_face_ad(k)%val
             s% L_start(k) = s% L(k)
             s% Y_face_start(k) = s% Y_face(k)
