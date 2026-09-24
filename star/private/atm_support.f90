@@ -329,7 +329,7 @@ contains
             Teff, &
             lnT_surf, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
             lnP_surf, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
-            ierr)
+            ierr, Rho_outer=s% atm_T_tau_Rho_outer)
 
        kap = 0._dp  ! This value is not used
 
