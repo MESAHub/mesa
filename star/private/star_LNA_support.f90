@@ -2115,7 +2115,7 @@
                var_id = map%var_id(slot)
                idx = (k - 1)*map%nvar_per_zone + slot
                if (star_LNA_var_is_dynamic(var_id) .and. &
-                     any(mtx%B(idx, :) /= 0d0)) then
+                     (any(mtx%B(idx, :) /= 0d0) .or. mtx%A(idx, idx) == 0d0)) then
                   ndyn = ndyn + 1
                else
                   nalg = nalg + 1
@@ -2132,9 +2132,9 @@
             do slot = 1, map%nvar_per_zone
                var_id = map%var_id(slot)
                idx = (k - 1)*map%nvar_per_zone + slot
-               ! A zero time-derivative row is an algebraic constraint.
+               ! Retain constraints with no diagonal pivot, such as the surface pressure row.
                if (star_LNA_var_is_dynamic(var_id) .and. &
-                     any(mtx%B(idx, :) /= 0d0)) then
+                     (any(mtx%B(idx, :) /= 0d0) .or. mtx%A(idx, idx) == 0d0)) then
                   ndyn = ndyn + 1
                   dyn_idx(ndyn) = idx
                else
