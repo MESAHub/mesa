@@ -136,6 +136,7 @@ contains
    !****
 
    subroutine test_T_tau_varying(T_tau_id, label, tau_base_in)
+      use utils_lib, only: is_bad
 
       integer, intent(in)      :: T_tau_id
       character(*), intent(in) :: label
@@ -143,6 +144,10 @@ contains
 
       real(dp) :: errtol
       integer  :: max_steps
+      real(dp), parameter :: delta = 1d-3
+      real(dp) :: values(3), partials(8), pressure_partials(3), lnP_trial(2), &
+         lnT_trial, Teff_trial, finite_difference
+      integer :: i, j
 
       include 'formats'
 
@@ -189,7 +194,7 @@ contains
       call atm_eval_T_tau_varying( &
          tau_base, L, R, M, cgrav, &
          T_tau_id, eos_proc, kap_proc, &
-         errtol, max_steps, SKIP_PARTIALS, &
+         errtol, max_steps, .false., &
          Teff, &
          lnT, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
          lnP, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
@@ -198,6 +203,30 @@ contains
          if (test_verbosely) write (*, *) 'failed in atm_eval_T_tau_varying'
          call mesa_error(__FILE__, __LINE__)
       end if
+
+      ! Perturb L, R and M independently, including their effects on Teff and g.
+      pressure_partials = [L*dlnP_dL, dlnP_dlnR, dlnP_dlnM]
+      do i = 1, 3
+         do j = 1, 2
+            values = [L, R, M]
+            values(i) = values(i)*exp((3 - 2*j)*delta)
+            Teff_trial = pow(values(1)/(pi*crad*clight*values(2)*values(2)), 0.25d0)
+            call atm_eval_T_tau_varying( &
+               tau_base, values(1), values(2), values(3), cgrav, &
+               T_tau_id, eos_proc, kap_proc, &
+               errtol, max_steps, .true., Teff_trial, &
+               lnT_trial, partials(1), partials(2), partials(3), partials(4), &
+               lnP_trial(j), partials(5), partials(6), partials(7), partials(8), ierr)
+            if (ierr /= 0) call mesa_error(__FILE__, __LINE__, 'varying atmosphere perturbation failed')
+         end do
+         finite_difference = (lnP_trial(1) - lnP_trial(2))/(2*delta)
+         if (is_bad(finite_difference) .or. is_bad(pressure_partials(i))) &
+            call mesa_error(__FILE__, __LINE__, 'nonfinite varying atmosphere pressure partial')
+         if (abs(finite_difference - pressure_partials(i)) > 5d-4*max(1d0, abs(pressure_partials(i)))) then
+            write(*,*) 'varying atmosphere pressure partial', i, pressure_partials(i), finite_difference
+            call mesa_error(__FILE__, __LINE__, 'varying atmosphere pressure partial failed')
+         end if
+      end do
 
       T = exp(lnT)
       P = exp(lnP)

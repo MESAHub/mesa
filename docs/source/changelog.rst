@@ -28,6 +28,10 @@ For a more in-depth look at the new build system, see :doc:`developing/build-sys
 New Features
 ------------
 
+Added ``atm_T_tau_Rho_outer`` to set the density used to estimate the
+initial gas pressure in an atmosphere with varying opacity. The default
+remains ``1d-10`` g/cm^3.
+
 The ``ppisn`` and ``pisn`` test cases have been improved and now use
 time dependent convection (TDC) during pulsations.
 
@@ -102,6 +106,10 @@ The new controls restore their incoming solver settings when relaxation ends.
 
 Bug Fixes
 ---------
+
+Fixed the pressure derivatives of atmospheres with varying opacity.
+The radius and mass derivatives now include the response to surface
+gravity. The corrected derivatives are also used by ``star_LNA``.
 
 Fixed the temperature offset from the outer face to the surface cell center
 when using a built in atmospheric temperature boundary condition. The

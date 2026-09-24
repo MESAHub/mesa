@@ -416,6 +416,7 @@
          real(dp) :: atm_T_tau_errtol
          integer :: atm_T_tau_max_iters
          integer :: atm_T_tau_max_steps
+         real(dp) :: atm_T_tau_Rho_outer
 
          character (len=strlen) :: atm_table
 

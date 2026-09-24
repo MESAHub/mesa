@@ -4627,6 +4627,20 @@
     atm_T_tau_max_steps = 500
 
 
+      ! atm_T_tau_Rho_outer
+      ! ~~~~~~~~~~~~~~~~~~~
+
+      ! Density in g/cm^3 used to estimate the initial gas pressure at the
+      ! outer integration point when ``atm_T_tau_opacity = 'varying'``.
+      ! The estimate is ``Pgas = cgas*atm_T_tau_Rho_outer*T_outer``.
+      ! This is not a density floor or a change to the outer optical depth.
+      ! Must be finite and positive.
+
+      ! ::
+
+    atm_T_tau_Rho_outer = 1d-10
+
+
       ! atm_table
       ! ~~~~~~~~~
 

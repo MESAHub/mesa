@@ -530,7 +530,7 @@
     atm_fixed_Teff, atm_fixed_Psurf, atm_fixed_Tsurf, &
 
     atm_T_tau_relation, atm_T_tau_opacity, atm_T_tau_errtol, atm_T_tau_max_iters, &
-    atm_T_tau_max_steps, &
+    atm_T_tau_max_steps, atm_T_tau_Rho_outer, &
 
     atm_table, &
 
@@ -1353,6 +1353,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% atm_T_tau_errtol = atm_T_tau_errtol
  s% atm_T_tau_max_iters = atm_T_tau_max_iters
  s% atm_T_tau_max_steps = atm_T_tau_max_steps
+ s% atm_T_tau_Rho_outer = atm_T_tau_Rho_outer
 
  s% atm_table = atm_table
 
@@ -3132,6 +3133,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  atm_T_tau_errtol = s% atm_T_tau_errtol
  atm_T_tau_max_iters = s% atm_T_tau_max_iters
  atm_T_tau_max_steps = s% atm_T_tau_max_steps
+ atm_T_tau_Rho_outer = s% atm_T_tau_Rho_outer
 
  atm_table = s% atm_table
 
