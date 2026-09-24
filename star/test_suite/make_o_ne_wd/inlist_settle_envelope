@@ -15,6 +15,7 @@
 
 
 &eos
+mass_fraction_limit_for_skye = 1d-16
 / ! end of eos namelist
 
 &kap
@@ -69,13 +70,7 @@
      delta_XSi_cntr_hard_limit = -1
 
 ! mesh
-
 ! solver
-      op_split_burn = .true.
-      op_split_burn_min_T = 3d8
-
-      op_split_burn_eps = 1d-7
-      op_split_burn_odescal = 1d-8
 
       convergence_ignore_equL_residuals = .true.
       make_gradr_sticky_in_solver_iters = .true.

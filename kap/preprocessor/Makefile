@@ -59,6 +59,7 @@ $(call kap,$1,0.1000,-1)
 endef
 
 define kap-co-enhanced
+$(call kap,$1,0.000,-1)
 $(call kap,$1,0.001,-1)
 $(call kap,$1,0.004,-1)
 $(call kap,$1,0.010,-1)
@@ -69,13 +70,13 @@ $(call kap,$1,0.100,-1)
 endef
 
 define kap-freedman
-$(call kap,$1,0.01,0)
-$(call kap,$1,0.02,0)
-$(call kap,$1,0.04,0)
-$(call kap,$1,0.10,0)
-$(call kap,$1,0.20,0)
-$(call kap,$1,0.63,0)
-$(call kap,$1,1.00,0)
+$(call kap,$1,0.007452,0)
+$(call kap,$1,0.014760,0)
+$(call kap,$1,0.029024,0)
+$(call kap,$1,0.069840,0)
+$(call kap,$1,0.130292,0)
+$(call kap,$1,0.321456,0)
+$(call kap,$1,0.428844,0)
 endef
 
 define kap-oplib
@@ -131,10 +132,10 @@ build-data: $(BUILD_DIR_MODULE)/kap_input_data/ logT_points $(OBJ_OUT) | $(BUILD
 	$(call kap-fixed-metal,inlist_lowT_fa05_mb22)
 
 	cp -r $(BUILD_DIR_MODULE)/kap_input_data/wichita/AAG21_lowT_MESA_tables/*  $(BUILD_DIR_MODULE)/data/kap_data/
-	cp condtable.data $(BUILD_DIR_MODULE)/data/kap_data/
+	cp condtabl.data $(BUILD_DIR_MODULE)/data/kap_data/
 
 $(BUILD_DIR_MODULE)/AESOPUS_AGSS09.h5: $(BUILD_DIR_MODULE)/ags09/
-	cd $(BUILD_DIR_MODULE); python $(CURDIR)/AESOPUS/aesopus.py $(CURDIR)/AESOPUS/AGSS09.yaml
+	cd $(BUILD_DIR_MODULE); python $(CURDIR)/AESOPUS/aesopus.py $(CURDIR)/AESOPUS/AGSS09.yml
 
 build-aesopus: $(BUILD_DIR_MODULE)/AESOPUS_AGSS09.h5
 

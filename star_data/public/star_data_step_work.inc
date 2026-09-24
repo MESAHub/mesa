@@ -378,6 +378,13 @@
          type(auto_diff_real_star_order1), pointer, dimension(:) :: &
             gradT_ad, Y_face_ad, gradr_ad, mlt_vc_ad, grada_face_ad, &
             gradL_ad, scale_height_ad, Lambda_ad, mlt_D_ad, mlt_Gamma_ad
+         logical, pointer :: reconstructed_face_state_valid(:)
+         type(auto_diff_real_star_order1), pointer, dimension(:) :: &
+            reconstructed_T_face_ad, reconstructed_rho_face_ad, reconstructed_P_face_ad, reconstructed_energy_face_ad, &
+            reconstructed_Cp_face_ad, reconstructed_ChiRho_face_ad, reconstructed_ChiT_face_ad, &
+            reconstructed_grada_face_ad, reconstructed_opacity_face_ad, &
+            reconstructed_scale_height_face_ad, reconstructed_gradr_face_ad
+         real(dp), pointer :: reconstructed_csound_face(:)
 
 
          logical, pointer :: fixed_gradr_for_rest_of_solver_iters(:)
@@ -812,6 +819,7 @@
          real(dp), pointer :: lnd_start(:) ! (nz)
          real(dp), pointer :: Peos_start(:) ! (nz)
          real(dp), pointer :: Peos_face_start(:) ! (nz)
+         real(dp), pointer :: reconstructed_P_face_start(:) ! (nz)
          real(dp), pointer :: lnPeos_start(:) ! (nz)
          real(dp), pointer :: lnPgas_start(:) ! (nz)
          real(dp), pointer :: lnT_start(:) ! (nz)

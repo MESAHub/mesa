@@ -138,7 +138,7 @@
 
       ! you might want to get a more complete list of mixing regions by using the following
 
-      !mixing_regions <integer> ! note: this includes regions where the mixing type is no_mixing.
+      mixing_regions 20 ! note: this includes regions where the mixing type is no_mixing.
 
          ! the <integer> is the number of regions to report
          ! there will be 2*<integer> columns for this in the log file, 2 for each region.
@@ -340,7 +340,7 @@
 
       ! you might want to get a more complete list of burning regions by using the following
 
-      !burning_regions <integer>
+      burning_regions 20
          ! the <integer> is the number of regions to report
          ! there will be 2*<integer> columns for this in the log file, 2 for each region.
          ! the first column for a region gives int(sign(val)*log10(max(1,abs(val))))

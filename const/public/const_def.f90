@@ -36,8 +36,6 @@ module const_def
 
    integer, parameter :: strlen = 256  ! for character (len=strlen)
 
-   integer, parameter :: max_extra_inlists = 5  ! number of inlists an inlist can depend on
-
 !
 ! mathematical and physical constants (in cgs)
 !

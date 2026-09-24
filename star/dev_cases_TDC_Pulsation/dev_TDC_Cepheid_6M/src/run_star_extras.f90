@@ -44,7 +44,7 @@ module run_star_extras
    ! values specified on inlist_common, inlist_pulses
       !!!!!!!!!!!!!!!!!!!!!!!!!
 
-   logical :: in_inlist_pulses, remesh_for_envelope_model, turn_off_remesh
+   logical :: in_inlist_pulses, turn_off_remesh
    integer :: kick_model_number, timestep_drop_model_number, turn_off_remesh_model_number
    integer :: initial_model_number
    real(dp) :: max_dt_before_pulse, max_dt_during_pulse
@@ -87,11 +87,10 @@ contains
       in_inlist_pulses = s%x_logical_ctrl(22)
       max_dt_before_pulse = s%x_ctrl(17)
       max_dt_during_pulse = s%x_ctrl(18)
-      remesh_for_envelope_model = s%x_logical_ctrl(23)
       turn_off_remesh = s%x_logical_ctrl(24)
-      kick_model_number = s%x_ctrl(11)
-      timestep_drop_model_number = s%x_ctrl(13)
-      turn_off_remesh_model_number = s%x_ctrl(12)
+      kick_model_number = int(s%x_ctrl(11))
+      timestep_drop_model_number = int(s%x_ctrl(13))
+      turn_off_remesh_model_number = int(s%x_ctrl(12))
    end subroutine extras_controls
 
    subroutine brott_wind(id, Lsurf, Msurf, Rsurf, Tsurf, X, Y, Z, w, ierr)
@@ -245,7 +244,6 @@ contains
       integer, intent(in) :: id
       integer, intent(out) :: ierr
       type(star_info), pointer :: s
-      real(dp) :: Lrad_div_Ledd
       ierr = 0
       call star_ptr(id, s, ierr)
       if (ierr /= 0) return
@@ -299,9 +297,7 @@ contains
 
       type(star_info), pointer :: s
       real(dp) :: velocity
-      real(dp) :: radius, logR
-      real(dp) :: logT_alt, inv_diff
-      real(dp) :: log_kap, alpha
+      real(dp) :: radius
 
       ierr = 0
       call star_ptr(id, s, ierr)
@@ -378,18 +374,12 @@ contains
       end if
       !initial_model_number = 0 ! since we are setting model # to 0 in inlist_pulses
 
-      ! for rsp style mesh
-      if (.not. restart .and. in_inlist_pulses .and. remesh_for_envelope_model) then
-         call remesh_for_TDC_pulsation(id, ierr)
-      end if
    end subroutine extras_startup
 
    subroutine extras_after_evolve(id, ierr)
       integer, intent(in) :: id
       integer, intent(out) :: ierr
       type(star_info), pointer :: s
-      real(dp) :: dt
-      character(len=strlen) :: test
       ierr = 0
       call star_ptr(id, s, ierr)
       if (ierr /= 0) return
@@ -400,10 +390,9 @@ contains
    end subroutine extras_after_evolve
 
    ! returns either keep_going, retry, or terminate.
-   integer function extras_check_model(id)
+      integer function extras_check_model(id)
       integer, intent(in) :: id
-      integer :: ierr, k
-      real(dp) :: max_v
+      integer :: ierr
       type(star_info), pointer :: s
       include 'formats'
       ierr = 0
@@ -426,10 +415,9 @@ contains
    subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
       integer, intent(in) :: id, n
       character(len=maxlen_history_column_name) :: names(n)
-      real(dp) :: vals(n), v_esc
+      real(dp) :: vals(n)
       integer, intent(out) :: ierr
       type(star_info), pointer :: s
-      integer :: k, k0
       ierr = 0
       call star_ptr(id, s, ierr)
       if (ierr /= 0) return
@@ -456,7 +444,6 @@ contains
       real(dp) :: vals(nz, n)
       integer, intent(out) :: ierr
       type(star_info), pointer :: s
-      integer :: k
       ierr = 0
       call star_ptr(id, s, ierr)
       if (ierr /= 0) return
@@ -517,11 +504,13 @@ contains
    subroutine my_before_struct_burn_mix(id, dt, res)
       use const_def, only: dp
       use star_def
+      use utils_lib, only: is_bad
       integer, intent(in) :: id
       real(dp), intent(in) :: dt
       integer, intent(out) :: res ! keep_going, redo, retry, terminate
-      real(dp) :: power_photo, v_esc
-      integer :: ierr, k
+      real(dp) :: dt_limit
+      integer :: ierr
+      logical :: have_dt_limit
       type(star_info), pointer :: s
       include 'formats'
       ierr = 0
@@ -530,15 +519,32 @@ contains
 
       if (in_inlist_pulses) then
          if (s%model_number > timestep_drop_model_number) then
-            s%max_timestep = max_dt_during_pulse
+            if (max_dt_during_pulse > 0d0) s%max_timestep = max_dt_during_pulse
          else
-            s%max_timestep = max_dt_before_pulse
+            if (max_dt_before_pulse > 0d0) s%max_timestep = max_dt_before_pulse
          end if
 
          ! time step control on pulsations
-         if (period > 0d0 .and. period/s%max_timestep < 600 .and. &
-             s%model_number > timestep_drop_model_number) then
-            s%max_timestep = period/600d0
+         have_dt_limit = .false.
+         dt_limit = 0d0
+         if (s%model_number > timestep_drop_model_number) then
+            if (num_periods < 1) then
+               if (.not. is_bad(s%dynamic_timescale) .and. s%dynamic_timescale > 0d0) then
+                  dt_limit = s%dynamic_timescale/600d0
+                  have_dt_limit = .true.
+               end if
+            else if (period > 0d0) then
+               dt_limit = period/600d0
+               have_dt_limit = .true.
+            end if
+         end if
+
+         if (have_dt_limit) then
+            if (s%max_timestep <= 0d0) then
+               s%max_timestep = dt_limit
+            else
+               s%max_timestep = min(s%max_timestep, dt_limit)
+            end if
          end if
 
          if (s%model_number > turn_off_remesh_model_number .and. turn_off_remesh) then
@@ -563,10 +569,10 @@ contains
       use run_star_support
       use math_lib
       integer, intent(in) :: id
-      integer :: ierr, k
-      real(dp) :: max_vel_inside, vesc_for_cell, vesc_surf !check_avg_v_div_vesc
+      integer :: ierr
       type(star_info), pointer :: s
       include 'formats'
+      extras_finish_step = terminate
       ierr = 0
       call star_ptr(id, s, ierr)
       if (ierr /= 0) return
@@ -594,4 +600,3 @@ contains
    end subroutine photo_read
 
 end module run_star_extras
-

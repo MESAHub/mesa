@@ -57,13 +57,13 @@
 
       integer function alloc_eos_handle_using_inlist(inlist,ierr) result(handle)
          use eos_def, only:do_alloc_eos
-         use eos_ctrls_io, only:read_namelist
+         use eos_ctrls_io, only:read_eos_namelist
          character (len=*), intent(in) :: inlist  ! empty means just use defaults.
          integer, intent(out) :: ierr  ! 0 means AOK.
          ierr = 0
          handle = do_alloc_eos(ierr)
          if (ierr /= 0) return
-         call read_namelist(handle, inlist, ierr)
+         call read_eos_namelist(handle, inlist, ierr)
       end function alloc_eos_handle_using_inlist
 
       subroutine free_eos_handle(handle)

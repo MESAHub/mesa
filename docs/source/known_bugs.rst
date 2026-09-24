@@ -13,6 +13,76 @@ issue, but it may not be complete.
 r26.4.1
 =======
 
+.. _duplicate_n14ag_rate_bug:
+
+Net: duplicate ``n14(a,g)f18(e+nu)o18`` reaction
+------------------------------------------------
+
+The ``cno_extras_o18_to_mg26.net`` and ``pp_cno_extras_o18_ne22.net``
+networks included both the explicit ``r_n14_ag_f18`` and ``r_f18_wk_o18``
+reactions and the approximate ``rn14ag_to_o18`` reaction. This double counted
+the ``n14(a,g)f18(e+nu)o18`` flow. The
+``cno_extras_o18_to_mg26_plus_fe56.net`` network was also affected because it
+includes ``cno_extras_o18_to_mg26.net``.
+
+This affects released MESA versions from ``r15140`` through ``r26.4.1`` and is
+fixed in the main branch after ``r26.4.1``. As a workaround, remove the
+approximate reaction after the hot CNO and ``o18`` extensions have been added::
+
+   remove_reaction(rn14ag_to_o18)
+
+See `gh-1056 <https://github.com/MESAHub/mesa/issues/1056>`_.
+
+.. _drag_energy_u_flag_bug:
+
+Star: drag energy could be included with ``u_flag``
+---------------------------------------------------
+
+In releases ``r24.03.1`` through ``r26.4.1``, setting ``u_flag = .true.``
+with a nonzero ``drag_coefficient`` and ``use_drag_energy = .true.`` could
+inject spurious energy. The drag energy source was evaluated even though the
+corresponding drag force only applies when ``v_flag = .true.``.
+
+This is fixed in the main branch after ``r26.4.1``. As a workaround, set
+``use_drag_energy = .false.`` when using ``u_flag``.
+
+.. _plasmon_weinberg_angle_bug:
+
+Neu: plasmon neutrino cooling used a hardcoded Weinberg angle
+-------------------------------------------------------------
+
+The plasmon neutrino cooling rate used a hardcoded prefactor calculated with a
+Weinberg angle of 0.2319, while all other neutrino cooling processes used
+calculated prefactors taking the Weinberg angle as input, with default value
+0.22290. Thus, modifying the value of the Weinberg angle resulted in changes to
+neutrino cooling processes except for the plasmon neutrinos.
+
+This affects all released MESA versions through ``r26.4.1`` and was found and
+fixed by user Garv Chauhan in `gh-998 <https://github.com/MESAHub/mesa/pull/998>`_.
+Plasmon neutrinos now use the same Weinberg angle as all other processes, and
+changing its value will affect the corresponding cooling rate. Changes to the plasmon neutrino prefactor for MESA's default Weinberg angle result in small numerical differences for stars where plasmon neutrino cooling is significant.
+
+.. _freedman_lowt_z_bug:
+
+Kap: ``lowT_Freedman11`` used ``[M/H]`` labels as ``Z``
+-------------------------------------------------------
+
+The ``lowT_Freedman11`` opacity option used the Freedman table labels
+``0.01``, ``0.02``, ``0.04``, ``0.10``, ``0.20``, ``0.63``, and ``1.00`` as
+metal mass fractions.  These labels correspond to ``[M/H]`` not
+MESA's metal mass fraction ``Z``.  The opacity routines incorrectly interpolated in ``Z``,
+using the ``[M/H]`` labels as the interpolation grid.
+
+This has been fixed in the main branch after ``r26.4.1``.  The fix updates the
+``lowT_Freedman11`` ``Z`` grid to use the correct corresponding metal mass fractions.
+See `gh-993 <https://github.com/MESAHub/mesa/pull/993>`_.
+
+If applying these fixes to an existing checkout, rerun the opacity preprocessor
+to regenerate the tables; this is not done by a normal MESA install::
+
+   cd $MESA_DIR/kap/preprocessor
+   ./build_data_and_export
+
 .. _overshoot_other_alpha_mlt_bug:
 
 Diffusive overshooting: ``other_alpha_mlt`` ignored

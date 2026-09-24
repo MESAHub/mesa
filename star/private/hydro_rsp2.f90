@@ -118,6 +118,7 @@
          integer, intent(out) :: ierr
          type(auto_diff_real_star_order1) ::  &
             L_expected, L_actual,resid
+         type(accurate_auto_diff_real_star_order1) :: L_sum
          real(dp) :: scale, residual, L_start_max
          logical :: test_partials
          include 'formats'
@@ -132,7 +133,10 @@
          ierr = 0
          !L_expected = compute_L_face(s, k, ierr)
          !if (ierr /= 0) return
-         L_expected = s% Lr_ad(k) + s% Lc_ad(k) + s% Lt_ad(k)
+         L_sum = s% Lr_ad(k)
+         L_sum = L_sum + s% Lc_ad(k)
+         L_sum = L_sum + s% Lt_ad(k)
+         L_expected = L_sum
          L_actual = wrap_L_00(s, k)
          L_start_max = maxval(s% L_start(1:s% nz))
          scale = 1d0/L_start_max
@@ -317,7 +321,11 @@
             call setup_dt_Eq_ad(ierr); if (ierr /= 0) return  ! erg g^-1
             call set_energy_eqn_scal(s, k, scal, ierr); if (ierr /= 0) return  ! 1/(erg g^-1 s^-1)
             ! sum terms in esum_ad using accurate_auto_diff_real_star_order1
-            esum_ad = d_turbulent_energy_ad + Ptrb_dV_ad + dt_dLt_dm_ad - dt_C_ad - dt_Eq_ad  ! erg g^-1
+            esum_ad = d_turbulent_energy_ad
+            esum_ad = esum_ad + Ptrb_dV_ad
+            esum_ad = esum_ad + dt_dLt_dm_ad
+            esum_ad = esum_ad - dt_C_ad
+            esum_ad = esum_ad - dt_Eq_ad  ! erg g^-1
             resid_ad = esum_ad
 
             if (k==-35 .and. s% solver_iter == 1) then
@@ -971,6 +979,7 @@
          type (star_info), pointer, intent(in) :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(out) :: L, Lr, Lc, Lt
+         type(accurate_auto_diff_real_star_order1) :: L_sum
          integer, intent(out) :: ierr
          include 'formats'
          ierr = 0
@@ -993,7 +1002,10 @@
             Lt = compute_Lt(s, k, ierr)
             if (ierr /= 0) return
          end if
-         L = Lr + Lc + Lt
+         L_sum = Lr
+         L_sum = L_sum + Lc
+         L_sum = L_sum + Lt
+         L = L_sum
          s% Lr_ad(k) = Lr
          s% Lc_ad(k) = Lc
          s% Lt_ad(k) = Lt

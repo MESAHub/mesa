@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+# uncomment the following line to skip the optional inlists
+# MESA_SKIP_OPTIONAL=t
+
+# this provides the definition of do_one (run one part of test)
+# do_one [inlist] [output model] [LOGS directory]
+source "${MESA_DIR}/star/test_suite/test_suite_helpers"
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+
+# check if can skip building starting model
+if [ -n "$MESA_SKIP_OPTIONAL" ]; then
+   cp standard_wd1_10_mi8_3_ONeNa.mod wd1_10_mi8_3_ONeNa.mod
+else
+   do_one inlist_create_wd_header wd1_10_mi8_3_ONeNa.mod
+   cp wd1_10_mi8_3_ONeNa.mod standard_wd1_10_mi8_3_ONeNa.mod
+fi
+
+do_one inlist_wd_o_ne_3_phase_header final.mod
+
+date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
+
+echo 'finished wd_o_ne_3_phase'
