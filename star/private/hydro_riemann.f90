@@ -508,7 +508,7 @@
          s% d_uface_domega(k) = 0
 
          if (k == 1) then
-            ! Surface energy work uses the cell pressure, not the momentum BC pressure.
+            ! A momentum BC supplies its own pressure for surface energy work.
             s% u_face_ad(k) = wrap_u_00(s,k)
             s% u_face_P_ad(k) = 0d0
             s% P_face_ad(k) = wrap_Peos_00(s,k)

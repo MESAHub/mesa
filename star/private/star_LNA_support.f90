@@ -1146,7 +1146,7 @@
          type(auto_diff_real_star_order1), intent(out) :: dwork_dm_ad
          integer, intent(out) :: ierr
          real(dp) :: P_cell, P_out, P_in
-         type(auto_diff_real_star_order1) :: P_cell_ad, rho_face_ad, conv_vel_ad
+         type(auto_diff_real_star_order1) :: P_cell_ad, rho_face_ad, conv_vel_ad, P_bc_ad, lnP_bc_ad
 
          ierr = 0
          if (s% use_P_d_1_div_rho_form_of_work .or. s% eps_grav_form_for_energy_eqn) then
@@ -1172,7 +1172,11 @@
             return
          end if
 
-         if (s% u_flag) then
+         if (k == 1 .and. .not. s% use_fixed_vsurf_outer_BC .and. use_surface_momentum_row_for_star_LNA(s)) then
+            call surface_P_bc_for_star_LNA(s, P_bc_ad, lnP_bc_ad, ierr)
+            if (ierr /= 0) return
+            P_out = P_bc_ad%val
+         else if (s% u_flag) then
             P_out = s% P_face_ad(k)%val
          else
             call static_face_pressure_for_star_LNA(s, k, P_out, ierr)
