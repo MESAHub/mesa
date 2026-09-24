@@ -15,7 +15,7 @@ The outputs are:
 
 * **Mag_bol** — bolometric magnitude, derived directly from the stellar luminosity
 * **Flux_bol** — bolometric flux at the specified distance
-* **Interp_rad** — distance in parameter space between the current stellar parameters and the nearest atmosphere grid point (a grid-proximity diagnostic, not an interpolation-error estimate)
+* **Interp_rad** — distance in parameter space between the current stellar parameters and the nearest atmosphere grid point (diagnostic for interpolation quality)
 * **One column per filter** — synthetic magnitude in every filter listed in the instrument index file, named by the filter filename (``*.dat`` suffix stripped)
 
 This is fundamentally different from the pre-existing bolometric correction (BC) interface in MESA. The old BC approach interpolates a table of pre-computed magnitude offsets. The colors module instead constructs a full SED at the stellar parameters and performs the photometry in full—there is no intermediate bolometric correction step. The old BC interface functions (``get_bc_by_name``, ``get_abs_mag_by_id``, etc.) are retained as stubs in ``colors_lib.f90`` that return ``-99.9`` solely to satisfy the MESA interface; they are not called by the colors module itself.
@@ -45,7 +45,7 @@ At each history output step, ``data_for_colors_history_columns`` is called with 
 
 The module locates the containing cell in the (T_eff, log g, [M/H]) grid and interpolates to produce a flux array F_λ at the stellar surface. Two paths exist:
 
-* **Flux cube path** (preferred): bounded Hermite tensor interpolation across the full pre-loaded 4D array. The Hermite result is checked against a multilinear result from the same grid cell, with multilinear interpolation used as a numerical fallback. All lookups are in-memory array accesses.
+* **Flux cube path** (preferred): hermite tensor interpolation across the full pre-loaded 4D array. All lookups are in-memory array accesses.
 * **Stencil fallback path** (low-RAM): an extended neighbourhood of SED files around the current grid cell is loaded on demand. Individual SED files are served from a bounded memory cache (256-slot circular buffer, ``sed_mem_cache_cap`` in ``colors_def.f90``) to avoid redundant disk reads. The stencil is invalidated and reloaded whenever the star moves into a new grid cell.
 
 **Step 2 — Distance dilution**
@@ -96,11 +96,8 @@ Source files
    │   ├── bolometric.f90       — bolometric magnitude and flux calculation
    │   ├── synthetic.f90        — per-filter convolution and magnitude calculation,
    │   │                          SED CSV output (make_csv / sed_per_model)
-   │   ├── hermite_interp.f90   — unbounded Hermite tensor interpolation
-   │   ├── hermite_interp_bounded.f90
-   │   │                        — default bounded Hermite interpolation with
-   │   │                          multilinear fallback
-   │   ├── linear_interp.f90    — multilinear interpolation
+   │   ├── hermite_interp.f90   — hermite tensor interpolation (cube path)
+   │   ├── linear_interp.f90    — trilinear interpolation (cube path fallback)
    │   ├── knn_interp.f90       — k-nearest-neighbour interpolation
    │   ├── colors_utils.f90     — I/O (SED, filter, lookup table, flux cube),
    │   │                          numerical integration, flux dilution,
@@ -235,4 +232,3 @@ A browsable mirror of the processed SED_Tools output is available at
 `https://nillmill.ddns.net/sed_tools/ <https://nillmill.ddns.net/sed_tools/>`_,
 providing a live view of all available atmosphere grids and filter facilities
 along with file counts, disk usage, and metadata.
-
