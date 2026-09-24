@@ -23,8 +23,8 @@
       
       ! Pre-MS model settings
       pre_ms_relax_to_start_radiative_core = .false.  ! Colors will only show up after these steps. 
-      initial_model_relax_num_steps = 10              ! These settings are not very scienticious.
-      pre_ms_relax_num_steps = 10                     ! But this is a test for Colors module, not science.
+      initial_model_relax_num_steps = 100             ! These settings are not very scienticious.
+      pre_ms_relax_num_steps = 100                    ! But this is a test for Colors module, not science.
 
       pgstar_flag     = .true.   !enable pg star for LC and HR
 /
@@ -105,7 +105,7 @@
       xa_central_lower_limit(1) = 1d-2  
 
       ! Fail-safe max age (just in case)
-      max_age = 1d12               
+      max_age = 1d14               
 
       ! --- OUTPUT CONTROL ---
       ! High resolution history for smooth light curves
@@ -152,6 +152,5 @@
   History_Track4_xaxis_label = 'U mag'
   History_Track4_yaxis_label = 'I mag'
   History_Track4_reverse_yaxis = .true.
-
-
 /
+
