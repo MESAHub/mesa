@@ -107,6 +107,15 @@ The new controls restore their incoming solver settings when relaxation ends.
 Bug Fixes
 ---------
 
+Fixed surface pressure work in the conservative energy equation with
+``u_flag`` or ``v_flag`` and a momentum outer boundary. Surface work now
+uses the same imposed pressure as the momentum equation, including fixed
+pressure and zero gas pressure boundaries. Previously it used the outer
+cell pressure, which could add artificial heating or cooling when the
+cell and boundary pressures differed. The corresponding ``star_LNA``
+surface work term has also been corrected. Cell pressure is retained in
+the simple compression work and ``eps_grav`` forms.
+
 Fixed the pressure derivatives of atmospheres with varying opacity.
 The radius and mass derivatives now include the response to surface
 gravity. The corrected derivatives are also used by ``star_LNA``.

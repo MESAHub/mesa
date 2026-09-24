@@ -69,11 +69,12 @@
             i_lnd, i_lnR, i_lnT, i_lum, i_v, i_u, i_w_div_wc, i_j_rot, &
             i_alpha_RTI, i_xh1, i_xhe4, species
          real(dp) :: L_phot_old
+         type(auto_diff_real_star_order1) :: P_surf_work_ad
          real(dp), dimension(:), pointer :: &
             L, lnR, lnP, lnT, energy
          logical :: v_flag, u_flag, dump_for_debug, &
             do_chem, do_mix, do_dlnd_dt, do_dv_dt, do_du_dt, do_dlnR_dt, &
-            do_alpha_RTI, do_w_div_wc, do_j_rot, do_dlnE_dt, do_equL, do_detrb_dt
+            do_alpha_RTI, do_w_div_wc, do_j_rot, do_dlnE_dt, do_equL, do_detrb_dt, use_P_surf_work
 
          include 'formats'
 
@@ -225,7 +226,7 @@
                end if
             end if
 
-            if (do_dlnE_dt) then
+            if (do_dlnE_dt .and. k > 1) then
                call zero_eps_grav_and_partials(s, k)
                call do1_energy_eqn(s, k, do_chem, nvar, op_err)
                if (op_err /= 0) then
@@ -278,7 +279,7 @@
 !$OMP END PARALLEL DO
 
          if (ierr == 0 .and. nzlo == 1) then
-            call PT_eqns_surf(s, nvar, do_du_dt, do_dv_dt, do_equL, ierr)
+            call PT_eqns_surf(s, nvar, do_du_dt, do_dv_dt, do_equL, P_surf_work_ad, use_P_surf_work, ierr)
             if (ierr /= 0) then
                if (s% report_ierr) write(*,2) 'ierr in PT_eqns_surf', ierr
                if (len_trim(s% retry_message) == 0) s% retry_message = 'error in PT_eqns_surf'
@@ -288,6 +289,21 @@
          if (ierr /= 0) then
             if (s% report_ierr) write(*,*) 'ierr in eval_equ_for_solver'
             return
+         end if
+
+         ! Surface energy work uses the pressure selected by the momentum BC.
+         if (do_dlnE_dt .and. nzlo == 1) then
+            call zero_eps_grav_and_partials(s, 1)
+            if (use_P_surf_work) then
+               call do1_energy_eqn(s, 1, do_chem, nvar, ierr, P_surf_work_ad)
+            else
+               call do1_energy_eqn(s, 1, do_chem, nvar, ierr)
+            end if
+            if (ierr /= 0) then
+               if (s% report_ierr) write(*,2) 'ierr in do1_energy_eqn', 1
+               if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_energy_eqn'
+               return
+            end if
          end if
 
          if (.false. .and. s% model_number == 2) then  !  .and. .not. s% doing_relax) then
@@ -720,7 +736,7 @@
       end subroutine do1_dj_rot_dt_eqn
 
 
-      subroutine PT_eqns_surf(s, nvar, do_du_dt, do_dv_dt, do_equL, ierr)
+      subroutine PT_eqns_surf(s, nvar, do_du_dt, do_dv_dt, do_equL, P_surf_work_ad, use_P_surf_work, ierr)
 
          use star_utils, only: save_eqn_residual_info
          use eos_lib, only: Radiation_Pressure
@@ -729,6 +745,8 @@
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
          logical, intent(in) :: do_du_dt, do_dv_dt, do_equL
+         type(auto_diff_real_star_order1), intent(out) :: P_surf_work_ad
+         logical, intent(out) :: use_P_surf_work
          integer, intent(out) :: ierr
 
          type(auto_diff_real_star_order1) :: &
@@ -742,6 +760,8 @@
          !test_partials = (s% solver_iter == s% solver_test_partials_iter_number)
          test_partials = .false.
          ierr = 0
+         P_surf_work_ad = 0d0
+         use_P_surf_work = .false.
          if (s% u_flag) then
             i_P_eqn = s% i_du_dt
          else  ! use this even if not v_flag
@@ -1040,6 +1060,8 @@
             integer, intent(out) :: ierr
             include 'formats'
             ierr = 0
+            P_surf_work_ad = P_bc_ad
+            use_P_surf_work = s% u_flag .or. s% v_flag
             if (s% u_flag) then
                call do_surf_Riemann_dudt_eqn(s, P_bc_ad, nvar, ierr)
             else

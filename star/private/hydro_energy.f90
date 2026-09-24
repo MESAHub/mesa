@@ -34,17 +34,18 @@
       contains
 
       subroutine do1_energy_eqn( &  ! energy conservation
-            s, k, do_chem, nvar, ierr)
+            s, k, do_chem, nvar, ierr, P_surf_ad)
          use star_utils, only: store_partials
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
          logical, intent(in) :: do_chem
          integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1), optional, intent(in) :: P_surf_ad
          real(dp), dimension(nvar) :: d_dm1, d_d00, d_dp1
          include 'formats'
          call get1_energy_eqn( &
             s, k, do_chem, nvar, &
-            d_dm1, d_d00, d_dp1, ierr)
+            d_dm1, d_d00, d_dp1, ierr, P_surf_ad)
          if (ierr /= 0) then
             if (s% report_ierr) write(*,2) 'ierr /= 0 for get1_energy_eqn', k
             return
@@ -55,7 +56,7 @@
 
 
       subroutine get1_energy_eqn( &
-            s, k, do_chem, nvar, d_dm1, d_d00, d_dp1, ierr)
+            s, k, do_chem, nvar, d_dm1, d_d00, d_dp1, ierr, P_surf_ad)
          use eos_def, only: i_grad_ad, i_lnPgas, i_lnE
          use eps_grav, only: eval_eps_grav_and_partials
          use accurate_sum_auto_diff_star_order1
@@ -65,6 +66,7 @@
          logical, intent(in) :: do_chem
          real(dp), intent(out), dimension(nvar) :: d_dm1, d_d00, d_dp1
          integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1), optional, intent(in) :: P_surf_ad
 
          type(auto_diff_real_star_order1) :: resid_ad, &
             dL_dm_ad, sources_ad, others_ad, d_turbulent_energy_dt_ad, &
@@ -201,7 +203,7 @@
                end if
             else
                call eval_dwork(s, k, skip_P, dwork_dm_ad, dwork, &
-                  d_dwork_dxam1, d_dwork_dxa00, d_dwork_dxap1, ierr)
+                  d_dwork_dxam1, d_dwork_dxa00, d_dwork_dxap1, ierr, P_surf_ad)
             end if
             if (ierr /= 0) then
                if (s% report_ierr) write(*,*) 'failed in setup_dwork_dm', k
@@ -660,12 +662,13 @@
 
 
       subroutine eval_dwork(s, k, skip_P, dwork_ad, dwork, &
-            d_dwork_dxam1, d_dwork_dxa00, d_dwork_dxap1, ierr)
+            d_dwork_dxam1, d_dwork_dxa00, d_dwork_dxap1, ierr, P_surf_ad)
          use auto_diff_support
          use star_utils, only: calc_Ptot_ad_tw
          type (star_info), pointer :: s
          integer, intent(in) :: k
          logical, intent(in) :: skip_P
+         type(auto_diff_real_star_order1), optional, intent(in) :: P_surf_ad
          type(auto_diff_real_star_order1), intent(out) :: dwork_ad
          real(dp), intent(out) :: dwork
          real(dp), intent(out), dimension(s% species) :: &
@@ -683,7 +686,7 @@
          ierr = 0
 
          call eval1_work(s, k, skip_P, &
-            work_00_ad, work_00, d_work_00_dxa00, d_work_00_dxam1, ierr)
+            work_00_ad, work_00, d_work_00_dxa00, d_work_00_dxam1, ierr, P_surf_ad)
          if (ierr /= 0) return
          call eval1_work(s, k+1, skip_P, &
             work_p1_ad, work_p1, d_work_p1_dxap1, d_work_p1_dxa00, ierr)
@@ -712,13 +715,14 @@
 
       ! ergs/s at face(k)
       subroutine eval1_work(s, k, skip_Peos, &
-            work_ad, work, d_work_dxa00, d_work_dxam1, ierr)
+            work_ad, work, d_work_dxa00, d_work_dxam1, ierr, P_surf_ad)
          use star_utils, only: get_Pvsc_ad, calc_Ptrb_ad_tw, get_rho_face
          use accurate_sum_auto_diff_star_order1
          use auto_diff_support
          type (star_info), pointer :: s
          integer, intent(in) :: k
          logical, intent(in) :: skip_Peos
+         type(auto_diff_real_star_order1), optional, intent(in) :: P_surf_ad
          type(auto_diff_real_star_order1), intent(out) :: work_ad
          real(dp), intent(out) :: work
          real(dp), dimension(s% species), intent(out) :: &
@@ -773,7 +777,12 @@
             P_theta = 1d0 ! try 1 - q(k)
          end if
 
-         if (s% u_flag) then
+         if (k == 1 .and. present(P_surf_ad) .and. .not. skip_Peos) then
+            ! Match the current boundary pressure in the momentum equation.
+            P_face_ad = P_surf_ad
+            d_Pface_dxa00 = 0d0
+            d_Pface_dxam1 = 0d0
+         else if (s% u_flag) then
             ! Time center the endpoint Riemann pressure once.
             P_face_ad = P_theta*s% P_face_ad(k) + (1d0-P_theta)*s% P_face_start(k)
             d_Pface_dxa00 = 0d0
