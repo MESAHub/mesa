@@ -156,6 +156,12 @@
          real(dp), pointer, dimension(:,:,:) :: ublk=>null(), dblk=>null(), lblk=>null()  ! (nvar,nvar,nz)
          real(dp), dimension(:,:,:), pointer :: lblkF=>null(), dblkF=>null(), ublkF=>null()  ! (nvar,nvar,nz)
 
+         logical :: report_rsp2_flux
+         integer :: rsp2_flux_equ_iter
+         real(dp), allocatable :: rsp2_flux_jac(:,:,:), rsp2_flux_dx(:,:), rsp2_flux_L(:,:), &
+            rsp2_flux_resid(:), rsp2_flux_scale(:), rsp2_flux_Y(:), rsp2_flux_gradL(:), &
+            rsp2_flux_Peos(:), rsp2_flux_T(:), rsp2_flux_dY(:), rsp2_flux_linear(:)
+
          call do_solver_work()
          ! Split it this way so we can guarantee cleanup() gets called once do_solver_work finishes
          ! Otherwise all the pointers will leak memory.
@@ -169,6 +175,8 @@
             err_msg = ''
 
             nz = s% nz
+            report_rsp2_flux = s% RSP2_report_flux_solver .and. s% RSP2_flag .and. &
+               s% i_rsp2_flux > 0 .and. s% i_Y > 0 .and. nz > 1
 
             AF(1:ldAF,1:neq) => AF1(1:ldAF*neq)
 
@@ -345,11 +353,14 @@
                      write(*,*) 'first model is slow to converge: num tries', &
                         s% num_solver_iterations
 
+               if (report_rsp2_flux) call save_rsp2_flux_state
                if (.not. solve_equ()) then  ! either singular or horribly ill-conditioned
                   write(err_msg, '(a, i5, 3x, a)') 'info', ierr, 'bad_matrix'
                   call oops(err_msg)
                   exit iter_loop
                end if
+
+               if (report_rsp2_flux) call save_rsp2_flux_correction
 
                call inspectB(s, nvar, soln, ierr)
                if (ierr /= 0) then
@@ -507,6 +518,11 @@
                passed_tol_tests = &
                   (pass_resid_tests .and. pass_corr_tests_with_coeff) .or. &
                   (disabled_resid_tests .and. pass_corr_tests_without_coeff)
+
+               if (report_rsp2_flux) &
+                  write(*,'(a,3(1x,i0),1x,l1,3(1x,es24.16e3))') 'RSP2_flux_iteration', &
+                     s% model_number, s% solver_call_number, iter, passed_tol_tests, &
+                     coeff, max_residual, residual_norm
 
                if (.not. passed_tol_tests) then
 
@@ -718,6 +734,7 @@
             call eval_equations(s, nvar, ierr)
             if (ierr /= 0) return
             call s% other_after_solver_setmatrix(s% id, ierr)
+            if (report_rsp2_flux .and. ierr == 0) rsp2_flux_equ_iter = s% solver_iter
          end subroutine do_equations
 
 
@@ -817,6 +834,7 @@
                call apply_coeff(nvar, nz, dxsave, soln, coeff, skip_eval_f)
 
                call do_equations(ierr)
+               if (report_rsp2_flux) call report_rsp2_flux_trial(coeff, ierr)
                if (ierr /= 0) then
                   if (alam > min_corr_coeff .and. s% model_number == 1) then
                      ! try again with smaller correction vector.
@@ -1803,6 +1821,97 @@
          end subroutine store_mix_type_str
 
 
+         subroutine save_rsp2_flux_state
+            integer :: k, i_equ
+
+            i_equ = s% i_rsp2_flux
+            rsp2_flux_dx = s% solver_dx(1:nvar,1:nz)
+            rsp2_flux_resid = equ(i_equ,1:nz)
+            rsp2_flux_Y = s% Y_face(1:nz)
+            rsp2_flux_gradL = s% gradL(1:nz)
+            rsp2_flux_Peos = s% Peos(1:nz)
+            rsp2_flux_T = s% T(1:nz)
+            rsp2_flux_L(1,:) = s% L(1:nz)
+            rsp2_flux_L(2,:) = s% Lr(1:nz)
+            rsp2_flux_L(3,:) = s% Lc(1:nz)
+            rsp2_flux_L(4,:) = s% Lt(1:nz)
+            if (rsp2_flux_equ_iter == 0) then
+               rsp2_flux_scale = max(1d0, abs(s% L(1:nz)), 1d-3*maxval(abs(s% L(1:nz))))
+            else
+               rsp2_flux_scale = max(1d0, abs(s% L_start(1:nz)), 1d-3*maxval(abs(s% L_start(1:nz))))
+            end if
+            ! Save the assembled, column-scaled row before matrix factorization.
+            do k=2,nz
+               rsp2_flux_jac(:,-1,k) = lblk(i_equ,:,k)
+               rsp2_flux_jac(:,0,k) = dblk(i_equ,:,k)
+               if (k < nz) rsp2_flux_jac(:,1,k) = ublk(i_equ,:,k)
+            end do
+         end subroutine save_rsp2_flux_state
+
+
+         subroutine save_rsp2_flux_correction
+            integer :: k
+
+            rsp2_flux_dY = soln(s% i_Y,1:nz)*s% x_scale(s% i_Y,1:nz)
+            do k=2,nz
+               rsp2_flux_linear(k) = rsp2_flux_resid(k) + dot_product(rsp2_flux_jac(:,0,k),soln(:,k)) + &
+                  dot_product(rsp2_flux_jac(:,-1,k),soln(:,k-1))
+               if (k < nz) rsp2_flux_linear(k) = rsp2_flux_linear(k) + &
+                  dot_product(rsp2_flux_jac(:,1,k),soln(:,k+1))
+            end do
+         end subroutine save_rsp2_flux_correction
+
+
+         subroutine report_rsp2_flux_trial(coeff, eval_ierr)
+            real(dp), intent(in) :: coeff
+            integer, intent(in) :: eval_ierr
+            integer :: k, j, indices(2)
+            real(dp) :: delta_scaled(nvar,nz), dR(nvar), L_scale, scale_ratio, R_predicted
+            character(len=*), parameter :: fmt = '(a,6(1x,i0),*(1x,es24.16e3))'
+
+            if (eval_ierr /= 0) then
+               write(*,'(a,5(1x,i0),2(1x,es24.16e3),1x,a)') 'RSP2_flux_trial_failed', &
+                  s% model_number, s% solver_call_number, iter, s% solver_adjust_iter, eval_ierr, &
+                  coeff, s% dt, trim(s% retry_message)
+               return
+            end if
+            indices(1) = 1 + maxloc(abs(rsp2_flux_resid(2:nz)),dim=1)
+            indices(2) = 1 + maxloc(abs(equ(s% i_rsp2_flux,2:nz)),dim=1)
+            delta_scaled = (s% solver_dx(1:nvar,1:nz) - rsp2_flux_dx)/s% x_scale(1:nvar,1:nz)
+            do j=1,2
+               if (j == 2 .and. indices(2) == indices(1)) cycle
+               k = indices(j)
+               L_scale = max(1d0, abs(s% L_start(k)), 1d-3*maxval(abs(s% L_start(1:nz))))
+               scale_ratio = rsp2_flux_scale(k)/L_scale
+               dR = rsp2_flux_jac(:,0,k)*delta_scaled(:,k) + &
+                  rsp2_flux_jac(:,-1,k)*delta_scaled(:,k-1)
+               if (k < nz) dR = dR + rsp2_flux_jac(:,1,k)*delta_scaled(:,k+1)
+               R_predicted = (rsp2_flux_resid(k) + sum(dR))*scale_ratio
+               write(*,fmt) 'RSP2_flux_residual', s% model_number, s% solver_call_number, &
+                  iter, s% solver_adjust_iter, k, s% retry_cnt, coeff, s% dt, &
+                  rsp2_flux_resid(k), equ(s% i_rsp2_flux,k), R_predicted, rsp2_flux_linear(k)*scale_ratio, &
+                  rsp2_flux_scale(k), L_scale, rsp2_flux_resid(k)*rsp2_flux_scale(k), &
+                  equ(s% i_rsp2_flux,k)*L_scale, tol_max_residual
+               write(*,fmt) 'RSP2_flux_Y', s% model_number, s% solver_call_number, &
+                  iter, s% solver_adjust_iter, k, s% retry_cnt, &
+                  s% xh_start(s% i_Y,k), rsp2_flux_Y(k), s% Y_face(k), s% x_scale(s% i_Y,k), &
+                  rsp2_flux_dY(k), coeff*soln(s% i_Y,k)*s% x_scale(s% i_Y,k), s% Y_face(k)-rsp2_flux_Y(k), &
+                  rsp2_flux_jac(s% i_Y,0,k)/s% x_scale(s% i_Y,k)*scale_ratio, &
+                  rsp2_flux_gradL(k), s% gradL(k), s% gradT(k)
+               write(*,fmt) 'RSP2_flux_before', s% model_number, s% solver_call_number, &
+                  iter, s% solver_adjust_iter, k, s% retry_cnt, rsp2_flux_L(:,k), &
+                  rsp2_flux_Peos(k-1), rsp2_flux_Peos(k), rsp2_flux_T(k-1), rsp2_flux_T(k), &
+                  s% dq(k-1), s% dq(k)
+               write(*,fmt) 'RSP2_flux_after', s% model_number, s% solver_call_number, &
+                  iter, s% solver_adjust_iter, k, s% retry_cnt, &
+                  s% L(k), s% Lr(k), s% Lc(k), s% Lt(k), s% Peos(k-1), s% Peos(k), &
+                  s% T(k-1), s% T(k), s% dq(k-1), s% dq(k)
+               write(*,fmt) 'RSP2_flux_dR', s% model_number, s% solver_call_number, &
+                  iter, s% solver_adjust_iter, k, s% retry_cnt, dR*scale_ratio
+            end do
+         end subroutine report_rsp2_flux_trial
+
+
          subroutine write_msg(msg)
             use const_def, only: secyer
             character(*)  :: msg
@@ -1917,6 +2026,26 @@
             allocate(save_ublk1(1:nvar*neq))
             allocate(save_dblk1(1:nvar*neq))
             allocate(save_lblk1(1:nvar*neq))
+
+            if (report_rsp2_flux) then
+               allocate(rsp2_flux_jac(nvar,-1:1,nz), rsp2_flux_dx(nvar,nz), rsp2_flux_L(4,nz), &
+                  rsp2_flux_resid(nz), rsp2_flux_scale(nz), rsp2_flux_Y(nz), rsp2_flux_gradL(nz), &
+                  rsp2_flux_Peos(nz), rsp2_flux_T(nz), rsp2_flux_dY(nz), rsp2_flux_linear(nz))
+               write(*,'(a)') 'RSP2_flux_keys: model solver_call iteration trial k retry'
+               write(*,'(a)') 'RSP2_flux_residual_columns: coeff dt R_before R_after R_predicted R_Newton ' // &
+                  'L_scale_before L_scale_after delta_L_before delta_L_after tol_max'
+               write(*,'(a)') 'RSP2_flux_Y_columns: Y_start Y_before Y_after x_scale ' // &
+                  'dY_Newton dY_requested dY_applied dR_dY gradL_before gradL_after gradT_after'
+               write(*,'(a)') 'RSP2_flux_state_columns: L Lr Lc Lt P_outer P_cell T_outer T_cell dq_outer dq_cell'
+               write(*,'(a,*(1x,a))') 'RSP2_flux_dR_columns:', (trim(s% nameofvar(i)), i=1,nvar)
+               write(*,'(a)') 'RSP2_flux_iteration_columns: model solver_call iteration ' // &
+                  'passed_tolerances coeff max_residual residual_norm'
+               write(*,'(a)') 'RSP2_flux_options_columns: model solver_call dynamic_gradL u_flag matrix_solver'
+               write(*,'(a)') 'RSP2_flux_trial_failed_columns: model solver_call iteration trial ierr coeff dt message'
+               write(*,'(a,2(1x,i0),2(1x,l1),1x,a)') 'RSP2_flux_options', &
+                  s% model_number, s% solver_call_number, s% TDC_use_dynamical_gradL, &
+                  s% u_flag, trim(s% hydro_matrix_solver)
+            end if
 
             band_kl = 2*nvar
             band_ku = 2*nvar

@@ -50,7 +50,7 @@
          use hydro_chem_eqns, only: do_chem_eqns, do1_chem_eqns
          use hydro_energy, only: do1_energy_eqn
          use hydro_temperature, only: do1_dlnT_dm_eqn
-         use hydro_rsp2, only: do1_turbulent_energy_eqn, do1_rsp2_L_eqn, do1_rsp2_Hp_eqn
+         use hydro_rsp2, only: do1_turbulent_energy_eqn, do1_rsp2_L_eqn, do1_rsp2_flux_eqn
          use hydro_alpha_rti_eqns, only: do1_dalpha_RTI_dt_eqn
          use eps_grav, only: zero_eps_grav_and_partials
          use profile, only: do_save_profiles
@@ -69,11 +69,12 @@
             i_lnd, i_lnR, i_lnT, i_lum, i_v, i_u, i_w_div_wc, i_j_rot, &
             i_alpha_RTI, i_xh1, i_xhe4, species
          real(dp) :: L_phot_old
+         type(auto_diff_real_star_order1) :: P_surf_work_ad
          real(dp), dimension(:), pointer :: &
             L, lnR, lnP, lnT, energy
          logical :: v_flag, u_flag, dump_for_debug, &
             do_chem, do_mix, do_dlnd_dt, do_dv_dt, do_du_dt, do_dlnR_dt, &
-            do_alpha_RTI, do_w_div_wc, do_j_rot, do_dlnE_dt, do_equL, do_detrb_dt
+            do_alpha_RTI, do_w_div_wc, do_j_rot, do_dlnE_dt, do_equL, do_detrb_dt, use_P_surf_work
 
          include 'formats'
 
@@ -83,7 +84,8 @@
             call mesa_error(__FILE__,__LINE__,'use_mass_corrections dP not supported with u_flag true')
 
          if (s% u_flag) then
-            call do_uface_and_Pface(s,ierr)
+            ! Reconstruct endpoint face states; the equations time center them once.
+            call do_uface_and_Pface(s, ierr)
             if (ierr /= 0) then
                if (len_trim(s% retry_message) == 0) s% retry_message = 'do_uface_and_Pface failed'
                if (s% report_ierr) write(*,*) 'ierr from do_uface_and_Pface'
@@ -224,7 +226,7 @@
                end if
             end if
 
-            if (do_dlnE_dt) then
+            if (do_dlnE_dt .and. k > 1) then
                call zero_eps_grav_and_partials(s, k)
                call do1_energy_eqn(s, k, do_chem, nvar, op_err)
                if (op_err /= 0) then
@@ -240,15 +242,15 @@
                   if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_turbulent_energy_eqn'
                   ierr = op_err
                end if
-               call do1_rsp2_Hp_eqn(s, k, nvar, op_err)
+               call do1_rsp2_flux_eqn(s, k, nvar, op_err)
                if (op_err /= 0) then
-                  if (s% report_ierr) write(*,2) 'ierr in do1_rsp2_Hp_eqn', k
-                  if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_rsp2_Hp_eqn'
+                  if (s% report_ierr) write(*,2) 'ierr in do1_rsp2_flux_eqn', k
+                  if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_rsp2_flux_eqn'
                   ierr = op_err
                end if
             end if
             if (do_equL) then
-               if (s% RSP2_flag .and. (k > 1 .or. s% RSP2_use_L_eqn_at_surface)) then
+               if (s% RSP2_flag .and. k == 1 .and. s% RSP2_use_L_eqn_at_surface) then
                   call do1_rsp2_L_eqn(s, k, nvar, op_err)
                   if (op_err /= 0) then
                      if (s% report_ierr) write(*,2) 'ierr in do1_rsp2_L_eqn', k
@@ -277,7 +279,7 @@
 !$OMP END PARALLEL DO
 
          if (ierr == 0 .and. nzlo == 1) then
-            call PT_eqns_surf(s, nvar, do_du_dt, do_dv_dt, do_equL, ierr)
+            call PT_eqns_surf(s, nvar, do_du_dt, do_dv_dt, do_equL, P_surf_work_ad, use_P_surf_work, ierr)
             if (ierr /= 0) then
                if (s% report_ierr) write(*,2) 'ierr in PT_eqns_surf', ierr
                if (len_trim(s% retry_message) == 0) s% retry_message = 'error in PT_eqns_surf'
@@ -287,6 +289,21 @@
          if (ierr /= 0) then
             if (s% report_ierr) write(*,*) 'ierr in eval_equ_for_solver'
             return
+         end if
+
+         ! Surface energy work uses the pressure selected by the momentum BC.
+         if (do_dlnE_dt .and. nzlo == 1) then
+            call zero_eps_grav_and_partials(s, 1)
+            if (use_P_surf_work) then
+               call do1_energy_eqn(s, 1, do_chem, nvar, ierr, P_surf_work_ad)
+            else
+               call do1_energy_eqn(s, 1, do_chem, nvar, ierr)
+            end if
+            if (ierr /= 0) then
+               if (s% report_ierr) write(*,2) 'ierr in do1_energy_eqn', 1
+               if (len_trim(s% retry_message) == 0) s% retry_message = 'error in do1_energy_eqn'
+               return
+            end if
          end if
 
          if (.false. .and. s% model_number == 2) then  !  .and. .not. s% doing_relax) then
@@ -719,7 +736,7 @@
       end subroutine do1_dj_rot_dt_eqn
 
 
-      subroutine PT_eqns_surf(s, nvar, do_du_dt, do_dv_dt, do_equL, ierr)
+      subroutine PT_eqns_surf(s, nvar, do_du_dt, do_dv_dt, do_equL, P_surf_work_ad, use_P_surf_work, ierr)
 
          use star_utils, only: save_eqn_residual_info
          use eos_lib, only: Radiation_Pressure
@@ -728,6 +745,8 @@
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
          logical, intent(in) :: do_du_dt, do_dv_dt, do_equL
+         type(auto_diff_real_star_order1), intent(out) :: P_surf_work_ad
+         logical, intent(out) :: use_P_surf_work
          integer, intent(out) :: ierr
 
          type(auto_diff_real_star_order1) :: &
@@ -741,6 +760,8 @@
          !test_partials = (s% solver_iter == s% solver_test_partials_iter_number)
          test_partials = .false.
          ierr = 0
+         P_surf_work_ad = 0d0
+         use_P_surf_work = .false.
          if (s% u_flag) then
             i_P_eqn = s% i_du_dt
          else  ! use this even if not v_flag
@@ -772,8 +793,9 @@
          if (ierr /= 0) return
 
          need_T_surf = .false.
-         if ((.not. do_equL) .or. &
-               s% constant_L .or. (s% RSP2_flag) .or. (s% use_RSP_L_eqn_outer_BC)) then
+         if ((.not. do_equL) .or. s% constant_L .or. &
+               (s% RSP2_flag .and. s% RSP2_use_L_eqn_at_surface) .or. &
+               s% use_RSP_L_eqn_outer_BC) then
             ! no Tsurf BC
          else
             need_T_surf = .true.
@@ -782,8 +804,10 @@
 
          offset_P_to_cell_center = .not. s% use_momentum_outer_BC
 
-         offset_T_to_cell_center = .true.
-         if (s% use_other_surface_PT .or. s% RSP2_flag .or. s% use_RSP_L_eqn_outer_BC) &
+         offset_T_to_cell_center = need_T_surf
+         if (s% use_other_surface_PT .or. &
+               (s% RSP2_flag .and. s% RSP2_use_L_eqn_at_surface) .or. &
+               s% use_RSP_L_eqn_outer_BC) &
             offset_T_to_cell_center = .false.
 
          ! Constant-L tests with an explicit momentum BC need no atmospheric P-T data.
@@ -796,7 +820,6 @@
             if (s% use_momentum_outer_BC) then
                if (s% floor_momentum_outer_BC_at_Prad) then
                   ! Do not let the atmosphere imply negative gas pressure.
-                  Prad_bc_ad = (crad/3d0)*pow4(T_bc_ad)
                   if (P_bc_ad%val < Prad_bc_ad%val) then
                      P_bc_ad = Prad_bc_ad
                      s% P_surf = P_bc_ad%val
@@ -809,7 +832,8 @@
             if (ierr /= 0) return
          end if
 
-         if (do_equL .and. s% constant_L) then
+         if (do_equL .and. s% constant_L .and. &
+               .not. (s% RSP2_flag .and. s% RSP2_use_L_eqn_at_surface)) then
             call do1_constant_L_eqn(s, 1, nvar, ierr)
             if (ierr /= 0) return
          else if (need_T_surf) then
@@ -838,14 +862,11 @@
                lnT_surf, dlnTsurf_dL, dlnTsurf_dlnR, dlnTsurf_dlnM, dlnTsurf_dlnkap, &
                lnP_surf, dlnPsurf_dL, dlnPsurf_dlnR, dlnPsurf_dlnM, dlnPsurf_dlnkap
             real(dp) :: &
-               dlnT_bc_dlnd, dlnT_bc_dlnT, dlnT_bc_dlnR, &
-               dlnT_bc_dL, dlnP_bc_dlnd, dlnP_bc_dlnT, dlnP_bc_dL, dlnP_bc_dlnR, &
-               dlnkap_dlnd, dlnkap_dlnT, dPinv_dlnd, dPinv_dlnT, dP0, dT0, &
-               P_surf, T_surf, dlnP_bc_dlnPsurf, &
-               dlnT_bc_dlnTsurf, P_bc, T_bc, lnT_bc, lnP_bc, &
-               dP0_dlnR, dT0_dlnR, dT0_dlnT, dT0_dlnd, dT0_dL, dlnP_bc_dP0, dlnT_bc_dT0, &
-               d_gradT_dlnR, d_gradT_dlnT00, d_gradT_dlnd00, d_gradT_dL, &
+               dlnP_bc_dlnd, dlnP_bc_dlnT, dlnP_bc_dL, dlnP_bc_dlnR, &
+               dlnkap_dlnd, dlnkap_dlnT, dP0, &
+               P_surf, T_surf, dlnP_bc_dlnPsurf, P_bc, lnP_bc, dP0_dlnR, dlnP_bc_dP0, &
                dlnR00, dlnT00, dlnd00
+            type(auto_diff_real_star_order1) :: dT0_ad
             logical, parameter :: skip_partials = .false.
             include 'formats'
             ierr = 0
@@ -870,17 +891,12 @@
             s% T_surf = T_surf
 
             dP0 = 0
-            dT0 = 0
             if (offset_P_to_cell_center) &
                dP0 = s% cgrav(1)*s% m_grav(1)*s% dm(1)/(8*pi*pow4(r))
-            if (offset_T_to_cell_center) &
-               dT0 = dP0*s% gradT(1)*s% T(1)/s% Peos(1)
 
             P_bc = P_surf + dP0
-            T_bc = T_surf + dT0
 
             lnP_bc = log(P_bc)
-            lnT_bc = log(T_bc)
 
             if (is_bad(P_bc)) then
                write(*,1) 'lnP_bc', lnP_bc
@@ -892,47 +908,14 @@
                call mesa_error(__FILE__,__LINE__,'P bc')
             end if
 
-            if (is_bad(T_bc)) then
-               write(*,1) 'lnT_bc', lnT_bc
-               write(*,1) 'T_bc', T_bc
-               write(*,1) 'T_surf', T_surf
-               write(*,1) 'dP0', dP0
-               write(*,1) 'lnT_surf', lnT_surf
-               call mesa_error(__FILE__,__LINE__,'T bc')
-            end if
-
             dP0_dlnR = 0
             if (offset_P_to_cell_center) then  ! include partials of dP0
                dP0_dlnR = -4*dP0
             end if
 
-            dT0_dlnR = 0
-            dT0_dlnT = 0
-            dT0_dlnd = 0
-            dT0_dL = 0
-            if (offset_T_to_cell_center) then  ! include partials of dT0
-               d_gradT_dlnR = s% gradT_ad(1)%d1Array(i_lnR_00)
-               d_gradT_dlnT00 = s% gradT_ad(1)%d1Array(i_lnT_00)
-               d_gradT_dlnd00 = s% gradT_ad(1)%d1Array(i_lnd_00)
-               d_gradT_dL = s% gradT_ad(1)%d1Array(i_L_00)
-               dT0_dlnR = -4*dT0 + dP0*d_gradT_dlnR*s% T(1)/s% Peos(1)
-               dPinv_dlnT = -s% chiT_for_partials(1)/s% Peos(1)
-               dT0_dlnT = &
-                    dT0 + &
-                    dP0*d_gradT_dlnT00*s% T(1)/s% Peos(1) + &
-                    dP0*s% gradT(1)*s% T(1)*dPinv_dlnT
-               dPinv_dlnd = -s% chiRho_for_partials(1)/s% Peos(1)
-               dT0_dlnd = &
-                    dP0*d_gradT_dlnd00*s% T(1)/s% Peos(1) + &
-                    dP0*s% gradT(1)*s% T(1)*dPinv_dlnd
-               dT0_dL = dP0*d_gradT_dL*s% T(1)/s% Peos(1)
-            end if
-
             dlnP_bc_dP0 = 1/P_bc
-            dlnT_bc_dT0 = 1/T_bc
 
             dlnP_bc_dlnPsurf = P_surf/P_bc
-            dlnT_bc_dlnTsurf = T_surf/T_bc
 
             dlnkap_dlnd = s% d_opacity_dlnd(1)/s% opacity(1)
             dlnkap_dlnT = s% d_opacity_dlnT(1)/s% opacity(1)
@@ -973,43 +956,42 @@
                0d0, 0d0, 0d0, &
                0d0, 0d0, 0d0)
 
-            dlnT_bc_dlnT = dlnT_bc_dlnTsurf*dlnTsurf_dlnkap*dlnkap_dlnT &
-                  + dlnT_bc_dT0*dT0_dlnT
-            dlnT_bc_dlnd = dlnT_bc_dlnTsurf*dlnTsurf_dlnkap*dlnkap_dlnd &
-                  + dlnT_bc_dT0*dT0_dlnd
-            dlnT_bc_dL = dlnT_bc_dlnTsurf*dlnTsurf_dL + dlnT_bc_dT0*dT0_dL
-            dlnT_bc_dlnR = dlnT_bc_dlnTsurf*dlnTsurf_dlnR + dlnT_bc_dT0*dT0_dlnR
+            dlnR00 = T_surf*dlnTsurf_dlnR
+            dlnT00 = T_surf*dlnTsurf_dlnkap*dlnkap_dlnT
+            dlnd00 = T_surf*dlnTsurf_dlnkap*dlnkap_dlnd
+            call wrap(T_bc_ad, T_surf, &
+               0d0, dlnd00, 0d0, &
+               0d0, dlnT00, 0d0, &
+               0d0, 0d0, 0d0, &
+               0d0, dlnR00, 0d0, &
+               0d0, 0d0, 0d0, &
+               0d0, T_surf*dlnTsurf_dL, 0d0, &
+               0d0, 0d0, 0d0, &
+               0d0, 0d0, 0d0, &
+               0d0, 0d0, 0d0, &
+               0d0, 0d0, 0d0, &
+               0d0, 0d0, 0d0)
 
-            dlnR00 = T_bc*dlnT_bc_dlnR
-            dlnT00 = T_bc*dlnT_bc_dlnT
-            dlnd00 = T_bc*dlnT_bc_dlnd
-            call wrap(T_bc_ad, T_bc, &
-               0d0, dlnd00, 0d0, &
-               0d0, dlnT00, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0, dlnR00, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0, T_bc*dlnT_bc_dL, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0, 0d0, 0d0)
-            dlnR00 = dlnT_bc_dlnR
-            dlnT00 = dlnT_bc_dlnT
-            dlnd00 = dlnT_bc_dlnd
-            call wrap(lnT_bc_ad, lnT_bc, &
-               0d0, dlnd00, 0d0, &
-               0d0, dlnT00, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0, dlnR00, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0, dlnT_bc_dL, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0, 0d0, 0d0, &
-               0d0, 0d0, 0d0)
+            ! The pressure floor uses the atmosphere temperature at the outer face.
+            if (need_P_surf .and. s% use_momentum_outer_BC .and. s% floor_momentum_outer_BC_at_Prad) &
+               Prad_bc_ad = (crad/3d0)*pow4(T_bc_ad)
+
+            ! Offset temperature to the cell center independently of the pressure BC.
+            if (offset_T_to_cell_center) then
+               dT0_ad = s% cgrav(1)*s% m_grav(1)*s% dm(1)/(8*pi*pow4(wrap_r_00(s,1)))
+               dT0_ad = dT0_ad*s% gradT_ad(1)*wrap_T_00(s,1)/wrap_Peos_00(s,1)
+               T_bc_ad = T_bc_ad + dT0_ad
+            end if
+            lnT_bc_ad = log(T_bc_ad)
+
+            if (is_bad(T_bc_ad%val)) then
+               write(*,1) 'lnT_bc', lnT_bc_ad%val
+               write(*,1) 'T_bc', T_bc_ad%val
+               write(*,1) 'T_surf', T_surf
+               write(*,1) 'dP0', dP0
+               write(*,1) 'lnT_surf', lnT_surf
+               call mesa_error(__FILE__,__LINE__,'T bc')
+            end if
 
          end subroutine get_PT_bc_ad
 
@@ -1017,25 +999,15 @@
          subroutine set_Tsurf_BC(ierr)
             integer, intent(out) :: ierr
             logical :: test_partials
-            type(auto_diff_real_star_order1) :: &
-               lnT1_ad, dT4_dm, T4_p1, T4_surf, T4_00_actual, T4_00_expected, scale
+            type(auto_diff_real_star_order1) :: lnT1_ad, scale
             real(dp) :: residual
             include 'formats'
             !test_partials = (1 == s% solver_test_partials_k)
             test_partials = .false.
             ierr = 0
-            if (s% RSP2_flag) then  ! interpolate lnT by mass, To do: check what happens when we do this with mlt?
-               T4_p1 = pow4(wrap_T_p1(s,1))
-               T4_surf = pow4(T_bc_ad)
-               dT4_dm = (T4_surf - T4_p1)/(s% dm(1) + 0.5d0*s% dm(2))
-               T4_00_expected = T4_surf - 0.5d0*s% dm(1)*dT4_dm
-               T4_00_actual = pow4(wrap_T_00(s,1))
-               resid_ad = T4_00_expected/T4_00_actual - 1d0
-            else
-               lnT1_ad = wrap_lnT_00(s,1)
-               scale = max(1d0,lnT1_ad)
-               resid_ad = (lnT_bc_ad - lnT1_ad)/scale
-            end if
+            lnT1_ad = wrap_lnT_00(s,1)
+            scale = max(1d0,lnT1_ad)
+            resid_ad = (lnT_bc_ad - lnT1_ad)/scale
             residual = resid_ad%val
             s% equ(s% i_equL, 1) = residual
             if (is_bad(residual)) then
@@ -1088,6 +1060,8 @@
             integer, intent(out) :: ierr
             include 'formats'
             ierr = 0
+            P_surf_work_ad = P_bc_ad
+            use_P_surf_work = s% u_flag .or. s% v_flag
             if (s% u_flag) then
                call do_surf_Riemann_dudt_eqn(s, P_bc_ad, nvar, ierr)
             else

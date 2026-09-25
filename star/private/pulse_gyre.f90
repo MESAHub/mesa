@@ -20,18 +20,43 @@
 module pulse_gyre
 
   use star_private_def
-  use const_def, only: dp, pi, four_thirds, rsun
+  use const_def, only: dp, pi, four_thirds, rsun, no_mixing, sqrt_2_div_3
   use utils_lib
   use atm_def
   use atm_support
   use eps_grav
   use pulse_utils
+  use star_utils, only: get_rho_face_val, get_scale_height_face_val
 
   implicit none
 
   private
   public :: get_gyre_data
   public :: write_gyre_data
+
+  integer, parameter :: gyre_schema_101_ncols = 18
+  integer, parameter :: gyre_schema_120_ncols = 19
+  integer, parameter :: gyre_schema_130_ncols = 38
+
+  integer, parameter :: i_tdc_l_conv0 = 20
+  integer, parameter :: i_tdc_a0 = 21
+  integer, parameter :: i_tdc_d_conv_h = 22
+  integer, parameter :: i_tdc_hp_face = 23
+  integer, parameter :: i_tdc_alpha_mlt_face = 24
+  integer, parameter :: i_tdc_cp_face = 25
+  integer, parameter :: i_tdc_chiT_face = 26
+  integer, parameter :: i_tdc_chiRho_face = 27
+  integer, parameter :: i_tdc_gradL_face = 28
+  integer, parameter :: i_tdc_gradT_face = 29
+  integer, parameter :: i_tdc_alpha_C = 30
+  integer, parameter :: i_tdc_alpha_S = 31
+  integer, parameter :: i_tdc_alpha_D = 32
+  integer, parameter :: i_tdc_alpha_R = 33
+  integer, parameter :: i_tdc_alpha_Pt = 34
+  integer, parameter :: i_tdc_alpha_M = 35
+  integer, parameter :: i_tdc_include_mlt_corr = 36
+  integer, parameter :: i_tdc_mlt_Pturb_factor = 37
+  integer, parameter :: i_tdc_mlt_Pturb0 = 38
 
 contains
 
@@ -79,6 +104,7 @@ contains
     integer                  :: j
     integer                  :: k
     integer                  :: sg
+    logical                  :: static_background
 
     ! Get model data for GYRE output
 
@@ -86,6 +112,28 @@ contains
     if (ierr /= 0) then
        write(*,*) 'bad star id for get_gyre_data'
        return
+    end if
+
+    if (s%gyre_data_schema == 130 .and. .not. s%gyre_write_tdc_lna_background) then
+       write(*,*) 'gyre_data_schema = 130 requires gyre_write_tdc_lna_background'
+       ierr = -1
+       return
+    end if
+    if (s%gyre_write_tdc_lna_background) then
+       if (s%gyre_data_schema /= 130) then
+          write(*,*) 'gyre_write_tdc_lna_background requires gyre_data_schema = 130'
+          ierr = -1
+          return
+       end if
+       if (trim(s%MLT_option) /= 'TDC') then
+          write(*,*) 'gyre_write_tdc_lna_background requires MLT_option = ''TDC'''
+          ierr = -1
+          return
+       end if
+       if (s%harmonic_dissipation_length_beta > 0d0) then
+          write(*,'(a)') 'WARNING: GYRE schema 130 does not support the harmonic TDC mixing length.'
+          write(*,'(a)') 'GYRE will use Lambda = mixing_length_alpha*Hp_face from the exported data.'
+       end if
     end if
 
     ! Set up segment indices
@@ -133,7 +181,7 @@ contains
 
     case(101,110)
 
-       allocate(point_data(18,nn))
+       allocate(point_data(gyre_schema_101_ncols,nn))
 
        r => point_data(1,:)
        m => point_data(2,:)
@@ -156,7 +204,31 @@ contains
 
     case(120)
 
-       allocate(point_data(19,nn))
+       allocate(point_data(gyre_schema_120_ncols,nn))
+
+       r => point_data(1,:)
+       m => point_data(2,:)
+       L => point_data(3,:)
+       P => point_data(4,:)
+       T => point_data(5,:)
+       rho => point_data(6,:)
+       nabla => point_data(7,:)
+       N2 => point_data(8,:)
+       Gamma_1 => point_data(9,:)
+       nabla_ad => point_data(10,:)
+       delta => point_data(11,:)
+       kap => point_data(12,:)
+       kap_kap_T => point_data(13,:)
+       kap_kap_rho => point_data(14,:)
+       eps_nuc => point_data(15,:)
+       eps_eps_T => point_data(16,:)
+       eps_eps_rho => point_data(17,:)
+       eps_grav => point_data(18,:)
+       Omega_rot => point_data(19,:)
+
+    case(130)
+
+       allocate(point_data(gyre_schema_130_ncols,nn))
 
        r => point_data(1,:)
        m => point_data(2,:)
@@ -186,18 +258,22 @@ contains
 
     end select
 
-    ! If necessary, update the eps_grav data in the model
+    ! A static snapshot has no evolution interval for eps_grav.
 
+    static_background = s%gyre_write_tdc_lna_background .and. s%dt <= 0d0
     if (ASSOCIATED(eps_grav)) then
-
-       do k = 1, s%nz
-          call eval_eps_grav_and_partials(s, k, ierr)
-          if (ierr /= 0) then
-             write(*,*) 'failed in call to eval_eps_grav_and_partials'
-             return
-          end if
-       end do
-
+       if (static_background) then
+          eps_grav = 0d0
+          write(*,'(a)') 'GYRE TDC export: static snapshot; using eps_grav = 0.'
+       else
+          do k = 1, s%nz
+             call eval_eps_grav_and_partials(s, k, ierr)
+             if (ierr /= 0) then
+                write(*,*) 'failed in call to eval_eps_grav_and_partials'
+                return
+             end if
+          end do
+       end if
     end if
 
     ! Store global data
@@ -309,6 +385,8 @@ contains
          Omega_rot(j) = 0d0
       end if
 
+      call store_tdc_lna_point_defaults(j)
+
       return
 
     end subroutine store_point_data_atm
@@ -349,13 +427,16 @@ contains
       eps_nuc(j) = eval_face(s%dq, s%eps_nuc, k, k_a, k_b)
       eps_eps_T(j) = eval_face(s%dq, s%d_epsnuc_dlnT, k, k_a, k_b)
       eps_eps_rho(j) = eval_face(s%dq, s%d_epsnuc_dlnd, k, k_a, k_b)
-      if (ASSOCIATED(eps_grav)) eps_grav(j) = eval_face(s%dq, s%eps_grav_ad%val, k, k_a, k_b)
+      if (ASSOCIATED(eps_grav) .and. .not. static_background) &
+         eps_grav(j) = eval_face(s%dq, s%eps_grav_ad%val, k, k_a, k_b)
 
       if (s%rotation_flag) then
          Omega_rot(j) = s%omega(k)  ! Not quite right; omega can be discontinuous
       else
          Omega_rot = 0d0
       end if
+
+      call store_tdc_lna_point_env(j, k, k_a, k_b)
 
       return
 
@@ -400,7 +481,8 @@ contains
       eps_nuc(j) = eval_center(s%rmid, s%eps_nuc, k_a, k_b)
       eps_eps_T(j) = eval_center(s%rmid, s%d_epsnuc_dlnT, k_a, k_b)
       eps_eps_rho(j) = eval_center(s%rmid, s%d_epsnuc_dlnd, k_a, k_b)
-      if (ASSOCIATED(eps_grav)) eps_grav(j) = eval_center(s%rmid, s%eps_grav_ad%val, k_a, k_b)
+      if (ASSOCIATED(eps_grav) .and. .not. static_background) &
+         eps_grav(j) = eval_center(s%rmid, s%eps_grav_ad%val, k_a, k_b)
 
       if (s%rotation_flag) then
          Omega_rot(j) = eval_center(s%r, s%omega, k_a, k_b)
@@ -408,10 +490,90 @@ contains
          Omega_rot(j) = 0d0
       end if
 
+      call store_tdc_lna_point_defaults(j)
 
       return
 
     end subroutine store_point_data_ctr
+
+
+    subroutine store_tdc_lna_point_defaults(j)
+
+      integer, intent(in) :: j
+
+      if (SIZE(point_data, 1) < gyre_schema_130_ncols) return
+
+      point_data(i_tdc_l_conv0:gyre_schema_130_ncols,j) = 0d0
+      if (.not. s%gyre_write_tdc_lna_background) return
+
+      point_data(i_tdc_alpha_C,j) = s%TDC_alpha_C
+      point_data(i_tdc_alpha_S,j) = s%TDC_alpha_S
+      point_data(i_tdc_alpha_D,j) = s%TDC_alpha_D
+      point_data(i_tdc_alpha_R,j) = s%TDC_alpha_R
+      point_data(i_tdc_alpha_Pt,j) = s%TDC_alpha_Pt
+      point_data(i_tdc_alpha_M,j) = s%TDC_alpha_M
+      point_data(i_tdc_include_mlt_corr,j) = merge(1d0, 0d0, s%include_mlt_corr_to_TDC)
+      point_data(i_tdc_mlt_Pturb_factor,j) = s%mlt_Pturb_factor
+
+    end subroutine store_tdc_lna_point_defaults
+
+
+    subroutine store_tdc_lna_point_env(j, k, k_a, k_b)
+
+      integer, intent(in) :: j
+      integer, intent(in) :: k
+      integer, intent(in) :: k_a
+      integer, intent(in) :: k_b
+
+      real(dp) :: Cp_face
+      real(dp) :: Hp_face
+      real(dp) :: Y_face
+      real(dp) :: denom
+
+      call store_tdc_lna_point_defaults(j)
+
+      if (.not. s%gyre_write_tdc_lna_background) return
+
+      Hp_face = get_scale_height_face_val(s, k)
+      Cp_face = eval_face(s%dq, s%Cp, k, k_a, k_b)
+      Y_face = s%gradT(k) - s%gradL(k)
+
+      ! Schema 130 exports the legacy Lambda = mixing_length_alpha*Hp_face.
+      point_data(i_tdc_hp_face,j) = Hp_face
+      point_data(i_tdc_alpha_mlt_face,j) = s%mixing_length_alpha
+      point_data(i_tdc_cp_face,j) = Cp_face
+      point_data(i_tdc_chiT_face,j) = eval_face(s%dq, s%chiT, k, k_a, k_b)
+      point_data(i_tdc_chiRho_face,j) = eval_face(s%dq, s%chiRho, k, k_a, k_b)
+      point_data(i_tdc_gradL_face,j) = s%gradL(k)
+      point_data(i_tdc_gradT_face,j) = s%gradT(k)
+
+      if (.not. tdc_lna_has_convective_velocity(k)) return
+
+      point_data(i_tdc_l_conv0,j) = s%L_conv(k)
+      point_data(i_tdc_a0,j) = s%mlt_vc(k)/sqrt_2_div_3
+      if (s%mlt_Pturb_factor > 0d0) &
+         point_data(i_tdc_mlt_Pturb0,j) = &
+            s%mlt_Pturb_factor*get_rho_face_val(s,k)*s%mlt_vc(k)*s%mlt_vc(k)/3d0
+      ! Infer D from F_conv = rho*T*Cp*D*(gradT - gradL)/Hp.
+      denom = 4d0*pi*r(j)*r(j)*rho(j)*T(j)*Cp_face*Y_face
+      if (denom > 0d0 .and. s%L_conv(k) > 0d0) &
+         point_data(i_tdc_d_conv_h,j) = s%L_conv(k)*Hp_face/denom
+
+    end subroutine store_tdc_lna_point_env
+
+
+    logical function tdc_lna_has_convective_velocity(k) result(has_velocity)
+
+      integer, intent(in) :: k
+
+      has_velocity = s%mixing_length_alpha > 0d0 .and. &
+         trim(s%MLT_option) == 'TDC' .and. &
+         k > s%TDC_num_outermost_cells_forced_nonturbulent .and. &
+         k <= s%nz - s%TDC_num_innermost_cells_forced_nonturbulent .and. &
+         s%mlt_mixing_type(k) /= no_mixing .and. &
+         s%mlt_vc(k) > 0d0
+
+    end function tdc_lna_has_convective_velocity
 
   end subroutine get_gyre_data
 
@@ -438,7 +600,7 @@ contains
     end if
 
     select case(s%gyre_data_schema)
-    case(101,120)
+    case(101,120,130)
     case default
        write(*,*) 'invalid gyre_data_schema'
        ierr = -1

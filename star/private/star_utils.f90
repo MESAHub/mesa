@@ -1101,7 +1101,8 @@
             s% photosphere_r, s% photosphere_m, s% photosphere_v, &
             s% photosphere_L, s% photosphere_T, s% photosphere_csound, &
             s% photosphere_opacity, s% photosphere_logg, &
-            s% photosphere_column_density, s% photosphere_cell_k)
+            s% photosphere_column_density, s% photosphere_cell_k, &
+            s% photosphere_v_start)
          s% photosphere_black_body_T = &
             atm_black_body_T(s% photosphere_L, s% photosphere_r)
          s% Teff = s% photosphere_black_body_T
@@ -1126,14 +1127,15 @@
       end subroutine set_phot_info
 
 
-      subroutine get_phot_info(s,r,m,v,L,T_phot,cs,kap,logg,ysum,k_phot)
+      subroutine get_phot_info(s,r,m,v,L,T_phot,cs,kap,logg,ysum,k_phot,v_start)
          type (star_info), pointer :: s
          real(dp), intent(out) :: r, m, v, L, T_phot, cs, kap, logg, ysum
          integer, intent(out) :: k_phot
+         real(dp), intent(out), optional :: v_start
 
          integer :: k
          real(dp) :: tau00, taup1, dtau, r003, rp13, r3, tau_phot, &
-            Tface_0, Tface_1
+            Tface_0, Tface_1, frac
 
          include 'formats'
 
@@ -1142,10 +1144,13 @@
          m = s% m(1)
          if (s% u_flag) then
             v = s% u(1)
+            if (present(v_start)) v_start = s% u_start(1)
          else if (s% v_flag) then
             v = s% v(1)
+            if (present(v_start)) v_start = s% v_start(1)
          else
             v = 0d0
+            if (present(v_start)) v_start = 0d0
          end if
          L = max(1d0, s% L(1))  ! don't use negative L(1)
          T_phot = s% T(1)
@@ -1166,25 +1171,30 @@
             taup1 = tau00 + dtau
             ysum = ysum + s% rho(k)*(s% r(k) - s% r(k+1))
             if (taup1 >= tau_phot .and. dtau > 0d0) then
+               frac = (tau_phot - tau00)/dtau
                if (k == 1) then
                   Tface_0 = s% T_surf
                else
                   Tface_0 = 0.5d0*(s% T(k) + s% T(k-1))
                end if
                Tface_1 = 0.5d0*(s% T(k) + s% T(k+1))
-               T_phot = Tface_0 + (Tface_1 - Tface_0)*(tau_phot - tau00)/dtau
+               T_phot = Tface_0 + (Tface_1 - Tface_0)*frac
                r003 = s% r(k)*s% r(k)*s% r(k)
                rp13 = s% r(k+1)*s% r(k+1)*s% r(k+1)
-               r3 = r003 + (rp13 - r003)*(tau_phot - tau00)/dtau
+               r3 = r003 + (rp13 - r003)*frac
                r = pow(r3,one_third)
-               m = s% m(k) - s% dm(k)*(tau_phot - tau00)/dtau
+               m = s% m(k) - s% dm(k)*frac
                if (s% u_flag) then
-                  v = s% v_center
-                  ! skip it since get_phot_info can be called before u_face has been set
+                  v = interp_phot_u(s, s% u, k, frac)
+                  if (present(v_start)) &
+                     v_start = interp_phot_u(s, s% u_start, k, frac)
                else if (s% v_flag) then
-                  v = s% v(k) + (s% v(k+1) - s% v(k))*(tau_phot - tau00)/dtau
+                  v = s% v(k) + (s% v(k+1) - s% v(k))*frac
+                  if (present(v_start)) &
+                     v_start = s% v_start(k) + &
+                        (s% v_start(k+1) - s% v_start(k))*frac
                end if
-               L = s% L(k) + (s% L(k+1) - s% L(k))*(tau_phot - tau00)/dtau
+               L = s% L(k) + (s% L(k+1) - s% L(k))*frac
                L = max(1d0, L)  ! blackbody temperature requires positive luminosity
                logg = safe_log10(s% cgrav(k_phot)*m/(r*r))
                k_phot = k
@@ -1200,12 +1210,31 @@
          r = s% R_center
          m = s% m_center
          v = s% v_center
+         if (present(v_start)) v_start = s% v_center
          T_phot = s% T(k_phot)
          L = max(1d0, s% L_center)
          cs = s% csound(k_phot)
          kap = s% opacity(k_phot)
          logg = safe_log10(s% cgrav(k_phot)*m/(r*r))
       end subroutine get_phot_info
+
+
+      real(dp) function interp_phot_u(s, u, k, frac) result(v)
+         type (star_info), pointer :: s
+         real(dp), intent(in) :: u(:), frac
+         integer, intent(in) :: k
+         real(dp) :: alfa, beta, v_outer, v_inner
+
+         if (k == 1) then
+            v_outer = u(1)
+         else
+            call get_face_weights(s, k, alfa, beta)
+            v_outer = alfa*u(k) + beta*u(k-1)
+         end if
+         call get_face_weights(s, k+1, alfa, beta)
+         v_inner = alfa*u(k+1) + beta*u(k)
+         v = v_outer + (v_inner - v_outer)*frac
+      end function interp_phot_u
 
 
       real(dp) function center_value(s, p)
@@ -1628,7 +1657,7 @@
             dw_m1, dw_00, dw_p1, &
             dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
-            dHp_m1, dHp_00, dHp_p1, &
+            dY_m1, dY_00, dY_p1, &
             dw_div_wc_m1, dw_div_wc_00, dw_div_wc_p1, &
             djrot_m1, djrot_00, djrot_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
@@ -1640,7 +1669,7 @@
             dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
             dw_m1, dw_00, dw_p1, dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
-            dHp_m1, dHp_00, dHp_p1, &
+            dY_m1, dY_00, dY_p1, &
             dw_div_wc_m1, dw_div_wc_00, dw_div_wc_p1, &
             djrot_m1, djrot_00, djrot_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
@@ -1654,7 +1683,7 @@
          if (s% i_u /= 0) call unpack1(s% i_u, dv_m1, dv_00, dv_p1)
          if (s% i_lum /= 0) call unpack1(s% i_lum, dL_m1, dL_00, dL_p1)
          if (s% i_w /= 0) call unpack1(s% i_w, dw_m1, dw_00, dw_p1)
-         if (s% i_Hp /= 0) call unpack1(s% i_Hp, dHp_m1, dHp_00, dHp_p1)
+         if (s% i_Y /= 0) call unpack1(s% i_Y, dY_m1, dY_00, dY_p1)
          if (s% i_w_div_wc /= 0) call unpack1(s% i_w_div_wc, dw_div_wc_m1, dw_div_wc_00, dw_div_wc_p1)
          if (s% i_j_rot /= 0) call unpack1(s% i_j_rot, djrot_m1, djrot_00, djrot_p1)
 
@@ -2395,11 +2424,35 @@
       end function eval_deltaM_total_from_profile
 
 
-      real(dp) function cell_specific_total_energy(s, k) result(cell_total)
+      real(dp) function tdc_cell_specific_turbulent_energy( &
+            s, k, use_mlt_vc_old) result(cell_turbulent_energy)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         real(dp) :: d_dv00,d_dvp1,d_dlnR00,d_dlnRp1
+         logical, intent(in) :: use_mlt_vc_old
+
+         if (use_mlt_vc_old) then
+            cell_turbulent_energy = 0.75d0*pow2(s% mlt_vc_old(k))
+            if (k < s% nz) cell_turbulent_energy = cell_turbulent_energy + &
+               0.75d0*pow2(s% mlt_vc_old(k+1))
+         else
+            cell_turbulent_energy = 0.75d0*pow2(s% mlt_vc(k))
+            if (k < s% nz) cell_turbulent_energy = cell_turbulent_energy + &
+               0.75d0*pow2(s% mlt_vc(k+1))
+         end if
+      end function tdc_cell_specific_turbulent_energy
+
+
+      real(dp) function cell_specific_total_energy( &
+            s, k, use_TDC_mlt_vc_old) result(cell_total)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         logical, intent(in), optional :: use_TDC_mlt_vc_old
+         real(dp) :: d_dv00, d_dvp1, d_dlnR00, d_dlnRp1
+         logical :: use_old_mlt_vc
          include 'formats'
+         use_old_mlt_vc = .false.
+         if (present(use_TDC_mlt_vc_old)) &
+            use_old_mlt_vc = use_TDC_mlt_vc_old
          cell_total = s% energy(k)
          if (s% v_flag .or. s% u_flag) &
             cell_total = cell_total + cell_specific_KE(s,k,d_dv00,d_dvp1)
@@ -2407,6 +2460,11 @@
          if (s% rotation_flag .and. s% include_rotation_in_total_energy) &
                cell_total = cell_total + cell_specific_rotational_energy(s,k)
          if (s% RSP2_flag) cell_total = cell_total + pow2(s% w(k))
+         if (.not. s%RSP2_flag .and. s%MLT_option == 'TDC' .and. &
+               s%TDC_include_eturb_in_energy_equation) then
+            cell_total = cell_total + &
+               tdc_cell_specific_turbulent_energy(s, k, use_old_mlt_vc)
+         end if
          if (s% rsp_flag) cell_total = cell_total + s% RSP_Et(k)
       end function cell_specific_total_energy
 
@@ -2442,7 +2500,7 @@
             total_energy_profile, &
             total_internal_energy, total_gravitational_energy, &
             total_radial_kinetic_energy, total_rotational_kinetic_energy, &
-            total_turbulent_energy, sum_total)
+            total_turbulent_energy, sum_total, use_TDC_mlt_vc_old)
          type (star_info), pointer :: s
          integer, intent(in) :: klo, khi  ! sum from klo to khi
          real(dp), intent(in) :: deltaM
@@ -2452,9 +2510,16 @@
             total_internal_energy, total_gravitational_energy, &
             total_radial_kinetic_energy, total_rotational_kinetic_energy, &
             total_turbulent_energy, sum_total
+         logical, intent(in), optional :: use_TDC_mlt_vc_old
          integer :: k
-         real(dp) :: dm, sum_dm, cell_total, cell1, d_dv00, d_dvp1, d_dlnR00, d_dlnRp1, alfa, beta,TDC_eturb_cell
+         real(dp) :: dm, sum_dm, cell_total, cell1, d_dv00, d_dvp1, &
+            d_dlnR00, d_dlnRp1
+         logical :: use_old_mlt_vc
          include 'formats'
+
+         use_old_mlt_vc = .false.
+         if (present(use_TDC_mlt_vc_old)) &
+            use_old_mlt_vc = use_TDC_mlt_vc_old
 
          total_internal_energy = 0d0
          total_gravitational_energy = 0d0
@@ -2471,6 +2536,7 @@
             cell_total = 0
             dm = s% dm(k)
             if (sum_dm + dm > deltaM) dm = deltaM - sum_dm
+            sum_dm = sum_dm + dm
             cell1 = dm*s% energy(k)
             cell_total = cell_total + cell1
             total_internal_energy = total_internal_energy + cell1
@@ -2493,14 +2559,9 @@
                cell_total = cell_total + cell1
                total_turbulent_energy = total_turbulent_energy + cell1
             else if ( s% MLT_option == 'TDC' .and. &
-               s% TDC_include_eturb_in_energy_equation) then ! needs corrected s% mlt_vc(k) >= 0 causes failures.
-               if (k < s% nz) then
-                  TDC_eturb_cell = 0.75d0*(pow2(s% mlt_vc(k)) + &
-                     pow2(s% mlt_vc(k+1)))
-               else ! k == s% nz
-                  TDC_eturb_cell = 0.75d0*pow2(s% mlt_vc(k))
-               end if
-               cell1 = dm*TDC_eturb_cell
+                  s% TDC_include_eturb_in_energy_equation) then
+               cell1 = dm*tdc_cell_specific_turbulent_energy( &
+                  s, k, use_old_mlt_vc)
                cell_total = cell_total + cell1
                total_turbulent_energy = total_turbulent_energy + cell1
             end if
@@ -2551,6 +2612,11 @@
                cell1 = dm*pow2(s% w(k))
                cell_total = cell_total + cell1
             end if
+            if (.not. s%RSP2_flag .and. s%MLT_option == 'TDC' .and. &
+                  s%TDC_include_eturb_in_energy_equation) then
+               cell_total = cell_total + &
+                  dm*tdc_cell_specific_turbulent_energy(s, k, .false.)
+            end if
             if (s% rsp_flag) then
                cell1 = dm*s% RSP_Et(k)
                cell_total = cell_total + cell1
@@ -2583,12 +2649,13 @@
       subroutine eval_total_energy_integrals(s, &
             total_internal_energy, total_gravitational_energy, &
             total_radial_kinetic_energy, total_rotational_kinetic_energy, &
-            total_turbulent_energy, sum_total)
+            total_turbulent_energy, sum_total, use_TDC_mlt_vc_old)
          type (star_info), pointer :: s
          real(dp), intent(out) :: &
             total_internal_energy, total_gravitational_energy, &
             total_radial_kinetic_energy, total_rotational_kinetic_energy, &
             total_turbulent_energy, sum_total
+         logical, intent(in), optional :: use_TDC_mlt_vc_old
          real(dp), allocatable, dimension(:) :: total_energy_profile
          allocate(total_energy_profile(1:s% nz))
          call eval_deltaM_total_energy_integrals( &
@@ -2596,7 +2663,7 @@
             total_energy_profile, &
             total_internal_energy, total_gravitational_energy, &
             total_radial_kinetic_energy, total_rotational_kinetic_energy, &
-            total_turbulent_energy, sum_total)
+            total_turbulent_energy, sum_total, use_TDC_mlt_vc_old)
       end subroutine eval_total_energy_integrals
 
 
@@ -3315,7 +3382,8 @@
       end subroutine get1_lpp
 
 
-      subroutine calc_Ptrb_ad_tw(s, k, Ptrb, Ptrb_div_etrb, ierr)
+      subroutine calc_Ptrb_ad_tw( &
+            s, k, Ptrb, Ptrb_div_etrb, ierr, allow_time_centering)
          ! note: Ptrb_div_etrb is not time weighted
          ! erg cm^-3 = g cm^2 s^-2 cm^-3 = g cm^-1 s^-2
          use auto_diff
@@ -3324,27 +3392,31 @@
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(out) :: Ptrb, Ptrb_div_etrb
          integer, intent(out) :: ierr
+         logical, intent(in), optional :: allow_time_centering
          type(auto_diff_real_star_order1) :: etrb, rho
          real(dp) :: Ptrb_start
          real(dp), parameter :: x_ALFAP = 2.d0/3.d0
-         logical :: time_center, test_partials
+         logical :: do_time_centering, time_center, test_partials
          include 'formats'
          ierr = 0
+         do_time_centering = .true.
+         if (present(allow_time_centering)) &
+            do_time_centering = allow_time_centering
          if (s% RSP2_alfap == 0 .or. s% mixing_length_alpha == 0 .or. &
                k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
-               k > s% nz - int(s% nz/s% RSP_nz_div_IBOTOM)) then
+               k > s% nz - int(s% nz/s% RSP2_nz_div_IBOTOM)) then
             Ptrb_div_etrb = 0d0
             Ptrb = 0d0
             return
          end if
          rho = wrap_d_00(s,k)
          etrb = wrap_etrb_00(s,k)
-         Ptrb_div_etrb = s% RSP2_alfap*x_ALFAP*etrb*rho
+         Ptrb_div_etrb = s% RSP2_alfap*x_ALFAP*rho
          Ptrb = Ptrb_div_etrb*etrb  ! cm^2 s^-2 g cm^-3 = erg cm^-3
-         time_center = (s% using_velocity_time_centering .and. &
+         time_center = (do_time_centering .and. s% using_velocity_time_centering .and. &
                   s% include_P_in_velocity_time_centering)
          if (time_center) then
-            Ptrb_start = s% RSP2_alfap*get_etrb_start(s,k)*s% rho_start(k)
+            Ptrb_start = s% RSP2_alfap*x_ALFAP*get_etrb_start(s,k)*s% rho_start(k)
             Ptrb = s% P_theta_for_velocity_time_centering*Ptrb + &
                (1d0 - s% P_theta_for_velocity_time_centering)*Ptrb_start
          end if
@@ -3368,9 +3440,11 @@
       end subroutine calc_Ptrb_ad_tw
 
 
-      ! Ptot_ad = Peos_ad + Pvsc_ad + Ptrb_ad + mlt_Pturb_ad with time weighting
+      ! Ptot_ad = Peos_ad + Pvsc_ad + Ptrb_ad + mlt_Pturb_ad.
+      ! Nonlinear hydro time weighting is enabled by default.
       subroutine calc_Ptot_ad_tw( &
-            s, k, skip_Peos, skip_mlt_Pturb, Ptot_ad, d_Ptot_dxa, ierr)
+            s, k, skip_Peos, skip_mlt_Pturb, Ptot_ad, d_Ptot_dxa, ierr, &
+            allow_time_centering, mlt_vc_ad)
          use auto_diff_support
           type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -3378,17 +3452,22 @@
          type(auto_diff_real_star_order1), intent(out) :: Ptot_ad
          real(dp), dimension(s% species), intent(out) :: d_Ptot_dxa
          integer, intent(out) :: ierr
+         logical, intent(in), optional :: allow_time_centering
+         type(auto_diff_real_star_order1), intent(in), optional :: mlt_vc_ad
          integer :: j
          real(dp) :: mlt_Pturb_start, alfa, beta
          type(auto_diff_real_star_order1) :: &
             Peos_ad, Pvsc_ad, Ptrb_ad, mlt_Pturb_ad, Ptrb_ad_div_etrb
-         logical :: time_center
+         logical :: do_time_centering, time_center
          include 'formats'
 
          ierr = 0
+         do_time_centering = .true.
+         if (present(allow_time_centering)) &
+            do_time_centering = allow_time_centering
          d_Ptot_dxa = 0d0
 
-         time_center = (s% using_velocity_time_centering .and. &
+         time_center = (do_time_centering .and. s% using_velocity_time_centering .and. &
                   s% include_P_in_velocity_time_centering .and. &
                   s% lnT(k)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering)
          if (time_center) then
@@ -3417,14 +3496,19 @@
 
          Ptrb_ad = 0d0
          if (s% RSP2_flag) then
-            call calc_Ptrb_ad_tw(s, k, Ptrb_ad, Ptrb_ad_div_etrb, ierr)
+            call calc_Ptrb_ad_tw( &
+               s, k, Ptrb_ad, Ptrb_ad_div_etrb, ierr, do_time_centering)
             if (ierr /= 0) return
             ! note that Ptrb_ad is already time weighted
          end if
 
          mlt_Pturb_ad = 0d0
          if ((.not. skip_mlt_Pturb) .and. s% mlt_Pturb_factor > 0d0 .and. k > 1) then
-            mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*get_rho_face(s,k)/3d0
+            if (present(mlt_vc_ad)) then
+               mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(mlt_vc_ad)*get_rho_face(s,k)/3d0
+            else
+               mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*get_rho_face(s,k)/3d0
+            end if
             if (time_center) then
                mlt_Pturb_start = &
                   s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*(s% rho_start(k-1) + s% rho_start(k))/6d0

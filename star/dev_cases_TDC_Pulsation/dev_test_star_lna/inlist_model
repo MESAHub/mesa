@@ -1,0 +1,14 @@
+! RGB tip model from the test suite. No local model copy is needed.
+&star_job
+   load_model_filename = '../../test_suite/1M_pre_ms_to_wd/standard_start_he_core_flash.mod'
+/
+&kap
+   Zbase = 0.02d0
+   kap_file_prefix = 'gs98'
+   kap_CO_prefix = 'gs98_co'
+   kap_lowT_prefix = 'lowT_fa05_gs98'
+   use_Type2_opacities = .true.
+/
+&controls
+   mixing_length_alpha = 2d0
+/

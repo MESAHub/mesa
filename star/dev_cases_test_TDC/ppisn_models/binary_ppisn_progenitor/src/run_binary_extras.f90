@@ -125,6 +125,10 @@ contains
        return
     end if
 
+    ! ixtra(1): last accepted binary model checked for a stopping condition.
+    b% ixtra(1) = -1
+    b% ixtra_old(1) = -1
+
     if (.not. restart) then
        b% lxtra(1) = .false. ! flag for end of donor's main sequence
        b% lxtra(2) = .false. ! flag for beginning RLOF
@@ -147,92 +151,107 @@ contains
   end function  extras_binary_startup
 
   integer function extras_binary_start_step(binary_id,ierr)
-    use binary_lib, only: binary_set_separation_eccentricity
+    use binary_lib, only: binary_set_point_mass_i, binary_set_separation_eccentricity
     type (binary_info), pointer :: b
+    type (star_info), pointer :: s
     integer, intent(in) :: binary_id
     integer, intent(out) :: ierr
-    character (len=200) :: fname
+    integer :: i
+    logical :: finished(2)
 
     extras_binary_start_step = keep_going
     call binary_ptr(binary_id, b, ierr)
-    if (ierr /= 0) then ! failure in  binary_ptr
+    if (ierr /= 0) return
+
+    ! Do not act on cached central values from a rejected trial.
+    if (b% ixtra(1) == b% model_number) return
+    b% ixtra(1) = b% model_number
+    b% ixtra_old(1) = b% model_number
+
+    ! Check each evolved star before taking another step; never access a missing model.
+    finished = .false.
+    if (b% have_star_1 .and. b% point_mass_i /= 1) then
+       finished(1) = reached_stopping_condition(b% s1, ierr)
+       if (ierr /= 0) return
+    end if
+    if (b% have_star_2 .and. b% point_mass_i /= 2) then
+       finished(2) = reached_stopping_condition(b% s2, ierr)
+       if (ierr /= 0) return
+    end if
+    if (.not. any(finished)) return
+
+    do i = 1, 2
+       if (.not. finished(i)) cycle
+       call star_ptr(b% star_ids(i), s, ierr)
+       if (ierr /= 0) return
+       write(*,'(a,i0,2a)') 'star ', i, ': writing model to ', trim(s% job% save_model_filename)
+       call star_write_model(s% id, trim(s% job% save_model_filename), ierr)
+       if (ierr /= 0) return
+       call star_write_profile_info(s% id, trim(s% log_directory)//'/final_profile.data', ierr)
+       if (ierr /= 0) return
+       write(*,'(a,i0,a,i0)') 'star ', i, ' reached stopping condition ', s% x_integer_ctrl(1)
+    end do
+
+    ! With a point-mass companion, this was the last evolved star.
+    if (b% point_mass_i /= 0 .or. all(finished)) then
+       extras_binary_start_step = terminate
+       write(*,'(a)') 'termination code: all evolved stars reached their selected stopping conditions'
        return
     end if
 
-if ((b% s1% center_h1 < 1.0d-4) .and. (b% s1% x_logical_ctrl(1) .eqv. .true.) .and. (b% s1% center_he4 < 1d-6)) then
+    i = 1
+    if (finished(2)) i = 2
+    call binary_set_point_mass_i(binary_id, i, ierr)
+    if (ierr /= 0) return
 
-    call do_saves_for_binary(b, ierr)
+    ! Neev's handoff: retain the finished star's mass and use a wide circular orbit.
+    b% eq_initial_bh_mass = b% m(i)
+    b% r(i) = 0d0
+    b% limit_retention_by_mdot_edd = .true.
+    b% use_radiation_corrected_transfer_rate = .true.
+    call binary_set_separation_eccentricity(binary_id, 100000d0*Rsun, 0d0, ierr)
+    if (ierr /= 0) return
 
-    print *, "save models post donor helium depletion"
-    fname = 'donor_postHe.mod'
-    call star_write_model(b% star_ids(1), fname, ierr)
-!    if (ierr /= 0) return
-    fname = 'accretor_postHe.mod'
-    call star_write_model(b% star_ids(2), fname, ierr)
-    b% s_donor% x_logical_ctrl(1) = .false. ! so we dont' get back in here
-!    if (ierr /= 0) return
-    print *, "****************************************"
-    print *, "* Switching from binary to single star *"
-    print *, "****************************************"
-
-    b% job% evolve_both_stars = .false.
-
-    b% d_i = 2
-    b% a_i = 1
-    b% s_donor => b% s2
-    b% s_accretor => b% s1
-    ! print *, 'd_i:', b% d_i, ' a_i:', b% a_i
-
-    b% point_mass_i = 1
-    ! print *, 'point mass is now', b% point_mass_i
-    ! print *, 'point mass old', b% point_mass_i_old
-    ! print *, b% have_star_1, b% have_star_2
-    b% have_star_1 = .false.
-    ! print *, b% have_star_1, b% have_star_2
-
+    ! Keep both stellar pointers (have_star_1/2) so photos can restart the handoff.
     b% s1% generations = 0
     b% s2% generations = 0
     b% generations = 0
+    ! Store the completed transition in case the first step is retried.
+    ierr = my_binary_finish_step(b)
+    if (ierr /= keep_going) then
+       ierr = -1
+       return
+    end if
+    ierr = 0
+    call do_saves_for_binary(b, ierr)
+    if (ierr /= 0) return
+    write(*,'(a,i0,a,i0)') 'star ', i, ' is now a point mass; continuing star ', 3-i
 
-     ! this updates 'old' values in case there is a retry on the first step
-     ierr = my_binary_finish_step(b)
-     if (ierr == keep_going) then
-        ierr = 0
-     else
-        ierr = -1
-     end if
+  end function extras_binary_start_step
 
-    b% m(1) = 2.6*msun
-    b% eq_initial_bh_mass = 2.6*msun
+  logical function reached_stopping_condition(s, ierr)
+    type (star_info), pointer :: s
+    integer, intent(out) :: ierr
 
-    b% limit_retention_by_mdot_edd = .true.
-    b% use_radiation_corrected_transfer_rate = .true.
-
-    ! print *, 'star mass:', b% s_donor% star_mass, b% m(2)/msun, b% m(b% d_i)/msun
-    ! print *, 'BH mass:', b% s_accretor% star_mass, b% m(1)/msun, b% m(b% a_i)/msun
-    ! print *, 'd_i:', b% d_i, ' a_i:', b% a_i
-
-    print *, "If this is a failed SN you can calculate the new e and P and set them here"
-
-    call binary_set_separation_eccentricity(binary_id, 100000*rsun, 0d0, ierr)
-    !    if (ierr /= 0) return
-    b% ignore_hard_limits_this_step = .true.
-    print *, "----------------------------------------"
-    print *, "new period, separation, Jorb, and eccentricity"
-    print *, b% period, b% separation, b% angular_momentum_j, b% eccentricity
-    print *, "----------------------------------------"
-
-
-end if
-
- end function  extras_binary_start_step
+    ierr = 0
+    reached_stopping_condition = .false.
+    select case (s% x_integer_ctrl(1))
+    case (1)
+       reached_stopping_condition = s% center_he4 <= 1d-8
+    case (2)
+       reached_stopping_condition = s% log_center_temperature >= 9d0
+    case default
+       write(*,'(a,i0,a,i0)') 'invalid stopping condition ', s% x_integer_ctrl(1), ' for star id ', s% id
+       ierr = -1
+    end select
+  end function reached_stopping_condition
 
   !Return either keep_going, retry or terminate
   integer function extras_binary_check_model(binary_id)
     type (binary_info), pointer :: b
     integer, intent(in) :: binary_id
     integer:: i_don, i_acc
-    real(dp) :: r_l2, d_l2, TAMS_h1_treshold
+    real(dp) :: r_l2, d_l2
     real(dp) :: q
     integer :: ierr
     call binary_ptr(binary_id, b, ierr)
@@ -241,80 +260,70 @@ end if
     end if
     extras_binary_check_model = keep_going
 
-    TAMS_h1_treshold = 1d-2
+    ! Neev: use the Misra et al. (2020) L2 checks throughout the evolution.
+    ! Omit the separate Marchant et al. (2016) main-sequence check; see
+    ! Misra et al. (2020) for its restriction to massive overcontact binaries.
 
-    if (b% point_mass_i /= 1) then !Check for L2 overflow for primary when not in MS
-       if (b% s1% center_h1 < TAMS_h1_treshold) then ! Misra et al. 2020 L2 overflow check starts only after TAMS of one of the two stars. Before we use Marchant et al. 2016 L2 overflow check implemented already in MESA
-          i_don = 1
-          i_acc = 2
-          if (b% m(i_don) > b% m(i_acc)) then !mdon>macc, q<1
-             q = b% m(i_acc) / b% m(i_don)
-             r_l2 = b% rl(i_don) * (0.784_dp * pow(q,1.05_dp) * exp(-0.188_dp*q) + 1.004_dp)
-             d_l2 = b% rl(i_don) * (3.334_dp * pow(q, 0.514_dp) * exp(-0.052_dp*q) + 1.308_dp)
-             !Condition to stop when star overflows L2
-             if (b% r(i_don) >= (r_l2)) then
-                ! extras_binary_check_model = terminate
-                write(*,'(g0)') 'termination code: overflow from L2 (R_L2) surface for q(=Macc/Mdon)<1, donor is star 1'
-                ! return
-             end if
-             if (b% r(i_don) >= (d_l2)) then
-                ! extras_binary_check_model = terminate
-                write(*,'(g0)') 'termination code: overflow from L2 (D_L2) distance for q(=Macc/Mdon)<1, donor is star 1'
-                !return
-             end if
+    if (b% point_mass_i /= 1) then
+       i_don = 1
+       i_acc = 2
+       if (b% m(i_don) > b% m(i_acc)) then !mdon>macc, q<1
+          q = b% m(i_acc) / b% m(i_don)
+          r_l2 = b% rl(i_don) * (0.784_dp * pow(q,1.05_dp) * exp(-0.188_dp*q) + 1.004_dp)
+          d_l2 = b% rl(i_don) * (3.334_dp * pow(q, 0.514_dp) * exp(-0.052_dp*q) + 1.308_dp)
+          !Condition to stop when star overflows L2
+          if (b% r(i_don) >= (r_l2)) then
+             extras_binary_check_model = terminate
+             write(*,'(g0)') 'termination code: overflow from L2 (R_L2) surface for q(=Macc/Mdon)<1, donor is star 1'
+          end if
+          if (b% r(i_don) >= (d_l2)) then
+             extras_binary_check_model = terminate
+             write(*,'(g0)') 'termination code: overflow from L2 (D_L2) distance for q(=Macc/Mdon)<1, donor is star 1'
+          end if
 
-          else    !mdonor<maccretor  Condition to stop when mass loss from L2 (previously it was L3) q>1
-             q = b% m(i_acc) / b% m(i_don)
-             r_l2 = b% rl(i_don) * (0.29066811_dp * pow(q, 0.82788069_dp) * exp(-0.01572339_dp*q) + 1.36176161_dp)
-             d_l2 = b% rl(i_don) * (-0.04029713_dp * pow(q, 0.862143_dp) * exp(-0.04049814_dp*q) + 1.88325644_dp)
-             if (b% r(i_don) >= (r_l2)) then
-                ! extras_binary_check_model = terminate
-                write(*,'(g0)') 'termination code: overflow from L2 (R_L2) surface for q(=Macc/Mdon)>1, donor is star 1'
-                ! return
-             end if
-             if (b% r(i_don) >= (d_l2)) then
-                !extras_binary_check_model = terminate
-                write(*,'(g0)') 'termination code: overflow from L2 (D_L2) distance for q(=Macc/Mdon)>1, donor is star 1'
-                !return
-             end if
+       else    !mdonor<maccretor  Condition to stop when mass loss from L2 (previously it was L3) q>1
+          q = b% m(i_acc) / b% m(i_don)
+          r_l2 = b% rl(i_don) * (0.29066811_dp * pow(q, 0.82788069_dp) * exp(-0.01572339_dp*q) + 1.36176161_dp)
+          d_l2 = b% rl(i_don) * (-0.04029713_dp * pow(q, 0.862143_dp) * exp(-0.04049814_dp*q) + 1.88325644_dp)
+          if (b% r(i_don) >= (r_l2)) then
+             extras_binary_check_model = terminate
+             write(*,'(g0)') 'termination code: overflow from L2 (R_L2) surface for q(=Macc/Mdon)>1, donor is star 1'
+          end if
+          if (b% r(i_don) >= (d_l2)) then
+             extras_binary_check_model = terminate
+             write(*,'(g0)') 'termination code: overflow from L2 (D_L2) distance for q(=Macc/Mdon)>1, donor is star 1'
           end if
        end if
     end if
 
-    if (b% point_mass_i /= 2) then  !Check for L2 overflow for primary when not in MS
-       if (b% s2% center_h1 < TAMS_h1_treshold) then ! Misra et al. 2020 L2 overflow check starts only after TAMS of one of the two stars. Before we use Marchant et al. 2016 L2 overflow check implemented already in MESA
-          i_don = 2
-          i_acc = 1
-          if (b% m(i_don) > b% m(i_acc)) then !mdon>macc, q<1
-             q = b% m(i_acc) / b% m(i_don)
-             r_l2 = b% rl(i_don) * (0.784_dp * pow(q, 1.05_dp) * exp(-0.188_dp * q) + 1.004_dp)
-             d_l2 = b% rl(i_don) * (3.334_dp * pow(q,  0.514_dp) * exp(-0.052_dp * q) + 1.308_dp)
-             !Condition to stop when star overflows L2
-             if (b% r(i_don) >= (r_l2)) then
-                !extras_binary_check_model = terminate
-                write(*,'(g0)') 'termination code: overflow from L2 (R_L2) surface for q(=Macc/Mdon)<1, donor is star 2'
-                !     return
-             end if
-             if (b% r(i_don) >= (d_l2)) then
-                !extras_binary_check_model = terminate
-                write(*,'(g0)') 'termination code: overflow from L2 (D_L2) distance for q(=Macc/Mdon)<1, donor is star 2'
-                !     return
-             end if
+    if (b% point_mass_i /= 2) then
+       i_don = 2
+       i_acc = 1
+       if (b% m(i_don) > b% m(i_acc)) then !mdon>macc, q<1
+          q = b% m(i_acc) / b% m(i_don)
+          r_l2 = b% rl(i_don) * (0.784_dp * pow(q, 1.05_dp) * exp(-0.188_dp * q) + 1.004_dp)
+          d_l2 = b% rl(i_don) * (3.334_dp * pow(q,  0.514_dp) * exp(-0.052_dp * q) + 1.308_dp)
+          !Condition to stop when star overflows L2
+          if (b% r(i_don) >= (r_l2)) then
+             extras_binary_check_model = terminate
+             write(*,'(g0)') 'termination code: overflow from L2 (R_L2) surface for q(=Macc/Mdon)<1, donor is star 2'
+          end if
+          if (b% r(i_don) >= (d_l2)) then
+             extras_binary_check_model = terminate
+             write(*,'(g0)') 'termination code: overflow from L2 (D_L2) distance for q(=Macc/Mdon)<1, donor is star 2'
+          end if
 
-          else             !mdonor<maccretor  Condition to stop when mass loss from L2 (previously it was L3) q>1
-             q = b% m(i_acc) / b% m(i_don)
-             r_l2 = b% rl(i_don) * (0.29066811_dp * pow(q, 0.82788069_dp) * exp(-0.01572339_dp*q) + 1.36176161_dp)
-             d_l2 = b% rl(i_don) * (-0.04029713_dp * pow(q, 0.862143_dp) * exp(-0.04049814_dp*q) + 1.88325644_dp)
-             if (b% r(i_don) >= (r_l2)) then
-                !extras_binary_check_model = terminate
-                write(*,'(g0)') 'termination code: overflow from L2 (R_L2) surface for q(=Macc/Mdon)>1, donor is star 2'
-                !return
-             end if
-             if (b% r(i_don) >= (d_l2)) then
-                !extras_binary_check_model = terminate
-                write(*,'(g0)') 'termination code: overflow from L2 (D_L2) distance for q(=Macc/Mdon)>1, donor is star 2'
-                !return
-             end if
+       else             !mdonor<maccretor  Condition to stop when mass loss from L2 (previously it was L3) q>1
+          q = b% m(i_acc) / b% m(i_don)
+          r_l2 = b% rl(i_don) * (0.29066811_dp * pow(q, 0.82788069_dp) * exp(-0.01572339_dp*q) + 1.36176161_dp)
+          d_l2 = b% rl(i_don) * (-0.04029713_dp * pow(q, 0.862143_dp) * exp(-0.04049814_dp*q) + 1.88325644_dp)
+          if (b% r(i_don) >= (r_l2)) then
+             !extras_binary_check_model = terminate
+             write(*,'(g0)') 'termination code: overflow from L2 (R_L2) surface for q(=Macc/Mdon)>1, donor is star 2'
+          end if
+          if (b% r(i_don) >= (d_l2)) then
+             !extras_binary_check_model = terminate
+             write(*,'(g0)') 'termination code: overflow from L2 (D_L2) distance for q(=Macc/Mdon)>1, donor is star 2'
           end if
        end if
     end if
@@ -338,9 +347,9 @@ end if
     use binary_lib, only: binary_set_separation_eccentricity
     type (binary_info), pointer :: b
     integer, intent(in) :: binary_id
-    integer :: star_id, ierr
+    integer :: ierr
     character (len=200) :: fname
-    real(dp) :: q, mdot_limit_low, mdot_limit_high, &
+    real(dp) :: mdot_limit_low, mdot_limit_high, &
          center_h1, center_h1_old, center_he4, center_he4_old, &
          rl23,rl2_1,trap_rad, mdot_edd, mdot_edd_eta, TAMS_h1_treshold
     logical :: is_ne_biggest
@@ -351,26 +360,30 @@ end if
     extras_binary_finish_step = keep_going
 
     ! abundance threshold for center_h1 defining TAMS
-    TAMS_h1_treshold = 1d-2
+    TAMS_h1_treshold = 1d-3
 
     ! find donor's TAMS
-    if ((b% lxtra(1) .eqv. .false.) .and. &
-       (b% s1% xa(b% s1% net_iso(ih1), b% s1% nz) < TAMS_h1_treshold)) then
-       b% lxtra(1) = .true.
-       b% xtra(1) = b% s1% r(1)
-       print *, "saved donor radius at TAMS", b% xtra(1)/Rsun
-       write(fname, fmt="(a14)") 'donor_TAMS.mod'
-       call star_write_model(b% star_ids(1), fname, ierr)
-       write(fname, fmt="(a15)") 'donor_TAMS.data'
-       call star_write_profile_info(b% star_ids(1), trim(b% s1% log_directory)//'/'//trim(fname), ierr)
+    if (b% have_star_1) then
+       if ((b% lxtra(1) .eqv. .false.) .and. &
+          (b% s1% xa(b% s1% net_iso(ih1), b% s1% nz) < TAMS_h1_treshold)) then
+          b% lxtra(1) = .true.
+          b% xtra(1) = b% s1% r(1)
+          print *, "saved donor radius at TAMS", b% xtra(1)/Rsun
+          write(fname, fmt="(a14)") 'donor_TAMS.mod'
+          call star_write_model(b% star_ids(1), fname, ierr)
+          write(fname, fmt="(a15)") 'donor_TAMS.data'
+          call star_write_profile_info(b% star_ids(1), trim(b% s1% log_directory)//'/'//trim(fname), ierr)
+       end if
     end if
 
     ! find beginning RLOF
     if (b% lxtra(2) .eqv. .false.) then
        ! RLOF has not started before
        if (b% rl_relative_gap(b% d_i) > 0) then
-          write(fname, fmt="(a20)") 'donor_onset_RLOF.mod'
-          call star_write_model(b% star_ids(1), fname, ierr)
+          if (b% have_star_1) then
+             write(fname, fmt="(a20)") 'donor_onset_RLOF.mod'
+             call star_write_model(b% star_ids(1), fname, ierr)
+          end if
           if (b% point_mass_i /= 2) then
              write(fname, fmt="(a23)") 'accretor_onset_RLOF.mod'
              call star_write_model(b% star_ids(2), fname, ierr)
@@ -409,23 +422,6 @@ end if
     end if
 
 
-    ! check for L2 overflow after ZAMS, but before TAMS
-    if(.not. b% ignore_rlof_flag .and. extras_binary_finish_step /= terminate .and. (b% point_mass_i == 0)) then ! only when we evolve both stars in MS
-       if (b% s1% center_h1 > TAMS_h1_treshold .and. b% s2% center_h1 > TAMS_h1_treshold) then
-          if (b% m(1) > b% m(2)) then
-             q = b% m(2) / b% m(1)
-             star_id = 2
-          else
-             q = b% m(1) / b% m(2)
-             star_id = 1
-          end if
-          if (b% rl_relative_gap(star_id) > 0.29858997d0*atan(1.83530121d0*pow(q,0.39661426d0))) then
-             write(*,'(g0)') "termination code: Terminate due to L2 overflow during case A"
-             extras_binary_finish_step = terminate
-          end if
-       end if
-    end if
-
     if (b% model_number == 1 ) then ! Saving initial_models
        write(*,*) "saving initial models"
        if (b% point_mass_i /= 1) then
@@ -449,20 +445,16 @@ end if
     if (ierr /= 0) then ! failure in  binary_ptr
        return
     end if
-    ! save profiles even if crashed MANOS: this should be checking if
-    !s1 is a point mass, but in minimum timestep cases, it is
-    !behaving like becoming a point mass.. So for now it is assuming
-    !it it is not a point mass, not sure if it works with compact
-    !object binaries.
-    call star_write_profile_info(b% s1% id, "LOGS1/final_profile.data", ierr)
-    if (ierr /= 0) then
-       STOP "failed to save profile for star 1"
+    ! Save final profiles for stellar models that are present.
+    ! MANOS reported that star 1 appeared to become a point mass after
+    ! minimum-timestep failures, so it was previously saved unconditionally.
+    ! TODO: verify these presence checks on that failure path.
+    if (b% have_star_1) then
+       call star_write_profile_info(b% s1% id, "LOGS1/final_profile.data", ierr)
+       if (ierr /= 0) return
     end if
-    if (b% point_mass_i /= 2) then
+    if (b% have_star_2) then
        call star_write_profile_info(b% s2% id, "LOGS2/final_profile.data", ierr)
-    end if
-    if (ierr /= 0) then
-       STOP "failed to save profile for star 2"
     end if
   end subroutine extras_binary_after_evolve
 

@@ -15,10 +15,10 @@
 
       ! use_TDC_Y_face_seeded_newton
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! If true, use the start-of-step TDC Y_face on the first solver
-      ! iteration, and the previous solver iteration's TDC Y_face thereafter,
-      ! to try a small local positive-Y bracket before the full bracketing path.
-      ! The seed is only used during structural solver iterations.
+      ! If true, first try a local bracket with Y_face > 0 during the
+      ! structural solve. Seed the first iteration with Y_face from the start
+      ! of the step, and later iterations with the previous iterate.
+      ! Use the full bracket search if the local bracket fails.
       !
       ! ::
 
@@ -26,9 +26,8 @@
 
       ! Hydro matrix solver options
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! hydro_matrix_solver selects the mesa-star hydro matrix solve.
-      ! Options are 'bcyclic' for the existing block cyclic reduction solver
-      ! and 'banded' for an RSP-like DGBTRF/DGBTRS banded solve.
+      ! Hydro matrix solver: 'bcyclic' uses block cyclic reduction;
+      ! 'banded' uses LAPACK DGBTRF/DGBTRS, as in RSP.
       !
       ! ::
 
@@ -50,8 +49,13 @@
       !     + for P and L in energy equation
       !     + for area when multiplied by P
       !
-      ! RSP2_Lsurf_factor: Lsurf = RSP2_Lsurf_factor*area(1)*clight*crad*T(1)**4
-      ! RSP2_use_Stellingwerf_Lr as in RSP
+      ! If RSP2_use_L_eqn_at_surface is true,
+      ! Lsurf = RSP2_Lsurf_factor*area(1)*clight*crad*T(1)**4.
+      ! If false, use the normal atmosphere temperature boundary condition
+      ! unless use_RSP_L_eqn_outer_BC or constant_L selects another boundary.
+      ! RSP2_use_mass_interp_face_values selects interpolation from cell
+      ! centers to faces using mass weights. Averages from faces to cells
+      ! remain centered.
       !
 
       ! ::
@@ -68,25 +72,33 @@
     RSP2_Lsurf_factor = 0.5d0
 
     RSP2_report_adjust_w = .false.
+
+    ! RSP2_report_flux_solver
+    ! ~~~~~~~~~~~~~~~~~~~~~~~
+    ! Write RSP2_flux_* diagnostics to terminal output for each Newton trial.
+    ! Report the largest interior flux residual before and after the trial,
+    ! its luminosity scale, Y corrections, and the full Jacobian prediction.
+    ! Luminosities are in erg/s.
+    !
+    ! ::
+
+    RSP2_report_flux_solver = .false.
+
     RSP2_use_L_eqn_at_surface = .true.
-    RSP2_assume_HSE = .true.
-    RSP2_use_RSP_eqn_for_Y_face = .true.
-    RSP2_use_mass_interp_face_values = .false.
+    RSP2_use_mass_interp_face_values = .true.
+    ! Unused. The radiative luminosity is Lr = Krad*gradT.
     RSP2_use_Stellingwerf_Lr = .true.
 
     RSP2_num_outermost_cells_forced_nonturbulent = 0
     RSP2_num_innermost_cells_forced_nonturbulent = 0
 
-   RSP2_w_fix_if_neg = 5d-5
-   RSP2_w_min_for_damping = 1d2
+   RSP2_w_fix_if_neg = 1d-12
    RSP2_source_seed = 0d0
 
-   RSP2_remesh_when_load = .true.
-
-   RSP2_nz = 150
-   RSP2_nz_outer = 40
-   RSP2_T_anchor = 11d3
-   RSP2_dq_1_factor = 2d0
+   ! If true, remesh when RSP2 is enabled and the requested number of zones
+   ! differs from the loaded model. Use TDC_hydro_* to specify the mesh.
+   ! Use steps_before_remesh_for_TDC_pulsations to delay remeshing.
+   RSP2_remesh_when_load = .false.
 
    RSP2_nz_div_IBOTOM = 30d0
 
@@ -129,6 +141,287 @@
     RSP2_map_last_period = -1
     RSP2_map_zone_interval = 2
     RSP2_map_history_filename = 'map_history.data'
+
+
+! star LNA controls
+! =================
+
+      ! Radial linear nonadiabatic analysis of a static background.
+      ! The velocity perturbation is v on faces or u in cells with u_flag.
+      ! Analysis with face velocities does not require v_flag.
+      ! Supports the standard and dPrad/dm temperature gradient equations.
+      ! Rotation, RTI, mass corrections, user other_* hooks, velocity drag,
+      ! use_compression_outer_BC, and constant_L are not supported.
+      !
+      ! star_LNA_flag
+      ! ~~~~~~~~~~~~~
+      ! If true, run the analysis once at star_LNA_model_number.
+      !
+      ! star_LNA_model_number
+      ! ~~~~~~~~~~~~~~~~~~~~~
+      ! If < 0, run during startup after the model has been loaded and
+      ! extras_startup has returned. If >= 0, run once when model_number equals
+      ! this value, after extras_start_step and before that timestep is evolved.
+      !
+      ! star_LNA_stop_after_run
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
+      ! If true, stop after a successful LNA solve, before the next evolution
+      ! step. With star_LNA_model_number < 0, load the model, analyze, and exit.
+      ! Leave false to continue evolution after a velocity kick.
+      ! Not supported for startup analysis in the binary driver.
+      !
+      ! star_LNA_T_inner
+      ! ~~~~~~~~~~~~~~~~
+      ! If positive, restrict the LNA to the contiguous surface envelope with
+      ! cell temperatures no greater than ``star_LNA_T_inner`` in K. Perturbations
+      ! below the selected inner boundary are zero. A nonpositive value uses
+      ! the complete model.
+      !
+      ! star_LNA_num_modes
+      ! ~~~~~~~~~~~~~~~~~~
+      ! Maximum number of selected positive frequency modes to write.
+      ! The solver eliminates algebraic variables, computes all eigenvalues
+      ! and eigenvectors, then applies the frequency, growth and residual limits.
+      ! Reducing this value does not reduce the matrix size.
+      !
+      ! star_LNA_min_mode_frequency_uHz
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Minimum cyclic frequency in microHz for selected modes. A value of
+      ! 1d-3 excludes periods longer than about 11574 days. Set to 0d0 to
+      ! disable the limit. All finite positive frequency modes are written
+      ! to <prefix>_raw_modes.data when star_LNA_write_period_growth is true.
+      !
+      ! star_LNA_min_first_mode_eta, star_LNA_min_mode_eta
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Lower limits on logKE_per_cycle = 4*pi*sigma_real/sigma_imag for the
+      ! first selected mode and subsequent modes, respectively.
+      !
+      ! star_LNA_max_abs_mode_eta
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! If > 0, reject modes with abs(logKE_per_cycle) above this value.
+      ! Set to 0d0 to disable the limit. Raw mode output is unaffected.
+      !
+      ! star_LNA_max_eigenvector_residual
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Maximum componentwise backward error accepted for a selected mode. The
+      ! residual is evaluated against the original full generalized eigenproblem
+      ! after reconstructing and unscaling the eigenvector. Candidates above
+      ! min(this limit, 1d-1) are refined against the full banded matrix pair.
+      ! Poorly resolved eigenvectors are first refined at fixed frequency.
+      ! The final residual must satisfy this limit, which must be > 0.
+      !
+      ! star_LNA_output_file_prefix
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Output filename prefix. If empty, use 'star_LNA'. Leading and trailing
+      ! / or \ characters are removed; internal separators become underscores.
+      ! Files with the same directory and prefix are replaced.
+      !
+      ! star_LNA_output_directory
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Output directory, created if needed. If empty, use log_directory.
+      ! Set to '.' to write in the run directory. Output filenames are
+      ! <prefix>_matrix_summary.data, <prefix>_row_structure.data,
+      ! <prefix>_rsp2_term_audit.data or <prefix>_tdc_face_audit.data when
+      ! applicable, <prefix>_period_growth.data, <prefix>_raw_modes.data,
+      ! <prefix>_eigenfunction_<mode>.data, and <prefix>_work_<mode>.data.
+      !
+      ! star_LNA_write_matrix_summary
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! If true, write <prefix>_matrix_summary.data with static background
+      ! residual diagnostics for the assembled rows.
+      !
+      ! star_LNA_write_period_growth
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! If true, write <prefix>_period_growth.data with the selected mode list.
+      ! Also write <prefix>_raw_modes.data with all finite positive frequency
+      ! modes before selection.
+      ! The output column is logKE_per_cycle = 4*pi*sigma_real/sigma_imag, the
+      ! RSP LINA log kinetic energy convention. For nonlinear comparisons use
+      ! ke_fractional_growth_per_period = exp(logKE_per_cycle)-1,
+      ! grekm_growth_per_period = 2*tanh(logKE_per_cycle/2), or
+      ! amplitude_fractional_growth_per_period = exp(logKE_per_cycle/2)-1.
+      !
+      ! star_LNA_write_eigenfunctions
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! If true, write <prefix>_eigenfunction_<mode>.data for each selected
+      ! mode.
+      !
+      ! star_LNA_write_work_integrals
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! If true, write <prefix>_work_<mode>.data for each selected mode.
+      ! Pressure and turbulent pressure work use the same closure as the
+      ! equations. Eddy viscosity and luminosity work are diagnostic terms.
+      ! The sum of the work columns need not equal the eigenvalue growth rate.
+      !
+      ! star_LNA_set_initial_velocity
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! If true, set a velocity kick from up to three selected modes.
+      ! Update v or u in the current and starting states. For u_flag, the
+      ! Riemann face state is also rebuilt. For RSP/RSP2 models, the period
+      ! selected by star_LNA_mode_for_period is copied into rsp_period/RSP2_period.
+      ! Requires v_flag or u_flag. If ``star_LNA_T_inner`` restricts the
+      ! domain, the kick sets the velocity below the selected envelope to zero.
+      ! Incompatible with use_fixed_vsurf_outer_BC, which constrains the
+      ! surface velocity used to normalize the kick.
+      !
+      ! star_LNA_kick_vsurf_km_per_sec
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Surface velocity amplitude for the optional kick, in km/s. Each selected
+      ! eigenfunction is converted to an RSP real velocity profile from
+      ! the displacement eigenfunction, normalized to positive unit surface
+      ! displacement. The final sum is scaled so the active surface velocity is
+      ! 1d5*star_LNA_kick_vsurf_km_per_sec in cgs units. star_LNA prints the
+      ! maximum velocity and velocity/csound after applying the kick.
+      !
+      ! star_LNA_mode_for_period
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Index in the selected mode list, starting at zero. Selects the period
+      ! copied into rsp_period/RSP2_period. A value of 0 selects the first mode
+      ! in <prefix>_period_growth.data.
+      !
+      ! star_LNA_kick_mode_1, star_LNA_kick_mode_2, star_LNA_kick_mode_3
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Mode numbers for the velocity kick, starting at one as in
+      ! <prefix>_period_growth.data. star_LNA_kick_mode_1 must be >= 1;
+      ! 0 disables the second or third component. star_LNA_num_modes must be
+      ! at least as large as the largest active kick mode.
+      !
+      ! star_LNA_kick_fraction_1, star_LNA_kick_fraction_2,
+      ! star_LNA_kick_fraction_3
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Relative weights for the kick components, normalized by their sum.
+      ! The surface amplitude is set by star_LNA_kick_vsurf_km_per_sec.
+      !
+      ! star_LNA_solver
+      ! ~~~~~~~~~~~~~~~
+      ! Eigensolver. Only 'dense' is supported, using LAPACK DGGEV after
+      ! elimination of algebraic variables.
+      !
+      ! star_LNA_include_tdc
+      ! ~~~~~~~~~~~~~~~~~~~~
+      ! If true and MLT_option == 'TDC', include the TDC convective luminosity,
+      ! convective velocity, and eddy viscosity perturbations. If false,
+      ! suppress these perturbations while retaining the TDC background.
+      !
+      ! star_LNA_include_rsp2
+      ! ~~~~~~~~~~~~~~~~~~~~~
+      ! If true and RSP2_flag is active, include the RSP2 variable set and
+      ! luminosity decomposition. RSP2 models require this to be true.
+      !
+      ! star_LNA_perturb_convective_flux
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! If true, perturb convective luminosity for TDC and RSP2.
+      ! If false, hold Lc and the RSP2 turbulent luminosity Lt fixed in the
+      ! equations and diagnostics. The luminosity row then has delta Lrad = delta L.
+      ! Turbulent velocity and pressure perturbations have separate controls.
+      ! For the frozen flux equation without RSP2, also set
+      ! star_LNA_convection_treatment = 'frozen_flux'.
+      !
+      ! star_LNA_perturb_turbulent_pressure
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! If true, include turbulent pressure perturbations in the LNA pressure
+      ! terms where supported. For RSP2 this uses Ptrb = alpha_p*(2/3)*rho*w^2.
+      ! A u_flag background with active RSP2 or MLT turbulent pressure requires
+      ! this option because the Riemann pressure reconstruction includes it.
+      !
+      ! star_LNA_perturb_eddy_viscosity
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! If true, include the supported eddy viscosity momentum/heating
+      ! perturbations and write the eddy viscosity work diagnostic. For TDC,
+      ! ``TDC_alpha_M`` controls whether the eddy viscosity term is present.
+      ! TDC and RSP2 support both ``v_flag`` and ``u_flag``.
+      !
+      ! star_LNA_perturb_turbulent_energy
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! If true, include turbulent energy perturbations where supported. RSP2
+      ! models require this because w and Y_face are part of the RSP2 LNA
+      ! variable set.
+      !
+      ! star_LNA_convection_treatment
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Convection perturbation mode. Allowed values are 'perturbed', 'frozen',
+      ! 'frozen_flux', and 'mlt_static'.
+      !
+      ! 'perturbed' includes TDC/RSP2 perturbations. For TDC, add a convective
+      ! velocity variable and solve the local luminosity and velocity equations.
+      !
+      ! 'frozen' disables TDC perturbations in models without RSP2. Use the
+      ! surface temperature equation and the static interior temperature
+      ! gradient equation. This does not impose delta Lconv = 0.
+      !
+      ! 'frozen_flux' uses Lrad_ad + Lconv0 - L = 0 in the interior, retaining
+      ! the background convective luminosity with delta Lconv = 0. No TDC
+      ! velocity variable is added. Not supported for RSP2.
+      !
+      ! 'mlt_static' uses the temperature gradient equation with MLT
+      ! derivatives and no convective velocity variable. Requires an MLT
+      ! background without TDC or RSP2.
+      !
+      ! ::
+
+    star_LNA_flag = .false.
+    star_LNA_model_number = -1
+    star_LNA_stop_after_run = .false.
+    star_LNA_T_inner = 0d0
+    star_LNA_num_modes = 3
+    star_LNA_min_mode_frequency_uHz = 1d-3
+    star_LNA_min_first_mode_eta = -3d0
+    star_LNA_min_mode_eta = -5d0
+    star_LNA_max_abs_mode_eta = 10d0
+    star_LNA_max_eigenvector_residual = 1d-3
+    star_LNA_output_directory = ''
+    star_LNA_output_file_prefix = ''
+    star_LNA_write_matrix_summary = .true.
+    star_LNA_write_period_growth = .true.
+    star_LNA_write_eigenfunctions = .true.
+    star_LNA_write_work_integrals = .true.
+    star_LNA_set_initial_velocity = .false.
+    star_LNA_kick_vsurf_km_per_sec = 1d0
+    star_LNA_mode_for_period = 0
+    star_LNA_kick_mode_1 = 1
+    star_LNA_kick_mode_2 = 0
+    star_LNA_kick_mode_3 = 0
+    star_LNA_kick_fraction_1 = 1d0
+    star_LNA_kick_fraction_2 = 0d0
+    star_LNA_kick_fraction_3 = 0d0
+    star_LNA_solver = 'dense'
+    star_LNA_include_tdc = .true.
+    star_LNA_include_rsp2 = .true.
+    star_LNA_perturb_convective_flux = .true.
+    star_LNA_perturb_turbulent_pressure = .true.
+    star_LNA_perturb_eddy_viscosity = .true.
+    star_LNA_perturb_turbulent_energy = .true.
+    star_LNA_convection_treatment = 'perturbed'
+
+
+! GYRE TDC LNA export controls
+! ============================
+
+      ! gyre_write_tdc_lna_background
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! If true, append TDC background quantities to GYRE pulse data using
+      ! experimental schema 130. Requires gyre_data_schema = 130,
+      ! MLT_option = 'TDC', and a GYRE reader that supports this schema.
+      !
+      ! Additional columns:
+      ! L_conv0, A0_tdc, D_conv_h, Hp_face, alpha_MLT_face, Cp_face,
+      ! chiT_face, chiRho_face, gradL_face, gradT_face, TDC_alpha_C/S/D/R/Pt/M,
+      ! include_mlt_corr_to_TDC, mlt_Pturb_factor, and mlt_Pturb0_face.
+      ! D_conv_h is the entropy diffusivity inferred from the convective
+      ! luminosity. mlt_Pturb0_face = mlt_Pturb_factor*rho_face*mlt_vc^2/3.
+      !
+      ! The exported mixing length is Lambda = mixing_length_alpha*Hp_face.
+      ! The harmonic TDC length is not included; a warning is printed if
+      ! harmonic_dissipation_length_beta > 0.
+      !
+      ! With dt <= 0, export eps_grav = 0 as a static background assumption.
+      ! A .mod file does not store eps_grav or the previous thermal state.
+      ! Stored heating and star_LNA thermal perturbations are unchanged.
+      ! With dt > 0, calculate eps_grav from the current and starting states.
+      !
+      ! ::
+
+    gyre_write_tdc_lna_background = .false.
 
 
 ! mass corrections
@@ -205,7 +498,7 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! If TDC_adjust_mass_fallback_to_mlt = .true., cells touched by
-      ! adjust_mass use MLT instead of TDC. This matches the previous behavior.
+      ! adjust_mass use MLT instead of TDC.
       ! If false, TDC remains enabled in those cells and uses the TDC
       ! convective velocity for the zone.
 
@@ -214,11 +507,32 @@
     TDC_adjust_mass_fallback_to_mlt = .true.
 
 
+      ! TDC_use_dynamical_gradL
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If TDC_use_dynamical_gradL = .true., multiply the neutral gradient
+      ! gradL by the ratio of the actual and QHSE pressure gradients in the
+      ! TDC and RSP2 luminosity closures. This gives
+      ! Y = gradT - f*gradL, where f = (dP/dm)/(dP/dm)_QHSE.
+      ! The pressure gradients use the current state. For TDC, leave
+      ! include_mlt_in_velocity_time_centering false with this option.
+      !
+      ! This option is not fully supported with the Ledoux criterion. In the
+      ! get_brunt_B fallback that already uses the QHSE pressure
+      ! interval, the composition term is multiplied by f a second time.
+
+      ! ::
+
+    TDC_use_dynamical_gradL = .false.
+
+
       ! use_TDC_enthalpy_flux_limiter
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! If use_TDC_enthalpy_flux_limiter = .true. , apply enthalpy flux limiter to TDC
       ! similar to the form presented in Wuchterl & Feuchtinger 1998, and Smolec 2008.
+      ! This control applies only to TDC. star_LNA ignores it and linearizes
+      ! the unsaturated TDC relation.
 
       ! ::
 
@@ -257,16 +571,11 @@
       ! use_face_reconstruction
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! MESA interpolates primitive solver variables such as T, rho, L, and
-      ! composition, together with constructed quantities such as opacity,
-      ! pressure, and other EOS results, onto cell faces for use in MLT and
-      ! TDC. If use_face_reconstruction = .true., this option
-      ! instead reconstructs only the primitive face variables and then makes
-      ! additional EOS and opacity calls to obtain the thermodynamic quantities
-      ! corresponding to that face state. Despite the cost of the extra EOS and
-      ! opacity work, this can improve accuracy on coarse meshes, especially in
-      ! unresolved opacity bumps in pulsating envelopes, and is a potential
-      ! candidate for becoming the default mode, pending further testing.
+      ! If true, reconstruct T, rho, L and composition at cell faces, then
+      ! evaluate the EOS and opacity there for MLT and TDC. If false,
+      ! interpolate both the primitive variables and the EOS and opacity
+      ! results from cells. Reconstruction requires extra EOS and opacity
+      ! calls and can improve accuracy across poorly resolved opacity bumps.
 
       ! ::
 
@@ -288,10 +597,12 @@
       ! include_mlt_in_velocity_time_centering
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! If doing velocity time_centering, include time centering in mlt. Depending on the time
-      ! centering flags adopted, include_mlt_in_velocity_time_centering includes time centering
-      ! for P, L, and r in geff, gradr, grada, and mlt.
-      ! Currently not supported together with ``use_face_reconstruction``.
+      ! Apply the selected velocity time centering to P, L and r when
+      ! evaluating geff, gradr, grada and MLT.
+      ! If false, the standard QHSE temperature equation also uses current
+      ! P and r. Luminosity time centering in the energy equation is separate.
+      ! RSP2 always uses current P and r in this spatial equation.
+      ! Not supported with ``use_face_reconstruction``.
 
       ! ::
 
@@ -319,7 +630,7 @@
 
       ! If true, and ``use_split_merge_amr`` and ``u_flag`` are true, use the
       ! weighted split/merge metric controls below instead of the standard
-      ! single-coordinate split/merge zoning controls.  This is ignored for
+      ! zoning controls based on a single coordinate. Ignored for
       ! ``v_flag``.
 
       ! ::
@@ -341,7 +652,7 @@
       ! split_merge_amr_metric_logtau_weight
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! Weight for the normalized log optical-depth contribution in the
+      ! Weight for the normalized log optical depth contribution in the
       ! ``u_flag`` split/merge metric.
 
       ! ::
@@ -363,7 +674,7 @@
       ! split_merge_amr_metric_min_delta_lntau
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! Floor for the log optical-depth normalization range in the ``u_flag``
+      ! Floor for the log optical depth normalization range in the ``u_flag``
       ! split/merge metric.
 
       ! ::
@@ -375,11 +686,11 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! If true, redistribute internal energy between the children of an
-      ! ``u_flag`` split to preserve the limited pre-split pressure gradient.
+      ! ``u_flag`` split to preserve the limited pressure gradient.
       ! The correction preserves total child internal energy and falls back to
       ! the standard conservative split when no bounded EOS solution exists.
       ! The pressure target includes MLT turbulent pressure. Split/merge AMR
-      ! does not currently support RSP2.
+      ! does not support RSP2.
 
       ! ::
 

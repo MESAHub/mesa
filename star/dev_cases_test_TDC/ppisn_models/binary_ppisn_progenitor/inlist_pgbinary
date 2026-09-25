@@ -124,8 +124,8 @@ Text_Summary1_name(8,1) = 'rl_2'
 Text_Summary1_name(9,1) = 'lg_mtransfer_rate'
 
 Grid1_file_flag = .true.
-Grid1_file_interval = 50
-Grid1_file_width = 19
-Grid1_file_aspect_ratio = 0.45
+Grid1_file_interval = 10
+Grid1_file_width = 34
+Grid1_file_aspect_ratio = -1
 
 / ! end of pgbinary namelist
