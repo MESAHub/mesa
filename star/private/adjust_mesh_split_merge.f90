@@ -1301,12 +1301,15 @@
             u_R, u_L, delta_u, delta_KE, delta_KE_div_dm, &
             min_stencil_energy, max_stencil_energy, max_delta_KE_div_dm, &
             pressure_R, pressure_C, pressure_L, grad_pressure, pressure_difference_target, &
+            lnT_R, lnT_C, lnT_L, &
             min_stencil_pressure, max_stencil_pressure, min_stencil_lnT, max_stencil_lnT, &
             superad_reduction_factorL, superad_reduction_factorR, Y_faceL, Y_faceR
-         logical :: done, use_new_grad_rho, pressure_reconstructed
+         logical :: done, use_new_grad_rho, use_pressure_reconstruction, pressure_reconstructed
          include 'formats'
 
          ierr = 0
+         use_pressure_reconstruction = &
+            s% u_flag .and. s% split_merge_amr_reconstruct_pressure_for_u_flag
          star_PE0 = get_star_PE(s)
          s% need_to_setvars = .true.
          nz = s% nz
@@ -1422,13 +1425,28 @@
          min_stencil_energy = min(energy_R, energy_C, energy_L)
          max_stencil_energy = max(energy_R, energy_C, energy_L)
 
-         pressure_R = s% Peos(iR) + get_split_mlt_Pturb(s, iR, s% lnT(iR))
-         pressure_C = s% Peos(iC) + get_split_mlt_Pturb(s, iC, s% lnT(iC))
-         pressure_L = s% Peos(iL) + get_split_mlt_Pturb(s, iL, s% lnT(iL))
-         min_stencil_pressure = min(pressure_R, pressure_C, pressure_L)
-         max_stencil_pressure = max(pressure_R, pressure_C, pressure_L)
-         min_stencil_lnT = min(s% lnT(iR), s% lnT(iC), s% lnT(iL))
-         max_stencil_lnT = max(s% lnT(iR), s% lnT(iC), s% lnT(iL))
+         ! Pressure reconstruction needs a fresh thermodynamic stencil.
+         min_stencil_pressure = 0d0
+         max_stencil_pressure = 0d0
+         min_stencil_lnT = 0d0
+         max_stencil_lnT = 0d0
+         if (use_pressure_reconstruction) then
+            ! Earlier AMR operations can move cells and rescale radii without
+            ! refreshing Peos or lnT. Evaluate the current stencil from rho/e/xa.
+            call eval_split_pressure( &
+               s, iR, rho_R, energy_R, s% lnT(iR), pressure_R, lnT_R, ierr)
+            if (ierr /= 0) return
+            call eval_split_pressure( &
+               s, iC, rho_C, energy_C, s% lnT(iC), pressure_C, lnT_C, ierr)
+            if (ierr /= 0) return
+            call eval_split_pressure( &
+               s, iL, rho_L, energy_L, s% lnT(iL), pressure_L, lnT_L, ierr)
+            if (ierr /= 0) return
+            min_stencil_pressure = min(pressure_R, pressure_C, pressure_L)
+            max_stencil_pressure = max(pressure_R, pressure_C, pressure_L)
+            min_stencil_lnT = min(lnT_R, lnT_C, lnT_L)
+            max_stencil_lnT = max(lnT_R, lnT_C, lnT_L)
+         end if
 
          ! get gradients before move cell contents
 
@@ -1455,8 +1473,10 @@
          end if
 
          grad_energy = get1_grad(energy_L, energy_C, energy_R, dLeft, dCntr, dRght)
-         grad_pressure = get1_grad(pressure_L, pressure_C, pressure_R, dLeft, dCntr, dRght)
-         pressure_difference_target = -0.5d0*grad_pressure*dr_old
+         if (use_pressure_reconstruction) then
+            grad_pressure = get1_grad(pressure_L, pressure_C, pressure_R, dLeft, dCntr, dRght)
+            pressure_difference_target = -0.5d0*grad_pressure*dr_old
+         end if
 
          if (s% RTI_flag) then
             grad_alpha = get1_grad( &
@@ -1863,7 +1883,7 @@
          if (ierr /= 0) return
 
          pressure_reconstructed = .false.
-         if (s% u_flag .and. s% split_merge_amr_reconstruct_pressure_for_u_flag) then
+         if (use_pressure_reconstruction) then
             call reconstruct_split_pressure( &
                s, i, ip, pressure_difference_target, &
                min_stencil_energy, max_stencil_energy, &
@@ -1885,8 +1905,6 @@
             min_stencil_energy, max_stencil_energy, &
             min_stencil_pressure, max_stencil_pressure, &
             min_stencil_lnT, max_stencil_lnT, accepted)
-         use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results, i_lnPgas
-         use eos_support, only: solve_eos_given_DE
          type (star_info), pointer :: s
          integer, intent(in) :: i, ip
          real(dp), intent(in) :: pressure_difference_target, &
@@ -2004,46 +2022,16 @@
 
             rho_outer = dm_outer/get_dV(s,i)
             rho_inner = dm_inner/get_dV(s,ip)
-            call eval_pressure( &
-               i, rho_outer, energy_outer, s% lnT(i), P_outer, lnT_out, eos_ierr)
+            call eval_split_pressure( &
+               s, i, rho_outer, energy_outer, s% lnT(i), P_outer, lnT_out, eos_ierr)
             if (eos_ierr /= 0) return
-            call eval_pressure( &
-               ip, rho_inner, energy_inner, s% lnT(ip), P_inner, lnT_in, eos_ierr)
+            call eval_split_pressure( &
+               s, ip, rho_inner, energy_inner, s% lnT(ip), P_inner, lnT_in, eos_ierr)
             if (eos_ierr /= 0) return
-
-            P_outer = P_outer + get_split_mlt_Pturb(s, i, lnT_out)
-            P_inner = P_inner + get_split_mlt_Pturb(s, ip, lnT_in)
 
             mismatch = P_inner - P_outer - pressure_difference_target
             valid = .not. is_bad(mismatch + P_outer + P_inner + lnT_out + lnT_in)
          end subroutine eval_pair
-
-
-         subroutine eval_pressure(k, rho, energy, lnT_guess, pressure, lnT, eos_ierr)
-            integer, intent(in) :: k
-            real(dp), intent(in) :: rho, energy, lnT_guess
-            real(dp), intent(out) :: pressure, lnT
-            integer, intent(out) :: eos_ierr
-            real(dp) :: logT, T, &
-               res(num_eos_basic_results), &
-               d_dlnd(num_eos_basic_results), d_dlnT(num_eos_basic_results), &
-               d_dxa(num_eos_d_dxa_results, s% species)
-
-            eos_ierr = 0
-            if (rho <= 0d0 .or. energy <= 0d0) then
-               eos_ierr = -1
-               return
-            end if
-            call solve_eos_given_DE( &
-               s, k, s% xa(:,k), log10(rho), log10(energy), lnT_guess/ln10, &
-               1d-11, 1d-11, logT, res, d_dlnd, d_dlnT, d_dxa, eos_ierr)
-            if (eos_ierr /= 0) return
-
-            lnT = logT*ln10
-            T = exp(lnT)
-            pressure = exp(res(i_lnPgas)) + crad*pow4(T)/3d0
-            if (pressure <= 0d0 .or. is_bad(pressure + lnT)) eos_ierr = -1
-         end subroutine eval_pressure
 
 
          logical function brackets_root(fa, fb)
@@ -2053,6 +2041,43 @@
          end function brackets_root
 
       end subroutine reconstruct_split_pressure
+
+
+      subroutine eval_split_pressure(s, k, rho, energy, lnT_guess, pressure, lnT, ierr)
+         use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results, i_lnPgas
+         use eos_support, only: solve_eos_given_DE
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(in) :: rho, energy, lnT_guess
+         real(dp), intent(out) :: pressure, lnT
+         integer, intent(out) :: ierr
+         real(dp) :: logT, T, &
+            res(num_eos_basic_results), &
+            d_dlnd(num_eos_basic_results), d_dlnT(num_eos_basic_results), &
+            d_dxa(num_eos_d_dxa_results, s% species)
+
+         ! Share the EOS and turbulent-pressure convention between the current
+         ! pre-split stencil and trial children; do not use derived EOS caches.
+         ierr = 0
+         if (rho <= 0d0 .or. energy <= 0d0 .or. is_bad(rho + energy + lnT_guess)) then
+            ierr = -1
+            return
+         end if
+         call solve_eos_given_DE( &
+            s, k, s% xa(:,k), log10(rho), log10(energy), lnT_guess/ln10, &
+            1d-11, 1d-11, logT, res, d_dlnd, d_dlnT, d_dxa, ierr)
+         if (ierr /= 0) return
+
+         lnT = logT*ln10
+         T = exp(lnT)
+         pressure = exp(res(i_lnPgas)) + crad*pow4(T)/3d0
+         if (pressure <= 0d0 .or. is_bad(pressure + lnT)) then
+            ierr = -1
+            return
+         end if
+         pressure = pressure + get_split_mlt_Pturb(s, k, lnT)
+         if (is_bad(pressure)) ierr = -1
+      end subroutine eval_split_pressure
 
 
       real(dp) function get_split_mlt_Pturb(s, k, lnT) result(Pturb)
