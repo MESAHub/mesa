@@ -660,6 +660,33 @@
     split_merge_amr_metric_logtau_weight = 1d0
 
 
+      ! split_merge_amr_metric_logT_weight
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Weight for the normalized log temperature contribution in the
+      ! ``u_flag`` split/merge metric, alongside log radius and log optical depth.
+      ! A nonpositive weight disables this contribution (zero by default).
+      !
+      ! Since temperature is cell-centered, each cell receives half of each
+      ! adjacent absolute difference in lnT; end cells have only one neighbor.
+      ! Normalize by their sum over the mesh (the total variation in lnT), with
+      ! the floor below. Extrema do not cancel. Use current remapped temperature
+      ! variables, not a cached EOS temperature. No additional EOS calls are made.
+      ! If temperatures are invalid or have zero total variation, omit this
+      ! contribution and its weight from the target.
+      !
+      ! This contributes to both splits and merges through the existing metric:
+      ! the target per cell is the sum of active weights divided by the effective
+      ! ``split_merge_amr_nz_baseline``. Increasing this relative weight allocates
+      ! more of that mesh budget to temperature variation; it does not directly
+      ! increase the baseline or impose a separate merge limit. This is distinct
+      ! from ``T_function1_weight`` in the normal adjust_mesh path.
+      !
+      ! ::
+
+    split_merge_amr_metric_logT_weight = 0d0
+
+
       ! split_merge_amr_metric_min_delta_lnR
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -680,6 +707,18 @@
       ! ::
 
     split_merge_amr_metric_min_delta_lntau = 1d-9
+
+
+      ! split_merge_amr_metric_min_delta_lnT
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Floor for the total log temperature variation used to normalize the
+      ! ``u_flag`` split/merge metric. This is in natural-log units; it is not
+      ! a per-cell temperature-jump limit.
+
+      ! ::
+
+    split_merge_amr_metric_min_delta_lnT = 1d-9
 
 
       ! split_merge_amr_reconstruct_pressure_for_u_flag
