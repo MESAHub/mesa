@@ -28,6 +28,13 @@ For a more in-depth look at the new build system, see :doc:`developing/build-sys
 New Features
 ------------
 
+Added ``atm_T_tau_Rho_outer`` to set the density used to estimate the
+initial gas pressure in an atmosphere with varying opacity. The default
+remains ``1d-10`` g/cm^3.
+
+The ``ppisn`` and ``pisn`` test cases have been improved and now use
+time dependent convection (TDC) during pulsations.
+
 MESA's documentation now includes a generated :ref:`Test Suite Gallery <tagoverview>` using metadata from test case ``README.rst`` files. The gallery groups test cases by module, physics, numerical method, workflow, and stellar object or phase. This change makes it easier to understand the purpose of each test case, and can help users more easily find a useful starting point for a MESA project. Details on the implementation can be found in :ref:`developing/test_suite:Gallery tags`.
 
 Diffusive overshooting (overmixing) prescriptions now support a
@@ -43,42 +50,55 @@ The `MESA SDK <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__ r
 
 Additional controls are available for TDC envelope remeshing:
 
-- ``remesh_for_TDC_pulsations_when_load`` remeshes a model after loading it from a ``.mod`` file.
+- ``steps_before_remesh_for_TDC_pulsations`` selects when a loaded ``.mod`` model is remeshed.
+  Negative values disable the remesh, zero remeshes before the first step, and positive values
+  remesh once after the requested number of accepted steps.
 - ``TDC_hydro_nz_inner`` adds geometrically spaced zones near the inner boundary.
-- ``TDC_hydro_nz_T_gradient`` adds zones according to the variation in ``logT`` below ``TDC_hydro_T_anchor`` while retaining the mass-based mesh.
+- ``TDC_hydro_nz_T_gradient`` adds zones according to the variation in ``logT`` below ``TDC_hydro_T_anchor`` while retaining the mass zoning.
 
-Two new profile columns, ``superad_reduction_Lrad_div_Ledd`` and ``superad_reduction_trigger``, and one new history column, ``num_cells_with_superad_reduction``, expose what the ``use_superad_reduction`` throttle is doing per cell (which threshold fired and at what proximity to Eddington). The existing ``superad_reduction_factor`` profile column and ``max_superad_reduction_factor`` history column are unchanged. The new ``superad_reduction_trigger`` is an integer flag: 1 = Eddington proximity (``Lrad/Ledd > Gamma_limit``); 2 = density-inversion criterion (Joss et al. 1973, Paxton, Cantiello et al. 2013 eq. 17); 3 = both.
+Added profile columns ``superad_reduction_Lrad_div_Ledd`` and
+``superad_reduction_trigger``, and history column
+``num_cells_with_superad_reduction``. The trigger identifies the criterion
+for superadiabatic reduction: 1 for ``Lrad/Ledd > Gamma_limit``, 2 for the
+density inversion criterion (Joss et al. 1973, Paxton, Cantiello et al. 2013,
+equation 17), and 3 for both.
 
-The new control ``superad_reduction_use_turnover_limit`` relaxes the applied superadiabatic reduction from its previous accepted value toward the instantaneous value. ``superad_reduction_turnover_limit_function`` selects either the exponential response ``1-exp(-dt/tau_conv)`` or the linear response ``min(dt/tau_conv,1)``. The limiter acts on the applied reduction ``1/Gamma_factor``. Zones with a lagged convective velocity use ``scale_height/max(mlt_vc,1d-10 cm/s)``; other zones use the Brunt frequency. The timescale is set at the start of the step and held fixed during solver iterations. With ``use_face_reconstruction``, this calculation uses the reconstructed face thermodynamic state. The scale height is the interpolated or reconstructed face value used by MLT and TDC. The previous reduction is preserved across retries, remeshing, and photo restarts. For ``k > 0``, ``superad_reduction_max_logT`` restricts the reduction to faces whose start-of-step temperature is below the selected ``logT``. Its default is ``7d0``, corresponding to :math:`10^7\,\mathrm{K}`. The ``k=0`` model-construction path is unchanged.
+``superad_reduction_use_turnover_limit`` relaxes ``1/Gamma_factor`` from its
+previous accepted value toward the instantaneous value.
+``superad_reduction_turnover_limit_function`` selects the exponential response
+``1-exp(-dt/tau_conv)`` or the linear response ``min(dt/tau_conv,1)``.
+Zones with a lagged convective velocity use
+``tau_conv = scale_height/max(mlt_vc,1d-10 cm/s)``; other zones use the Brunt
+frequency. The calculation uses the MLT/TDC face state, including face
+reconstruction when enabled. The timescale is fixed at the start of each
+step, and the previous reduction is preserved across retries, remeshing
+and photo restarts. For ``k > 0``, ``superad_reduction_max_logT`` limits the
+reduction to faces below this temperature at the start of the step. The
+default is ``7d0``, or :math:`10^7\,\mathrm{K}`. This limit does not apply
+during model construction at ``k=0``.
 
-Restored the default-off ``constant_L`` control for idealized hydrodynamic
-tests. It replaces the temperature-gradient equation with
-``L(k) = L(k+1)``, using ``L_center`` at the innermost boundary, and applies
-the same relation at the surface instead of a temperature boundary condition.
-The surface-luminosity timestep limit is disabled because luminosity is
-prescribed by this equation. The momentum boundary condition remains
-independently selectable. Explicit momentum boundaries do not evaluate unused
-atmospheric pressure-temperature data.
+Restored ``constant_L`` for idealized hydrodynamic tests, disabled by default.
+It replaces the temperature gradient equation with ``L(k) = L(k+1)``,
+using ``L_center`` at the inner boundary and the same relation at the surface.
+The surface luminosity timestep limit is disabled. The momentum boundary
+condition is selected independently.
 
-Metric zoning for split/merge AMR now uses ``split_merge_amr_MaxLong`` both
-to split an existing oversized cell and to reject a proposed merge whose
-summed metric would exceed the same limit. This removes the redundant metric
-merge-guard control and keeps the prospective merge and subsequent split
-criteria consistent.
+Metric zoning for split/merge AMR now uses ``split_merge_amr_MaxLong`` to
+split oversized cells and reject merges that would exceed the same limit.
+The separate metric merge limit has been removed.
 
-The optional pressure-child reconstruction for cell-centered split/merge AMR
-now includes MLT turbulent pressure in its bounded pressure target. The
-conservative energy transfer continues to modify only the EOS pressure; the
-turbulent contribution is evaluated from its remapped face state. Split/merge
-AMR does not currently support RSP2.
+Pressure reconstruction when splitting cells with ``u_flag`` now includes
+MLT turbulent pressure in the target. Internal energy is redistributed
+conservatively to adjust the EOS pressure; turbulent pressure is evaluated
+from the remapped face state. Split/merge AMR does not support RSP2.
 
-Cell-centered Riemann hydrodynamics can now reduce chemical diffusion across
-resolved shocks using the default-off ``Riemann_shock_D_mix_reduction_on`` and
-``Riemann_shock_D_mix_reduction_full_on`` controls. Corresponding compression,
-pressure-jump, shock-strength, and diffusion-factor profile columns are
-available for diagnostics.
+Riemann hydrodynamics with ``u_flag`` can now reduce chemical diffusion
+across resolved shocks using ``Riemann_shock_D_mix_reduction_on`` and
+``Riemann_shock_D_mix_reduction_full_on``, disabled by default. Profile
+columns report compression, pressure jump, shock strength and the diffusion
+reduction factor.
 
-Entropy-profile relaxation can now use an implicit or normalized energy
+Entropy profile relaxation can now use an implicit or normalized energy
 source and can temporarily select the Newton correction scale and retry hold.
 The new controls restore their incoming solver settings when relaxation ends.
 
@@ -86,6 +106,41 @@ The new controls restore their incoming solver settings when relaxation ends.
 
 Bug Fixes
 ---------
+
+Fixed surface pressure work in the conservative energy equation with
+``u_flag`` or ``v_flag`` and a momentum outer boundary. Surface work now
+uses the same imposed pressure as the momentum equation, including fixed
+pressure and zero gas pressure boundaries. Previously it used the outer
+cell pressure, which could add artificial heating or cooling when the
+cell and boundary pressures differed. The corresponding ``star_LNA``
+surface work term has also been corrected. Cell pressure is retained in
+the simple compression work and ``eps_grav`` forms.
+
+Fixed the pressure derivatives of atmospheres with varying opacity.
+The radius and mass derivatives now include the response to surface
+gravity. The corrected derivatives are also used by ``star_LNA``.
+
+Fixed the temperature offset from the outer face to the surface cell center
+when using a built in atmospheric temperature boundary condition. The
+offset is now independent of the momentum boundary condition, including
+``use_momentum_outer_BC``, compression, zero gas pressure, fixed pressure
+and fixed velocity. Momentum uses the pressure at the outer face, with its
+optional radiation pressure floor evaluated at the atmospheric temperature.
+Both corrections are included in ``star_LNA``.
+
+Fixed the convective velocity interpolation used to set the diffusion
+coefficient at ``f0*Hp`` inside the convective region. In MLT or TDC models,
+interpolation between a mesh face and a convective boundary that did not
+bracket this point could produce excessively large or negative coefficients.
+Interpolation now uses the two mesh faces unless the convective boundary
+brackets the sampling point. Boundary radii on mesh faces are preserved
+exactly, and weights are calculated without subtracting nearly equal cubes.
+This applies to exponential, step and ``step+exponential`` overshooting.
+
+Fixed split/merge AMR handling of ``mesh_min_dlnR``. Cells below the requested
+spacing are now subject to the normal merge limits instead of being
+merged unconditionally. Only radial spacings near numerical precision force
+an emergency merge.
 
 Removed duplicate treatment of ``n14(a,g)f18(e+nu)o18`` in networks that
 include both the explicit hot CNO reactions and the corresponding approximate
@@ -97,45 +152,45 @@ Fixed the hydrodynamic drag energy term so that it is only included when
 ``drag_coefficient`` could inject spurious energy. See :ref:`the known bugs
 entry <drag_energy_u_flag_bug>`.
 
-Fixed the TDC eddy-viscosity boundary condition for cell-centered Riemann
-hydrodynamics. The outer boundary now has zero turbulent stress while the
+Fixed the TDC eddy viscosity boundary condition with ``u_flag``.
+The outer boundary now has zero turbulent stress while the
 surface cell retains the force from its inner turbulent face.
 
-Fixed a radius-collocation inconsistency in TDC eddy viscosity for
-cell-centered Riemann hydrodynamics. The strain, viscous heating, and momentum
-force now use the same lagged cell-midpoint radius, preserving the tridiagonal
-velocity coupling and nonpositive discrete viscous momentum work.
+Fixed inconsistent radii in TDC eddy viscosity with ``u_flag``.
+The strain, viscous heating, and momentum force now use the same lagged
+radius at the cell midpoint, preserving the tridiagonal velocity coupling
+and nonpositive discrete viscous momentum work.
 
 Fixed an ambiguity between the generic transport velocity ``conv_vel`` and
 the MLT/TDC turbulent velocity ``mlt_vc``. ``do1_mlt_eval`` now copies
 ``conv_vel`` into ``mlt_vc`` only for ``convective_mixing``. This preserves
-semiconvective and thermohaline diffusion coefficients while preventing their
-diffusion-equivalent velocities from entering turbulent energy, turbulent
-pressure, or TDC momentum terms.
+semiconvective and thermohaline diffusion coefficients while preventing
+velocities inferred from those coefficients from entering turbulent energy,
+turbulent pressure or TDC momentum terms.
 
-Fixed local eddy-viscous energy accounting when the ``dedt`` energy equation
-explicitly includes radial kinetic energy. TDC now includes the midpoint
-mechanical work from its cell-centered ``u_flag`` acceleration or its
-half-cell ``v_flag`` accelerations in addition to viscous heating. RSP2 uses
-the same ``v_flag`` correction. Energy equations that omit ``dKE/dt``,
-including the time-centered ``P d(1/rho)`` form used by pulsation models,
-continue to include viscous heating alone.
+RSP2 and TDC include midpoint eddy viscous mechanical work when the ``dedt``
+energy equation explicitly includes radial kinetic energy. With ``v_flag``,
+TDC retains this work in the residual but omits its ``k+2`` derivative
+from the block tridiagonal Jacobian. The
+``use_P_d_1_div_rho_form_of_work`` option omits explicit kinetic and
+potential energy time derivatives and therefore does not require this work
+term.
 
 Fixed RTI handling during model cuts and split/merge AMR. Relaxation to a
 stellar cut now restores an incoming ``RTI_flag``. Splitting a cell now
-preserves the mass-weighted ``alpha_RTI`` while keeping child values
-nonnegative and within the original stencil range. The optional behind-shock
-RTI ramp now also handles its zero default without division by zero and cannot
+preserves the mass integral of ``alpha_RTI`` while keeping child values
+nonnegative and within the original stencil range. The optional RTI ramp
+behind a shock now handles its zero default without division by zero and cannot
 produce a negative diffusion multiplier ahead of the shock.
 
-Fixed RTI momentum-diffusion energy accounting for cell-centered Riemann
-hydrodynamics. The total-energy equation now includes the matching midpoint
+Fixed RTI momentum diffusion energy accounting with ``u_flag``.
+The total energy equation now includes the matching midpoint
 mechanical work and interface dissipation. This preserves total energy while
 preventing RTI acceleration from drawing energy from an individual cell's
 internal energy.
 
-Fixed the post-hydrodynamic convergence check to honor
-``hydro_mtx_min_allowed_logT``. Previously it imposed a separate hard-coded
+Fixed the convergence check after the hydrodynamic solve to honor
+``hydro_mtx_min_allowed_logT``. Previously it imposed a separate fixed
 ``logT = 1`` floor after the Newton solve, so lowering the documented matrix
 limit could not permit colder models.
 
@@ -150,15 +205,16 @@ replaced by the surface luminosity. ``photosphere_L`` and ``Teff`` therefore
 use the same photospheric radius and luminosity, while ``log_L`` continues to
 report the surface luminosity.
 
-Fixed the radiative-luminosity split in the ``dPrad/dm`` temperature gradient
+Fixed the radiative luminosity split in the ``dPrad/dm`` temperature gradient
 equation when an actively convective face has negative ``gradr``.
 The equation now retains the counterflowing convective luminosity instead of
-treating the total luminosity as radiative, preventing one-cell temperature
-inversions in dynamic models. The equivalent ``L0*gradT`` form is evaluated
-directly from the face state, avoiding the removable ``L/gradr`` singularity
+treating the total luminosity as radiative, preventing temperature
+inversions confined to one cell in dynamic models. The equivalent
+``L0*gradT`` form is evaluated directly from the face state, avoiding the
+removable ``L/gradr`` singularity
 when the luminosity and ``gradr`` pass through zero. The reported convective
-and radiative luminosities use the same pole-free split. The split now also
-uses the local MLT state rather than the dominant chemical-mixing label, so
+and radiative luminosities use the same expression. The split now also
+uses the local MLT state rather than the dominant chemical mixing label, so
 RTI mixing cannot incorrectly make an active convective face radiative.
 
 Added an optional floor on the atmospheric pressure used by the momentum
@@ -166,13 +222,13 @@ outer boundary. The floor prevents a hydrostatic atmosphere from supplying
 less than the radiation pressure at its boundary temperature.
 
 Fixed velocity remapping during mass loss. Momentum is now conservatively
-remapped on the cell or dual-cell mass coordinates, and unresolved kinetic
+remapped on the cell or dual cell mass coordinates, and unresolved kinetic
 energy is returned locally through ``eps_mdot`` instead of being lost.
 
 Fixed nonpositive surface optical depths after removing surface cells from a
 dynamic model. Surface removal now retains the existing optical depth when
 the hydrostatic pressure estimate is nonphysical. Split/merge metric zoning
-also disables its logarithmic optical-depth component when the optical-depth
+also disables its logarithmic optical depth component when the optical depth
 coordinate is not positive, preventing invalid logarithms from driving
 unbounded mesh refinement.
 
@@ -181,7 +237,7 @@ Important bug fix for ``r26.4.1`` identified by Emily Sandford and Louis Siebena
 The plasmon neutrino cooling rate used a hardcoded prefactor calculated with a Weinberg angle of 0.2319, while all other neutrino cooling processes used calculated prefactors taking the Weinberg angle as input, with default value 0.22290. Thus, modifying the value of the Weinberg angle resulted in changes to neutrino cooling processes except for the plasmon neutrinos. This affects all previous MESA versions, and was found and fixed by user Garv Chauhan, see :ref:`the known bugs entry <plasmon_weinberg_angle_bug>` and `gh-998 <https://github.com/MESAHub/mesa/pull/998>`_. Plasmon neutrinos now use the same Weinberg angle as all other processes and changing its value will affect the corresponding cooling rate. Changes to the plasmon neutrino prefactor for MESA's default Weinberg angle result in small numerical differences for stars where plasmon neutrino cooling is significant.
 
 Fixed a bug where RSP photo restarts did not immediately reconstruct ``s% L``,
-which could leave ``s% L(1)`` with an uninitialized near-zero value and crash
+which could leave ``s% L(1)`` with an uninitialized value near zero and crash
 MESA when the KH timescale was recalculated on restart.
 
 Fixed a small bug where diffusive overshooting (overmixing) routines did not
@@ -194,7 +250,11 @@ The parameter ``report_max_infall_inside_fe_core`` was ignored in versions r25.1
 
 In ``set_superad_reduction`` (``star/private/turb_support.f90``), the density inversion contribution to ``Gamma_term`` used ``superad_reduction_Gamma_limit_scale`` instead of ``superad_reduction_Gamma_inv_scale``. This made the latter control inactive. The published algorithm is restored (Jermyn et al. 2023, equation 64, ``alpha_2`` term). Existing test suite cases set the two scales to the same value and are bit-for-bit unaffected. The fix changes results only when the scales differ.
 
-Photo restarts now preserve the stored superadiabatic turnover-limiter state while ``finish_load_model`` rebuilds derived quantities. Previously, the stored reduction could be reset before ``extras_startup`` restored controls selected dynamically by ``run_star_extras``. Runs that leave superadiabatic reduction disabled still reset the factor on the first evolution step.
+Photo restarts now preserve the stored superadiabatic turnover limiter
+state while ``finish_load_model`` rebuilds derived quantities. Previously,
+the reduction could be reset before ``extras_startup`` restored controls
+from ``run_star_extras``. If superadiabatic reduction remains disabled, the
+factor is reset on the first evolution step.
 
 .. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ``changelog_template.rst``).
 

@@ -108,8 +108,9 @@
       real(dp) :: max_Lneu_for_mass_loss
       real(dp) :: delta_lgLnuc_limit, max_Lphoto_for_lgLnuc_limit, max_Lphoto_for_lgLnuc_limit2
       real(dp) :: delta_lgRho_cntr_hard_limit, dt_div_min_dr_div_cs_limit
+      real(dp) :: gold_tol_residual_norm3, gold_tol_max_residual3
       real(dp) :: logT_for_v_flag, logLneu_for_v_flag
-      logical :: stop_100d_after_pulse, use_RTI_during_hydro
+      logical :: stop_100d_after_pulse, use_RTI_during_hydro, limit_convection_in_unbound_layers
 
       contains
 
@@ -168,6 +169,7 @@
          logLneu_for_v_flag = s% x_ctrl(16)
          stop_100d_after_pulse = s% x_logical_ctrl(1)
          use_RTI_during_hydro = s% x_logical_ctrl(3)
+         limit_convection_in_unbound_layers = s% x_logical_ctrl(4)
          vsurf_for_fixed_bc = s% x_ctrl(17)
          surface_ejecta_removal_mode = s% x_integer_ctrl(2)
          surface_ejecta_radius_limit = s% x_ctrl(18)
@@ -196,6 +198,9 @@
          ! high value until the onset of a pulse to prevent unnecessarily
          ! small timesteps before a pulsation
          dt_div_min_dr_div_cs_limit = s% dt_div_min_dr_div_cs_limit
+
+         gold_tol_residual_norm3 = s% gold_tol_residual_norm3
+         gold_tol_max_residual3 = s% gold_tol_max_residual3
 
       end subroutine extras_controls
 
@@ -353,9 +358,13 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         if (s% generations > 2) then
-            write(*,*) "check mdots", s% mstar_dot, s% mstar_dot_old
-            if (abs(s% mstar_dot) > 1.05d0*abs(s% mstar_dot_old)) then
+         if (s% generations > 1) then
+            if (s% mstar_dot_old == 0d0) then
+               s% mstar_dot = 0.05d0*s% mstar_dot
+            else if (s% mstar_dot*s% mstar_dot_old <= 0d0) then
+               s% mstar_dot = s% mstar_dot_old + &
+                  0.05d0*(s% mstar_dot - s% mstar_dot_old)
+            else if (abs(s% mstar_dot) > 1.05d0*abs(s% mstar_dot_old)) then
                s% mstar_dot = 1.05d0*s% mstar_dot_old
             else if (abs(s% mstar_dot) < 0.95d0*abs(s% mstar_dot_old)) then
                s% mstar_dot = 0.95d0*s% mstar_dot_old
@@ -404,7 +413,7 @@
          s% force_tau_factor = s% tau_factor
          if (s% u_flag) then
             s% use_fixed_vsurf_outer_BC = .true.
-            ! Fixed velocity takes precedence; this keeps P and T at the cell face.
+            ! Fixed velocity takes precedence over the momentum boundary.
             s% use_momentum_outer_BC = .true.
             s% fixed_vsurf = min(s% xtra(x_direct_removal_vsurf), &
                1d5*vsurf_for_fixed_bc)
@@ -1014,6 +1023,7 @@
             max_years_for_timestep, omega_crit, &
             denergy
          real(dp) :: core_mass, rmax, alfa, log10_r, lburn_div_lsurf
+         real(dp) :: fixed_Tsurf, fixed_vsurf, removed_energy, removed_mass, dT0
          logical :: just_did_relax
          character (len=200) :: fname
          include 'formats'
@@ -1024,6 +1034,50 @@
 
          !this is used to ensure we read the right inlist options
          s% use_other_before_struct_burn_mix = .true.
+
+         ! Remove ejecta before the solve so accepted output satisfies the new boundary.
+         if (surface_ejecta_removal_mode == surface_ejecta_removal_direct .and. s% u_flag) then
+            call find_surface_ejecta(s, k_keep, removed_mass, removed_energy)
+            if (k_keep > 1) then
+               write(*,*) 'Removing detached surface layers', &
+                  k_keep, removed_mass/Msun, removed_energy
+
+               fixed_Tsurf = s% T(k_keep)
+               if (surface_ejecta_radius_limit > 0d0) then
+                  fixed_vsurf = max(s% u(k_keep), &
+                     2d0*sqrt(2d0*standard_cgrav*s% m(k_keep)/ &
+                     (surface_ejecta_radius_limit*Rsun)))
+               else
+                  fixed_vsurf = max(s% u(k_keep), &
+                     2d0*sqrt(2d0*s% cgrav(k_keep)*s% m(k_keep)/s% r(k_keep)))
+               end if
+               s% atm_option = 'fixed_Tsurf'
+               s% atm_fixed_Tsurf = fixed_Tsurf
+               s% use_fixed_vsurf_outer_BC = .false.
+               s% use_momentum_outer_BC = .true.
+               call star_remove_surface_at_cell_k(s% id, k_keep, ierr)
+               if (dbg) write(*,*) 'check ierr', ierr
+               if (ierr /= 0) return
+
+               ! Use the rebuilt surface gradient, including the new k=1 cell opacity.
+               ! Subtract the face-to-center temperature offset without changing T(1).
+               dT0 = s% cgrav(1)*s% m_grav(1)*s% dm(1)/(8*pi*pow4(s% r(1)))
+               dT0 = dT0*s% gradT(1)*s% T(1)/s% Peos(1)
+               fixed_Tsurf = s% T(1) - dT0
+               if (is_bad(fixed_Tsurf) .or. fixed_Tsurf <= 0d0) then
+                  write(*,1) 'invalid face temperature after surface removal', fixed_Tsurf
+                  write(*,1) 'surface cell temperature', s% T(1)
+                  write(*,1) 'surface temperature offset', dT0
+                  return
+               end if
+               s% xtra(x_direct_removal_Tsurf) = fixed_Tsurf
+               s% xtra(x_direct_removal_tau_factor) = s% tau_factor
+               s% xtra(x_direct_removal_vsurf) = fixed_vsurf
+               s% lxtra(lx_using_direct_removal_bcs) = .true.
+               call set_direct_removal_boundary(s)
+               s% need_to_setvars = .true.
+            end if
+         end if
 
          ! be sure power info is stored
          call star_set_power_info(s)
@@ -1036,6 +1090,8 @@
                if((abs(log10(lburn_div_lsurf))) < 0.01d0 .and. &
                   (s% star_age > 1d3 .or. s% center_he4 < 0.98d0)) then
                   s% use_other_before_struct_burn_mix = .false.
+                  s% gold_tol_residual_norm3 = gold_tol_residual_norm3
+                  s% gold_tol_max_residual3 = gold_tol_max_residual3
                   call star_relax_uniform_omega(id, 1, s% job% new_omega_div_omega_crit,&
                                                 s% job% num_steps_to_relax_rotation, 1d0, ierr)
                   s% use_other_before_struct_burn_mix = .true.
@@ -1264,6 +1320,10 @@
                s% use_other_before_struct_burn_mix = .false.
                s% timestep_hold = 0
 
+               ! Use the original residual tolerances during entropy relaxation.
+               s% gold_tol_residual_norm3 = gold_tol_residual_norm3
+               s% gold_tol_max_residual3 = gold_tol_max_residual3
+
                call star_relax_to_star_cut(s% id, k_keep, .true., .true., .true., ierr)
                if (ierr /= 0) then
                   write(*,*) "error when removing mass through star_relax_to_star_cut", ierr
@@ -1430,7 +1490,7 @@
          integer, intent(in) :: id
          real(dp), intent(in) :: dt
          integer, intent(out) :: res  ! keep_going, redo, retry, terminate
-         real(dp) :: power_photo
+         real(dp) :: power_photo, v_esc
          integer :: ierr, k
          type (star_info), pointer :: s
          include 'formats'
@@ -1442,6 +1502,27 @@
          !do this to ensure proper behaviour of retries
          if(s% u_flag) then
             call star_read_controls(id, 'inlist_hydro_on', ierr)
+            if (s% xtra(x_time_start_pulse) > 0d0) then
+               s% v_drag = 1d5*vsurf_for_fixed_bc
+            else
+               s% v_drag = 0d0
+            end if
+
+            if (limit_convection_in_unbound_layers) then
+               if (s% xtra(x_time_start_pulse) > 0d0) then
+                  s% max_q_for_convection_with_hydro_on = 1d99
+                  do k = s% nz, 1, -1
+                     v_esc = sqrt(2d0*s% cgrav(k)*s% m(k)/s% r(k))
+                     if (s% u(k) > 4d0*v_esc) exit
+                  end do
+                  if (k > 1) s% max_q_for_convection_with_hydro_on = s% q(k)
+               else
+                  s% max_q_for_convection_with_hydro_on = 0.999d0
+               end if
+            else
+               s% max_q_for_convection_with_hydro_on = 1d99
+            end if
+
             if (s% xtra(x_time_start_pulse) > 0d0) then
                if (max_dt_during_pulse > 0d0) then
                   s% max_timestep = max_dt_during_pulse
@@ -1476,8 +1557,19 @@
                s% max_timestep = 1d99
             end if
             call star_read_controls(id, 'inlist_hydro_off', ierr)
+            s% max_q_for_convection_with_hydro_on = 1d99
          end if
          call set_direct_removal_boundary(s)
+
+         if (.not. s% doing_relax) then
+            ! Set level 3 gold tolerances after reading the hydro inlist on each try.
+            s% gold_tol_residual_norm3 = gold_tol_residual_norm3
+            s% gold_tol_max_residual3 = gold_tol_max_residual3
+            if (s% x_ctrl(23) > 0d0 .and. maxval(s% T(1:s% nz)) > s% x_ctrl(23)) then
+               s% gold_tol_residual_norm3 = 1d3
+               s% gold_tol_max_residual3 = 1d3
+            end if
+         end if
 
          !ignore L_nuc limit if L_phot is too high or if we just did a relax
          !(ixtra(ix_steps_since_relax) is set to zero right after a relax)
@@ -1501,11 +1593,13 @@
                s% delta_lgL_nuc_hard_limit = -1d0
             else
                s% delta_lgL_nuc_limit = delta_lgLnuc_limit
-               s% delta_lgL_nuc_hard_limit = 2d0*delta_lgLnuc_limit
+               ! hard limits can crash the model, be careful
+               s% delta_lgL_nuc_hard_limit = 10d0*delta_lgLnuc_limit
             end if
             if (safe_log10(abs(power_photo)) > max_Lphoto_for_lgLnuc_limit) then
                s% delta_lgL_power_photo_limit = delta_lgLnuc_limit
-               s% delta_lgL_power_photo_hard_limit = 2d0*delta_lgLnuc_limit
+               ! hard limits can crash the model, be careful
+               s% delta_lgL_power_photo_hard_limit = 10d0*delta_lgLnuc_limit
             else
                s% delta_lgL_power_photo_limit = -1d0
                s% delta_lgL_power_photo_hard_limit = -1d0
@@ -1518,7 +1612,7 @@
                .or. safe_log10(s% power_neutrinos) > max_Lneu_for_mass_loss &
                .or. s% u_flag) then
             s% use_other_wind = .false.
-            s% use_other_adjust_mdot = use_other_adjust_mdot_for_winds
+            s% use_other_adjust_mdot = .false.
             s% was_in_implicit_wind_limit = .false.
          else
             s% use_other_wind = .true.
@@ -1547,8 +1641,7 @@
       integer function extras_finish_step(id)
          use run_star_support
          integer, intent(in) :: id
-         integer :: ierr, k_keep
-         real(dp) :: fixed_Tsurf, fixed_vsurf, max_vel_inside, removed_energy, removed_mass
+         integer :: ierr
          type (star_info), pointer :: s
          include 'formats'
          ierr = 0
@@ -1567,46 +1660,12 @@
                s% xtra(x_time_since_first_gamma_zero) + s% dt
          end if
 
-         if (surface_ejecta_removal_mode == surface_ejecta_removal_direct .and. s% u_flag) then
-            call find_surface_ejecta(s, k_keep, removed_mass, removed_energy)
-            if (k_keep > 1) then
-               write(*,*) 'Removing detached surface layers', &
-                  k_keep, removed_mass/Msun, removed_energy
-
-               fixed_Tsurf = s% T(k_keep)
-               if (surface_ejecta_radius_limit > 0d0) then
-                  fixed_vsurf = max(s% u(k_keep), &
-                     2d0*sqrt(2d0*standard_cgrav*s% m(k_keep)/ &
-                     (surface_ejecta_radius_limit*Rsun)))
-               else
-                  fixed_vsurf = max(s% u(k_keep), &
-                     2d0*sqrt(2d0*s% cgrav(k_keep)*s% m(k_keep)/s% r(k_keep)))
-               end if
-               s% atm_option = 'fixed_Tsurf'
-               s% atm_fixed_Tsurf = fixed_Tsurf
-               s% use_fixed_vsurf_outer_BC = .false.
-               s% use_momentum_outer_BC = .true.
-               call star_remove_surface_at_cell_k(s% id, k_keep, ierr)
-               if (dbg) write(*,*) 'check ierr', ierr
-               if (ierr /= 0) then
-                  extras_finish_step = terminate
-                  return
-               end if
-               s% xtra(x_direct_removal_Tsurf) = fixed_Tsurf
-               s% xtra(x_direct_removal_tau_factor) = s% tau_factor
-               s% xtra(x_direct_removal_vsurf) = fixed_vsurf
-               s% lxtra(lx_using_direct_removal_bcs) = .true.
-               call set_direct_removal_boundary(s)
-               s% need_to_setvars = .true.
-            end if
-         end if
-
          s% ixtra(ix_steps_since_relax) = s% ixtra(ix_steps_since_relax) + 1
          s% ixtra(ix_steps_since_hydro_on) = s% ixtra(ix_steps_since_hydro_on) + 1
 
          if (s% ixtra(ix_num_relaxations) == 1 .and. stop_100d_after_pulse &
                .and. s% star_age - s% xtra(x_star_age_at_relax) > 100d0/dayyer) then
-            !for the test_suite, terminate at the onset of the second pulse
+            ! Terminate 100 days after the first pulse relaxation.
             extras_finish_step = terminate
             s% termination_code = t_xtra1
             termination_code_str(t_xtra1) = "Successful test: evolved 100 days past first relax"

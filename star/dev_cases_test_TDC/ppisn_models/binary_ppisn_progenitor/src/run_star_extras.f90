@@ -29,7 +29,6 @@ module run_star_extras
   use chem_def
   use num_lib
   use binary_def
-  use ionization_def
 
   implicit none
 
@@ -81,20 +80,6 @@ contains
     call star_ptr(id, s, ierr)
     if (ierr /= 0) return
 
-    ! use 11-16 to avoid overlap with lxtra(1) and lxtra(2) used in run_binary_extras.f90
-    if (.not. restart) then
-       s% lxtra(11) = .false.
-       s% lxtra(12) = .false.
-       s% lxtra(13) = .false.
-       s% lxtra(14) = .false.
-       s% lxtra(15) = .false.
-       s% lxtra(16) = .false.
-       s% lxtra(17) = .false.
-       s% lxtra(18) = .false.
-       s% lxtra(19) = .false.
-       s% lxtra(20) = .false.
-       s% lxtra(21) = .false.
-    end if
   end subroutine extras_startup
 
 
@@ -115,152 +100,10 @@ contains
     integer, intent(in) :: id
     integer :: ierr
     type (star_info), pointer :: s
-    real(dp) :: error, atol, rtol
     ierr = 0
     call star_ptr(id, s, ierr)
     if (ierr /= 0) return
     extras_check_model = keep_going
-
-    ! check we don't overshoot too much the radii of interest
-    if ((s% lxtra(11) .eqv. .false.) .and. (s% r(1)/Rsun >= 20.0d0)) then
-
-        error = 1d0*(s%r(1)/Rsun - 20.0d0)
-
-        if (error > 0.1d0) then
-            extras_check_model = retry
-        end if
-
-    end if
-
-    !check we don't overshoot too much the radii of interest
-    if ((s% lxtra(12) .eqv. .false.) .and. (s% r(1)/Rsun >= 25.0d0)) then
-
-        error = 1d0*(s%r(1)/Rsun - 25.0d0)
-
-        if (error > 1d0) then
-            print*, "error", error
-            extras_check_model = retry
-        end if
-
-    end if
-
-    !check we don't overshoot too much the radii of interest
-    if ((s% lxtra(13) .eqv. .false.) .and. (s% r(1)/Rsun >= 30.0d0)) then
-
-        error = 1d0*(s%r(1)/Rsun - 30.0d0)
-
-        if (error > 1d0) then
-            print*, "error", error
-            extras_check_model = retry
-
-        end if
-
-    end if
-
-    !check we don't overshoot too much the radii of interest
-    if ((s% lxtra(14) .eqv. .false.) .and. (s% r(1)/Rsun >= 50.0d0)) then
-
-        error = 1d0*(s%r(1)/Rsun - 50.0d0)
-
-        if (error > 1d0) then
-            print*, "error", error
-            extras_check_model = retry
-
-        end if
-
-    end if
-
-    !check we don't overshoot too much the radii of interest
-    if ((s% lxtra(15) .eqv. .false.) .and. (s% r(1)/Rsun >= 100.0d0)) then
-
-        error = 1d0*(s%r(1)/Rsun - 100.0d0)
-
-        if (error > 5d0) then
-            print*, "error", error
-            extras_check_model = retry
-
-        end if
-
-    end if
-
-    !check we don't overshoot too much the radii of interest
-    if ((s% lxtra(16) .eqv. .false.) .and. (s% r(1)/Rsun >= 500.0d0)) then
-
-        error = 1d0*(s%r(1)/Rsun - 500.0d0)
-
-        if (error > 10d0) then
-            print*, "error", error
-            extras_check_model = retry
-
-        end if
-
-    end if
-
-    !check we don't overshoot too much the radii of interest
-    if ((s% lxtra(17) .eqv. .false.) .and. (s% r(1)/Rsun >= 1000.0d0)) then
-
-        error = 1d0*(s%r(1)/Rsun - 1000.0d0)
-
-        if (error > 20d0) then
-            print*, "error", error
-            extras_check_model = retry
-
-        end if
-
-    end if
-
-    !check we don't overshoot too much the radii of interest
-    if ((s% lxtra(18) .eqv. .false.) .and. (s% r(1)/Rsun >= 1200.0d0)) then
-
-        error = 1d0*(s%r(1)/Rsun - 1200.0d0)
-
-        if (error > 20d0) then
-            print*, "error", error
-            extras_check_model = retry
-
-        end if
-
-    end if
-
-    !check we don't overshoot too much the radii of interest
-    if ((s% lxtra(19) .eqv. .false.) .and. (s% r(1)/Rsun >= 1300.0d0)) then
-
-        error = 1d0*(s%r(1)/Rsun - 1300.0d0)
-
-        if (error > 20d0) then
-            print*, "error", error
-            extras_check_model = retry
-
-        end if
-
-    end if
-
-    !check we don't overshoot too much the radii of interest
-    if ((s% lxtra(20) .eqv. .false.) .and. (s% r(1)/Rsun >= 1400.0d0)) then
-
-        error = 1d0*(s%r(1)/Rsun - 1400.0d0)
-
-        if (error > 20d0) then
-            print*, "error", error
-            extras_check_model = retry
-
-        end if
-
-    end if
-
-    !check we don't overshoot too much the radii of interest
-    if ((s% lxtra(21) .eqv. .false.) .and. (s% r(1)/Rsun >= 1500.0d0)) then
-
-
-        error = 1d0*(s%r(1)/Rsun - 1500.0d0)
-
-        if (error > 20d0) then
-            print*, "error", error
-            extras_check_model = retry
-
-        end if
-
-    end if
 
     ! by default, indicate where (in the code) MESA terminated
     if (extras_check_model == terminate) s% termination_code = t_extras_check_model
@@ -274,199 +117,20 @@ contains
     ierr = 0
     call star_ptr(id, s, ierr)
     if (ierr /= 0) return
-    how_many_extra_history_columns =  13
+    how_many_extra_history_columns =  0
   end function how_many_extra_history_columns
 
 
   subroutine data_for_extra_history_columns(id, n, names, vals, ierr)
-    use chem_def, only: chem_isos
     integer, intent(in) :: id, n
     character (len=maxlen_history_column_name) :: names(n)
     real(dp) :: vals(n)
     integer, intent(out) :: ierr
-    ! POSYDON output
-    real(dp) :: env_binding_E, total_env_binding_E
-    integer :: i, k, nz
-    integer :: i1, k1, k2, j
-    integer :: h1, he4, c12, o16
-    real(dp) :: he_core_mass_1cent,  he_core_mass_10cent, he_core_mass_30cent
-    real(dp) :: he_core_radius_1cent, he_core_radius_10cent, he_core_radius_30cent
-    real(dp) ::  lambda_CE_1cent, lambda_CE_10cent, lambda_CE_30cent
-    real(dp),  dimension (:), allocatable ::  adjusted_energy, energy
-    real(dp) :: rec_energy_HII_to_HI, &
-         rec_energy_HeII_to_HeI, &
-         rec_energy_HeIII_to_HeII, &
-         diss_energy_H2, &
-         frac_HI, frac_HII, &
-         frac_HeI, frac_HeII, frac_HeIII, &
-         avg_charge_He, energy_comp
-    logical :: have_30_value, have_10_value, have_1_value, have_co_value
-    logical :: sticking_to_energy_without_recombination_corr
     ! -------------------------------------
     type (star_info), pointer :: s
     ierr = 0
     call star_ptr(id, s, ierr)
     if (ierr /= 0) return
-
-    nz = s% nz
-
-    ! output info about the ENV.: binding energy
-    total_env_binding_E = 0.0d0
-    do k=1,s% nz-1
-       if (s% m(k) > (s% he_core_mass * Msun)) then !envelope is defined to be H-rich
-          env_binding_E = s% dm(k) * (s% energy(k) - (s% cgrav(k) * s% m(k+1))/s% r(k+1))
-          total_env_binding_E = total_env_binding_E + env_binding_E
-       end if
-    end do
-
-    names(1) = 'envelope_binding_energy'
-    vals(1) = total_env_binding_E
-
-    ! lambda_CE calculation for different core definitions.
-    ! get energy from the EOS and adjust the different contributions from recombination/dissociation to internal energy
-    ! allocate(adjusted_energy(s% nz))
-    allocate(energy(s% nz))
-    ! adjusted_energy=0.0d0
-    energy=0.0d0
-
-    ! do k=1, s% nz
-    !   ! the following lines compute the fractions of HI, HII, HeI, HeII and HeIII
-    !   ! things like ion_ifneut_H are defined in $MESA_DIR/ionization/public/ionization.def
-    !   ! this file can be checked for additional ionization output available
-    !   frac_HI = get_ion_info(s,ion_ifneut_H,k)
-    !   frac_HII = 1.0d0 - frac_HI
-
-    !   ! ionization module provides neutral fraction and average charge of He.
-    !   ! use these two to compute the mass fractions of HeI and HeII
-    !   frac_HeI = get_ion_info(s,ion_ifneut_He,k)
-    !   avg_charge_He = get_ion_info(s,ion_iZ_He,k)
-    !   ! the following is the solution to the equations
-    !   !   avg_charge_He = 2*fracHeIII + 1*fracHeII
-    !   !               1 = fracHeI + fracHeII + fracHeIII
-    !   frac_HeII = 2d0 - 2d0*frac_HeI - avg_charge_He
-    !   frac_HeIII = 1d0 - frac_HeII - frac_HeI
-
-    !   ! recombination energies from https://physics.nist.gov/PhysRefData/ASD/ionEnergy.html
-    !   rec_energy_HII_to_HI = avo*13.59843449d0*frac_HII*ev2erg*s% X(k)
-    !   diss_energy_H2 = avo*4.52d0/2d0*ev2erg*s% X(k)
-    !   rec_energy_HeII_to_HeI = avo*24.58738880d0*(frac_HeII+frac_HeIII)*ev2erg*s% Y(k)/4d0
-    !   rec_energy_HeIII_to_HeII = avo*54.4177650d0*frac_HeIII*ev2erg*s% Y(k)/4d0
-
-    !   adjusted_energy(k) = s% energy(k) &
-    !         - rec_energy_HII_to_HI &
-    !         - rec_energy_HeII_to_HeI &
-    !         - rec_energy_HeIII_to_HeII &
-    !         - diss_energy_H2
-
-    !     !write(*,*) "s% energy(k):", s% energy(k), " adjusted_energy, ", adjusted_energy(k)
-    !     !write(*,*) "frac HII", frac_HII
-    !   if (adjusted_energy(k) < 0d0 .or. adjusted_energy(k) > s% energy(k)) then
-    !       write(*,*) "Error when computing adjusted energy in CE, ", &
-    !           "s% energy(k):", s% energy(k), " adjusted_energy, ", adjusted_energy(k)
-    !       !sticking_to_energy_without_recombination_corr = .true.
-    !   end if
-
-    !   if(.false.) then
-    !       ! for debug, check the mismatch between the EOS energy and that of a gas+radiation
-    !       energy_comp = 3.0d0*avo*boltzm*s% T(k)/(2*s% mu(k)) + crad*pow4(s% T(k))/s% rho(k) &
-    !           + rec_energy_HII_to_HI &
-    !           + rec_energy_HeII_to_HeI &
-    !           + rec_energy_HeIII_to_HeII &
-    !           + diss_energy_H2
-
-    !       write(*,*) "compare energies", k, s%m(k)/Msun, s% energy(k), energy_comp, &
-    !           (s% energy(k)-energy_comp)/s% energy(k)
-    !   end if
-
-    ! end do
-
-   do k=1, s% nz
-      energy(k) = s% energy(k)
-   end do
-
-    ! to do. lambda_CEE calculation for He star envelope too.s
-    he_core_mass_1cent = 0.0d0
-    he_core_mass_10cent = 0.0d0
-    he_core_mass_30cent = 0.0d0
-    !for MS stars = he core is 0, lambda calculated for whole star
-    !for He stars = he core is whole star, lambda calculated for whole star
-
-    he_core_radius_1cent = 0.0d0
-    he_core_radius_10cent = 0.0d0
-    he_core_radius_30cent = 0.0d0
-
-    h1 = s% net_iso(ih1)
-    he4 = s% net_iso(ihe4)
-    have_30_value = .false.
-    have_10_value = .false.
-    have_1_value = .false.
-    if (h1 /= 0 .and. he4 /= 0) then
-       do k=1, s% nz
-          if (.not. have_30_value) then
-             if (s% xa(h1,k) <=  0.3d0 .and. &
-                  s% xa(he4,k) >= 0.1d0) then
-                he_core_mass_30cent = s% m(k)
-                he_core_radius_30cent = s% r(k)
-                have_30_value = .true.
-             end if
-          end if
-          if (.not. have_10_value) then
-             if (s% xa(h1,k) <= 0.1d0 .and. &
-                  s% xa(he4,k) >= 0.1d0) then
-                he_core_mass_10cent = s% m(k)
-                he_core_radius_10cent = s% r(k)
-                have_10_value = .true.
-             end if
-          end if
-          if (.not. have_1_value) then
-             if (s% xa(h1,k) <= 0.01d0 .and. &
-                  s% xa(he4,k) >= 0.1d0) then
-                he_core_mass_1cent = s% m(k)
-                he_core_radius_1cent = s% r(k)
-                have_1_value = .true.
-             end if
-          end if
-       end do
-    end if
-
-    lambda_CE_1cent = lambda_CE(s,energy, he_core_mass_1cent)
-    lambda_CE_10cent = lambda_CE(s,energy, he_core_mass_10cent)
-    lambda_CE_30cent = lambda_CE(s,energy, he_core_mass_30cent)
-
-    names(2) = 'lambda_CE_1cent'
-    vals(2) = lambda_CE_1cent
-    names(3) = 'lambda_CE_10cent'
-    vals(3) = lambda_CE_10cent
-    names(4) = 'lambda_CE_30cent'
-    vals(4) = lambda_CE_30cent
-
-    names(5) = 'he_core_mass_1cent'
-    vals(5) = he_core_mass_1cent
-    names(6) = 'he_core_mass_10cent'
-    vals(6) = he_core_mass_10cent
-    names(7) = 'he_core_mass_30cent'
-    vals(7) = he_core_mass_30cent
-    names(8) = 'he_core_radius_1cent'
-    vals(8) = he_core_radius_1cent
-    names(9) = 'he_core_radius_10cent'
-    vals(9) = he_core_radius_10cent
-    names(10) = 'he_core_radius_30cent'
-    vals(10) = he_core_radius_30cent
-
-    do k=1, s% nz
-      energy(k) = 0
-    end do
-
-    lambda_CE_1cent = lambda_CE(s,energy, he_core_mass_1cent)
-    lambda_CE_10cent = lambda_CE(s,energy, he_core_mass_10cent)
-    lambda_CE_30cent = lambda_CE(s,energy, he_core_mass_30cent)
-
-    names(11) = 'lambda_CE_1cent_grav'
-    vals(11) = lambda_CE_1cent
-    names(12) = 'lambda_CE_10cent_grav'
-    vals(12) = lambda_CE_10cent
-    names(13) = 'lambda_CE_30cent_grav'
-    vals(13) = lambda_CE_30cent
 
   end subroutine data_for_extra_history_columns
 
@@ -489,15 +153,6 @@ contains
     integer, intent(out) :: ierr
     type (star_info), pointer :: s
     integer :: k
-
-    ! real(dp) :: rec_energy_HII_to_HI, &
-    !      rec_energy_HeII_to_HeI, &
-    !      rec_energy_HeIII_to_HeII, &
-    !      diss_energy_H2, &
-    !      frac_HI, frac_HII, &
-    !      frac_HeI, frac_HeII, frac_HeIII, &
-    !      avg_charge_He, energy_comp
-
     ierr = 0
     call star_ptr(id, s, ierr)
     if (ierr /= 0) return
@@ -512,41 +167,6 @@ contains
     !do k = 1, nz
     !   vals(k,1) = s% Pgas(k)/s% P(k)
     !end do
-
-    ! names(1) = 'u_no_rec'
-    ! names(2) = 'u_yes_rec'
-
-    ! do k=1, s% nz
-    !   ! the following lines compute the fractions of HI, HII, HeI, HeII and HeIII
-    !   ! things like ion_ifneut_H are defined in $MESA_DIR/ionization/public/ionization.def
-    !   ! this file can be checked for additional ionization output available
-    !   frac_HI = get_ion_info(s,ion_ifneut_H,k)
-    !   frac_HII = 1.0d0 - frac_HI
-
-    !   ! ionization module provides neutral fraction and average charge of He.
-    !   ! use these two to compute the mass fractions of HeI and HeII
-    !   frac_HeI = get_ion_info(s,ion_ifneut_He,k)
-    !   avg_charge_He = get_ion_info(s,ion_iZ_He,k)
-    !   ! the following is the solution to the equations
-    !   !   avg_charge_He = 2*fracHeIII + 1*fracHeII
-    !   !               1 = fracHeI + fracHeII + fracHeIII
-    !   frac_HeII = 2d0 - 2d0*frac_HeI - avg_charge_He
-    !   frac_HeIII = 1d0 - frac_HeII - frac_HeI
-
-    !   ! recombination energies from https://physics.nist.gov/PhysRefData/ASD/ionEnergy.html
-    !   rec_energy_HII_to_HI = avo*13.59843449d0*frac_HII*ev2erg*s% X(k)
-    !   diss_energy_H2 = avo*4.52d0/2d0*ev2erg*s% X(k)
-    !   rec_energy_HeII_to_HeI = avo*24.58738880d0*(frac_HeII+frac_HeIII)*ev2erg*s% Y(k)/4d0
-    !   rec_energy_HeIII_to_HeII = avo*54.4177650d0*frac_HeIII*ev2erg*s% Y(k)/4d0
-
-    !     vals(k,1) = s% energy(k) &
-    !         - rec_energy_HII_to_HI &
-    !         - rec_energy_HeII_to_HeI &
-    !         - rec_energy_HeIII_to_HeII &
-    !         - diss_energy_H2
-
-    !     vals(k,2) = s% energy(k)
-    ! end do
 
   end subroutine data_for_extra_profile_columns
 
@@ -611,179 +231,12 @@ contains
   ! note: cannot request retry or backup; extras_check_model can do that.
   integer function extras_finish_step(id)
     integer, intent(in) :: id
-    integer :: ierr, i
-    real(dp) :: envelope_mass_fraction, L_He, L_tot, min_center_h1_for_diff, &
-         critmass, feh, rot_full_off, rot_full_on, frac2, TAMS_h1_treshold
-    real(dp), parameter :: huge_dt_limit = 3.15d16 ! ~1 Gyr
-    real(dp), parameter :: new_varcontrol_target = 1d-3
-    real(dp), parameter :: Zsol = 0.0142_dp
-    logical :: diff_test1, diff_test2, diff_test3, is_ne_biggest
-    !character (len=strlen) :: photoname, fname
-    character (len=30) :: photoname, fname
+    integer :: ierr
     type (star_info), pointer :: s
     ierr = 0
     call star_ptr(id, s, ierr)
     if (ierr /= 0) return
     extras_finish_step = keep_going
-
-    ! write(fname, fmt="(a11)") 'recombination.data'
-    ! print*, "saving profile "// fname
-    ! call star_write_profile_info(id, trim(s%log_directory)//'/'//trim(fname), ierr)
-    ! extras_finish_step = terminate
-
-    if (s%lxtra(11) .eqv. .false.) then
-       ! save profile for R=20Rsun
-       if (s% r(1)/Rsun >= 20) then
-          s% lxtra(11) = .true.
-          write(fname, fmt="(a11)") '20Rsun.data'
-          print*, "saving profile "// fname
-          call star_write_profile_info(id, trim(s%log_directory)//'/'//trim(fname), ierr)
-          write(fname, fmt="(a10)") '20Rsun.mod'
-          call star_write_model(id, trim(fname), ierr)
-          write(fname, fmt="(a6)") '20Rsun'
-          call star_save_for_restart(id, trim(s%photo_directory)//'/'//trim(fname), ierr)
-       end if
-    end if
-
-    if (s%lxtra(12) .eqv. .false.) then
-       ! save profile for R=25Rsun
-       if (s% r(1)/Rsun >= 25) then
-          s% lxtra(12) = .true.
-          fname = '25Rsun.data'
-          print*, "saving profile "// fname
-          call star_write_profile_info(id, trim(s%log_directory)//'/'//trim(fname), ierr)
-          fname = '25Rsun.mod'
-          call star_write_model(id, trim(fname), ierr)
-          fname = '25Rsun'
-          call star_save_for_restart(id, trim(s%photo_directory)//'/'//trim(fname), ierr)
-       end if
-    end if
-
-    if (s%lxtra(13) .eqv. .false.) then
-       ! save profile for R=30Rsun
-       if (s% r(1)/Rsun >= 30) then
-          s% lxtra(13) = .true.
-          fname = '30Rsun.data'
-          print*, "saving profile "// fname
-          call star_write_profile_info(id, trim(s%log_directory)//'/'//trim(fname), ierr)
-          fname = '30Rsun.mod'
-          call star_write_model(id, trim(fname), ierr)
-          fname = '30Rsun'
-          call star_save_for_restart(id, trim(s%photo_directory)//'/'//trim(fname), ierr)
-       end if
-    end if
-
-    if (s%lxtra(14) .eqv. .false.) then
-       ! save profile for R=50Rsun
-       if (s% r(1)/Rsun >= 50) then
-          s% lxtra(14) = .true.
-          fname = '50Rsun.data'
-          print*, "saving profile "//fname
-          call star_write_profile_info(id, trim(s%log_directory)//'/'//trim(fname), ierr)
-          fname = '50Rsun.mod'
-          call star_write_model(id, trim(fname), ierr)
-          fname = '50Rsun'
-          call star_save_for_restart(id, trim(s%photo_directory)//'/'//trim(fname), ierr)
-       end if
-    end if
-
-    if (s%lxtra(15) .eqv. .false.) then
-       ! save profile for R=100Rsun
-       if (s% r(1)/Rsun >= 100) then
-          s% lxtra(15) = .true.
-          write(fname, fmt="(a12)") '100Rsun.data'
-          print*, "saving profile "//fname
-          call star_write_profile_info(id, trim(s%log_directory)//'/'//trim(fname), ierr)
-          write(fname, fmt="(a11)") '100Rsun.mod'
-          call star_write_model(id, trim(fname), ierr)
-          write(fname, fmt="(a7)") '100Rsun'
-          call star_save_for_restart(id, trim(s%photo_directory)//'/'//trim(fname), ierr)
-       end if
-    end if
-
-    if (s%lxtra(16) .eqv. .false.) then
-       ! save profile for R=500Rsun
-       if (s% r(1)/Rsun >= 500) then
-          s% lxtra(16) = .true.
-          fname = '500Rsun.data'
-          print*, "saving profile "//fname
-          call star_write_profile_info(id, trim(s%log_directory)//'/'//trim(fname), ierr)
-          fname = '500Rsun.mod'
-          call star_write_model(id, trim(fname), ierr)
-          fname = '500Rsun'
-          call star_save_for_restart(id, trim(s%photo_directory)//'/'//trim(fname), ierr)
-       end if
-    end if
-
-    if (s%lxtra(17) .eqv. .false.) then
-       ! save profile for R=1000Rsun
-       if (s% r(1)/Rsun >= 1000) then
-          s% lxtra(17) = .true.
-          write(fname, fmt="(a13)") '1000Rsun.data'
-          print*, "saving profile "//fname
-          call star_write_profile_info(id, trim(s%log_directory)//'/'//trim(fname), ierr)
-          write(fname, fmt="(a12)") '1000Rsun.mod'
-          call star_write_model(id, trim(fname), ierr)
-          write(fname, fmt="(a8)") '1000Rsun'
-          call star_save_for_restart(id, trim(s%photo_directory)//'/'//trim(fname), ierr)
-       end if
-    end if
-
-    if (s%lxtra(18) .eqv. .false.) then
-       ! save profile for R=1200Rsun
-       if (s% r(1)/Rsun >= 1200) then
-          s% lxtra(18) = .true.
-          write(fname, fmt="(a13)") '1200Rsun.data'
-          print*, "saving profile "//fname
-          call star_write_profile_info(id, trim(s%log_directory)//'/'//trim(fname), ierr)
-          write(fname, fmt="(a12)") '1200Rsun.mod'
-          call star_write_model(id, trim(fname), ierr)
-          write(fname, fmt="(a8)") '1200Rsun'
-          call star_save_for_restart(id, trim(s%photo_directory)//'/'//trim(fname), ierr)
-       end if
-    end if
-
-    if (s%lxtra(19) .eqv. .false.) then
-       ! save profile for R=1300Rsun
-       if (s% r(1)/Rsun >= 1300) then
-          s% lxtra(19) = .true.
-          write(fname, fmt="(a13)") '1300Rsun.data'
-          print*, "saving profile "//fname
-          call star_write_profile_info(id, trim(s%log_directory)//'/'//trim(fname), ierr)
-          write(fname, fmt="(a12)") '1300Rsun.mod'
-          call star_write_model(id, trim(fname), ierr)
-          write(fname, fmt="(a8)") '1300Rsun'
-          call star_save_for_restart(id, trim(s%photo_directory)//'/'//trim(fname), ierr)
-       end if
-    end if
-
-    if (s%lxtra(20) .eqv. .false.) then
-       ! save profile for R=1400Rsun
-       if (s% r(1)/Rsun >= 1400) then
-          s% lxtra(20) = .true.
-          write(fname, fmt="(a13)") '1400Rsun.data'
-          print*, "saving profile "//fname
-          call star_write_profile_info(id, trim(s%log_directory)//'/'//trim(fname), ierr)
-          write(fname, fmt="(a12)") '1400Rsun.mod'
-          call star_write_model(id, trim(fname), ierr)
-          write(fname, fmt="(a8)") '1400Rsun'
-          call star_save_for_restart(id, trim(s%photo_directory)//'/'//trim(fname), ierr)
-       end if
-    end if
-
-    if (s%lxtra(21) .eqv. .false.) then
-       ! save profile for R=1500Rsun
-       if (s% r(1)/Rsun >= 1500) then
-          s% lxtra(21) = .true.
-          write(fname, fmt="(a13)") '1500Rsun.data'
-          print*, "saving profile "//fname
-          call star_write_profile_info(id, trim(s%log_directory)//'/'//trim(fname), ierr)
-          write(fname, fmt="(a12)") '1500Rsun.mod'
-          call star_write_model(id, trim(fname), ierr)
-          write(fname, fmt="(a8)") '1500Rsun'
-          call star_save_for_restart(id, trim(s%photo_directory)//'/'//trim(fname), ierr)
-       end if
-    end if
 
     if (extras_finish_step == terminate) s% termination_code = t_extras_finish_step
   end function extras_finish_step
@@ -1010,61 +463,4 @@ subroutine eval_Sabhahit_wind(w)
          end subroutine eval_Sabhahit_wind
 
 end subroutine my_wind
-
-real(dp) function lambda_CE(s, adjusted_energy, star_core_mass_CE)
-  type (star_info), pointer :: s
-  integer :: k
-  real(dp) :: E_bind, E_bind_shell, star_core_mass_CE, E_bind_grav_shell, E_bind_thermal_shell, E_bind_grav, E_bind_thermal
-  real(dp) :: adjusted_energy(:)
-
-  if (s% m(1) <= (star_core_mass_CE)) then
-     lambda_CE = 1d99 ! no envelope, so immediately have a "succesfull envelope ejection"
-  else
-     E_bind = 0.0d0
-     E_bind_shell = 0.0d0
-     E_bind_grav = 0.0d0
-     E_bind_grav_shell = 0.0d0
-     E_bind_thermal = 0.0d0
-     E_bind_thermal_shell = 0.0d0
-     do k=1, s% nz
-        if (s% m(k) > (star_core_mass_CE)) then !envelope is defined as everything above star_core_mass_CE.
-
-           E_bind_grav_shell = (s% cgrav(1) * s% m(k) * s% dm_bar(k))/(s% r(k))
-           E_bind_grav = E_bind_grav + E_bind_grav_shell
-
-           E_bind_thermal_shell = s% dm(k) * adjusted_energy(k)
-           E_bind_thermal = E_bind_thermal + E_bind_thermal_shell
-
-        end if
-     end do
-
-    !  write(*,*) "E_bind_grav", E_bind_grav, "E_bind_thermal", E_bind_thermal
-
-     E_bind = E_bind_thermal - E_bind_grav
-     lambda_CE = - s% cgrav(1) * (s% m(1)) * ((s% m(1)) - star_core_mass_CE)/(E_bind * s% r(1))
-  end if
-
-end function lambda_CE
-
-
-real(dp) function get_ion_info(s,id,k)
-  use ionization_def, only: num_ion_vals
-  use ionization_lib, only: eval_ionization
-  integer, intent(in) :: id, k
-  integer :: ierr
-  real(dp) :: ionization_res(num_ion_vals)
-  type (star_info), pointer :: s
-  ierr = 0
-  call eval_ionization( &
-       1d0 - (s% X(k) + s% Y(k)), s% X(k), s% Rho(k), s% lnd(k)/ln10, &
-       s% T(k), s% lnT(k)/ln10, ionization_res, ierr)
-  if (ierr /= 0) ionization_res = 0
-  get_ion_info = ionization_res(id)
-end function get_ion_info
-
-
-
-
-  !include 'POSYDON_single_stars.inc'
-
 end module run_star_extras

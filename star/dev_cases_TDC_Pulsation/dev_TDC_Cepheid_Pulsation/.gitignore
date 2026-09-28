@@ -1,0 +1,34 @@
+# MESA build products
+star
+build/
+make/*.o
+make/*.mod
+make/*.smod
+
+# MESA run output
+LOGS*/
+photos/
+png/
+png_*/
+hr_png/
+TRho/
+.mesa_temp_cache/
+restart_photo
+LNA/
+
+# Saved models and custom run data
+mod_dir/
+*.mod
+!standard_he_dep.mod
+!model_00000800.mod
+
+# Common captured output
+*.log
+*.out
+*.err
+output.txt
+.DS_Store
+*.mp4
+plotting/*.csv
+plotting/*.png
+plotting/*.txt

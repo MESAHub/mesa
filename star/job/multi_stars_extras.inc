@@ -4,7 +4,8 @@
          integer :: id, ierr, i, i_prev, result, result_reason, model_number
          type (star_info), pointer :: s
          character (len=64) :: inlist_fname
-         logical :: okay_to_restart, restart, first_try, continue_evolve_loop
+         logical :: okay_to_restart, restart, first_try, continue_evolve_loop, &
+            stop_after_star_LNA
          real(dp) :: sum_times
          real(dp) :: dt
          logical :: pgstar_ok
@@ -50,8 +51,9 @@
             call start_run1_star( &
                do_alloc_star, do_free_star, okay_to_restart, &
                id, restart, restart_names(i), pgstar_ok, dbg, &
-               extras_controls, ierr, inlist_names(i))
+               extras_controls, ierr, inlist_names(i), stop_after_star_LNA)
             if (failed('before_evolve_loop',ierr)) return
+            star_done(i) = stop_after_star_LNA
 
             call star_ptr(id, s, ierr)
             if (failed('star_ptr',ierr)) return

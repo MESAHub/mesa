@@ -22,6 +22,7 @@
       use star_private_def
       use const_def, only: dp, ln10, pi4, four_thirds_pi, crad
       use chem_def, only: ih1, ihe3, ihe4
+      use math_lib, only: log1p
       use utils_lib
       use auto_diff_support
 
@@ -29,6 +30,8 @@
 
       private
       public :: remesh_split_merge
+
+      real(dp), parameter :: numerical_dlnR_floor = 64d0*epsilon(1d0)
 
       contains
 
@@ -41,10 +44,6 @@
          integer :: ierr
 
          include 'formats'
-
-         if (s% RSP2_flag) then
-            call mesa_error(__FILE__,__LINE__,'split/merge AMR does not support RSP2')
-         end if
 
          s% amr_split_merge_has_undergone_remesh(:) = .false.
 
@@ -102,7 +101,7 @@
             s% dm(k)*s% opacity(k)/(pi4*s% rmid(k)*s% rmid(k))
          call enforce_surface_dq_min
          if (ierr /= 0) return
-         call enforce_dlnR_min
+         call enforce_numerical_dlnR_floor
          if (ierr /= 0) return
          do iter = 1, s% split_merge_amr_max_iters
             call biggest_smallest(s, tau_center, TooBig, TooSmall, iTooBig, iTooSmall)
@@ -184,7 +183,9 @@
 
          subroutine enforce_surface_dq_min
             include 'formats'
-            do while (s% nz > 1 .and. s% dq(1) < s% min_surface_cell_dq)
+            do while (s% nz > 1 .and. &
+                  s% dq(1) < s% split_merge_amr_min_surface_cell_dq)
+               if (.not. merge_respects_surface_dq_max(s, 1)) exit
                if (s% trace_split_merge_amr) &
                   write(*,2) 'surface dq merge', 1, s% dq(1)
                call do_merge(s, 1, species, new_xa, .true., ierr)
@@ -194,7 +195,7 @@
          end subroutine enforce_surface_dq_min
 
 
-         subroutine enforce_dlnR_min
+         subroutine enforce_numerical_dlnR_floor
             integer :: j, j_merge
             real(dp) :: dlnR, min_dlnR
             include 'formats'
@@ -206,19 +207,19 @@
                min_dlnR = huge(1d0)
                do j = 1, s% nz
                   dlnR = cell_dlnR(s, j)
-                  if (dlnR < s% mesh_min_dlnR .and. dlnR < min_dlnR) then
-                     j_merge = j
-                     min_dlnR = dlnR
-                  end if
+                  if (dlnR > numerical_dlnR_floor .or. dlnR >= min_dlnR) cycle
+                  if (.not. merge_respects_surface_dq_max(s, j)) cycle
+                  j_merge = j
+                  min_dlnR = dlnR
                end do
                if (j_merge == 0) exit
                if (s% trace_split_merge_amr) &
-                  write(*,2) 'dlnR floor merge', j_merge, min_dlnR
+                  write(*,2) 'numerical dlnR floor merge', j_merge, min_dlnR
                call do_merge(s, j_merge, species, new_xa, .true., ierr)
                if (ierr /= 0) return
                num_merge = num_merge + 1
             end do
-         end subroutine enforce_dlnR_min
+         end subroutine enforce_numerical_dlnR_floor
 
 
          subroutine split1  ! ratio of desired/actual is too large
@@ -257,6 +258,19 @@
       end subroutine amr
 
 
+      real(dp) function dlnR_between(r_outer, r_inner) result(dlnR)
+         real(dp), intent(in) :: r_outer, r_inner
+
+         if (r_inner <= 0d0) then
+            dlnR = huge(1d0)
+         else if (r_outer <= 0d0) then
+            dlnR = -huge(1d0)
+         else
+            dlnR = log1p((r_outer - r_inner)/r_inner)
+         end if
+      end function dlnR_between
+
+
       real(dp) function cell_dlnR(s, k) result(dlnR)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -271,7 +285,7 @@
          else
             r_inner = s% r(k+1)
          end if
-         dlnR = log(s% r(k)) - log(r_inner)
+         dlnR = dlnR_between(s% r(k), r_inner)
       end function cell_dlnR
 
 
@@ -289,24 +303,63 @@
             r_inner = s% r(k+1)
          end if
          r_mid = 0.5d0*(s% r(k) + r_inner)
-         dlnR_outer = log(s% r(k)) - log(r_mid)
-         dlnR_inner = log(r_mid) - log(r_inner)
+         dlnR_outer = dlnR_between(s% r(k), r_mid)
+         dlnR_inner = dlnR_between(r_mid, r_inner)
          split_respects_dlnR_min = &
             min(dlnR_outer, dlnR_inner) >= 2d0*s% mesh_min_dlnR
       end function split_respects_dlnR_min
 
 
+      real(dp) function cell_dq_limit(s, k, nz) result(dq_limit)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k, nz
+         real(dp) :: log_center_limit
+
+         dq_limit = s% split_merge_amr_dq_max
+         if (s% split_merge_amr_max_center_cell_dq > 0d0 .and. &
+               s% split_merge_amr_max_center_cell_dq < dq_limit) then
+            log_center_limit = log(s% split_merge_amr_max_center_cell_dq) + &
+               real(nz-k, dp)*log(s% split_merge_amr_center_dq_ratio)
+            if (log_center_limit < log(dq_limit)) dq_limit = exp(log_center_limit)
+         end if
+         if (k == 1 .and. s% split_merge_amr_max_surface_cell_dq > 0d0) &
+            dq_limit = min(dq_limit, s% split_merge_amr_max_surface_cell_dq)
+      end function cell_dq_limit
+
+
+      logical function merge_respects_surface_dq_max(s, i_merge)
+         type (star_info), pointer :: s
+         integer, intent(in) :: i_merge
+         integer :: i, ip
+
+         merge_respects_surface_dq_max = .true.
+         if (s% split_merge_amr_max_surface_cell_dq <= 0d0) return
+         if (s% nz <= 1) then
+            merge_respects_surface_dq_max = .false.
+            return
+         end if
+         call select_merge_pair(s, i_merge, i, ip)
+         if (i /= 1) return
+         merge_respects_surface_dq_max = &
+            s% dq(i) + s% dq(ip) <= cell_dq_limit(s, i, s% nz-1)
+      end function merge_respects_surface_dq_max
+
+
       subroutine emergency_merge(s, iTooSmall)
          type (star_info), pointer :: s
          integer, intent(out) :: iTooSmall
-         integer :: k_min_dq
+         integer :: k
+         real(dp) :: min_dq
          include 'formats'
-         k_min_dq = minloc(s% dq(1:s% nz),dim=1)
-         if (s% dq(k_min_dq) < s% split_merge_amr_dq_min) then
-            iTooSmall = k_min_dq
-         else
-            iTooSmall = 0
-         end if
+         iTooSmall = 0
+         min_dq = huge(1d0)
+         do k = 1, s% nz
+            if (s% dq(k) >= s% split_merge_amr_dq_min) cycle
+            if (s% dq(k) >= min_dq) cycle
+            if (.not. merge_respects_surface_dq_max(s, k)) cycle
+            iTooSmall = k
+            min_dq = s% dq(k)
+         end do
       end subroutine emergency_merge
 
 
@@ -314,12 +367,19 @@
          type (star_info), pointer :: s
          integer, intent(out) :: iTooBig
          integer :: k
+         real(dp) :: dq_limit, oversize_ratio, max_oversize_ratio
          include 'formats'
          iTooBig = 0
+         max_oversize_ratio = 0d0
          do k = 1, s% nz
-            if (s% dq(k) <= s% split_merge_amr_dq_max) cycle
+            dq_limit = cell_dq_limit(s, k, s% nz)
+            if (s% dq(k) <= dq_limit) cycle
             if (.not. split_respects_dlnR_min(s, k)) cycle
-            if (iTooBig == 0 .or. s% dq(k) > s% dq(iTooBig)) iTooBig = k
+            oversize_ratio = s% dq(k)/dq_limit
+            if (oversize_ratio > max_oversize_ratio) then
+               max_oversize_ratio = oversize_ratio
+               iTooBig = k
+            end if
          end do
       end subroutine emergency_split
 
@@ -331,16 +391,16 @@
          real(dp), intent(out) :: TooBig, TooSmall
          integer, intent(out) :: iTooBig, iTooSmall
          real(dp) :: &
-            oversize_ratio, undersize_ratio, abs_du_div_cs, &
-            xmin, xmax, dx_actual, xR, xL, dq_min, dq_min_k, dq_max, dx_baseline, &
+            oversize_ratio, undersize_ratio, dlnR, dlnR_ratio, abs_du_div_cs, &
+            xmin, xmax, dx_actual, xR, xL, dq_min, dq_min_k, dq_max, dq_max_k, dx_baseline, &
             outer_dx_baseline, inner_dx_baseline, inner_outer_q, r_core_cm, &
             target_dr_core, target_dlnR_envelope, target_dlnR_core, target_dr_envelope, &
-            metric_logR_weight, metric_logtau_weight, metric_weight_sum, &
-            metric_delta_lnR, metric_delta_lntau, &
+            metric_logR_weight, metric_logtau_weight, metric_logT_weight, metric_weight_sum, &
+            metric_delta_lnR, metric_delta_lntau, metric_delta_lnT, &
             guarded_undersize_ratio
-         real(dp) :: cell_metric(2), pair_metric(2), guarded_pair_metric(2)
+         real(dp) :: cell_metric(3), pair_metric(3), guarded_pair_metric(3)
          logical :: hydrid_zoning, flipped_hydrid_zoning, log_zoning, logtau_zoning, &
-            du_div_cs_limit_flag, metric_zoning, metric_merge_guard
+            du_div_cs_limit_flag, metric_zoning, metric_merge_guard, dq_merge_guard
          integer :: nz, nz_baseline, k, nz_r_core, i_merge, ip_merge, &
             num_metric_guard_rejections, guarded_i_merge, guarded_ip_merge
          real(dp), pointer :: v(:), r_for_v(:)
@@ -381,6 +441,7 @@
 
          metric_logR_weight = max(0d0, s% split_merge_amr_metric_logR_weight)
          metric_logtau_weight = max(0d0, s% split_merge_amr_metric_logtau_weight)
+         metric_logT_weight = max(0d0, s% split_merge_amr_metric_logT_weight)
          ! A logarithmic coordinate requires positive optical-depth boundaries.
          if (metric_logtau_weight > 0d0) then
             if (tau_center <= 0d0 .or. is_bad(tau_center)) then
@@ -394,7 +455,25 @@
                end do
             end if
          end if
-         metric_weight_sum = metric_logR_weight + metric_logtau_weight
+         metric_delta_lnT = 1d0
+         if (metric_logT_weight > 0d0) then
+            ! xh moves with the cells and contains remapped temperatures; the
+            ! derived lnT cache is not shifted for every earlier AMR operation.
+            if (any(is_bad(s% xh(s% i_lnT,1:nz)))) then
+               metric_logT_weight = 0d0
+            else
+               metric_delta_lnT = 0d0
+               do k = 1, nz
+                  metric_delta_lnT = metric_delta_lnT + metric_dlnT(k)
+               end do
+               ! An isothermal mesh has no temperature coordinate to resolve.
+               ! Do not dilute the other metric terms with an inactive weight.
+               if (metric_delta_lnT <= 0d0) metric_logT_weight = 0d0
+               metric_delta_lnT = max(metric_delta_lnT, &
+                  max(tiny(1d0), s% split_merge_amr_metric_min_delta_lnT))
+            end if
+         end if
+         metric_weight_sum = metric_logR_weight + metric_logtau_weight + metric_logT_weight
          metric_zoning = s% split_merge_amr_use_metric_zoning_for_u_flag .and. &
             s% u_flag .and. metric_weight_sum > 0d0
 
@@ -464,7 +543,9 @@
             xL = xR
             dx_baseline = inner_dx_baseline
             dq_min_k = dq_min
-            if (k == 1) dq_min_k = max(dq_min_k, s% min_surface_cell_dq)
+            dq_max_k = cell_dq_limit(s, k, nz)
+            if (k == 1) dq_min_k = &
+               max(dq_min_k, s% split_merge_amr_min_surface_cell_dq)
             if (metric_zoning .and. s% split_merge_amr_MaxLong > 0d0) then
                call metric_cell(k, cell_metric)
                dx_actual = sum(cell_metric)
@@ -528,6 +609,9 @@
 
             ! first check for cells that are too big and need to be split
             oversize_ratio = dx_actual/dx_baseline
+            if (s% split_merge_amr_max_center_cell_dq > 0d0 .or. &
+                  (k == 1 .and. s% split_merge_amr_max_surface_cell_dq > 0d0)) &
+               oversize_ratio = max(oversize_ratio, s% dq(k)/dq_max_k)
             if (TooBig < oversize_ratio .and. s% dq(k) > 5d0*dq_min_k .and. &
                   split_respects_dlnR_min(s, k)) then
                if (k < nz .or. s% split_merge_amr_okay_to_split_nz) then
@@ -553,6 +637,24 @@
                undersize_ratio = dq_min_k/s% dq(k)
             end if
 
+            if (s% merge_if_dlnR_too_small .and. s% mesh_min_dlnR > 0d0) then
+               dlnR = cell_dlnR(s, k)
+               if (dlnR < s% mesh_min_dlnR) then
+                  dlnR_ratio = s% mesh_min_dlnR/max(dlnR, numerical_dlnR_floor)
+                  undersize_ratio = max(undersize_ratio, &
+                     max(1d0, s% split_merge_amr_MaxShort)*dlnR_ratio)
+               end if
+            end if
+
+            call select_merge_pair(s, k, i_merge, ip_merge)
+            if (s% merge_amr_ignore_surface_cells .and. &
+                  i_merge <= s% merge_amr_k_for_ignore_surface_cells) cycle
+            dq_merge_guard = .false.
+            if (s% split_merge_amr_max_center_cell_dq > 0d0 .or. &
+                  (i_merge == 1 .and. s% split_merge_amr_max_surface_cell_dq > 0d0)) &
+               dq_merge_guard = s% dq(i_merge) + s% dq(ip_merge) > &
+                  cell_dq_limit(s, i_merge, nz-1)
+
             metric_merge_guard = .false.
             ! Do not merge a pair that the split criterion would immediately reject.
             if (metric_zoning) then
@@ -572,7 +674,7 @@
                end if
             end if
 
-            if (.not. metric_merge_guard) then
+            if (.not. metric_merge_guard .and. .not. dq_merge_guard) then
                if (s% merge_amr_max_abs_du_div_cs >= 0d0) then
                   call check_merge_limits
                else if (TooSmall < undersize_ratio .and. s% dq(k) < dq_max/5d0) then
@@ -589,15 +691,12 @@
 
          real(dp) function metric_dlnR(j)
             integer, intent(in) :: j
-            real(dp) :: x_inner, x_outer
 
-            if (j == nz) then
-               x_inner = log(max(1d0, s% R_center))
+            if (j == nz .and. s% R_center <= 0d0) then
+               metric_dlnR = abs(log(s% r(j)) - log(1d0))
             else
-               x_inner = log(s% r(j+1))
+               metric_dlnR = abs(cell_dlnR(s, j))
             end if
-            x_outer = log(s% r(j))
-            metric_dlnR = abs(x_outer - x_inner)
          end function metric_dlnR
 
 
@@ -615,9 +714,23 @@
          end function metric_dlntau
 
 
+         real(dp) function metric_dlnT(j)
+            integer, intent(in) :: j
+
+            ! Temperature is cell-centered. Share each center-to-center jump
+            ! equally between its adjacent cells; boundary cells get one half
+            ! jump. Sum absolute jumps so a temperature extremum cannot cancel.
+            metric_dlnT = 0d0
+            if (j > 1) metric_dlnT = metric_dlnT + &
+               0.5d0*abs(s% xh(s% i_lnT,j) - s% xh(s% i_lnT,j-1))
+            if (j < nz) metric_dlnT = metric_dlnT + &
+               0.5d0*abs(s% xh(s% i_lnT,j+1) - s% xh(s% i_lnT,j))
+         end function metric_dlnT
+
+
          subroutine metric_cell(j, component)
             integer, intent(in) :: j
-            real(dp), intent(out) :: component(2)
+            real(dp), intent(out) :: component(3)
 
             component = 0d0
 
@@ -628,14 +741,18 @@
             if (metric_logtau_weight > 0d0) then
                component(2) = metric_logtau_weight*metric_dlntau(j)/metric_delta_lntau
             end if
+
+            if (metric_logT_weight > 0d0) then
+               component(3) = metric_logT_weight*metric_dlnT(j)/metric_delta_lnT
+            end if
          end subroutine metric_cell
 
 
          subroutine metric_merge_pair(j, i, ip, component)
             integer, intent(in) :: j
             integer, intent(out) :: i, ip
-            real(dp), intent(out) :: component(2)
-            real(dp) :: neighbor_component(2)
+            real(dp), intent(out) :: component(3)
+            real(dp) :: neighbor_component(3)
 
             call select_merge_pair(s, j, i, ip)
             call metric_cell(i, component)
@@ -645,31 +762,31 @@
 
 
          subroutine trace_metric_zoning
-            real(dp) :: component(2)
+            real(dp) :: component(3)
             integer :: i, ip
 
-            write(*,'(a,2(1x,es14.6))') 'split_merge metric weights logR logtau', &
-               metric_logR_weight, metric_logtau_weight
-            write(*,'(a,2(1x,es14.6))') 'split_merge metric ranges dlnR dlntau', &
-               metric_delta_lnR, metric_delta_lntau
+            write(*,'(a,3(1x,es14.6))') 'split_merge metric weights logR logtau logT', &
+               metric_logR_weight, metric_logtau_weight, metric_logT_weight
+            write(*,'(a,3(1x,es14.6))') 'split_merge metric ranges dlnR dlntau dlnT', &
+               metric_delta_lnR, metric_delta_lntau, metric_delta_lnT
             write(*,'(a,1x,es14.6)') 'split_merge metric target', inner_dx_baseline
 
             if (iTooBig > 0) then
                call metric_cell(iTooBig, component)
-               write(*,'(a,i8,a,2(1x,es14.6),a,1x,es14.6,a,1x,es14.6)') &
+               write(*,'(a,i8,a,3(1x,es14.6),a,1x,es14.6,a,1x,es14.6)') &
                   'split_merge metric split cell ', iTooBig, ' components', component, &
                   ' total', sum(component), ' ratio', TooBig
             end if
 
             if (iTooSmall > 0) then
                call metric_merge_pair(iTooSmall, i, ip, component)
-               write(*,'(a,i8,a,i8,1x,i8,a,2(1x,es14.6),a,1x,es14.6,a,1x,es14.6)') &
+               write(*,'(a,i8,a,i8,1x,i8,a,3(1x,es14.6),a,1x,es14.6,a,1x,es14.6)') &
                   'split_merge metric merge cell ', iTooSmall, ' pair ', i, ip, &
                   ' components', component, ' total', sum(component), ' ratio', TooSmall
             end if
 
             if (num_metric_guard_rejections > 0) then
-               write(*,'(a,i8,a,i8,1x,i8,a,2(1x,es14.6),a,1x,es14.6,a,1x,es14.6)') &
+               write(*,'(a,i8,a,i8,1x,i8,a,3(1x,es14.6),a,1x,es14.6,a,1x,es14.6)') &
                   'split_merge metric guard rejected ', num_metric_guard_rejections, &
                   ' strongest pair ', guarded_i_merge, guarded_ip_merge, &
                   ' components', guarded_pair_metric, &
@@ -877,9 +994,14 @@
             delta_KE = 0.5d0*dm_i*dm_ip*pow2(s% u(i) - s% u(ip))/dm
             s% u(i) = v
             cell_ie = cell_ie + delta_KE
-         else if (s% v_flag) then
-            ! there's no good solution for this.
-            ! so just leave s% v(i) unchanged.
+         else if (s% v_flag .and. s% RSP2_flag) then
+            v = s% v_center
+            if (ip < nz) v = s% v(ip+1)
+            cell_ie = cell_ie + KE_i + KE_ip - 0.25d0*dm*(pow2(s% v(i)) + pow2(v))
+            if (cell_ie <= 0d0) then
+               ierr = -1
+               return
+            end if
          end if
 
          s% energy(i) = cell_ie/dm
@@ -919,7 +1041,7 @@
             end if
             if (s% RSP2_flag) then
                s% w(im) = s% w(i0)
-               s% Hp_face(im) = s% Hp_face(i0)
+               s% Y_face(im) = s% Y_face(i0)
             end if
             s% energy(im) = s% energy(i0)
             s% dPdr_dRhodr_info(im) = s% dPdr_dRhodr_info(i0)
@@ -951,7 +1073,7 @@
 
          if (s% RSP2_flag) then
             s% xh(s% i_w,i) = s% w(i)
-            s% xh(s% i_Hp,i) = s% Hp_face(i)
+            s% xh(s% i_Y,i) = s% Y_face(i)
          end if
 
          ! do this after move cells since need new r(ip) to calc new rho(i).
@@ -963,31 +1085,116 @@
          if (ierr /= 0) return  ! call mesa_error(__FILE__,__LINE__,'update_xh_eos_and_kap failed in do_merge')
 
          star_PE1 = get_star_PE(s)
-         call revise_star_radius(s, star_PE0, star_PE1)
+         call revise_star_radius(s, star_PE0, star_PE1, ierr)
+         if (ierr /= 0) return
 
       end subroutine do_merge
 
 
-      subroutine revise_star_radius(s, star_PE0, star_PE1)
+      subroutine revise_star_radius(s, star_PE0, star_PE1, ierr)
          use star_utils, only: store_r_in_xh, get_lnR_from_xh
          type (star_info), pointer :: s
          real(dp), intent(in) :: star_PE0, star_PE1
+         integer, intent(out) :: ierr
          integer :: k
          real(dp) :: frac
+         logical :: keep_R_center_fixed
          include 'formats'
+         ierr = 0
          if (star_PE1 == 0d0 .or. star_PE0 == star_PE1) return
-         frac = star_PE1/star_PE0
+         keep_R_center_fixed = &
+            s% split_merge_amr_keep_R_center_fixed .and. s% R_center > 0d0
+         if (keep_R_center_fixed) then
+            call get_fixed_R_center_radius_scale(s, star_PE0, star_PE1, frac, ierr)
+            if (ierr /= 0) return
+         else
+            frac = star_PE1/star_PE0
+         end if
          if (s% model_number == -6918) write(*,1) 'frac', frac
          if (s% model_number == -6918) write(*,1) 'star_PE0', star_PE0
          if (s% model_number == -6918) write(*,1) 'star_PE1', star_PE1
          do k=1,s% nz
-            s% r(k) = s% r(k)*frac
+            if (keep_R_center_fixed) then
+               s% r(k) = s% R_center + frac*(s% r(k) - s% R_center)
+            else
+               s% r(k) = s% r(k)*frac
+            end if
             if (s% model_number == -6918) write(*,2) 's% r(k)', k, s% r(k)
             call store_r_in_xh(s, k, s% r(k))
             s% lnR(k) = get_lnR_from_xh(s,k)
          end do
-         s% r_center = frac*s% r_center
+         if (.not. keep_R_center_fixed) s% r_center = frac*s% r_center
       end subroutine revise_star_radius
+
+
+      subroutine get_fixed_R_center_radius_scale(s, target_PE, current_PE, frac, ierr)
+         type (star_info), pointer :: s
+         real(dp), intent(in) :: target_PE, current_PE
+         real(dp), intent(out) :: frac
+         integer, intent(out) :: ierr
+         integer :: iter
+         real(dp) :: frac_lo, frac_hi, PE_lo, PE_hi, PE_mid
+
+         ierr = 0
+         frac = 1d0
+         frac_lo = 0d0
+         PE_lo = get_star_PE_at_fixed_R_center_scale(s, frac_lo)
+         if (target_PE >= 0d0 .or. PE_lo >= target_PE) then
+            if (s% report_ierr) write(*,*) &
+               'failed to bracket fixed R_center split/merge AMR PE correction'
+            ierr = -1
+            return
+         end if
+
+         frac_hi = 1d0
+         PE_hi = current_PE
+         do iter = 1, 100
+            if (PE_hi >= target_PE) exit
+            frac_hi = 2d0*frac_hi
+            PE_hi = get_star_PE_at_fixed_R_center_scale(s, frac_hi)
+         end do
+         if (PE_hi < target_PE) then
+            if (s% report_ierr) write(*,*) &
+               'failed to bracket fixed R_center split/merge AMR PE correction'
+            ierr = -1
+            return
+         end if
+
+         do iter = 1, 100
+            frac = 0.5d0*(frac_lo + frac_hi)
+            PE_mid = get_star_PE_at_fixed_R_center_scale(s, frac)
+            if (abs(PE_mid - target_PE) <= 1d-14*abs(target_PE)) return
+            if (PE_mid < target_PE) then
+               frac_lo = frac
+            else
+               frac_hi = frac
+            end if
+         end do
+         frac = 0.5d0*(frac_lo + frac_hi)
+      end subroutine get_fixed_R_center_radius_scale
+
+
+      real(dp) function get_star_PE_at_fixed_R_center_scale(s, frac) result(totPE)
+         type (star_info), pointer :: s
+         real(dp), intent(in) :: frac
+         integer :: k
+         real(dp) :: PE, rL, rC, dm, mC
+
+         totPE = 0d0
+         do k=1,s% nz
+            if (k == s% nz) then
+               rL = s% R_center
+            else
+               rL = s% r(k+1)
+            end if
+            rC = 0.5d0*(rL + s% r(k))
+            rC = s% R_center + frac*(rC - s% R_center)
+            dm = s% dm(k)
+            mC = s% m(k) - 0.5d0*dm
+            PE = -s% cgrav(k)*mC*dm/rC
+            totPE = totPE + PE
+         end do
+      end function get_star_PE_at_fixed_R_center_scale
 
 
       real(dp) function get_star_PE(s) result(totPE)
@@ -1048,7 +1255,7 @@
             mC = s% m(k) - 0.5d0*dm
             PE = -s% cgrav(k)*mC*dm/rC
          end if
-         Etot = IE + KE + PE
+         Etot = IE + KE + PE + Etrb
          if (is_bad(Etot + IE + KE + PE) .or. &
              IE <= 0 .or. KE < 0) then
             write(*,2) 'nz', s% nz
@@ -1131,12 +1338,15 @@
             u_R, u_L, delta_u, delta_KE, delta_KE_div_dm, &
             min_stencil_energy, max_stencil_energy, max_delta_KE_div_dm, &
             pressure_R, pressure_C, pressure_L, grad_pressure, pressure_difference_target, &
+            lnT_R, lnT_C, lnT_L, &
             min_stencil_pressure, max_stencil_pressure, min_stencil_lnT, max_stencil_lnT, &
-            superad_reduction_factorL, superad_reduction_factorR
-         logical :: done, use_new_grad_rho, pressure_reconstructed
+            superad_reduction_factorL, superad_reduction_factorR, Y_faceL, Y_faceR
+         logical :: done, use_new_grad_rho, use_pressure_reconstruction, pressure_reconstructed
          include 'formats'
 
          ierr = 0
+         use_pressure_reconstruction = &
+            s% u_flag .and. s% split_merge_amr_reconstruct_pressure_for_u_flag
          star_PE0 = get_star_PE(s)
          s% need_to_setvars = .true.
          nz = s% nz
@@ -1182,6 +1392,14 @@
             tauL = s% tau(ip)
          end if
 
+         Y_faceR = 0d0
+         Y_faceL = 0d0
+         if (s% RSP2_flag) then
+            Y_faceR = s% Y_face(i)
+            Y_faceL = Y_faceR
+            if (i < nz) Y_faceL = s% Y_face(ip)
+         end if
+
          tauR = s% tau(i)
          if (i == nz) then
             tauL = tau_center
@@ -1215,6 +1433,7 @@
          end if
 
          energy = s% energy(i)
+         etrb = 0d0
          if (s% RSP2_flag) etrb = pow2(s% w(i))
 
          ! use iR, iC, and iL for getting values to determine slopes
@@ -1243,13 +1462,28 @@
          min_stencil_energy = min(energy_R, energy_C, energy_L)
          max_stencil_energy = max(energy_R, energy_C, energy_L)
 
-         pressure_R = s% Peos(iR) + get_split_mlt_Pturb(s, iR, s% lnT(iR))
-         pressure_C = s% Peos(iC) + get_split_mlt_Pturb(s, iC, s% lnT(iC))
-         pressure_L = s% Peos(iL) + get_split_mlt_Pturb(s, iL, s% lnT(iL))
-         min_stencil_pressure = min(pressure_R, pressure_C, pressure_L)
-         max_stencil_pressure = max(pressure_R, pressure_C, pressure_L)
-         min_stencil_lnT = min(s% lnT(iR), s% lnT(iC), s% lnT(iL))
-         max_stencil_lnT = max(s% lnT(iR), s% lnT(iC), s% lnT(iL))
+         ! Pressure reconstruction needs a fresh thermodynamic stencil.
+         min_stencil_pressure = 0d0
+         max_stencil_pressure = 0d0
+         min_stencil_lnT = 0d0
+         max_stencil_lnT = 0d0
+         if (use_pressure_reconstruction) then
+            ! Earlier AMR operations can move cells and rescale radii without
+            ! refreshing Peos or lnT. Evaluate the current stencil from rho/e/xa.
+            call eval_split_pressure( &
+               s, iR, rho_R, energy_R, s% lnT(iR), pressure_R, lnT_R, ierr)
+            if (ierr /= 0) return
+            call eval_split_pressure( &
+               s, iC, rho_C, energy_C, s% lnT(iC), pressure_C, lnT_C, ierr)
+            if (ierr /= 0) return
+            call eval_split_pressure( &
+               s, iL, rho_L, energy_L, s% lnT(iL), pressure_L, lnT_L, ierr)
+            if (ierr /= 0) return
+            min_stencil_pressure = min(pressure_R, pressure_C, pressure_L)
+            max_stencil_pressure = max(pressure_R, pressure_C, pressure_L)
+            min_stencil_lnT = min(lnT_R, lnT_C, lnT_L)
+            max_stencil_lnT = max(lnT_R, lnT_C, lnT_L)
+         end if
 
          ! get gradients before move cell contents
 
@@ -1276,8 +1510,10 @@
          end if
 
          grad_energy = get1_grad(energy_L, energy_C, energy_R, dLeft, dCntr, dRght)
-         grad_pressure = get1_grad(pressure_L, pressure_C, pressure_R, dLeft, dCntr, dRght)
-         pressure_difference_target = -0.5d0*grad_pressure*dr_old
+         if (use_pressure_reconstruction) then
+            grad_pressure = get1_grad(pressure_L, pressure_C, pressure_R, dLeft, dCntr, dRght)
+            pressure_difference_target = -0.5d0*grad_pressure*dr_old
+         end if
 
          if (s% RTI_flag) then
             grad_alpha = get1_grad( &
@@ -1287,6 +1523,7 @@
             max_alpha = max(s% alpha_RTI(iL), s% alpha_RTI(iC), s% alpha_RTI(iR))
          end if
 
+         grad_etrb = 0d0
          if (s% RSP2_flag) then
             etrb_R = pow2(s% w(iR))
             etrb_C = pow2(s% w(iC))
@@ -1300,7 +1537,10 @@
             v_L = s% u(iL)
             grad_v = get1_grad(v_L, v_C, v_R, dLeft, dCntr, dRght)
          else if (s% v_flag) then
-            if (iL == s% nz) then
+            if (s% RSP2_flag) then
+               v_L = s% v_center
+               if (i < nz_old) v_L = s% v(ip)
+            else if (iL == s% nz) then
                v_L = s% v_center
             else
                v_L = s% v(ip)
@@ -1342,6 +1582,10 @@
                   s% u(jp) = s% u(j)
                else if (s% v_flag) then
                   s% v(jp) = s% v(j)
+               end if
+               if (s% RSP2_flag) then
+                  s% w(jp) = s% w(j)
+                  s% Y_face(jp) = s% Y_face(j)
                end if
                s% energy(jp) = s% energy(j)
                s% dPdr_dRhodr_info(jp) = s% dPdr_dRhodr_info(j)
@@ -1482,8 +1726,16 @@
             s% u(ip) = u_L
             s% energy(i) = s% energy(i) - delta_KE_div_dm
             s% energy(ip) = s% energy(ip) - delta_KE_div_dm
-         else if (s% v_flag) then  ! just make a rough approximation.
-            s% v(ip) = sqrt(0.5d0*(v2_L + v2_R))
+         else if (s% v_flag) then
+            if (s% RSP2_flag) then
+               s% v(ip) = v_R + (v_L - v_R)*dMR/dm
+               delta_KE = cell_KE_old - 0.25d0*( &
+                  dMR*(v2_R + pow2(s% v(ip))) + dML*(pow2(s% v(ip)) + v2_L))
+               s% energy(i) = s% energy(i) + delta_KE/dm
+               s% energy(ip) = s% energy(ip) + delta_KE/dm
+            else
+               s% v(ip) = sqrt(0.5d0*(v2_L + v2_R))
+            end if
          end if
 
          if (s% RTI_flag) then  ! set new alpha
@@ -1498,6 +1750,14 @@
                s% alpha_RTI(ip) = new_alphaL
             end if
             s% dPdr_dRhodr_info(ip) = s% dPdr_dRhodr_info(i)
+         end if
+
+         if (s% RSP2_flag) then
+            s% Y_face(ip) = Y_faceR + (Y_faceL - Y_faceR)*dMR/dM
+            s% xh(s% i_Y,i) = s% Y_face(i)
+            s% xh(s% i_Y,ip) = s% Y_face(ip)
+            s% xh(s% i_w,i) = s% w(i)
+            s% xh(s% i_w,ip) = s% w(ip)
          end if
 
          ! These are face-based, so a split creates new interior face values here.
@@ -1526,14 +1786,31 @@
             end if
             grad_xa(j) = 0
             grad_xa(j) = -sum(grad_xa)
-            ! set new mass fractions
-            do q = 1, species
-               call split1_non_negative( &
-                  s% xa(q,i), grad_xa(q), &
-                  dr, dV, dVR, dVL, new_xaL, new_xaR)
-               s% xa(q,i) = new_xaR
-               s% xa(q,ip) = new_xaL
-            end do
+            if (s% RSP2_flag) then
+               ! A common slope limiter preserves sum(xa) and each species mass.
+               f = 1d0
+               do q = 1, species
+                  new_xaR = grad_xa(q)*dr/4d0
+                  new_xaL = -dMR*new_xaR/dML
+                  if (new_xaR > 0d0) f = min(f, (1d0-s% xa(q,i))/new_xaR)
+                  if (new_xaR < 0d0) f = min(f, -s% xa(q,i)/new_xaR)
+                  if (new_xaL > 0d0) f = min(f, (1d0-s% xa(q,i))/new_xaL)
+                  if (new_xaL < 0d0) f = min(f, -s% xa(q,i)/new_xaL)
+               end do
+               do q = 1, species
+                  new_xaR = f*grad_xa(q)*dr/4d0
+                  s% xa(q,ip) = s% xa(q,i) - dMR*new_xaR/dML
+                  s% xa(q,i) = s% xa(q,i) + new_xaR
+               end do
+            else
+               do q = 1, species
+                  call split1_non_negative( &
+                     s% xa(q,i), grad_xa(q), &
+                     dr, dV, dVR, dVL, new_xaL, new_xaR)
+                  s% xa(q,i) = new_xaR
+                  s% xa(q,ip) = new_xaL
+               end do
+            end if
             !check mass fractions >= 0 and <= 1 and sum to 1.0
             do q = 1, species
                s% xa(q,i) = min(1d0, max(0d0, s% xa(q,i)))
@@ -1639,10 +1916,11 @@
          if (ierr /= 0) return  ! call mesa_error(__FILE__,__LINE__,'update_xh_eos_and_kap failed in do_split')
 
          star_PE1 = get_star_PE(s)
-         call revise_star_radius(s, star_PE0, star_PE1)
+         call revise_star_radius(s, star_PE0, star_PE1, ierr)
+         if (ierr /= 0) return
 
          pressure_reconstructed = .false.
-         if (s% u_flag .and. s% split_merge_amr_reconstruct_pressure_for_u_flag) then
+         if (use_pressure_reconstruction) then
             call reconstruct_split_pressure( &
                s, i, ip, pressure_difference_target, &
                min_stencil_energy, max_stencil_energy, &
@@ -1664,8 +1942,6 @@
             min_stencil_energy, max_stencil_energy, &
             min_stencil_pressure, max_stencil_pressure, &
             min_stencil_lnT, max_stencil_lnT, accepted)
-         use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results, i_lnPgas
-         use eos_support, only: solve_eos_given_DE
          type (star_info), pointer :: s
          integer, intent(in) :: i, ip
          real(dp), intent(in) :: pressure_difference_target, &
@@ -1783,46 +2059,16 @@
 
             rho_outer = dm_outer/get_dV(s,i)
             rho_inner = dm_inner/get_dV(s,ip)
-            call eval_pressure( &
-               i, rho_outer, energy_outer, s% lnT(i), P_outer, lnT_out, eos_ierr)
+            call eval_split_pressure( &
+               s, i, rho_outer, energy_outer, s% lnT(i), P_outer, lnT_out, eos_ierr)
             if (eos_ierr /= 0) return
-            call eval_pressure( &
-               ip, rho_inner, energy_inner, s% lnT(ip), P_inner, lnT_in, eos_ierr)
+            call eval_split_pressure( &
+               s, ip, rho_inner, energy_inner, s% lnT(ip), P_inner, lnT_in, eos_ierr)
             if (eos_ierr /= 0) return
-
-            P_outer = P_outer + get_split_mlt_Pturb(s, i, lnT_out)
-            P_inner = P_inner + get_split_mlt_Pturb(s, ip, lnT_in)
 
             mismatch = P_inner - P_outer - pressure_difference_target
             valid = .not. is_bad(mismatch + P_outer + P_inner + lnT_out + lnT_in)
          end subroutine eval_pair
-
-
-         subroutine eval_pressure(k, rho, energy, lnT_guess, pressure, lnT, eos_ierr)
-            integer, intent(in) :: k
-            real(dp), intent(in) :: rho, energy, lnT_guess
-            real(dp), intent(out) :: pressure, lnT
-            integer, intent(out) :: eos_ierr
-            real(dp) :: logT, T, &
-               res(num_eos_basic_results), &
-               d_dlnd(num_eos_basic_results), d_dlnT(num_eos_basic_results), &
-               d_dxa(num_eos_d_dxa_results, s% species)
-
-            eos_ierr = 0
-            if (rho <= 0d0 .or. energy <= 0d0) then
-               eos_ierr = -1
-               return
-            end if
-            call solve_eos_given_DE( &
-               s, k, s% xa(:,k), log10(rho), log10(energy), lnT_guess/ln10, &
-               1d-11, 1d-11, logT, res, d_dlnd, d_dlnT, d_dxa, eos_ierr)
-            if (eos_ierr /= 0) return
-
-            lnT = logT*ln10
-            T = exp(lnT)
-            pressure = exp(res(i_lnPgas)) + crad*pow4(T)/3d0
-            if (pressure <= 0d0 .or. is_bad(pressure + lnT)) eos_ierr = -1
-         end subroutine eval_pressure
 
 
          logical function brackets_root(fa, fb)
@@ -1834,6 +2080,43 @@
       end subroutine reconstruct_split_pressure
 
 
+      subroutine eval_split_pressure(s, k, rho, energy, lnT_guess, pressure, lnT, ierr)
+         use eos_def, only: num_eos_basic_results, num_eos_d_dxa_results, i_lnPgas
+         use eos_support, only: solve_eos_given_DE
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(in) :: rho, energy, lnT_guess
+         real(dp), intent(out) :: pressure, lnT
+         integer, intent(out) :: ierr
+         real(dp) :: logT, T, &
+            res(num_eos_basic_results), &
+            d_dlnd(num_eos_basic_results), d_dlnT(num_eos_basic_results), &
+            d_dxa(num_eos_d_dxa_results, s% species)
+
+         ! Share the EOS and turbulent-pressure convention between the current
+         ! pre-split stencil and trial children; do not use derived EOS caches.
+         ierr = 0
+         if (rho <= 0d0 .or. energy <= 0d0 .or. is_bad(rho + energy + lnT_guess)) then
+            ierr = -1
+            return
+         end if
+         call solve_eos_given_DE( &
+            s, k, s% xa(:,k), log10(rho), log10(energy), lnT_guess/ln10, &
+            1d-11, 1d-11, logT, res, d_dlnd, d_dlnT, d_dxa, ierr)
+         if (ierr /= 0) return
+
+         lnT = logT*ln10
+         T = exp(lnT)
+         pressure = exp(res(i_lnPgas)) + crad*pow4(T)/3d0
+         if (pressure <= 0d0 .or. is_bad(pressure + lnT)) then
+            ierr = -1
+            return
+         end if
+         pressure = pressure + get_split_mlt_Pturb(s, k, lnT)
+         if (is_bad(pressure)) ierr = -1
+      end subroutine eval_split_pressure
+
+
       real(dp) function get_split_mlt_Pturb(s, k, lnT) result(Pturb)
          use star_utils, only: get_face_weights
          type (star_info), pointer :: s
@@ -1842,6 +2125,13 @@
          real(dp) :: alfa, beta, rho_00, rho_m1, rho_face, theta
 
          Pturb = 0d0
+         if (s% RSP2_flag) then
+            if (s% mixing_length_alpha == 0d0 .or. &
+                  k <= s% RSP2_num_outermost_cells_forced_nonturbulent .or. &
+                  k > s% nz - int(s% nz/s% RSP2_nz_div_IBOTOM)) return
+            Pturb = (2d0/3d0)*s% RSP2_alfap*(s% dm(k)/get_dV(s,k))*pow2(s% w(k))
+            return
+         end if
          if (s% mlt_Pturb_factor <= 0d0 .or. k <= 1) return
 
          rho_00 = s% dm(k)/get_dV(s,k)

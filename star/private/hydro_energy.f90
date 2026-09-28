@@ -34,17 +34,18 @@
       contains
 
       subroutine do1_energy_eqn( &  ! energy conservation
-            s, k, do_chem, nvar, ierr)
+            s, k, do_chem, nvar, ierr, P_surf_ad)
          use star_utils, only: store_partials
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
          logical, intent(in) :: do_chem
          integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1), optional, intent(in) :: P_surf_ad
          real(dp), dimension(nvar) :: d_dm1, d_d00, d_dp1
          include 'formats'
          call get1_energy_eqn( &
             s, k, do_chem, nvar, &
-            d_dm1, d_d00, d_dp1, ierr)
+            d_dm1, d_d00, d_dp1, ierr, P_surf_ad)
          if (ierr /= 0) then
             if (s% report_ierr) write(*,2) 'ierr /= 0 for get1_energy_eqn', k
             return
@@ -55,7 +56,7 @@
 
 
       subroutine get1_energy_eqn( &
-            s, k, do_chem, nvar, d_dm1, d_d00, d_dp1, ierr)
+            s, k, do_chem, nvar, d_dm1, d_d00, d_dp1, ierr, P_surf_ad)
          use eos_def, only: i_grad_ad, i_lnPgas, i_lnE
          use eps_grav, only: eval_eps_grav_and_partials
          use accurate_sum_auto_diff_star_order1
@@ -65,6 +66,7 @@
          logical, intent(in) :: do_chem
          real(dp), intent(out), dimension(nvar) :: d_dm1, d_d00, d_dp1
          integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1), optional, intent(in) :: P_surf_ad
 
          type(auto_diff_real_star_order1) :: resid_ad, &
             dL_dm_ad, sources_ad, others_ad, d_turbulent_energy_dt_ad, &
@@ -87,8 +89,7 @@
          call setup_eps_grav(ierr); if (ierr /= 0) return  ! do this first - it sets eps_grav_form
          ! Only total-energy forms need work from momentum sources.
          include_dke_dt = .not. eps_grav_form .and. &
-            .not. (s% using_velocity_time_centering .and. &
-               s% use_P_d_1_div_rho_form_of_work_when_time_centering_velocity)
+            .not. s% use_P_d_1_div_rho_form_of_work
          call setup_de_dt_and_friends(ierr); if (ierr /= 0) return
          call setup_dwork_dm(ierr); if (ierr /= 0) return
          call setup_dL_dm(ierr); if (ierr /= 0) return
@@ -110,8 +111,7 @@
             esum_ad = esum_ad - d_turbulent_energy_dt_ad
             esum_ad = esum_ad - dwork_dm_ad
             esum_ad = esum_ad + eps_grav_ad
-         else if (s% using_velocity_time_centering .and. &
-                s% use_P_d_1_div_rho_form_of_work_when_time_centering_velocity) then
+         else if (s% use_P_d_1_div_rho_form_of_work) then
             esum_ad = -dL_dm_ad
             esum_ad = esum_ad + sources_ad
             esum_ad = esum_ad + others_ad
@@ -185,8 +185,8 @@
             include 'formats'
             ierr = 0
             skip_P = eps_grav_form
-            if (s% using_velocity_time_centering .and. &
-                s% use_P_d_1_div_rho_form_of_work_when_time_centering_velocity) then
+            if (s% use_P_d_1_div_rho_form_of_work .or. &
+                  (s% RSP2_flag .and. eps_grav_form)) then
                call eval_simple_PdV_work(s, k, skip_P, dwork_dm_ad, dwork, &
                   d_dwork_dxa00, ierr)
                d_dwork_dxam1 = 0
@@ -203,7 +203,7 @@
                end if
             else
                call eval_dwork(s, k, skip_P, dwork_dm_ad, dwork, &
-                  d_dwork_dxam1, d_dwork_dxa00, d_dwork_dxap1, ierr)
+                  d_dwork_dxam1, d_dwork_dxa00, d_dwork_dxap1, ierr, P_surf_ad)
             end if
             if (ierr /= 0) then
                if (s% report_ierr) write(*,*) 'failed in setup_dwork_dm', k
@@ -233,14 +233,16 @@
 
 
          subroutine setup_sources_and_others(ierr) ! sources_ad, others_ad
-            use hydro_rsp2, only: compute_Eq_cell, compute_Uq_face
+            use hydro_rsp2, only: compute_Uq_face, compute_Uq_dm_cell
             use hydro_riemann, only: get_RTI_momentum_diffusion
             use tdc_hydro, only: &
-               compute_tdc_Eq_div_w_face, compute_tdc_Uq_face, compute_tdc_Uq_dm_cell
-            real(dp) :: alfa, beta
+               compute_tdc_Eq_cell, compute_tdc_Eq_div_w_face, &
+               compute_tdc_Eq_div_w_inner_boundary, &
+               compute_tdc_Uq_face, compute_tdc_Uq_dm_cell
             integer, intent(out) :: ierr
             type(auto_diff_real_star_order1) :: &
-               eps_nuc_ad, non_nuc_neu_ad, extra_heat_ad, Eq_ad, viscous_work_ad, &
+               eps_nuc_ad, non_nuc_neu_ad, extra_heat_ad, Eq_ad, Eq_00, Eq_p1, &
+               viscous_work_ad, &
                Uq_00, Uq_p1, RTI_diffusion_ad, RTI_momentum_energy_ad, &
                RTI_force_ad, RTI_dissipation_ad, v_00, v_p1, drag_force, drag_energy
             type(accurate_auto_diff_real_star_order1) :: sources_sum_ad
@@ -301,32 +303,52 @@
                      if (ierr /= 0) return
                   end if
                   have_v_viscous_work = .true.
+               else if (include_dke_dt .and. s% u_flag) then
+                  Uq_00 = compute_Uq_dm_cell(s, k, ierr)/s%dm(k)
+                  if (ierr /= 0) return
+                  v_00 = 0.5d0*(wrap_u_00(s,k) + s%u_start(k))
+                  viscous_work_ad = v_00*Uq_00
                end if
             else if (s% TDC_alpha_M >0d0 .and. s% MLT_option == 'TDC' .and. &
                s% TDC_include_eturb_in_energy_equation .and. (s% v_flag .or. s% u_flag)) then
-                if (k < s% nz) then
-                  Eq_ad = 0.5d0*(compute_tdc_Eq_div_w_face(s, k, ierr)*s% mlt_vc_ad(k) + &
-                     shift_p1(compute_tdc_Eq_div_w_face(s, k+1, ierr))*shift_p1(s% mlt_vc_ad(k+1)))/sqrt_2_div_3
-                else ! center cell is 0 at inner face
-                     Eq_ad = 0.5d0*compute_tdc_Eq_div_w_face(s, k, ierr)*s% mlt_vc_ad(k)/sqrt_2_div_3
-                end if
-                if (ierr /= 0) return
-                if (include_dke_dt) then
-                   if (s% u_flag) then
-                      Uq_00 = compute_tdc_Uq_dm_cell(s, k, ierr)/s% dm(k)
-                      if (ierr /= 0) return
-                      v_00 = 0.5d0*(wrap_u_00(s,k) + s% u_start(k))
-                      viscous_work_ad = v_00*Uq_00
-                   else if (s% v_flag) then
-                      Uq_00 = compute_tdc_Uq_face(s, k, ierr)
-                      if (ierr /= 0) return
-                      if (k < s% nz) then
-                         Uq_p1 = shift_p1(compute_tdc_Uq_face(s, k+1, ierr))
-                         if (ierr /= 0) return
-                      end if
-                      have_v_viscous_work = .true.
-                   end if
-                end if
+               if (s% v_flag) then
+                  Eq_ad = compute_tdc_Eq_cell(s, k, ierr)
+                  if (ierr /= 0) return
+                  if (include_dke_dt) then
+                     Uq_00 = compute_tdc_Uq_face(s, k, ierr)
+                     if (ierr /= 0) return
+                     if (k < s% nz) then
+                        ! Drop the zone k+2 partial to retain the block-tridiagonal
+                        ! Jacobian. The current residual value remains conservative.
+                        Uq_p1 = shift_p1(compute_tdc_Uq_face(s, k+1, ierr))
+                        if (ierr /= 0) return
+                     end if
+                     have_v_viscous_work = .true.
+                  end if
+               else
+                  Eq_00 = compute_tdc_Eq_div_w_face(s, k, ierr)
+                  if (ierr /= 0) return
+                  Eq_ad = 0.5d0*Eq_00*s%mlt_vc_ad(k)/sqrt_2_div_3
+                  if (k < s%nz) then
+                     Eq_p1 = shift_p1(compute_tdc_Eq_div_w_face(s, k+1, ierr))
+                     if (ierr /= 0) return
+                     Eq_ad = Eq_ad + 0.5d0*Eq_p1* &
+                        shift_p1(s%mlt_vc_ad(k+1))/sqrt_2_div_3
+                  else if (s%TDC_include_inner_boundary_eddy_viscosity .and. &
+                        s%R_center > 0d0) then
+                     Eq_p1 = compute_tdc_Eq_div_w_inner_boundary(s, ierr)
+                     if (ierr /= 0) return
+                     Eq_ad = Eq_ad + 0.5d0*Eq_p1* &
+                        s%mlt_vc_ad(k)/sqrt_2_div_3
+                  end if
+               end if
+               if (ierr /= 0) return
+               if (include_dke_dt .and. s% u_flag) then
+                  Uq_00 = compute_tdc_Uq_dm_cell(s, k, ierr)/s%dm(k)
+                  if (ierr /= 0) return
+                  v_00 = 0.5d0*(wrap_u_00(s,k) + s%u_start(k))
+                  viscous_work_ad = v_00*Uq_00
+               end if
             end if
 
             if (have_v_viscous_work) then
@@ -475,7 +497,7 @@
             include 'formats'
             ierr = 0
 
-            if (s% u_flag) then  ! for now, assume u_flag means no eps_grav
+            if (s% u_flag .and. .not. s% RSP2_flag) then
                eps_grav_form = .false.
                return
             end if
@@ -488,9 +510,6 @@
             end if
 
             if (eps_grav_form) then
-               if (s% RSP2_flag) then
-                  call mesa_error(__FILE__,__LINE__,'cannot use eps_grav with et yet.  fix energy eqn.')
-               end if
                call eval_eps_grav_and_partials(s, k, ierr)  ! get eps_grav info
                if (ierr /= 0) then
                   if (s% report_ierr) write(*,2) 'failed in eval_eps_grav_and_partials', k
@@ -643,12 +662,13 @@
 
 
       subroutine eval_dwork(s, k, skip_P, dwork_ad, dwork, &
-            d_dwork_dxam1, d_dwork_dxa00, d_dwork_dxap1, ierr)
+            d_dwork_dxam1, d_dwork_dxa00, d_dwork_dxap1, ierr, P_surf_ad)
          use auto_diff_support
          use star_utils, only: calc_Ptot_ad_tw
          type (star_info), pointer :: s
          integer, intent(in) :: k
          logical, intent(in) :: skip_P
+         type(auto_diff_real_star_order1), optional, intent(in) :: P_surf_ad
          type(auto_diff_real_star_order1), intent(out) :: dwork_ad
          real(dp), intent(out) :: dwork
          real(dp), intent(out), dimension(s% species) :: &
@@ -666,7 +686,7 @@
          ierr = 0
 
          call eval1_work(s, k, skip_P, &
-            work_00_ad, work_00, d_work_00_dxa00, d_work_00_dxam1, ierr)
+            work_00_ad, work_00, d_work_00_dxa00, d_work_00_dxam1, ierr, P_surf_ad)
          if (ierr /= 0) return
          call eval1_work(s, k+1, skip_P, &
             work_p1_ad, work_p1, d_work_p1_dxap1, d_work_p1_dxa00, ierr)
@@ -695,13 +715,14 @@
 
       ! ergs/s at face(k)
       subroutine eval1_work(s, k, skip_Peos, &
-            work_ad, work, d_work_dxa00, d_work_dxam1, ierr)
+            work_ad, work, d_work_dxa00, d_work_dxam1, ierr, P_surf_ad)
          use star_utils, only: get_Pvsc_ad, calc_Ptrb_ad_tw, get_rho_face
          use accurate_sum_auto_diff_star_order1
          use auto_diff_support
          type (star_info), pointer :: s
          integer, intent(in) :: k
          logical, intent(in) :: skip_Peos
+         type(auto_diff_real_star_order1), optional, intent(in) :: P_surf_ad
          type(auto_diff_real_star_order1), intent(out) :: work_ad
          real(dp), intent(out) :: work
          real(dp), dimension(s% species), intent(out) :: &
@@ -756,7 +777,13 @@
             P_theta = 1d0 ! try 1 - q(k)
          end if
 
-         if (s% u_flag) then
+         if (k == 1 .and. present(P_surf_ad) .and. .not. skip_Peos) then
+            ! Match the current boundary pressure in the momentum equation.
+            P_face_ad = P_surf_ad
+            d_Pface_dxa00 = 0d0
+            d_Pface_dxam1 = 0d0
+         else if (s% u_flag) then
+            ! Time center the endpoint Riemann pressure once.
             P_face_ad = P_theta*s% P_face_ad(k) + (1d0-P_theta)*s% P_face_start(k)
             d_Pface_dxa00 = 0d0
             d_Pface_dxam1 = 0d0
@@ -790,7 +817,7 @@
                end if
             end if
 
-            ! set Pvsc_ad
+            ! Use current Pvsc to match the momentum equation.
             if (.not. s% use_Pvsc_art_visc) then
                Pvsc_ad = 0d0
             else
@@ -798,17 +825,11 @@
                   call get_Pvsc_ad(s, k-1, PvscR_ad, ierr)
                   if (ierr /= 0) return
                   PvscR_ad = shift_m1(PvscR_ad)
-                  if (s% include_P_in_velocity_time_centering .and. &
-                      s% lnT(k)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) &
-                     PvscR_ad = 0.5d0*(PvscR_ad + s% Pvsc_start(k-1))
                else
                   PvscR_ad = 0d0
                end if
                call get_Pvsc_ad(s, k, PvscL_ad, ierr)
                if (ierr /= 0) return
-               if (s% include_P_in_velocity_time_centering .and. &
-                   s% lnT(k)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) &
-                  PvscL_ad = 0.5d0*(PvscL_ad + s% Pvsc_start(k))
                Pvsc_ad = alfa*PvscL_ad + beta*PvscR_ad
             end if
 
@@ -894,9 +915,7 @@
             u_face_ad%val = s% vc(k)
             u_face_ad%d1Array(i_v_00) = s% d_vc_dv
          else if (s% u_flag) then
-            u_face_ad = s% u_face_ad(k)
-            if (s% using_velocity_time_centering) &
-               u_face_ad = 0.5d0*(u_face_ad + s% u_face_start(k))
+            u_face_ad = wrap_opt_time_center_v_00(s,k)
          else if (s% using_velocity_time_centering) then
             u_face_ad%val = 0.5d0*(s% r(k) - s% r_start(k))/s% dt
             u_face_ad%d1Array(i_lnR_00) = 0.5d0*s% r(k)/s% dt

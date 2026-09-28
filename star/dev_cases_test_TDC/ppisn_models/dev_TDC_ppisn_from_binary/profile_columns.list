@@ -144,8 +144,8 @@
    !logS_per_baryon ! log10(specific entropy per baryon / kerg)
 
    !pressure ! total pressure at center of zone (pgas + prad)
-   !prad ! radiation pressure at center of zone
-   !pgas ! gas pressure at center of zone (electrons and ions)
+   prad ! radiation pressure at center of zone
+   pgas ! gas pressure at center of zone (electrons and ions)
    logPgas ! log10(pgas)
    pgas_div_ptotal ! pgas/pressure
 
@@ -358,7 +358,7 @@
 
 
 !# Opacity
-   !opacity ! opacity measured at center of zone
+   opacity ! opacity measured at center of zone
    log_opacity ! log10(opacity)
    !dkap_dlnrho_face ! partial derivative of opacity wrt. ln rho (at T=const) at outer edge of cell
       !  (was previously called dkap_dlnrho_at_face)
@@ -779,7 +779,7 @@
 
 
 !# Extras
-   !extra_heat
+   extra_heat
    !extra_L ! extra_heat integrated from center (Lsun)
    !log_extra_L ! log10 integrated from center (Lsun)
    !log_irradiation_heat

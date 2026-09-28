@@ -1,0 +1,15 @@
+! Red starting model for the 5M blue loop, before the Cepheid crossing.
+! Copy this file to inlist_model to select it.
+&star_job
+   load_model_filename = '../../test_suite/5M_cepheid_blue_loop/standard_start.mod'
+/
+&kap
+   Zbase = 0.008d0
+   kap_file_prefix = 'a09'
+   kap_CO_prefix = 'a09_co'
+   kap_lowT_prefix = 'lowT_fa05_a09p'
+   use_Type2_opacities = .true.
+/
+&controls
+   mixing_length_alpha = 2d0
+/

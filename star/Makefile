@@ -91,7 +91,6 @@ SRCS := \
    private/hydro_riemann.f90 \
    private/hydro_rotation.f90 \
    private/hydro_rsp2.f90 \
-   private/hydro_rsp2_support.f90 \
    private/hydro_temperature.f90 \
    private/hydro_vars.f90 \
    private/init.f90 \
@@ -158,6 +157,9 @@ SRCS := \
    private/timestep.f90 \
    private/tdc_hydro.f90 \
    private/tdc_hydro_support.f90 \
+   private/star_LNA_turbulence_closures.f90 \
+   private/star_LNA_support.f90 \
+   private/star_LNA.f90 \
    private/turb_info.f90 \
    private/turb_support.f90 \
    private/winds.f90 \

@@ -20,7 +20,7 @@
       module hydro_riemann
 
       use star_private_def
-      use const_def, only: dp, pi
+      use const_def, only: dp, pi, ln10
       use star_utils, only: em1, e00, ep1
       use utils_lib
       use auto_diff
@@ -44,7 +44,7 @@
       private
       public :: do_surf_Riemann_dudt_eqn, do1_Riemann_momentum_eqn, &
          do_uface_and_Pface, get_Riemann_shock_diagnostics, &
-         get_RTI_momentum_diffusion
+         get_RTI_momentum_diffusion, eval_Riemann_dudt_rhs
          ! Riemann energy eqn is now part of the standard energy equation
          ! Riemann dlnR_dt rqn is now part of the standard radius equation
 
@@ -72,28 +72,19 @@
 
       subroutine do1_dudt_eqn( &
             s, k, P_surf_ad, nvar, ierr)
-         use accurate_sum_auto_diff_star_order1
-         use star_utils, only: get_area_info_opt_time_center, save_eqn_residual_info
-         use tdc_hydro, only: compute_tdc_Uq_dm_cell
+         use star_utils, only: save_eqn_residual_info
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(in) :: P_surf_ad  ! only for k=1
          integer, intent(in) :: nvar
          integer, intent(out) :: ierr
-         integer :: nz, i_du_dt
+         integer :: i_du_dt
          type(auto_diff_real_star_order1) :: &
-            flux_in_ad, flux_out_ad, diffusion_source_ad, &
-            geometry_source_ad, gravity_source_ad, &
-            area_00, area_p1, inv_R2_00, inv_R2_p1, &
-            dudt_expected_ad, dudt_actual_ad, resid_ad, &
-            Uq_cell
-         type(accurate_auto_diff_real_star_order1) :: sum_ad
-         real(dp) :: dt, dm, ie_plus_ke, scal, residual
-         logical :: dbg, test_partials
-         real(dp) :: v_drag, drag_factor, drag_fraction
+            dudt_expected_ad, dudt_actual_ad, resid_ad
+         real(dp) :: dt, ie_plus_ke, scal, residual
+         logical :: test_partials
 
          include 'formats'
-         dbg = .false.
 
          !test_partials = (k == s% solver_test_partials_k)
          test_partials = .false.
@@ -106,62 +97,11 @@
             call mesa_error(__FILE__,__LINE__,'Riemann dudt does not support use_mass_corrections')
 
          ierr = 0
-         nz = s% nz
          i_du_dt = s% i_du_dt
          dt = s% dt
-         dm = s% dm(k)
-
-         call get_area_info_opt_time_center(s, k, area_00, inv_R2_00, ierr)
+         call eval_Riemann_dudt_rhs( &
+            s, k, P_surf_ad, .true., .true., dudt_expected_ad, ierr)
          if (ierr /= 0) return
-         if (k < nz) then
-            call get_area_info_opt_time_center(s, k+1, area_p1, inv_R2_p1, ierr)
-            if (ierr /= 0) return
-            area_p1 = shift_p1(area_p1)
-            inv_R2_p1 = shift_p1(inv_R2_p1)
-         end if
-
-         call setup_momentum_flux
-         call setup_geometry_source(ierr); if (ierr /= 0) return
-         call setup_gravity_source
-         call setup_diffusion_source
-
-         ! Add turbulent eddy viscous acceleration Uq for TDC as source
-         Uq_cell = 0d0
-         if (s% MLT_option == 'TDC' .and. s%TDC_alpha_M > 0d0) then
-            Uq_cell = compute_tdc_Uq_dm_cell(s, k, ierr) ! Uq * dm
-            if (ierr /= 0) return
-         end if
-
-         sum_ad = flux_in_ad
-         sum_ad = sum_ad - flux_out_ad
-         sum_ad = sum_ad + geometry_source_ad
-         sum_ad = sum_ad + gravity_source_ad
-         sum_ad = sum_ad + diffusion_source_ad
-         sum_ad = sum_ad + Uq_cell
-         dudt_expected_ad = sum_ad
-         dudt_expected_ad = dudt_expected_ad/dm
-
-         ! implement drag
-         drag_factor = s% v_drag_factor
-         v_drag = s% v_drag
-         if (s% q(k) < s% q_for_v_drag_full_off) then
-            drag_fraction = 0d0
-         else if (s% q(k) > s% q_for_v_drag_full_on) then
-            drag_fraction = 1d0
-         else
-            drag_fraction = (s% q(k) - s% q_for_v_drag_full_off)&
-                               /(s% q_for_v_drag_full_on - s% q_for_v_drag_full_off)
-         end if
-         drag_factor = drag_factor*drag_fraction
-
-         if (drag_factor > 0d0) then
-            if (s% u(k) > v_drag) then
-               dudt_expected_ad = dudt_expected_ad - drag_factor*pow2(s% u(k) - v_drag)/s% r(k)
-            else if (s% u(k) < -v_drag) then
-               dudt_expected_ad = dudt_expected_ad + drag_factor*pow2(s% u(k) + v_drag)/s% r(k)
-            end if
-         end if
-
 
          ! make residual units be relative difference in energy
          ie_plus_ke = s% energy_start(k) + 0.5d0*s% u_start(k)*s% u_start(k)
@@ -197,16 +137,130 @@
             !write(*,*) 'do1_dudt_eqn', s% solver_test_partials_var
             end if
 
+      end subroutine do1_dudt_eqn
+
+
+      subroutine eval_Riemann_dudt_rhs( &
+            s, k, P_surf_ad, use_time_centering, include_tdc_Uq, &
+            dudt_expected_ad, ierr, mlt_vc_ad)
+         use accurate_sum_auto_diff_star_order1
+         use star_utils, only: get_area_info_opt_time_center
+         use tdc_hydro, only: compute_tdc_Uq_dm_cell
+         use hydro_rsp2, only: compute_Uq_dm_cell
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1), intent(in) :: P_surf_ad
+         logical, intent(in) :: use_time_centering, include_tdc_Uq
+         type(auto_diff_real_star_order1), intent(out) :: dudt_expected_ad
+         integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1), intent(in), optional :: mlt_vc_ad
+         integer :: nz
+         type(auto_diff_real_star_order1) :: &
+            flux_in_ad, flux_out_ad, diffusion_source_ad, &
+            geometry_source_ad, gravity_source_ad, &
+            area_00, area_p1, inv_R2_00, inv_R2_p1, Uq_cell
+         type(accurate_auto_diff_real_star_order1) :: sum_ad
+         real(dp) :: dm, v_drag, drag_factor, drag_fraction
+
+         ierr = 0
+         nz = s% nz
+         dm = s% dm(k)
+
+         call get_area_info(k, area_00, inv_R2_00, ierr)
+         if (ierr /= 0) return
+         if (k < nz) then
+            call get_area_info(k + 1, area_p1, inv_R2_p1, ierr)
+            if (ierr /= 0) return
+            area_p1 = shift_p1(area_p1)
+            inv_R2_p1 = shift_p1(inv_R2_p1)
+         end if
+
+         call setup_momentum_flux
+         call setup_geometry_source(ierr); if (ierr /= 0) return
+         call setup_gravity_source
+         call setup_diffusion_source
+
+         ! Viscosity routines return Uq*dm for the force sum.
+         Uq_cell = 0d0
+         if (include_tdc_Uq) then
+            if (s% RSP2_flag) then
+               Uq_cell = compute_Uq_dm_cell(s, k, ierr)
+               if (ierr /= 0) return
+            else if (s% MLT_option == 'TDC' .and. s% TDC_alpha_M > 0d0) then
+               Uq_cell = compute_tdc_Uq_dm_cell(s, k, ierr)
+               if (ierr /= 0) return
+            end if
+         end if
+
+         sum_ad = flux_in_ad
+         sum_ad = sum_ad - flux_out_ad
+         sum_ad = sum_ad + geometry_source_ad
+         sum_ad = sum_ad + gravity_source_ad
+         sum_ad = sum_ad + diffusion_source_ad
+         sum_ad = sum_ad + Uq_cell
+         dudt_expected_ad = sum_ad
+         dudt_expected_ad = dudt_expected_ad/dm
+
+         drag_factor = s% v_drag_factor
+         v_drag = s% v_drag
+         if (s% q(k) < s% q_for_v_drag_full_off) then
+            drag_fraction = 0d0
+         else if (s% q(k) > s% q_for_v_drag_full_on) then
+            drag_fraction = 1d0
+         else
+            drag_fraction = (s% q(k) - s% q_for_v_drag_full_off)&
+                               /(s% q_for_v_drag_full_on - s% q_for_v_drag_full_off)
+         end if
+         drag_factor = drag_factor*drag_fraction
+
+         if (drag_factor > 0d0) then
+            if (s% u(k) > v_drag) then
+               dudt_expected_ad = dudt_expected_ad - drag_factor*pow2(s% u(k) - v_drag)/s% r(k)
+            else if (s% u(k) < -v_drag) then
+               dudt_expected_ad = dudt_expected_ad + drag_factor*pow2(s% u(k) + v_drag)/s% r(k)
+            end if
+         end if
+
          contains
+
+         subroutine get_area_info(kk, area_ad, inv_R2_ad, ierr)
+            integer, intent(in) :: kk
+            type(auto_diff_real_star_order1), intent(out) :: area_ad, inv_R2_ad
+            integer, intent(out) :: ierr
+            type(auto_diff_real_star_order1) :: r_ad, r2_ad
+
+            if (use_time_centering) then
+               call get_area_info_opt_time_center(s, kk, area_ad, inv_R2_ad, ierr)
+               return
+            end if
+
+            ierr = 0
+            r_ad = wrap_r_00(s, kk)
+            r2_ad = pow2(r_ad)
+            area_ad = 4d0*pi*r2_ad
+            inv_R2_ad = 1d0/r2_ad
+         end subroutine get_area_info
+
+         function get_Pface(kk) result(Pface)
+            integer, intent(in) :: kk
+            type(auto_diff_real_star_order1) :: Pface
+
+            Pface = s% P_face_ad(kk)
+            if (use_time_centering .and. s% using_velocity_time_centering .and. &
+                  s% include_P_in_velocity_time_centering .and. &
+                  s% lnT(kk)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) &
+               Pface = s% P_theta_for_velocity_time_centering*Pface + &
+                  (1d0 - s% P_theta_for_velocity_time_centering)*s% P_face_start(kk)
+         end function get_Pface
 
          subroutine setup_momentum_flux
             if (k == 1) then
                flux_out_ad = P_surf_ad*area_00
             else
-               flux_out_ad = s% P_face_ad(k)*area_00
+               flux_out_ad = get_Pface(k)*area_00
             end if
             if (k < nz) then
-               flux_in_ad = shift_p1(s% P_face_ad(k+1))*area_p1
+               flux_in_ad = shift_p1(get_Pface(k+1))*area_p1
             else
                flux_in_ad = 0d0
             end if
@@ -220,7 +274,9 @@
             logical, parameter :: skip_Peos = .false., skip_mlt_Pturb = .false.
             ierr = 0
             ! use same P here as the cell pressure in P_face calculation
-            call calc_Ptot_ad_tw(s, k, skip_Peos, skip_mlt_Pturb, P, d_Ptot_dxa, ierr)
+            call calc_Ptot_ad_tw( &
+               s, k, skip_Peos, skip_mlt_Pturb, P, d_Ptot_dxa, ierr, &
+               use_time_centering, mlt_vc_ad)
             if (ierr /= 0) return
             if (k == nz) then
                ! no flux in from left, so only have geometry source on right
@@ -253,8 +309,6 @@
                gsL = -Gp1*mL*0.5d0*dm*inv_R2_p1
             end if
             gravity_source_ad = gsL + gsR  ! total gravitational force on cell
-
-
          end subroutine setup_gravity_source
 
          subroutine setup_diffusion_source
@@ -263,7 +317,7 @@
             s% dudt_RTI(k) = diffusion_source_ad%val/dm
          end subroutine setup_diffusion_source
 
-      end subroutine do1_dudt_eqn
+      end subroutine eval_Riemann_dudt_rhs
 
 
       subroutine get_RTI_momentum_diffusion(s, k, force_ad, dissipation_ad)
@@ -310,16 +364,18 @@
       end subroutine get_RTI_momentum_diffusion
 
 
-      subroutine do_uface_and_Pface(s, ierr)
+      subroutine do_uface_and_Pface(s, ierr, mlt_vc_ad)
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
+         ! LNA supplies the convective velocity and retains the outer density partial.
+         type(auto_diff_real_star_order1), intent(in), optional :: mlt_vc_ad(:)
          integer :: k, op_err
          include 'formats'
          ierr = 0
 !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
          do k = 1, s% nz
             op_err = 0
-            call do1_uface_and_Pface(s, k, op_err)
+            call do1_uface_and_Pface(s, k, op_err, mlt_vc_ad)
             if (op_err /= 0) ierr = op_err
          end do
 !$OMP END PARALLEL DO
@@ -423,23 +479,24 @@
       end subroutine get_Riemann_shock_diagnostics
 
 
-      subroutine do1_uface_and_Pface(s, k, ierr)
+      subroutine do1_uface_and_Pface(s, k, ierr, mlt_vc_ad)
          use eos_def, only: i_gamma1, i_lnfree_e, i_lnPgas
          use star_utils, only: calc_Ptot_ad_tw, get_face_weights
-         use hydro_rsp2, only: compute_Uq_face
          type (star_info), pointer :: s
          integer, intent(in) :: k
          integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1), intent(in), optional :: mlt_vc_ad(:)
          logical :: test_partials
 
          type(auto_diff_real_star_order1) :: &
             r_ad, A_ad, PL_ad, PR_ad, uL_ad, uR_ad, rhoL_ad, rhoR_ad, &
             gamma1L_ad, gamma1R_ad, csL_ad, csR_ad, G_ad, dPdm_grav_ad, &
             Sl1_ad, Sl2_ad, Sr1_ad, Sr2_ad, numerator_ad, denominator_ad, &
-            Sl_ad, Sr_ad, Ss_ad, P_face_L_ad, P_face_R_ad, du_ad, Uq_ad
+            Sl_ad, Sr_ad, Ss_ad, P_face_L_ad, P_face_R_ad, du_ad, &
+            conv_vel_00, conv_vel_m1
          real(dp), dimension(s% species) :: d_Ptot_dxa  ! skip this
          logical, parameter :: skip_Peos = .false., skip_mlt_Pturb = .false.
-         real(dp) :: delta_m, f
+         real(dp) :: delta_m, f, dPR_dlnd_m2
 
          include 'formats'
 
@@ -451,19 +508,46 @@
          s% d_uface_domega(k) = 0
 
          if (k == 1) then
+            ! A momentum BC supplies its own pressure for surface energy work.
             s% u_face_ad(k) = wrap_u_00(s,k)
+            s% u_face_P_ad(k) = 0d0
             s% P_face_ad(k) = wrap_Peos_00(s,k)
+            s% u_face_val(k) = s% u_face_ad(k)%val
+            if (s% P_face_start(k) < 0d0) then
+               s% u_face_start(k) = s% u_start(k)
+               s% u_face_P_start(k) = 0d0
+               s% P_face_start(k) = s% Peos_start(k)
+            end if
             return
          end if
 
          r_ad = wrap_r_00(s,k)
          A_ad = 4d0*pi*pow2(r_ad)
 
-         call calc_Ptot_ad_tw(s, k, skip_Peos, skip_mlt_Pturb, PL_ad, d_Ptot_dxa, ierr)
+         ! The equations time center the reconstructed endpoint face state.
+         conv_vel_00 = 0d0
+         conv_vel_m1 = 0d0
+         if (s% mlt_Pturb_factor > 0d0) then
+            if (present(mlt_vc_ad)) then
+               conv_vel_00 = mlt_vc_ad(k)
+               conv_vel_m1 = mlt_vc_ad(k - 1)
+            else
+               conv_vel_00 = s% mlt_vc_old(k)
+               conv_vel_m1 = s% mlt_vc_old(k - 1)
+            end if
+         end if
+         call calc_Ptot_ad_tw( &
+            s, k, skip_Peos, skip_mlt_Pturb, PL_ad, d_Ptot_dxa, ierr, &
+            .false., conv_vel_00)
          if (ierr /= 0) return
-         call calc_Ptot_ad_tw(s, k-1, skip_Peos, skip_mlt_Pturb, PR_ad, d_Ptot_dxa, ierr)
+         call calc_Ptot_ad_tw( &
+            s, k - 1, skip_Peos, skip_mlt_Pturb, PR_ad, d_Ptot_dxa, ierr, &
+            .false., conv_vel_m1)
          if (ierr /= 0) return
+         dPR_dlnd_m2 = PR_ad%d1Array(i_lnd_m1)
          PR_ad = shift_m1(PR_ad)
+         ! LNA carries the k-2 density partial in the unused xtra2 triplet.
+         if (present(mlt_vc_ad)) PR_ad%d1Array(i_xtra2_m1) = dPR_dlnd_m2
 
          uL_ad = wrap_u_00(s,k)
          uR_ad = wrap_u_m1(s,k)
@@ -524,6 +608,7 @@
          Ss_ad = numerator_ad/denominator_ad
 
          s% u_face_ad(k) = Ss_ad
+         s% u_face_P_ad(k) = (PL_ad - PR_ad)/denominator_ad
          s% d_uface_domega(k) = s% u_face_ad(k)%d1Array(i_L_00)
 
          ! contact pressure (eqn 2.19)
@@ -543,16 +628,11 @@
          end if
 
 
-         if (s% RSP2_flag) then  ! include Uq in u_face, To do: implement in sources instead ~ EbF
-            Uq_ad = compute_Uq_face(s, k, ierr)
-            if (ierr /= 0) return
-            s% u_face_ad(k) = s% u_face_ad(k) + Uq_ad
-         end if
-
          s% u_face_val(k) = s% u_face_ad(k)%val
 
          if (s% P_face_start(k) < 0d0) then
             s% u_face_start(k) = s% u_face_val(k)
+            s% u_face_P_start(k) = s% u_face_P_ad(k)%val
             s% P_face_start(k) = s% P_face_ad(k)%val
          end if
 

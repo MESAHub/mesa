@@ -34,6 +34,7 @@ module tdc_hydro_support
 contains
 
    subroutine remesh_for_TDC_pulsations(s, ierr)
+      ! The same envelope mesh is used for TDC and RSP2 pulsations.
       ! uses these controls
       !  TDC_hydro_nz = 190
       !  TDC_hydro_nz_outer = 40
@@ -88,9 +89,32 @@ contains
       call check_new_lnR2
       call interpolate1_face_val2(s%i_lum, s%L_center)
       if (s%i_v /= 0) call interpolate1_face_val2(s%i_v, s%v_center)
+      if (s%have_mlt_vc) then
+         ! Preserve the lagged TDC state on the new face grid.
+         v_old(1:nz_old) = s%mlt_vc(1:nz_old)
+         if (s%r_center == 0d0) then
+            v_old(nz_old + 1) = 0d0
+         else
+            ! A truncated envelope has no center symmetry condition.
+            v_old(nz_old + 1) = s%mlt_vc(nz_old)
+         end if
+         call interpolate_vector_pm( &
+            nz_old + 1, xm_old, nz + 1, xm, v_old, v_new, work1, &
+            'remesh_for_TDC mlt_vc', ierr)
+         if (ierr /= 0) call mesa_error(__FILE__, __LINE__, 'TDC remesh mlt_vc interpolation failed')
+         s%mlt_vc(1:nz) = v_new(1:nz)
+      end if
       call set_new_lnd2
       call interpolate1_cell_val2(s%i_lnT)
       if (s%i_u /= 0) call interpolate1_cell_val2(s%i_u)
+      if (s%RSP2_flag) then
+         call interpolate1_face_val2(s%i_Y, s%xh(s%i_Y,nz_old))
+         s%xh(s%i_Y,1) = 0d0
+         v_old(1:nz_old) = pow2(s%xh(s%i_w,1:nz_old))
+         call remap1_cell_average2
+         s%xh(s%i_w,1:nz) = sqrt(max(0d0, v_new(1:nz)))
+         s%w(1:nz) = s%xh(s%i_w,1:nz)
+      end if
       do j = 1, s%species
          call remap1_xa2(j)
       end do
@@ -113,8 +137,8 @@ contains
          integer :: nz_base
          include 'formats'
          nz_base = nz - s%TDC_hydro_nz_T_gradient
-         if (s%RSP_flag .or. s%RSP2_flag) then
-            write(*,'(A)') 'TDC remesh cannot be applied after enabling RSP or RSP2'
+         if (s%RSP_flag) then
+            write(*,'(A)') 'TDC remesh cannot be applied after enabling RSP'
             ierr = -1
          else if (nz > nz_old) then
             write(*,3) 'TDC remesh cannot increase the number of zones', nz, nz_old
@@ -664,27 +688,34 @@ contains
 
       subroutine remap1_xa2(j)
          integer, intent(in) :: j
-         integer :: k_old, k_scan, k_new
-         real(dp) :: overlap, species_mass
 
          v_old(1:nz_old) = s%xa(j, 1:nz_old)
+         call remap1_cell_average2
+         s%xa(j, 1:nz) = v_new(1:nz)
+      end subroutine remap1_xa2
+
+
+      subroutine remap1_cell_average2
+         integer :: k_old, k_scan, k_new
+         real(dp) :: overlap, cell_integral
+
          k_old = 1
          do k_new = 1, nz
             do while (k_old < nz_old .and. xm_old(k_old + 1) <= xm(k_new))
                k_old = k_old + 1
             end do
-            species_mass = 0d0
+            cell_integral = 0d0
             k_scan = k_old
             do while (k_scan <= nz_old .and. xm_old(k_scan) < xm(k_new + 1))
-               ! A mass-overlap average conserves the total mass of each species.
+               ! Integrate the old cell averages over the new mass interval.
                overlap = min(xm(k_new + 1), xm_old(k_scan + 1)) - &
                   max(xm(k_new), xm_old(k_scan))
-               if (overlap > 0d0) species_mass = species_mass + overlap*v_old(k_scan)
+               if (overlap > 0d0) cell_integral = cell_integral + overlap*v_old(k_scan)
                k_scan = k_scan + 1
             end do
-            s%xa(j, k_new) = species_mass/s%dm(k_new)
+            v_new(k_new) = cell_integral/s%dm(k_new)
          end do
-      end subroutine remap1_xa2
+      end subroutine remap1_cell_average2
 
       subroutine remap_rotation2(old_J, old_abs_J)
          real(dp), intent(in) :: old_J, old_abs_J
@@ -809,9 +840,17 @@ contains
                dm_face = 0.5d0*(s%dm(k - 1) + s%dm(k))
             end if
             P_00 = P_m1 + s%cgrav(k)*s%m(k)*dm_face/(4d0*pi*pow4(s%r(k)))
-            logP = log10(P_00)  ! value for QHSE
-            s%lnPeos(k) = logP*ln10
             s%Peos(k) = P_00
+            if (s%RSP2_flag .and. s%mixing_length_alpha /= 0d0 .and. &
+                  k > s%RSP2_num_outermost_cells_forced_nonturbulent .and. &
+                  k <= nz - int(nz/s%RSP2_nz_div_IBOTOM)) &
+               s%Peos(k) = s%Peos(k) - (2d0/3d0)*s%RSP2_alfap*s%rho(k)*pow2(s%w(k))
+            if (s%Peos(k) <= 0d0) then
+               ierr = -1
+               return
+            end if
+            logP = log10(s%Peos(k))  ! EOS pressure required for QHSE
+            s%lnPeos(k) = logP*ln10
             logRho = s%lnd(k)/ln10
             logT_guess = s%lnT(k)/ln10
             logT_tol = 1d-11
