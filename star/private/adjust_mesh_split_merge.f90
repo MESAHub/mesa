@@ -395,10 +395,10 @@
             xmin, xmax, dx_actual, xR, xL, dq_min, dq_min_k, dq_max, dq_max_k, dx_baseline, &
             outer_dx_baseline, inner_dx_baseline, inner_outer_q, r_core_cm, &
             target_dr_core, target_dlnR_envelope, target_dlnR_core, target_dr_envelope, &
-            metric_logR_weight, metric_logtau_weight, metric_weight_sum, &
-            metric_delta_lnR, metric_delta_lntau, &
+            metric_logR_weight, metric_logtau_weight, metric_logT_weight, metric_weight_sum, &
+            metric_delta_lnR, metric_delta_lntau, metric_delta_lnT, &
             guarded_undersize_ratio
-         real(dp) :: cell_metric(2), pair_metric(2), guarded_pair_metric(2)
+         real(dp) :: cell_metric(3), pair_metric(3), guarded_pair_metric(3)
          logical :: hydrid_zoning, flipped_hydrid_zoning, log_zoning, logtau_zoning, &
             du_div_cs_limit_flag, metric_zoning, metric_merge_guard, dq_merge_guard
          integer :: nz, nz_baseline, k, nz_r_core, i_merge, ip_merge, &
@@ -441,6 +441,7 @@
 
          metric_logR_weight = max(0d0, s% split_merge_amr_metric_logR_weight)
          metric_logtau_weight = max(0d0, s% split_merge_amr_metric_logtau_weight)
+         metric_logT_weight = max(0d0, s% split_merge_amr_metric_logT_weight)
          ! A logarithmic coordinate requires positive optical-depth boundaries.
          if (metric_logtau_weight > 0d0) then
             if (tau_center <= 0d0 .or. is_bad(tau_center)) then
@@ -454,7 +455,25 @@
                end do
             end if
          end if
-         metric_weight_sum = metric_logR_weight + metric_logtau_weight
+         metric_delta_lnT = 1d0
+         if (metric_logT_weight > 0d0) then
+            ! xh moves with the cells and contains remapped temperatures; the
+            ! derived lnT cache is not shifted for every earlier AMR operation.
+            if (any(is_bad(s% xh(s% i_lnT,1:nz)))) then
+               metric_logT_weight = 0d0
+            else
+               metric_delta_lnT = 0d0
+               do k = 1, nz
+                  metric_delta_lnT = metric_delta_lnT + metric_dlnT(k)
+               end do
+               ! An isothermal mesh has no temperature coordinate to resolve.
+               ! Do not dilute the other metric terms with an inactive weight.
+               if (metric_delta_lnT <= 0d0) metric_logT_weight = 0d0
+               metric_delta_lnT = max(metric_delta_lnT, &
+                  max(tiny(1d0), s% split_merge_amr_metric_min_delta_lnT))
+            end if
+         end if
+         metric_weight_sum = metric_logR_weight + metric_logtau_weight + metric_logT_weight
          metric_zoning = s% split_merge_amr_use_metric_zoning_for_u_flag .and. &
             s% u_flag .and. metric_weight_sum > 0d0
 
@@ -695,9 +714,23 @@
          end function metric_dlntau
 
 
+         real(dp) function metric_dlnT(j)
+            integer, intent(in) :: j
+
+            ! Temperature is cell-centered. Share each center-to-center jump
+            ! equally between its adjacent cells; boundary cells get one half
+            ! jump. Sum absolute jumps so a temperature extremum cannot cancel.
+            metric_dlnT = 0d0
+            if (j > 1) metric_dlnT = metric_dlnT + &
+               0.5d0*abs(s% xh(s% i_lnT,j) - s% xh(s% i_lnT,j-1))
+            if (j < nz) metric_dlnT = metric_dlnT + &
+               0.5d0*abs(s% xh(s% i_lnT,j+1) - s% xh(s% i_lnT,j))
+         end function metric_dlnT
+
+
          subroutine metric_cell(j, component)
             integer, intent(in) :: j
-            real(dp), intent(out) :: component(2)
+            real(dp), intent(out) :: component(3)
 
             component = 0d0
 
@@ -708,14 +741,18 @@
             if (metric_logtau_weight > 0d0) then
                component(2) = metric_logtau_weight*metric_dlntau(j)/metric_delta_lntau
             end if
+
+            if (metric_logT_weight > 0d0) then
+               component(3) = metric_logT_weight*metric_dlnT(j)/metric_delta_lnT
+            end if
          end subroutine metric_cell
 
 
          subroutine metric_merge_pair(j, i, ip, component)
             integer, intent(in) :: j
             integer, intent(out) :: i, ip
-            real(dp), intent(out) :: component(2)
-            real(dp) :: neighbor_component(2)
+            real(dp), intent(out) :: component(3)
+            real(dp) :: neighbor_component(3)
 
             call select_merge_pair(s, j, i, ip)
             call metric_cell(i, component)
@@ -725,31 +762,31 @@
 
 
          subroutine trace_metric_zoning
-            real(dp) :: component(2)
+            real(dp) :: component(3)
             integer :: i, ip
 
-            write(*,'(a,2(1x,es14.6))') 'split_merge metric weights logR logtau', &
-               metric_logR_weight, metric_logtau_weight
-            write(*,'(a,2(1x,es14.6))') 'split_merge metric ranges dlnR dlntau', &
-               metric_delta_lnR, metric_delta_lntau
+            write(*,'(a,3(1x,es14.6))') 'split_merge metric weights logR logtau logT', &
+               metric_logR_weight, metric_logtau_weight, metric_logT_weight
+            write(*,'(a,3(1x,es14.6))') 'split_merge metric ranges dlnR dlntau dlnT', &
+               metric_delta_lnR, metric_delta_lntau, metric_delta_lnT
             write(*,'(a,1x,es14.6)') 'split_merge metric target', inner_dx_baseline
 
             if (iTooBig > 0) then
                call metric_cell(iTooBig, component)
-               write(*,'(a,i8,a,2(1x,es14.6),a,1x,es14.6,a,1x,es14.6)') &
+               write(*,'(a,i8,a,3(1x,es14.6),a,1x,es14.6,a,1x,es14.6)') &
                   'split_merge metric split cell ', iTooBig, ' components', component, &
                   ' total', sum(component), ' ratio', TooBig
             end if
 
             if (iTooSmall > 0) then
                call metric_merge_pair(iTooSmall, i, ip, component)
-               write(*,'(a,i8,a,i8,1x,i8,a,2(1x,es14.6),a,1x,es14.6,a,1x,es14.6)') &
+               write(*,'(a,i8,a,i8,1x,i8,a,3(1x,es14.6),a,1x,es14.6,a,1x,es14.6)') &
                   'split_merge metric merge cell ', iTooSmall, ' pair ', i, ip, &
                   ' components', component, ' total', sum(component), ' ratio', TooSmall
             end if
 
             if (num_metric_guard_rejections > 0) then
-               write(*,'(a,i8,a,i8,1x,i8,a,2(1x,es14.6),a,1x,es14.6,a,1x,es14.6)') &
+               write(*,'(a,i8,a,i8,1x,i8,a,3(1x,es14.6),a,1x,es14.6,a,1x,es14.6)') &
                   'split_merge metric guard rejected ', num_metric_guard_rejections, &
                   ' strongest pair ', guarded_i_merge, guarded_ip_merge, &
                   ' components', guarded_pair_metric, &

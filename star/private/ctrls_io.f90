@@ -278,8 +278,8 @@
     split_merge_amr_keep_R_center_fixed, &
     trace_split_merge_amr, equal_split_density_amr, use_hydro_merge_limits_in_mesh_plan, &
     split_merge_amr_use_metric_zoning_for_u_flag, &
-    split_merge_amr_metric_logR_weight, split_merge_amr_metric_logtau_weight, &
-    split_merge_amr_metric_min_delta_lnR, split_merge_amr_metric_min_delta_lntau, &
+    split_merge_amr_metric_logR_weight, split_merge_amr_metric_logtau_weight, split_merge_amr_metric_logT_weight, &
+    split_merge_amr_metric_min_delta_lnR, split_merge_amr_metric_min_delta_lntau, split_merge_amr_metric_min_delta_lnT, &
     split_merge_amr_reconstruct_pressure_for_u_flag, &
 
     ! nuclear reaction parameters
@@ -680,7 +680,8 @@
 
     if (s% split_merge_amr_use_metric_zoning_for_u_flag .and. &
           max(0d0, s% split_merge_amr_metric_logR_weight) + &
-          max(0d0, s% split_merge_amr_metric_logtau_weight) <= 0d0 .and. &
+          max(0d0, s% split_merge_amr_metric_logtau_weight) + &
+          max(0d0, s% split_merge_amr_metric_logT_weight) <= 0d0 .and. &
           .not. have_warned_about_zero_split_merge_amr_metric_weights) then
        write(*,'(a)') 'WARNING: split/merge AMR metric zoning has no positive weights.'
        write(*,'(a)') 'Falling back to the legacy split/merge AMR zoning controls.'
@@ -1699,8 +1700,10 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% split_merge_amr_use_metric_zoning_for_u_flag = split_merge_amr_use_metric_zoning_for_u_flag
  s% split_merge_amr_metric_logR_weight = split_merge_amr_metric_logR_weight
  s% split_merge_amr_metric_logtau_weight = split_merge_amr_metric_logtau_weight
+ s% split_merge_amr_metric_logT_weight = split_merge_amr_metric_logT_weight
  s% split_merge_amr_metric_min_delta_lnR = split_merge_amr_metric_min_delta_lnR
  s% split_merge_amr_metric_min_delta_lntau = split_merge_amr_metric_min_delta_lntau
+ s% split_merge_amr_metric_min_delta_lnT = split_merge_amr_metric_min_delta_lnT
  s% split_merge_amr_reconstruct_pressure_for_u_flag = split_merge_amr_reconstruct_pressure_for_u_flag
 
  ! nuclear reaction parameters
@@ -3474,8 +3477,10 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  split_merge_amr_use_metric_zoning_for_u_flag = s% split_merge_amr_use_metric_zoning_for_u_flag
  split_merge_amr_metric_logR_weight = s% split_merge_amr_metric_logR_weight
  split_merge_amr_metric_logtau_weight = s% split_merge_amr_metric_logtau_weight
+ split_merge_amr_metric_logT_weight = s% split_merge_amr_metric_logT_weight
  split_merge_amr_metric_min_delta_lnR = s% split_merge_amr_metric_min_delta_lnR
  split_merge_amr_metric_min_delta_lntau = s% split_merge_amr_metric_min_delta_lntau
+ split_merge_amr_metric_min_delta_lnT = s% split_merge_amr_metric_min_delta_lnT
  split_merge_amr_reconstruct_pressure_for_u_flag = s% split_merge_amr_reconstruct_pressure_for_u_flag
  ! nuclear reaction parameters
  screening_mode = s% screening_mode
