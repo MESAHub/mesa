@@ -107,18 +107,15 @@ Developers
 * `Warrick Ball <https://warrickball.gitlab.io/>`__
 * `Evan Bauer <https://evbauer.github.io/>`__
 * `Earl Bellinger <https://earlbellinger.com/>`__
-* `Lars Bildsten <http://www.kitp.ucsb.edu/bildsten/>`__
 * `Matteo Cantiello <http://www.matteocantiello.com/>`__
 * `Matthias Fabry <https://github.com/matthiasfabry>`__
 * `Ebraheem Farag <https://github.com/Debraheem>`__
 * `Jared Goldberg <https://jaredagoldberg.wordpress.com/>`__
-* `Meridith Joyce <http://www.meridithjoyce.com/>`__
-* `Philip Mocz <https://pmocz.github.io/>`__
-* `Joey Mombarg <https://jmombarg.github.io/PersonalWebsite/index.html>`__
+* `Niall Miller <https://nialljmiller.com/>`__
+* `McKenzie Myers <https://physics.sciences.ncsu.edu/people/18650/>`__
 * `Mathieu Renzo <https://www.as.arizona.edu/~mrenzo/>`__
 * `Radek Smolec <https://www.camk.edu.pl/en/staff/smolec/>`__
 * `Anne Thoul <https://scholar.google.be/citations?user=pVXttZoAAAAJ&hl=fr>`__
-* `Frank Timmes <http://cococubed.com/>`__
 * `Rich Townsend <http://www.astro.wisc.edu/~townsend>`__
 * `Vincent Vanlaer <https://www.kuleuven.be/wieiswie/en/person/00149901>`__
 * `Bill Wolf <http://wmwolf.github.io/>`__
@@ -126,14 +123,19 @@ Developers
 Past Developers
 ---------------
 
+* `Lars Bildsten <http://www.kitp.ucsb.edu/bildsten/>`__
 * `Ed Brown <http://web.pa.msu.edu/people/ebrown/>`__
 * `Aaron Dotter <https://aarondotter.github.io/>`__
 * `Robert Farmer <https://www.linkedin.com/in/rob-farmer-2a9781287/>`__
 * `Eoin Farrell <https://scholar.google.es/citations?user=Shv2DncAAAAJ&hl=es>`__
 * `Falk Herwig <http://www.astro.uvic.ca/~fherwig/>`__
 * `Adam Jermyn <http://adamjermyn.com/>`__
+* `Meridith Joyce <http://www.meridithjoyce.com/>`__
 * `Pablo Marchant <https://orlox.github.io/>`__
+* `Philip Mocz <https://pmocz.github.io/>`__
+* `Joey Mombarg <https://jmombarg.github.io/PersonalWebsite/index.html>`__
 * `Josiah Schwab <https://yoshiyahu.org/>`__
+* `Frank Timmes <http://cococubed.com/>`__
 
 Other Code Contributors
 -----------------------
