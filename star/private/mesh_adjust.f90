@@ -230,6 +230,8 @@
          end if
 
          if (s% rotation_flag) then
+            ! adjust_omega needs i_rot before it can set omega = j_rot/i_rot
+            ! in tidal binaries i_rot depends on omega, so interpolate omega to the new mesh first
             call do_interp_pt_val( &
                s, nz, nz_old, nzlo, nzhi, s% omega, omega_old, omega_old(nz_old), &
                xq, xq_old_plus1, xq_new, .false., work, tmp1, tmp2, ierr)
