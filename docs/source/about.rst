@@ -112,7 +112,7 @@ Developers
 * `Ebraheem Farag <https://github.com/Debraheem>`__
 * `Jared Goldberg <https://jaredagoldberg.wordpress.com/>`__
 * `Niall Miller <https://nialljmiller.com/>`__
-* `McKenzie Myers <https://physics.sciences.ncsu.edu/people/18650/>`__
+* `McKenzie Myers <http://mckenziemyers.com>`__
 * `Mathieu Renzo <https://www.as.arizona.edu/~mrenzo/>`__
 * `Radek Smolec <https://www.camk.edu.pl/en/staff/smolec/>`__
 * `Anne Thoul <https://scholar.google.be/citations?user=pVXttZoAAAAJ&hl=fr>`__
