@@ -133,7 +133,6 @@ real(dp) :: max_F_irr
 ! common envelope controls
 real(dp) :: CE_alpha
 real(dp) :: CE_alpha_th
-real(dp) :: CE_alpha_core
 real(dp) :: CE_mass_loss_rate_high
 real(dp) :: CE_mass_loss_rate_low
 real(dp) :: CE_rel_rlo_for_detachment

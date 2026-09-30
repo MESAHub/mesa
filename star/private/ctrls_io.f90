@@ -60,7 +60,7 @@
     stop_at_phase_O_Burn, stop_at_phase_Si_Burn, stop_at_phase_WDCS, &
     peak_burn_vconv_div_cs_limit, omega_div_omega_crit_limit, delta_nu_lower_limit, &
     delta_nu_upper_limit, delta_Pg_lower_limit, delta_Pg_upper_limit, shock_mass_upper_limit, &
-    mach1_mass_upper_limit, stop_when_reach_this_cumulative_extra_heating, &
+    stop_when_reach_this_cumulative_extra_heating, &
     xa_central_lower_limit_species, xa_central_lower_limit, xa_central_upper_limit_species, xa_central_upper_limit, &
     xa_surface_lower_limit_species, xa_surface_lower_limit, xa_surface_upper_limit_species, xa_surface_upper_limit, &
     xa_average_lower_limit_species, xa_average_lower_limit, xa_average_upper_limit_species, xa_average_upper_limit, &
@@ -99,11 +99,10 @@
     add_center_point_to_pulse_data, keep_surface_point_for_pulse_data, add_double_points_to_pulse_data, &
     interpolate_rho_for_pulse_data, threshold_grad_mu_for_double_point, max_number_of_double_points,&
     gyre_data_schema, fgong_header, fgong_ivers, &
-    max_num_gyre_points, format_for_OSC_data, &
+    format_for_OSC_data, &
     fgong_zero_A_inside_r, use_other_export_pulse_data, use_other_get_pulse_data, use_other_edit_pulse_data, &
     write_model_with_profile, model_data_prefix, model_data_suffix, &
-    mixing_D_limit_for_log, trace_mass_location, min_tau_for_max_abs_v_location, &
-    min_q_for_inner_mach1_location, max_q_for_outer_mach1_location, &
+    mixing_D_limit_for_log, &
     conv_core_gap_dq_limit, &
     TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, TDC_alpha_M, &
     TDC_alpha_C, TDC_alpha_S, &
@@ -121,8 +120,7 @@
 
     ! burn zone eps definitions for use in logs and profiles
     burn_min1, burn_min2, &
-    max_conv_vel_div_csound_maxq, width_for_limit_conv_vel, max_q_for_limit_conv_vel, &
-    max_mass_in_gm_for_limit_conv_vel, max_r_in_cm_for_limit_conv_vel, &
+    max_conv_vel_div_csound_maxq, &
 
     ! for reported surface/center abundances
     surface_avg_abundance_dq, center_avg_value_dq, &
@@ -144,6 +142,7 @@
     max_logT_for_mlt, thermohaline_coeff, thermohaline_option, mixing_length_alpha, remove_small_D_limit, &
     alt_scale_height_flag, Henyey_MLT_y_param, Henyey_MLT_nu_param, no_MLT_below_shock, mlt_make_surface_no_mixing, &
     MLT_option, mlt_use_rotation_correction, mlt_Pturb_factor, do_normalize_dqs_as_part_of_set_qs, &
+    burn_h_mix_region_logT, burn_he_mix_region_logT, burn_z_mix_region_logT, &
     max_Y_for_burn_z_mix_region, max_X_for_burn_he_mix_region, &
     limit_overshoot_Hp_using_size_of_convection_zone, RSP_min_tau_for_turbulent_flux, &
     predictive_mix, predictive_superad_thresh, predictive_avoid_reversal, predictive_limit_ingestion,&
@@ -151,9 +150,9 @@
     predictive_bdy_q_min, predictive_bdy_q_max, T_mix_limit, RSP_report_undercorrections, &
     do_conv_premix, conv_premix_avoid_increase, conv_premix_time_factor, &
     conv_premix_fix_pgas, conv_premix_dump_snapshots, do_premix_heating, &
-    overshoot_f, overshoot_f2, overshoot_f0, overshoot_D0, RSP_Qvisc_linear, dq_D_mix_zero_at_H_He_crossover, &
+    overshoot_f, overshoot_f2, overshoot_f0, overshoot_D0, dq_D_mix_zero_at_H_He_crossover, &
     overshoot_Delta0, overshoot_mass_full_on, overshoot_mass_full_off, dq_D_mix_zero_at_H_C_crossover, &
-    overshoot_scheme, overshoot_zone_type, overshoot_zone_loc, RSP_Qvisc_quadratic, &
+    overshoot_scheme, overshoot_zone_type, overshoot_zone_loc, &
     overshoot_bdy_loc, overshoot_D_min, overshoot_brunt_B_max, mlt_gradT_fraction, max_conv_vel_div_csound, &
     max_v_for_convection, max_q_for_convection_with_hydro_on, alpha_RTI_src_max_q, &
     max_v_div_cs_for_convection, max_abs_du_div_cs_for_convection, RSP_max_dt, RSP_relax_dm_tolerance, &
@@ -164,9 +163,9 @@
     RSP_min_PERIOD_div_PERIODLIN, RSP_report_limit_dt, RSP_mode_for_setting_PERIODLIN, RSP_initial_dt_factor, &
     RSP_v_div_cs_threshold_for_dt_limit, RSP_max_dt_times_min_dr_div_cs, RSP_thetae, &
     RSP_alfa, RSP_thetaq, RSP_default_PERIODLIN, &
-   RSP_theta, RSP_thetat, RSP_thetau, RSP_wtr, RSP_wtc, RSP_wtt, RSP_gam, RSP_max_retries_per_step, RSP_Qvisc_linear_static, &
+   RSP_theta, RSP_thetat, RSP_thetau, RSP_wtr, RSP_wtc, RSP_wtt, RSP_gam, RSP_max_retries_per_step, &
    RSP_alfa, RSP_alfap, RSP_alfam, RSP_alfat, RSP_alfas, RSP_alfac, RSP_alfad, RSP_gammar, RSP_nz_div_IBOTOM, &
-   RSP_efl0, RSP_cq, RSP_zsh, RSP_tol_max_corr, RSP_tol_max_resid, RSP_max_iters_per_try, &
+   RSP_efl0, RSP_cq, RSP_zsh, RSP_tol_max_corr, RSP_max_iters_per_try, &
     RTI_smooth_mass, RTI_smooth_iterations, RTI_smooth_fraction, RSP_dq_1_factor, &
     alpha_RTI_diffusion_factor, dudt_RTI_diffusion_factor, dedt_RTI_diffusion_factor, alpha_RTI_src_min_v_div_cs, &
     dlnddt_RTI_diffusion_factor, composition_RTI_diffusion_factor, max_M_RTI_factors_full_on, min_M_RTI_factors_full_off, &
@@ -382,7 +381,6 @@
     tol_correction_norm, tol_max_correction, correction_xa_limit, &
     tol_correction_high_T_limit, tol_correction_norm_high_T, tol_max_correction_high_T, &
     tol_correction_extreme_T_limit, tol_correction_norm_extreme_T, tol_max_correction_extreme_T, &
-    tol_bad_max_correction, bad_max_correction_series_limit, &
     tol_max_residual1, tol_residual_norm1, tol_max_residual2, &
     tol_residual_norm2, tol_max_residual3, tol_residual_norm3, &
     warning_limit_for_max_residual, trace_solver_damping, &
@@ -406,7 +404,7 @@
     hydro_mtx_min_allowed_logT, hydro_mtx_min_allowed_logRho, use_DGESVX_in_bcyclic, use_equilibration_in_DGESVX, &
     op_split_burn, op_split_burn_min_T, op_split_burn_eps, op_split_burn_odescal, &
     op_split_burn_min_T_for_variable_T_solver, solver_test_partials_show_dx_var_name, &
-    tiny_corr_coeff_limit, scale_correction_norm, corr_param_factor, num_times_solver_reuse_mtx, &
+    tiny_corr_coeff_limit, scale_correction_norm, corr_param_factor, &
     scale_max_correction, ignore_min_corr_coeff_for_scale_max_correction, &
     ignore_too_large_correction, ignore_species_in_max_correction, &
     corr_norm_jump_limit, max_corr_jump_limit, resid_norm_jump_limit, max_resid_jump_limit, RSP2_use_mass_interp_face_values, &
@@ -416,15 +414,15 @@
     min_xa_hard_limit, min_xa_hard_limit_for_highT, logT_max_for_min_xa_hard_limit, logT_min_for_min_xa_hard_limit_for_highT, &
     sum_xa_hard_limit, sum_xa_hard_limit_for_highT, logT_max_for_sum_xa_hard_limit, logT_min_for_sum_xa_hard_limit_for_highT, &
     xa_clip_limit, report_solver_progress, solver_test_partials_k_high, RSP2_use_L_eqn_at_surface, RSP2_use_RSP_eqn_for_Y_face, &
-    solver_epsder_chem, solver_epsder_struct, solver_numerical_jacobian, energy_conservation_dump_model_number, &
-    solver_jacobian_nzlo, solver_jacobian_nzhi, solver_check_everything, solver_inspect_soln_flag, RSP2_assume_HSE, &
+    energy_conservation_dump_model_number, &
+    solver_check_everything, RSP2_assume_HSE, &
     solver_test_partials_dx_0, solver_test_partials_k, solver_show_correction_info, eps_mdot_leak_frac_factor, &
     solver_test_partials_write_eos_call_info, solver_save_photo_call_number, RSP2_min_Lc_div_L_for_convective_mixing_type, &
     solver_test_partials_var_name, solver_test_partials_equ_name, RSP2_min_Lt_div_L_for_overshooting_mixing_type, &
     solver_test_eos_partials, solver_test_kap_partials, solver_test_net_partials, solver_test_atm_partials, &
     fill_arrays_with_NaNs, zero_when_allocate, warn_when_large_rel_run_E_err, &
     absolute_cumulative_energy_err, solver_test_partials_k_low, &
-    warn_when_large_virial_thm_rel_err, warn_when_get_a_bad_eos_result, warn_rates_for_high_temp, max_safe_logT_for_rates, &
+    warn_when_large_virial_thm_rel_err, warn_rates_for_high_temp, max_safe_logT_for_rates, &
     RSP2_alfap, RSP2_alfat, RSP2_alfam, RSP2_alfar, RSP2_Lsurf_factor, RSP2_use_Stellingwerf_Lr, RSP2_remesh_when_load, &
     RSP2_alfad, RSP2_num_outermost_cells_forced_nonturbulent, RSP2_num_innermost_cells_forced_nonturbulent, &
     RSP2_target_steps_per_cycle, RSP2_max_num_periods, RSP2_work_period, RSP2_map_first_period, RSP2_map_last_period, &
@@ -828,7 +826,6 @@
  s% delta_Pg_lower_limit = delta_Pg_lower_limit
  s% delta_Pg_upper_limit = delta_Pg_upper_limit
  s% shock_mass_upper_limit = shock_mass_upper_limit
- s% mach1_mass_upper_limit = mach1_mass_upper_limit
  s% stop_when_reach_this_cumulative_extra_heating = stop_when_reach_this_cumulative_extra_heating
 
  s% xa_central_lower_limit_species = xa_central_lower_limit_species
@@ -964,7 +961,6 @@
  s% fgong_header = fgong_header
  s% fgong_ivers = fgong_ivers
 
- s% max_num_gyre_points = max_num_gyre_points
  s% format_for_OSC_data = format_for_OSC_data
  s% fgong_zero_A_inside_r = fgong_zero_A_inside_r
  s% use_other_export_pulse_data = use_other_export_pulse_data
@@ -976,10 +972,6 @@
  s% model_data_suffix = model_data_suffix
 
  s% mixing_D_limit_for_log = mixing_D_limit_for_log
- s% trace_mass_location = trace_mass_location
- s% min_tau_for_max_abs_v_location = min_tau_for_max_abs_v_location
- s% min_q_for_inner_mach1_location = min_q_for_inner_mach1_location
- s% max_q_for_outer_mach1_location = max_q_for_outer_mach1_location
 
  s% conv_core_gap_dq_limit = conv_core_gap_dq_limit
 
@@ -988,10 +980,6 @@
  s% burn_min2 = burn_min2
 
  s% max_conv_vel_div_csound_maxq = max_conv_vel_div_csound_maxq
- s% width_for_limit_conv_vel = width_for_limit_conv_vel
- s% max_q_for_limit_conv_vel = max_q_for_limit_conv_vel
- s% max_mass_in_gm_for_limit_conv_vel = max_mass_in_gm_for_limit_conv_vel
- s% max_r_in_cm_for_limit_conv_vel = max_r_in_cm_for_limit_conv_vel
 
  ! for reported average values
  s% surface_avg_abundance_dq = surface_avg_abundance_dq
@@ -1151,11 +1139,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
    s% RSP_min_tau_for_turbulent_flux = RSP_min_tau_for_turbulent_flux
    s% RSP_cq = RSP_cq
    s% RSP_zsh = RSP_zsh
-   s% RSP_Qvisc_quadratic = RSP_Qvisc_quadratic
-   s% RSP_Qvisc_linear = RSP_Qvisc_linear
-   s% RSP_Qvisc_linear_static = RSP_Qvisc_linear_static
    s% RSP_tol_max_corr = RSP_tol_max_corr
-   s% RSP_tol_max_resid = RSP_tol_max_resid
    s% RSP_max_iters_per_try = RSP_max_iters_per_try
    s% RSP_max_retries_per_step = RSP_max_retries_per_step
    s% RSP_nz_div_IBOTOM = RSP_nz_div_IBOTOM
@@ -1895,8 +1879,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% tol_correction_norm_extreme_T = tol_correction_norm_extreme_T
  s% tol_max_correction_extreme_T = tol_max_correction_extreme_T
 
- s% tol_bad_max_correction = tol_bad_max_correction
- s% bad_max_correction_series_limit = bad_max_correction_series_limit
 
  s% tol_residual_norm1 = tol_residual_norm1
  s% tol_max_residual1 = tol_max_residual1
@@ -1980,7 +1962,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  s% tiny_corr_coeff_limit = tiny_corr_coeff_limit
  s% scale_correction_norm = scale_correction_norm
- s% num_times_solver_reuse_mtx = num_times_solver_reuse_mtx
  s% corr_param_factor = corr_param_factor
  s% scale_max_correction = scale_max_correction
  s% ignore_min_corr_coeff_for_scale_max_correction = ignore_min_corr_coeff_for_scale_max_correction
@@ -2022,14 +2003,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% report_solver_progress = report_solver_progress
  s% solver_test_partials_call_number = solver_test_partials_call_number
  s% solver_test_partials_iter_number = solver_test_partials_iter_number
- s% solver_epsder_chem = solver_epsder_chem
- s% solver_epsder_struct = solver_epsder_struct
- s% solver_numerical_jacobian = solver_numerical_jacobian
- s% solver_jacobian_nzlo = solver_jacobian_nzlo
- s% solver_jacobian_nzhi = solver_jacobian_nzhi
  s% solver_check_everything = solver_check_everything
  s% energy_conservation_dump_model_number = energy_conservation_dump_model_number
- s% solver_inspect_soln_flag = solver_inspect_soln_flag
  s% solver_test_partials_dx_0 = solver_test_partials_dx_0
  s% solver_test_partials_k = solver_test_partials_k
  s% solver_test_partials_k_low = solver_test_partials_k_low
@@ -2050,7 +2025,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% warn_when_large_rel_run_E_err = warn_when_large_rel_run_E_err
  s% absolute_cumulative_energy_err = absolute_cumulative_energy_err
  s% warn_when_large_virial_thm_rel_err = warn_when_large_virial_thm_rel_err
- s% warn_when_get_a_bad_eos_result = warn_when_get_a_bad_eos_result
  s% warn_rates_for_high_temp = warn_rates_for_high_temp
  s% max_safe_logT_for_rates = max_safe_logT_for_rates
  s% eps_mdot_leak_frac_factor = eps_mdot_leak_frac_factor
@@ -2456,9 +2430,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  s% diffusion_dump_call_number = diffusion_dump_call_number
 
- s% surface_accel_div_grav_limit = surface_accel_div_grav_limit
- s% steps_before_start_stress_test = steps_before_start_stress_test
- s% stress_test_relax = stress_test_relax
 
  end subroutine store_controls
 
@@ -2556,7 +2527,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  delta_Pg_lower_limit = s% delta_Pg_lower_limit
  delta_Pg_upper_limit = s% delta_Pg_upper_limit
  shock_mass_upper_limit = s% shock_mass_upper_limit
- mach1_mass_upper_limit = s% mach1_mass_upper_limit
  stop_when_reach_this_cumulative_extra_heating = s% stop_when_reach_this_cumulative_extra_heating
 
  xa_central_lower_limit_species = s% xa_central_lower_limit_species
@@ -2694,7 +2664,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  fgong_header = s% fgong_header
  fgong_ivers = s% fgong_ivers
 
- max_num_gyre_points = s% max_num_gyre_points
  format_for_OSC_data = s% format_for_OSC_data
  fgong_zero_A_inside_r = s% fgong_zero_A_inside_r
  use_other_export_pulse_data = s% use_other_export_pulse_data
@@ -2706,10 +2675,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  model_data_suffix = s% model_data_suffix
 
  mixing_D_limit_for_log = s% mixing_D_limit_for_log
- trace_mass_location = s% trace_mass_location
- min_tau_for_max_abs_v_location = s% min_tau_for_max_abs_v_location
- min_q_for_inner_mach1_location = s% min_q_for_inner_mach1_location
- max_q_for_outer_mach1_location = s% max_q_for_outer_mach1_location
 
  conv_core_gap_dq_limit = s% conv_core_gap_dq_limit
 
@@ -2718,10 +2683,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  burn_min2 = s% burn_min2
 
  max_conv_vel_div_csound_maxq = s% max_conv_vel_div_csound_maxq
- width_for_limit_conv_vel = s% width_for_limit_conv_vel
- max_q_for_limit_conv_vel = s% max_q_for_limit_conv_vel
- max_mass_in_gm_for_limit_conv_vel = s% max_mass_in_gm_for_limit_conv_vel
- max_r_in_cm_for_limit_conv_vel = s% max_r_in_cm_for_limit_conv_vel
 
  ! for reported average values
  surface_avg_abundance_dq = s% surface_avg_abundance_dq
@@ -2878,11 +2839,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
    RSP_min_tau_for_turbulent_flux = s% RSP_min_tau_for_turbulent_flux
    RSP_cq = s% RSP_cq
    RSP_zsh = s% RSP_zsh
-   RSP_Qvisc_quadratic = s% RSP_Qvisc_quadratic
-   RSP_Qvisc_linear = s% RSP_Qvisc_linear
-   RSP_Qvisc_linear_static = s% RSP_Qvisc_linear_static
    RSP_tol_max_corr = s% RSP_tol_max_corr
-   RSP_tol_max_resid = s% RSP_tol_max_resid
    RSP_max_iters_per_try = s% RSP_max_iters_per_try
    RSP_max_retries_per_step = s% RSP_max_retries_per_step
    RSP_nz_div_IBOTOM = s% RSP_nz_div_IBOTOM
@@ -3613,8 +3570,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  tol_correction_norm_extreme_T = s% tol_correction_norm_extreme_T
  tol_max_correction_extreme_T = s% tol_max_correction_extreme_T
 
- tol_bad_max_correction = s% tol_bad_max_correction
- bad_max_correction_series_limit = s% bad_max_correction_series_limit
 
  tol_residual_norm1 = s% tol_residual_norm1
  tol_max_residual1 = s% tol_max_residual1
@@ -3698,7 +3653,6 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
 
  tiny_corr_coeff_limit = s% tiny_corr_coeff_limit
  scale_correction_norm = s% scale_correction_norm
- num_times_solver_reuse_mtx = s% num_times_solver_reuse_mtx
  corr_param_factor = s% corr_param_factor
  scale_max_correction = s% scale_max_correction
  ignore_min_corr_coeff_for_scale_max_correction = s% ignore_min_corr_coeff_for_scale_max_correction
@@ -3740,14 +3694,8 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  report_solver_progress = s% report_solver_progress
  solver_test_partials_call_number = s% solver_test_partials_call_number
  solver_test_partials_iter_number = s% solver_test_partials_iter_number
- solver_epsder_chem = s% solver_epsder_chem
- solver_epsder_struct = s% solver_epsder_struct
- solver_numerical_jacobian = s% solver_numerical_jacobian
- solver_jacobian_nzlo = s% solver_jacobian_nzlo
- solver_jacobian_nzhi = s% solver_jacobian_nzhi
  solver_check_everything = s% solver_check_everything
  energy_conservation_dump_model_number = s% energy_conservation_dump_model_number
- solver_inspect_soln_flag = s% solver_inspect_soln_flag
  solver_test_partials_dx_0 = s% solver_test_partials_dx_0
  solver_test_partials_k = s% solver_test_partials_k
  solver_test_partials_k_low = s% solver_test_partials_k_low
@@ -3768,7 +3716,6 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  warn_when_large_rel_run_E_err = s% warn_when_large_rel_run_E_err
  absolute_cumulative_energy_err = s% absolute_cumulative_energy_err
  warn_when_large_virial_thm_rel_err = s% warn_when_large_virial_thm_rel_err
- warn_when_get_a_bad_eos_result = s% warn_when_get_a_bad_eos_result
  warn_rates_for_high_temp = s% warn_rates_for_high_temp
  max_safe_logT_for_rates = s% max_safe_logT_for_rates
  eps_mdot_leak_frac_factor = s% eps_mdot_leak_frac_factor
@@ -4173,15 +4120,12 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
 
  diffusion_dump_call_number = s% diffusion_dump_call_number
 
- surface_accel_div_grav_limit = s% surface_accel_div_grav_limit
  gradT_excess_age_fraction = s% gradT_excess_age_fraction
  gradT_excess_max_change = s% gradT_excess_max_change
  hot_wind_scheme = s% hot_wind_scheme
  cool_wind_full_on_T = s% cool_wind_full_on_T
  hot_wind_full_on_T = s% hot_wind_full_on_T
  num_cells_for_smooth_brunt_B = s% num_cells_for_smooth_brunt_B
- steps_before_start_stress_test = s% steps_before_start_stress_test
- stress_test_relax = s% stress_test_relax
 
 
 

@@ -32,7 +32,6 @@
          real(dp) :: log_center_temp_lower_limit
          real(dp) :: log_center_density_upper_limit, log_center_density_lower_limit
          real(dp) :: log_max_temp_upper_limit, log_max_temp_lower_limit
-         real(dp) :: surface_accel_div_grav_limit
          real(dp) :: center_entropy_upper_limit, center_entropy_lower_limit
          real(dp) :: max_entropy_upper_limit, max_entropy_lower_limit
 
@@ -146,7 +145,7 @@
          real(dp) :: peak_burn_vconv_div_cs_limit, omega_div_omega_crit_limit
          real(dp) :: delta_nu_lower_limit, delta_nu_upper_limit
          real(dp) :: delta_Pg_lower_limit, delta_Pg_upper_limit
-         real(dp) :: shock_mass_upper_limit, mach1_mass_upper_limit, &
+         real(dp) :: shock_mass_upper_limit, &
             stop_when_reach_this_cumulative_extra_heating
 
       ! output of "snapshots" for restarts
@@ -205,13 +204,8 @@
          character (len=strlen) :: fgong_header(4)
          integer :: fgong_ivers
 
-         integer :: max_num_gyre_points
-
          real(dp) :: fgong_zero_A_inside_r
-         real(dp) :: trace_mass_location, &
-            min_tau_for_max_abs_v_location, min_q_for_inner_mach1_location, &
-            max_q_for_outer_mach1_location, &
-            conv_core_gap_dq_limit
+         real(dp) :: conv_core_gap_dq_limit
          real(dp) :: mixing_D_limit_for_log
 
       ! burn zone eps definitions for use in logs and profiles
@@ -221,9 +215,7 @@
 
       ! limit for max conv vel div csound
 
-         real(dp) :: max_conv_vel_div_csound_maxq, max_q_for_limit_conv_vel, &
-            max_mass_in_gm_for_limit_conv_vel, max_r_in_cm_for_limit_conv_vel
-         integer :: width_for_limit_conv_vel
+         real(dp) :: max_conv_vel_div_csound_maxq
 
       ! for reported averages
 
@@ -364,7 +356,7 @@
          real(dp) :: &
             RSP_theta, RSP_thetat, RSP_thetaq, RSP_thetau, RSP_thetae, RSP_wtr, RSP_wtc, RSP_wtt, RSP_gam, &
             RSP_alfa, RSP_alfap, RSP_alfam, RSP_alfat, RSP_alfas, RSP_alfac, RSP_alfad, RSP_gammar, RSP_efl0, &
-            RSP_cq, RSP_zsh, RSP_Qvisc_quadratic, RSP_Qvisc_linear, RSP_tol_max_corr, RSP_tol_max_resid, &
+            RSP_cq, RSP_zsh, RSP_tol_max_corr, &
             RSP_nz_div_IBOTOM, RSP_Teff, RSP_mass, RSP_L, RSP_X, RSP_Z, RSP_GREKM_avg_abs_frac_new, &
             RSP_min_max_R_for_periods, RSP_GREKM_avg_abs_limit, RSP_Avel, RSP_Arnd, RSP_default_PERIODLIN, &
             RSP_kick_vsurf_km_per_sec, RSP_T_anchor, RSP_T_inner, RSP_Psurf, set_RSP_Psurf_to_multiple_of_initial_P1, &
@@ -373,7 +365,7 @@
             RSP_max_dt_times_min_dr_div_cs, RSP_tau_surf_for_atm_grey_with_kap, &
             RSP_min_tau_for_turbulent_flux, RSP_max_dt, RSP_min_deltaR_for_periods, &
             RSP_kap_density_factor, RSP_T_anchor_tolerance, RSP_T_inner_tolerance, RSP_relax_dm_tolerance, &
-            RSP_max_dt_times_min_rad_diff_time, RSP_Qvisc_linear_static, RSP_dq_1_factor, &
+            RSP_max_dt_times_min_rad_diff_time, RSP_dq_1_factor, &
             RSP_surface_tau
 
          real(dp) :: &
@@ -906,8 +898,6 @@
             tol_correction_norm_high_T, tol_max_correction_high_T
          real(dp) :: tol_correction_extreme_T_limit, &
             tol_correction_norm_extreme_T, tol_max_correction_extreme_T
-         real(dp) :: tol_bad_max_correction
-         integer :: bad_max_correction_series_limit
 
          real(dp) :: tol_residual_norm1, tol_max_residual1
          real(dp) :: tol_residual_norm2, tol_max_residual2
@@ -925,8 +915,6 @@
             relax_solver_iters_timestep_limit, &
             relax_iter_for_resid_tol2, relax_iter_for_resid_tol3
 
-         integer :: steps_before_start_stress_test
-         logical :: stress_test_relax
 
          logical :: use_gold_tolerances
          integer :: &
@@ -979,7 +967,6 @@
             hydro_mtx_min_allowed_logRho, &
             solver_reduced_min_corr_coeff
 
-         integer :: num_times_solver_reuse_mtx
          integer :: tiny_corr_coeff_limit
          real(dp) :: scale_correction_norm
          real(dp) :: corr_param_factor
@@ -1079,10 +1066,7 @@
          logical :: report_solver_progress
          logical :: report_ierr, report_bad_negative_xa
 
-         logical :: solver_numerical_jacobian
-         integer :: solver_jacobian_nzlo, solver_jacobian_nzhi
          logical :: solver_check_everything
-         logical :: solver_inspect_soln_flag
          real(dp) :: solver_test_partials_dx_0
          integer :: solver_test_partials_k, solver_test_partials_call_number, &
             solver_test_partials_iter_number, solver_save_photo_call_number, &
@@ -1094,10 +1078,9 @@
             solver_test_net_partials, solver_test_atm_partials
 
          logical :: solver_show_correction_info
-         real(dp) :: solver_epsder_chem, solver_epsder_struct
 
          logical :: fill_arrays_with_NaNs
-         logical :: zero_when_allocate, warn_when_get_a_bad_eos_result, &
+         logical :: zero_when_allocate, &
             warn_rates_for_high_temp, absolute_cumulative_energy_err
          real(dp) :: warn_when_large_rel_run_E_err, &
             warn_when_large_virial_thm_rel_err, max_safe_logT_for_rates, &
