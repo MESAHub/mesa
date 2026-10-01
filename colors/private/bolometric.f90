@@ -19,17 +19,31 @@
 
 module bolometric
 
-   use const_def, only: dp
+   use const_def, only: dp, pi, pc, Lsun, mbolsun
    use colors_def, only: Colors_General_Info
    use colors_utils, only: simpson_integration
    use hermite_interp, only: construct_sed_hermite
+   use hermite_interp_bounded, only: construct_sed_hermite_bounded
    use linear_interp, only: construct_sed_linear
    use knn_interp, only: construct_sed_knn
+   use utils_lib, only: is_inf, is_nan, mesa_error
 
    implicit none
 
    private
-   public :: calculate_bolometric
+   public :: calculate_bolometric, calculate_bolometric_phot
+
+
+
+   ! IAU 2015 Resolution B2 zero-point for the bolometric magnitude scale:
+   ! the irradiance corresponding to M_bol = 0. Defined so that a source with
+   ! L = L_sun observed from 10 pc has M_bol = 4.74. This is a fixed constant
+   ! and is unrelated to the Vega/AB/ST conventions in synthetic.f90, which
+   ! apply to bandpass magnitudes only.
+   real(dp), parameter :: f_bol_zero_point = &
+      Lsun*10.0_dp**(0.4_dp*mbolsun)/(4.0_dp*pi*(10.0_dp*pc)**2)  ! erg s^-1 cm^-2
+
+
 
 contains
 
@@ -44,7 +58,7 @@ contains
 
       character(len=32) :: interpolation_method
 
-      interpolation_method = 'Hermite'   ! or 'Linear' / 'KNN' later
+      interpolation_method = 'Hermite_bounded'   ! or 'Linear' / 'KNN' / 'Hermite' / 'Hermite_bounded'
 
       ! how far (teff, log_g, metallicity) is from the nearest grid point
       interpolation_radius = compute_interp_radius(teff, log_g, metallicity, &
@@ -63,28 +77,43 @@ contains
          call construct_sed_knn(rq, teff, log_g, metallicity, R, d, &
                                 sed_filepath, wavelengths, fluxes)
 
+      case ('Hermite_bounded', 'hermite_bounded', 'HERMITE_BOUNDED')
+         call construct_sed_hermite_bounded(rq, teff, log_g, metallicity, R, d, &
+                                            sed_filepath, wavelengths, fluxes)
+
       case default
-         ! fallback: hermite
-         call construct_sed_hermite(rq, teff, log_g, metallicity, R, d, &
-                                    sed_filepath, wavelengths, fluxes)
+         ! fallback: bounded hermite (switches to linear in regions where hermite overshoots.)
+         call construct_sed_hermite_bounded(rq, teff, log_g, metallicity, R, d, &
+                                            sed_filepath, wavelengths, fluxes)
       end select
 
       call calculate_bolometric_phot(wavelengths, fluxes, bolometric_magnitude, bolometric_flux)
    end subroutine calculate_bolometric
 
    subroutine calculate_bolometric_phot(wavelengths, fluxes, bolometric_magnitude, bolometric_flux)
-      real(dp), dimension(:), intent(inout) :: wavelengths, fluxes
+      real(dp), dimension(:), intent(in) :: wavelengths, fluxes
       real(dp), intent(out) :: bolometric_magnitude, bolometric_flux
+      real(dp), allocatable :: clean_fluxes(:)
       integer :: i
 
-      ! zero out any invalid flux/wavelength values
-      do i = 1, size(wavelengths) - 1
-         if (wavelengths(i) <= 0.0d0 .or. fluxes(i) < 0.0d0) then
-            fluxes(i) = 0.0d0
+      if (size(wavelengths) /= size(fluxes) .or. size(wavelengths) < 2) then
+         write (*, *) 'colors: invalid array sizes in calculate_bolometric_phot'
+         call mesa_error(__FILE__, __LINE__)
+      end if
+
+      allocate (clean_fluxes(size(fluxes)))
+      clean_fluxes = fluxes
+
+      do i = 1, size(wavelengths)
+         if (is_nan(wavelengths(i)) .or. is_inf(wavelengths(i)) .or. wavelengths(i) <= 0.0d0 .or. &
+             is_nan(clean_fluxes(i)) .or. is_inf(clean_fluxes(i)) .or. clean_fluxes(i) < 0.0d0) then
+            clean_fluxes(i) = 0.0d0
          end if
       end do
 
-      call simpson_integration(wavelengths, fluxes, bolometric_flux)
+      call simpson_integration(wavelengths, clean_fluxes, bolometric_flux)
+
+      deallocate (clean_fluxes)
 
       if (bolometric_flux <= 0.0d0) then
          print *, "Error: Flux integration resulted in non-positive value."
@@ -99,11 +128,15 @@ contains
 
    real(dp) function flux_to_magnitude(flux)
       real(dp), intent(in) :: flux
+      logical, save :: warned = .false.
       if (flux <= 0.0d0) then
-         print *, "Error: Flux must be positive to calculate magnitude."
+         if (.not. warned) then
+            print *, "colors: non-positive bolometric flux; Mag_bol set to 99"
+            warned = .true.
+         end if
          flux_to_magnitude = 99.0d0
       else
-         flux_to_magnitude = -2.5d0*log10(flux)
+         flux_to_magnitude = -2.5d0*log10(flux/f_bol_zero_point)
       end if
    end function flux_to_magnitude
 

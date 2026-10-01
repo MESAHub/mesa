@@ -85,21 +85,22 @@ def get_improved_mesa_phase_info(phase_code):
     Map MESA's phase_of_evolution integer codes to phase names and more intuitive colors.
     Colors follow stellar evolution logic: blue (hot/young) -> red (cool/evolved) -> white (remnants)
     """
+
     # Improved phase colors that make physical sense
     phase_map = {
         -1: ("Relax", "#808080"),  # Gray - Relaxation phase
         1: ("Starting", "#E6E6FA"),  # Lavender - Starting phase
         2: ("Pre-MS", "#9370DB"),  # Medium purple - Pre-main sequence (young)
         3: ("ZAMS", "#4169E1"),  # Royal blue - Zero-age MS (hot, young MS)
-        4: ("IAMS", "#00CED1"),  # Dark turquoise - Intermediate-age MS
-        5: ("TAMS", "#FF6347"),  # Tomato - Terminal-age MS (cooler, evolved MS)
+        4: ("IAMS", "#3BC665"),  # Dark turquoise - Intermediate-age MS
+        5: ("TAMS", "#0F0040"),  # Tomato - Terminal-age MS (cooler, evolved MS)
         6: ("He-Burn", "#FF4500"),  # Orange red - Helium burning (post-MS)
-        7: ("ZACHeB", "#FF8C00"),  # Dark orange - Zero-age core helium burning
+        7: ("ZACHeB", "#638F71"),  # Dark orange - Zero-age core helium burning
         8: ("TACHeB", "#FFA500"),  # Orange - Terminal-age core helium burning
         9: ("TP-AGB", "#DC143C"),  # Crimson - Thermally pulsing AGB (very evolved)
-        10: ("C-Burn", "#B22222"),  # Fire brick - Carbon burning (massive stars)
-        11: ("Ne-Burn", "#8B0000"),  # Dark red - Neon burning
-        12: ("O-Burn", "#800000"),  # Maroon - Oxygen burning
+        10: ("C-Burn", "#A1FF42"),  # Fire brick - Carbon burning (massive stars)
+        11: ("Ne-Burn", "#8B6900"),  # Dark red - Neon burning
+        12: ("O-Burn", "#8AA0B0"),  # Maroon - Oxygen burning
         13: ("Si-Burn", "#654321"),  # Dark brown - Silicon burning (pre-collapse)
         14: ("WDCS", "#F5F5F5"),  # White smoke - White dwarf cooling sequence
     }
