@@ -43,9 +43,13 @@ At each history output step, ``data_for_colors_history_columns`` is called with 
 
 **Step 1 — SED interpolation**
 
-The module locates the containing cell in the (T_eff, log g, [M/H]) grid and interpolates to produce a flux array F_λ at the stellar surface. Two paths exist:
+The module locates the containing cell in the (T_eff, log g, [M/H]) grid and interpolates to produce a flux array F_λ at the stellar surface. The default is bounded Hermite tensor interpolation: negligible negative undershoots are set to zero, and an unusable spectrum triggers a fallback to trilinear interpolation. An undershoot is negligible only when both its integrated magnitude and its peak amplitude are at most 0.1% of the corresponding positive flux quantities. The accepted spectrum must have a finite, positive integrated flux; if both interpolation methods return invalid spectra, the module reports an error.
 
-* **Flux cube path** (preferred): hermite tensor interpolation across the full pre-loaded 4D array. All lookups are in-memory array accesses.
+These safeguards enforce physical flux constraints but do not guarantee accuracy in sparsely sampled regions. Switching between Hermite and linear interpolation can also introduce changes in the smoothness of the resulting photometry. Linear, K-nearest-neighbour (KNN), and unbounded Hermite routines are available in the source, but there is no namelist control for selecting the interpolation method.
+
+Two data-loading paths exist, both using the same bounded Hermite procedure:
+
+* **Flux cube path** (preferred): interpolation across the full pre-loaded 4D array. All lookups are in-memory array accesses.
 * **Stencil fallback path** (low-RAM): an extended neighbourhood of SED files around the current grid cell is loaded on demand. Individual SED files are served from a bounded memory cache (256-slot circular buffer, ``sed_mem_cache_cap`` in ``colors_def.f90``) to avoid redundant disk reads. The stencil is invalidated and reloaded whenever the star moves into a new grid cell.
 
 **Step 2 — Distance dilution**
@@ -78,7 +82,7 @@ The synthetic magnitude is then:
 
 where F_zp is the precomputed zero-point for the selected magnitude system (Vega, AB, or ST).
 
-If the star's parameters fall outside the atmosphere grid, the module clamps to the nearest grid boundary. The ``Interp_rad`` column records the Euclidean distance (in normalised parameter space) between the stellar parameters and the nearest grid point.
+If the star's parameters fall outside a non-degenerate atmosphere grid axis, Hermite interpolation uses the nearest grid-point spectrum rather than extrapolating. An axis containing only one tabulated value is treated as a fixed dimension. The ``Interp_rad`` column records the Euclidean distance (in normalised parameter space) between the stellar parameters and the nearest grid point; it is a grid-distance diagnostic, not an error estimate or an indicator of which interpolation method was used.
 
 Source files
 ============
@@ -97,6 +101,8 @@ Source files
    │   ├── synthetic.f90        — per-filter convolution and magnitude calculation,
    │   │                          SED CSV output (make_csv / sed_per_model)
    │   ├── hermite_interp.f90   — hermite tensor interpolation (cube path)
+   │   ├── hermite_interp_bounded.f90 — SED validation, negligible undershoot repair,
+   │   │                                and trilinear fallback
    │   ├── linear_interp.f90    — trilinear interpolation (cube path fallback)
    │   ├── knn_interp.f90       — k-nearest-neighbour interpolation
    │   ├── colors_utils.f90     — I/O (SED, filter, lookup table, flux cube),
