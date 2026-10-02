@@ -136,8 +136,9 @@ def check_io(filename, dt, var):
     m1 = f"{dt}% {var} = {var}"
     m2 = f"{var} = {dt}% {var}"
 
-    regexp_1 = f"^[ \t]*[ ]?{dt}[ ]*%[ ]*{var}[ ]*=[ ]*{var}"
-    regexp_2 = f"^[ \t]*[ ]?{var}[ ]*=[ ]*{dt}[ ]*%[ ]*{var}"
+    whole_array = r"(?:\(\s*:\s*(?:,\s*:\s*)*\))?"
+    regexp_1 = rf"^[ \t]*{dt}[ ]*%[ ]*{var}\b{whole_array}[ ]*=[ ]*{var}\b"
+    regexp_2 = rf"^[ \t]*{var}\b{whole_array}[ ]*=[ ]*{dt}[ ]*%[ ]*{var}\b"
 
     rc1 = re.compile(regexp_1, flags=re.IGNORECASE)
     rc2 = re.compile(regexp_2, flags=re.IGNORECASE)
@@ -239,7 +240,22 @@ if __name__ == "__main__":
         "star_job_dev",
     )
 
-    failed = result1 + result2 + result3 + result4
+    result5 = run_checks(
+        "binary/public/binary_controls.inc",
+        "binary/defaults/binary_controls.defaults",
+        "binary/private/binary_ctrls_io.f90",
+        "b",
+        "binary_controls",
+    )
+    result6 = run_checks(
+        "binary/private/binary_job_controls.inc",
+        "binary/defaults/binary_job.defaults",
+        "binary/private/binary_job_ctrls_io.f90",
+        "b% job",
+        "binary_job",
+    )
+
+    failed = result1 + result2 + result3 + result4 + result5 + result6
     if not failed:
         print("All checks passed.")
         sys.exit(0)

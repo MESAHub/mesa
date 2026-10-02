@@ -463,16 +463,16 @@
       ! pre_ms_check_radiative_core_min_mass
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! |    ``pre_ms_relax_to_start_radiative_core``. wait this many steps before start checking for radiative core
+      ! |    ``pre_ms_min_steps_before_check_radiative_core``. wait this many relaxation steps before stopping for a radiative core; zero adds no waiting period
       ! |    ``pre_ms_check_radiative_core_start``. only start checking after have encountered ``min_conv_mx1_bot`` < this
-      ! |    this forces it to wait until after have become fully convective.
+      ! |    this forces it to wait until after have become fully convective. The running minimum includes the initial waiting steps.
       ! |    ``pre_ms_check_radiative_core_stop``. stop when ``conv_mx1_bot`` > this (measured in q).
       ! |    The relaxation to a radiative core is stopped if Lnuc/L > ``pre_ms_check_radiative_core_Lnuc_div_L_limit``,
       ! |    or when the mass is below ``pre_ms_check_radiative_core_min_mass`` (in Msun).
 
       ! ::
 
-    pre_ms_min_steps_before_check_radiative_core = 50
+    pre_ms_min_steps_before_check_radiative_core = 0
     pre_ms_check_radiative_core_start = 1d-6
     pre_ms_check_radiative_core_stop = 1d-3
     pre_ms_check_radiative_core_Lnuc_div_L_limit = 0.1d0
@@ -1504,23 +1504,6 @@
     new_u_flag = .false.
 
 
-      ! change_reconstruction_flag
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! change_initial_reconstruction_flag
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! new_reconstruction_flag
-      ! ~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! change whether MESA reconstruction variables with Riemann.
-      ! only applies when u_flag is true.
-
-      ! ::
-
-    change_reconstruction_flag = .false.
-    change_initial_reconstruction_flag = .false.
-    new_reconstruction_flag = .false.
-
-
    ! rotation controls
    ! _________________
 
@@ -2148,17 +2131,6 @@
       ! ::
 
     limit_center_logP_at_each_step = -1d99
-
-
-      ! zero_initial_inner_v_by_mass_Msun
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! zero_inner_v_by_mass_Msun
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! ::
-
-    zero_initial_inner_v_by_mass_Msun = 0
-    zero_inner_v_by_mass_Msun = 0
 
 
       ! remove_center_logRho_limit

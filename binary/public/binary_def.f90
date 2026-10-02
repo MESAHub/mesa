@@ -241,7 +241,7 @@
          integer :: binary_id  ! unique identifier for each binary_info instance
          logical :: in_use
 
-         integer :: extra_binary_terminal_iounit
+         integer :: extra_binary_terminal_iounit = 0
 
          type (binary_job_controls) :: job
          include 'binary_data.inc'
