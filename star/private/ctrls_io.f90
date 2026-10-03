@@ -366,7 +366,7 @@
     P_theta_for_velocity_time_centering, L_theta_for_velocity_time_centering, &
     max_logT_for_include_P_and_L_in_velocity_time_centering, &
     steps_before_use_TDC, use_P_d_1_div_rho_form_of_work_when_time_centering_velocity, compare_TDC_to_MLT, &
-    use_TDC_Y_face_seeded_newton, &
+    use_TDC_Y_face_seeded_newton, solver_damping_on_retry, &
     hydro_matrix_solver, &
     remesh_for_TDC_pulsations_when_load, remesh_for_TDC_pulsations_log_core_zoning, &
     velocity_logT_lower_bound, &
@@ -409,6 +409,7 @@
     tiny_corr_coeff_limit, scale_correction_norm, corr_param_factor, num_times_solver_reuse_mtx, &
     scale_max_correction, ignore_min_corr_coeff_for_scale_max_correction, &
     ignore_too_large_correction, ignore_species_in_max_correction, &
+    solver_use_T_reference, &
     corr_norm_jump_limit, max_corr_jump_limit, resid_norm_jump_limit, max_resid_jump_limit, RSP2_use_mass_interp_face_values, &
     corr_coeff_limit, tiny_corr_factor, solver_test_partials_call_number, solver_test_partials_iter_number, &
     max_tries1, solver_max_tries_before_reject, max_tries_for_retry, max_tries_after_5_retries, solver_test_partials_sink_name, &
@@ -1986,6 +1987,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% ignore_min_corr_coeff_for_scale_max_correction = ignore_min_corr_coeff_for_scale_max_correction
  s% ignore_too_large_correction = ignore_too_large_correction
  s% ignore_species_in_max_correction = ignore_species_in_max_correction
+ s% solver_use_T_reference = solver_use_T_reference
 
  s% corr_norm_jump_limit = corr_norm_jump_limit
  s% max_corr_jump_limit = max_corr_jump_limit
@@ -2074,6 +2076,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% include_mlt_in_velocity_time_centering = include_mlt_in_velocity_time_centering
  s% compare_TDC_to_MLT = compare_TDC_to_MLT
  s% use_TDC_Y_face_seeded_newton = use_TDC_Y_face_seeded_newton
+ s% solver_damping_on_retry = solver_damping_on_retry
  s% hydro_matrix_solver = hydro_matrix_solver
  s% TDC_hydro_use_mass_interp_face_values = TDC_hydro_use_mass_interp_face_values
  s% TDC_hydro_nz = TDC_hydro_nz
@@ -3704,6 +3707,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  ignore_min_corr_coeff_for_scale_max_correction = s% ignore_min_corr_coeff_for_scale_max_correction
  ignore_too_large_correction = s% ignore_too_large_correction
  ignore_species_in_max_correction = s% ignore_species_in_max_correction
+ solver_use_T_reference = s% solver_use_T_reference
 
  corr_norm_jump_limit = s% corr_norm_jump_limit
  max_corr_jump_limit = s% max_corr_jump_limit
@@ -3792,6 +3796,7 @@ solver_test_partials_sink_name = s% solver_test_partials_sink_name
  include_mlt_in_velocity_time_centering = s% include_mlt_in_velocity_time_centering
  compare_TDC_to_MLT = s% compare_TDC_to_MLT
  use_TDC_Y_face_seeded_newton = s% use_TDC_Y_face_seeded_newton
+ solver_damping_on_retry = s% solver_damping_on_retry
  hydro_matrix_solver = s% hydro_matrix_solver
  TDC_hydro_use_mass_interp_face_values = s% TDC_hydro_use_mass_interp_face_values
  TDC_hydro_nz = s% TDC_hydro_nz

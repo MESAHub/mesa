@@ -607,7 +607,7 @@
          if (dbg) write(*,*) 'call eval_using_rate_tables'
          call eval_using_rate_tables( &
             g% num_reactions, g% reaction_id, g% rate_table, g% rattab_f1, nrattab,  &
-            n% ye, n% logT, n% temp, n% rho, n% rate_factors, g% logttab, &
+            n% ye, n% logT, n% temp, n% rho, n% rate_factors, g% ttab, g% logttab, &
             n% rate_raw, n% rate_raw_dT, n% rate_raw_dRho, ierr)
          if (ierr /= 0) then
             if (dbg) write(*,*) 'ierr from eval_using_rate_tables'
