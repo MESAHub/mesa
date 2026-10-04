@@ -346,7 +346,7 @@
 
       ! data table types
 
-      type (HELM_Table), pointer :: eos_ht
+      type (Helm_Table), allocatable, target :: eos_ht
 
       ! for mesa (logQ,logT) tables
       type EosDT_XZ_Info

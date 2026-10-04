@@ -40,8 +40,8 @@
 
       subroutine eos_shutdown
          use eos_def
-         use helm_alloc,only:free_helm_table
-         if (associated(eos_ht)) call free_helm_table(eos_ht)
+
+         deallocate(eos_ht)
          call eos_def_shutdown
       end subroutine eos_shutdown
 
