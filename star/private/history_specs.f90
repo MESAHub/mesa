@@ -57,15 +57,16 @@
       integer, parameter :: eps_neu_rate_offset = eps_nuc_rate_offset + idel
 
       integer, parameter :: start_of_special_cases = eps_neu_rate_offset + idel
-      ! mixing and burning regions must be given the largest offsets
+      ! mixing, burning, and RTI regions must be given the largest offsets
       ! so they can be distinguished from the other ones
 
       integer, parameter :: mixing_offset = start_of_special_cases
       integer, parameter :: mix_relr_offset = mixing_offset + idel
       integer, parameter :: burning_offset = mix_relr_offset + idel
       integer, parameter :: burn_relr_offset = burning_offset + idel
+      integer, parameter :: rti_offset = burn_relr_offset + idel
 
-      !integer, parameter :: next_available_offset = burning_offset + idel
+      !integer, parameter :: next_available_offset = rti_offset + idel
 
       contains
 
@@ -317,6 +318,22 @@
                      write(*,*) 'failed for history item ' // trim(string)
                      ierr = -1; cycle
                   end if
+               else if (nxt_spec == h_rti_regions) then
+                  t = token(iounit, n, i, buffer, string)
+                  if (t /= name_token) then
+                     ierr = -1; cycle
+                  end if
+                  read(string,fmt=*,iostat=spec_err) cnt
+                  if (spec_err /= 0 .or. cnt <= 0 .or. cnt > 1000) then
+                     write(*,*) 'bad integer count for RTI regions: ' // trim(string)
+                     ierr = -1; cycle
+                  end if
+                  do ii=1,2*cnt
+                     call insert_spec(rti_offset + ii, string, spec_err)
+                     if (spec_err /= 0) then
+                        call error; return
+                     end if
+                  end do
                else if (nxt_spec == h_mixing_regions) then
                   t = token(iounit, n, i, buffer, string)
                   if (t /= name_token) then
@@ -529,6 +546,7 @@
          if (id > 0) then
             spec = id
             if (id == h_mixing_regions .or. &
+                id == h_rti_regions .or. &
                 id == h_mix_relr_regions .or. &
                 id == h_burning_regions .or. &
                 id == h_burn_relr_regions) then

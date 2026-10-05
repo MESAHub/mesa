@@ -91,56 +91,6 @@
    evolve_both_stars = .false.
 
 
-! relax_primary_to_th_eq
-! ~~~~~~~~~~~~~~~~~~~~~~
-! log_Lnuc_div_L_for_relax_primary_to_th_eq
-! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-! min_age_for_relax_primary_to_th_eq
-! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-! max_steps_for_relax_primary_to_th_eq
-! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-! no_history_during_relax_primary_to_th_eq
-! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-! reset_age_for_relax_primary_to_th_eq
-! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-! tsync_for_relax_primary_to_th_eq
-! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-! NOT IMPLEMENTED YET!!!
-! Set relax_primary_to_th_eq to .true. to ignore mass loss, rlof and changes in orbital
-! period or separation (depending on which was chosen as the initial condition)
-! until the primary (given by inlist_names(1)) reaches thermal equilibrium. This is meant
-! to ignore the fast evolution that a ZAMS star can experience as it evolves
-! to CN equilibrium at its core.
-
-! Thermal equilibrium in this case is defined as
-
-! ::
-
-!      log(s% L_nuc_burn_total*Lsun/s% L(1)) < log_Lnuc_div_L_for_relax_primary_to_th_eq,
-
-! and the relaxation process is followed for at least min_age_for_relax_primary_to_th_eq
-! years, even if the condition is met at the first step. If the process takes more than
-! max_steps_for_relax_primary_to_th_eq steps, then the simulation is terminated.
-
-! If you want output to be written to history during the relaxation process, then
-! no_history_during_relax_primary_to_th_eq = .false.. After relaxation, if
-! reset_age_relax_primary_to_th_eq = .true., then both model numbers and ages of the
-! components and the binary will be reset to their values before relaxation.
-
-! when modeling a system with rotation and tides, the synchronization timescale can be fixed
-! for both stars using tsync_for_relax_primary_to_th_eq (in years).
-
-! ::
-
-   relax_primary_to_th_eq = .false.
-   log_Lnuc_div_L_for_relax_primary_to_th_eq = 0.005d0
-   min_age_for_relax_primary_to_th_eq = 1d2
-   max_steps_for_relax_primary_to_th_eq = 1000
-   no_history_during_relax_primary_to_th_eq = .true.
-   reset_age_for_relax_primary_to_th_eq = .true.
-   tsync_for_relax_primary_to_th_eq = 1
-
 ! modifications to model
 ! ======================
 
