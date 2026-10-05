@@ -250,6 +250,7 @@ contains
       type(auto_diff_real_tdc) :: dQdZ
       integer :: iter, line_iter
       logical :: converged, have_derivatives, corr_has_derivatives
+      real(dp) :: residual_scale
       real(dp), parameter :: correction_tolerance = 1d-13
       real(dp), parameter :: residual_tolerance = 1d-8
       integer, parameter :: max_iter = 200
@@ -257,6 +258,12 @@ contains
       include 'formats'
 
       ierr = 0
+
+      ! A remote luminosity peak must not loosen this face's closure tolerance.
+      ! Include the local radiative luminosity at gradL for cancelling fluxes,
+      ! and retain a tighter scale supplied by the caller, with an erg/s floor.
+      residual_scale = max(1d0, min(scale, &
+         max(abs(info%L%val), abs(info%L0%val*info%gradL%val))))
 
       ! We start by bisecting to find a narrow interval around the root.
       lower_bound_Z = Zlb
@@ -290,9 +297,9 @@ contains
             exit
          end if
 
-         if (abs(Q%val)/scale <= residual_tolerance .and. have_derivatives) then
+         if (abs(Q%val)/residual_scale <= residual_tolerance .and. have_derivatives) then
             ! Can't exit on the first iteration, otherwise we have no derivative information.
-            if (info%report) write(*,2) 'converged', iter, abs(Q%val)/scale, residual_tolerance
+            if (info%report) write(*,2) 'converged', iter, abs(Q%val)/residual_scale, residual_tolerance
             converged = .true.
             exit
          end if
@@ -370,7 +377,8 @@ contains
             write(*,*) 'failed get_TDC_solution TDC_iter', &
                iter
             write(*,*) 'scale', scale
-            write(*,*) 'Q/scale', Q%val/scale
+            write(*,*) 'local residual scale', residual_scale
+            write(*,*) 'Q/local residual scale', Q%val/residual_scale
             write(*,*) 'tolerance', residual_tolerance
             write(*,*) 'dQdZ', dQdZ%val
             write(*,*) 'Y', Y%val
