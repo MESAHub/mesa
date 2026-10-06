@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# ruff: noqa: BLE001
 import glob
 import os
 
@@ -12,9 +13,11 @@ import numpy as np
 from matplotlib.animation import FuncAnimation
 
 # Import functions from static version for consistency
-from plot_history import MesaView  # get_mesa_phase_info,
-from plot_history import read_header_columns, setup_hr_diagram_params
-
+from plot_history import (
+    MesaView,  # get_mesa_phase_info,
+    read_header_columns,
+    setup_hr_diagram_params,
+)
 
 NEWTON_ITER_PATHS = [
     "../SED/iteration_colors.data",

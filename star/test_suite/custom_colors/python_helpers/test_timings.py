@@ -343,6 +343,7 @@ def run_config(label: str, params: dict) -> dict:
         proc = subprocess.run(
             ["./rn"],
             capture_output=True,
+            check=False,
             text=True,
             timeout=RUN_TIMEOUT,
         )

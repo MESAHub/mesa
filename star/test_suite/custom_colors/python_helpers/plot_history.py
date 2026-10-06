@@ -1,4 +1,5 @@
 #!/usr/bin/env python3.8
+# ruff: noqa: BLE001
 ####################################################
 #
 # Author: M Joyce, Modified by N. Miller,
@@ -228,7 +229,7 @@ def create_phase_plots(history_file="../LOGS/history.data"):
     # Flux_bol = np.log10(md.Flux_bol)
 
     # Read headers and get filter info
-    all_cols, filter_columns = read_header_columns(history_file)
+    _all_cols, filter_columns = read_header_columns(history_file)
 
     # Set up HR diagram parameters
     hr_color, hr_mag, hr_xlabel, hr_ylabel, color_index = setup_hr_diagram_params(
@@ -360,7 +361,7 @@ def main():
     print("  6: He-Burn, 7: ZACHeB, 8: TACHeB, 9: TP-AGB")
     print("  10: C-Burn, 11: Ne-Burn, 12: O-Burn, 13: Si-Burn, 14: WDCS")
 
-    fig, axes, phases, phase_colors = create_phase_plots(history_file)
+    _fig, _axes, _phases, _phase_colors = create_phase_plots(history_file)
     plt.show()
 
 

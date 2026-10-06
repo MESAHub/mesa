@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# ruff: noqa: BLE001, S110
 """
 Two-panel movie for the MESA colors module.
 
@@ -25,17 +26,15 @@ import csv
 import glob
 import math
 import re
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable
 
 import matplotlib.pyplot as plt
 import mesa_reader as mr
 import numpy as np
 from matplotlib.animation import FFMpegWriter, FuncAnimation
 from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
-
 from plot_history import MesaView, read_header_columns, setup_hr_diagram_params
-
 
 FLOAT_RE = re.compile(
     r"""
@@ -339,8 +338,8 @@ def make_colors_grid_movie(
     md_raw = mr.MesaData(str(history_file))
     md = MesaView(md_raw, mesa_view_stride) if mesa_view_stride > 1 else md_raw
 
-    all_cols, filter_columns = read_header_columns(str(history_file))
-    hr_color, hr_mag, hr_xlabel, hr_ylabel, color_index = setup_hr_diagram_params(
+    _all_cols, filter_columns = read_header_columns(str(history_file))
+    hr_color, hr_mag, hr_xlabel, hr_ylabel, _color_index = setup_hr_diagram_params(
         md, filter_columns
     )
 
@@ -417,7 +416,7 @@ def make_colors_grid_movie(
         label="real atmosphere SED nodes",
     )
 
-    (full_path,) = ax_grid.plot(
+    (_full_path,) = ax_grid.plot(
         x_path,
         logg,
         meta,
@@ -448,7 +447,7 @@ def make_colors_grid_movie(
         s=9,
         alpha=0.85,
     )
-    (cmd_path,) = ax_cmd.plot(hr_color, hr_mag, lw=0.8, alpha=0.25)
+    (_cmd_path,) = ax_cmd.plot(hr_color, hr_mag, lw=0.8, alpha=0.25)
     cmd_current = ax_cmd.scatter(
         [],
         [],

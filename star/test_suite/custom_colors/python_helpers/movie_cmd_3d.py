@@ -18,8 +18,8 @@ def make_cmd_rotation_video(
     md = mr.MesaData(history_file)
     md = MesaView(md, 5)
 
-    all_cols, filter_columns = read_header_columns(history_file)
-    hr_color, hr_mag, hr_xlabel, hr_ylabel, color_index = setup_hr_diagram_params(
+    _all_cols, filter_columns = read_header_columns(history_file)
+    hr_color, hr_mag, hr_xlabel, hr_ylabel, _color_index = setup_hr_diagram_params(
         md, filter_columns
     )
 
