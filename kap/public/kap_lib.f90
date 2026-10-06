@@ -137,6 +137,7 @@
          use kap_def, only : Kap_General_Info, get_kap_ptr
          use other_elect_cond_opacity
          use other_compton_opacity
+         use other_radiative_opacity
          integer, intent(in) :: handle
          integer, intent(out):: ierr
 
@@ -147,6 +148,7 @@
 
          rq% other_elect_cond_opacity => null_other_elect_cond_opacity
          rq% other_compton_opacity => null_other_compton_opacity
+         rq% other_radiative_opacity => null_other_radiative_opacity
 
       end subroutine kap_setup_hooks
 
