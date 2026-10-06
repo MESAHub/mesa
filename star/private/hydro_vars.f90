@@ -542,6 +542,10 @@
             if (failed('set_rotation_info')) return
          end if
 
+         ! Invalidate before MLT rebuilds the face cache for the current state.
+         if (.not. skip_mlt .and. .not. s% RSP_flag) &
+            s% reconstructed_face_state_valid(1:s%nz) = .false.
+
          if (.not. skip_grads) then
             if (dbg) write(*,*) 'call do_brunt_B'
             call do_brunt_B(s, nzlo, nzhi, ierr)  ! for unsmoothed_brunt_B
@@ -563,9 +567,6 @@
          end if
 
          if (.not. skip_mlt .and. .not. s% RSP_flag) then
-
-            s% reconstructed_face_state_valid(1:s%nz) = .false.
-
             if (.not. skip_mixing_info) then
                if (s% make_gradr_sticky_in_solver_iters) then
                   s% fixed_gradr_for_rest_of_solver_iters(nzlo:nzhi) = .false.
@@ -611,7 +612,8 @@
                end if
             end if
 
-            call set_mlt_vars(s, nzlo, nzhi, ierr)
+            call set_mlt_vars(s, nzlo, nzhi, ierr, &
+               set_tau_conv = .not. skip_grads)
             if (failed('set_mlt_vars')) return
             if (dbg) write(*,*) 'call check_for_redo_MLT'
 
