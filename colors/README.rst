@@ -13,7 +13,7 @@ MESA colors is a runtime module that generates observer-frame photometry directl
 
 The outputs are:
 
-* **Mag_bol** — bolometric magnitude, derived directly from the stellar luminosity
+* **Mag_bol** — bolometric magnitude, derived directly from the integrated and distance diluted SED
 * **Flux_bol** — bolometric flux at the specified distance
 * **Interp_rad** — distance in parameter space between the current stellar parameters and the nearest atmosphere grid point (diagnostic for interpolation quality)
 * **One column per filter** — synthetic magnitude in every filter listed in the instrument index file, named by the filter filename (``*.dat`` suffix stripped)
@@ -39,7 +39,7 @@ On startup, ``colors_setup_tables`` loads all data that will be needed at runtim
 Per-timestep computation
 -------------------------
 
-At each history output step, ``data_for_colors_history_columns`` is called with the current stellar parameters: T_eff, log g, metallicity [M/H], radius R, and distance d.
+At each history output step, ``data_for_colors_history_columns`` is called with the current stellar parameters: T_eff, log g, metallicity [M/H], radius R, and distance d. The distance d is taken from the colors settings. The history interface uses photospheric quentities ``s%Teff``, ``s%photosphere_logg``, and ``photosphere_r * Rsun``. 
 
 **Step 1 — SED interpolation**
 
@@ -66,13 +66,18 @@ where R is the stellar radius and d is ``distance`` (default 10 pc, giving absol
 
 The bolometric flux is obtained by integrating the diluted SED over all wavelengths using adaptive Simpson's rule (falling back to the trapezoid rule for even-length arrays). The bolometric magnitude follows from the standard relation using the solar bolometric absolute magnitude.
 
+.. code-block:: text
+   
+    F_bol,zp = Lsun × 10^(0.4 × mbolsun) / (4π × (10 pc)²)
+    m_bol = -2.5 × log10(F_bol / F_bol,zp)
+
 **Step 4 — Synthetic photometry**
 
 For each filter, the in-band flux is computed by integrating the product of the diluted SED and the filter transmission curve:
 
 .. code-block:: text
 
-   F_band = ∫ F_observed(λ) × T(λ) dλ  /  ∫ T(λ) dλ
+   F_band = ∫ F_observed(λ) × T(λ) × λ dλ  /  ∫ T(λ) × λ dλ
 
 The synthetic magnitude is then:
 
@@ -82,7 +87,7 @@ The synthetic magnitude is then:
 
 where F_zp is the precomputed zero-point for the selected magnitude system (Vega, AB, or ST).
 
-If the star's parameters fall outside a non-degenerate atmosphere grid axis, Hermite interpolation uses the nearest grid-point spectrum rather than extrapolating. An axis containing only one tabulated value is treated as a fixed dimension. The ``Interp_rad`` column records the Euclidean distance (in normalised parameter space) between the stellar parameters and the nearest grid point; it is a grid-distance diagnostic, not an error estimate or an indicator of which interpolation method was used.
+The ``Interp_rad`` column records the Euclidean distance (in normalised parameter space) between the stellar parameters and the nearest grid point; it is a grid-distance diagnostic, not an error estimate or an indicator of which interpolation method was used.
 
 Source files
 ============
