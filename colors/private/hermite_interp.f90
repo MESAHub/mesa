@@ -454,7 +454,7 @@ contains
 
       f_interp = f_sum
    end function hermite_tensor_interp3d
-   
+
    subroutine compute_derivatives_at_point(f, i, j, k, nx, ny, nz, &
                                            x_grid, y_grid, z_grid, &
                                            df_dx, df_dy, df_dz)
