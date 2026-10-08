@@ -2390,13 +2390,32 @@
       ! TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! if ``TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .true.``, mlt_vc_old (the start of step value)
-      ! is used in place of the current solver iterate mlt_vc_ad inside the hydro momentum equation. This option can
-      ! provide greater numerical stability in extremely dynamic models.
+      ! If ``TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .true.``,
+      ! ``mlt_vc_old`` (the start-of-step value) is used in place of the current
+      ! solver iterate ``mlt_vc_ad`` inside the nonlinear hydro momentum equation.
+      ! This can improve numerical stability in extremely dynamic models.
+      ! It does not alter ``star_LNA`` and can cause a slight mismatch with
+      ! nonlinear growth rates.
 
       ! ::
 
      TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .false.
+
+
+      ! TDC_include_inner_boundary_eddy_viscosity
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If true, ``u_flag`` TDC hydrodynamics includes the eddy-viscous stress
+      ! between the innermost cell and a prescribed excised boundary with
+      ! ``R_center > 0``. The corresponding ``Eq`` heating is included when
+      ! ``TDC_include_eturb_in_energy_equation`` is true. ``star_LNA`` includes
+      ! the first-order boundary stress when
+      ! ``star_LNA_perturb_eddy_viscosity`` is true. The ``v_flag``
+      ! innermost-cell stress already uses ``R_center`` and ``v_center``.
+
+      ! ::
+
+     TDC_include_inner_boundary_eddy_viscosity = .false.
 
 
       ! include_mlt_corr_to_TDC
@@ -2413,11 +2432,11 @@
       ! TDC_include_eturb_in_energy_equation
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! While ``TDC`` is already implicitly coupled to the total energy equation, this
-      ! controls feedsback the turbulent energy into the total energy equation by
-      ! calculating and incorporating det/dt from TDC as a source term in
-      ! the total energy equation, along with the eddy viscous heating Eq. This comes
-      ! at the cost of numerical stability on long timescales, be warned.
+      ! If true, include the TDC turbulent-energy time derivative and the
+      ! eddy-viscous turbulent-energy source ``Eq`` in the energy equation.
+      ! For ``v_flag``, the corresponding ``v*Uq`` work is omitted when
+      ! ``use_P_d_1_div_rho_form_of_work`` is false because its second-neighbor
+      ! derivatives would widen the block-tridiagonal hydro stencil.
 
       ! ::
 
@@ -4608,6 +4627,20 @@
     atm_T_tau_max_steps = 500
 
 
+      ! atm_T_tau_Rho_outer
+      ! ~~~~~~~~~~~~~~~~~~~
+
+      ! Density in g/cm^3 used to estimate the initial gas pressure at the
+      ! outer integration point when ``atm_T_tau_opacity = 'varying'``.
+      ! The estimate is ``Pgas = cgas*atm_T_tau_Rho_outer*T_outer``.
+      ! This is not a density floor or a change to the outer optical depth.
+      ! Must be finite and positive.
+
+      ! ::
+
+    atm_T_tau_Rho_outer = 1d-10
+
+
       ! atm_table
       ! ~~~~~~~~~
 
@@ -6070,8 +6103,11 @@
       ! merge_if_dlnR_too_small
       ! ~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! If true, standard and split/merge AMR mesh adjustment will force merge
-      ! if difference in lnR across cell is too small.
+      ! If true, standard mesh adjustment will force a merge if the difference
+      ! in lnR across a cell is too small. Split/merge AMR instead treats the
+      ! cell as a priority merge candidate subject to its usual merge guards.
+      ! It only forces a merge when the radial spacing approaches numerical
+      ! precision.
 
       ! ::
 
@@ -6138,7 +6174,6 @@
       ! ~~~~~~~~~~~~~~~~~~~
 
       ! Largest and smallest allowed dq at the surface.
-      ! ``min_surface_cell_dq`` also applies to split/merge AMR.
 
       ! ::
 
@@ -6665,8 +6700,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~
       ! TDC_hydro_use_mass_interp_face_values
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! remesh_for_TDC_pulsations_when_load
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! steps_before_remesh_for_TDC_pulsations
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remesh_for_TDC_pulsations_log_core_zoning
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! If ``remesh_for_TDC_pulsations_log_core_zoning`` is true, the model is rezoned below
@@ -6696,12 +6731,16 @@
       ! Use ``TDC_hydro_nz_inner`` and ``TDC_hydro_nz_T_gradient`` to resolve the inner boundary
       ! and steep temperature gradients in AGB envelopes with deep convective regions.
 
-      ! If ``remesh_for_TDC_pulsations_when_load`` is true, a model loaded from a ``.mod`` file
-      ! is remeshed before the first step. This is not applied to photo restarts.
+      ! ``steps_before_remesh_for_TDC_pulsations`` controls a one-time remesh of a model loaded
+      ! from a ``.mod`` file. A negative value disables the remesh. Zero remeshes the model before
+      ! the first step. A positive value remeshes after that many accepted steps. A photo restart
+      ! before the selected step retains the pending remesh; a restart after it does not repeat it.
+      ! The same remesher supports TDC and RSP2. For RSP2 it remaps the
+      ! cell-centered turbulent velocity and reconstructs the pressure scale height.
 
       ! ::
 
-    remesh_for_TDC_pulsations_when_load = .false.
+    steps_before_remesh_for_TDC_pulsations = -1
     remesh_for_TDC_pulsations_log_core_zoning = .false.
     TDC_hydro_use_mass_interp_face_values = .false.
 
@@ -6857,11 +6896,52 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~
       ! split_merge_amr_dq_max
       ! ~~~~~~~~~~~~~~~~~~~~~~
+      ! split_merge_amr_min_surface_cell_dq
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! split_merge_amr_max_surface_cell_dq
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! split_merge_amr_max_center_cell_dq
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! split_merge_amr_center_dq_ratio
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! ``split_merge_amr_min_surface_cell_dq`` sets the minimum allowed
+      ! ``dq`` of the surface cell. If ``split_merge_amr_max_surface_cell_dq``
+      ! is positive, it sets the maximum allowed ``dq`` of the surface cell.
+      ! These are combined with ``split_merge_amr_dq_min`` and
+      ! ``split_merge_amr_dq_max``, respectively.
+      ! The maximum takes precedence if a whole cell merge cannot satisfy both
+      ! surface limits.
+      !
+      ! If ``split_merge_amr_max_center_cell_dq`` is positive, limit the
+      ! innermost cell to this ``dq`` and increase the maximum allowed ``dq``
+      ! geometrically outward by ``split_merge_amr_center_dq_ratio``. The
+      ! resulting limit for cell ``k`` is
+      ! ``min(split_merge_amr_dq_max, split_merge_amr_max_center_cell_dq *
+      ! split_merge_amr_center_dq_ratio**(nz-k))``. The ratio must exceed one.
+      ! A nonpositive center-cell limit disables this additional zoning.
 
       ! ::
 
     split_merge_amr_dq_min = 1d-14
     split_merge_amr_dq_max = 1d0
+    split_merge_amr_min_surface_cell_dq = 1d-99
+    split_merge_amr_max_surface_cell_dq = -1d0
+    split_merge_amr_max_center_cell_dq = -1d0
+    split_merge_amr_center_dq_ratio = 1.2d0
+
+
+      ! split_merge_amr_keep_R_center_fixed
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! If true and ``R_center`` is positive, keep ``R_center`` fixed during
+      ! the split/merge AMR gravitational-potential-energy correction. The
+      ! other radii are rescaled about ``R_center`` with a scale factor chosen
+      ! to restore the gravitational potential energy before the remesh.
+
+      ! ::
+
+    split_merge_amr_keep_R_center_fixed = .false.
 
 
       ! split_merge_amr_r_core_cm
@@ -8588,8 +8668,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! include_L_in_velocity_time_centering
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! use_P_d_1_div_rho_form_of_work_when_time_centering_velocity
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! use_P_d_1_div_rho_form_of_work
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! P_theta_for_velocity_time_centering
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! L_theta_for_velocity_time_centering
@@ -8602,11 +8682,19 @@
       ! and to minimize numerical damping.
       ! as discussed in the 3rd mesa instrument paper (2015).
       ! time centering applies to velocities, pressures, and luminosities.
-      ! not for u_flag.
       ! steps_before_use_velocity_time_centering < 0 means no time centering.
       ! P_theta and L_theta = 0.5 for time centered, = 1.0 for fully implicit.
+      ! With u_flag, P_theta also weights the pressure jump contribution to the
+      ! Riemann face velocity in radius motion and energy work. The fluid velocity
+      ! contribution remains centered. If pressure time centering is disabled,
+      ! the pressure jump contribution uses the current state.
       ! Above ``max_logT_for_include_P_and_L_in_velocity_time_centering``, P and L are not time centered
       ! to aid in damping spurious modes in the core.
+
+      ! If ``use_P_d_1_div_rho_form_of_work`` is true, use the internal-energy
+      ! form with local ``P d(1/rho)`` work. This choice is independent of
+      ! velocity time centering and omits explicit kinetic- and potential-energy
+      ! time derivatives from the energy equation.
 
       ! ::
 
@@ -8615,7 +8703,7 @@
     P_theta_for_velocity_time_centering = 0.5d0
     include_L_in_velocity_time_centering = .false.
     L_theta_for_velocity_time_centering = 0.5d0
-    use_P_d_1_div_rho_form_of_work_when_time_centering_velocity = .false.
+    use_P_d_1_div_rho_form_of_work = .false.
     max_logT_for_include_P_and_L_in_velocity_time_centering = 1d99
 
       ! use_dPrad_dm_form_of_T_gradient_eqn

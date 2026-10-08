@@ -8,17 +8,32 @@ binary_ppisn_progenitor
 
 This development case constructs the binary-evolution progenitor used by
 ``dev_TDC_ppisn_from_binary``. It evolves an initially
-:math:`100\,M_\odot + 50\,M_\odot` binary with an orbital period of 10 days
-and metallicity :math:`Z = 0.00146`.
+:math:`100\,M_\odot + 70\,M_\odot` binary with an orbital period of 10 days
+and metallicity :math:`Z = 0.0001`.
 
 Evolution and model handoff
 ===========================
 
 ``inlist_binary`` selects ``inlist1`` for the initial donor and ``inlist2``
 for the initial accretor. Both stars share the physics in ``inlist_both`` and
-``inlist_extra``. At donor helium depletion, ``run_binary_extras`` writes
-``donor_postHe.mod`` and ``accretor_postHe.mod``, replaces star 1 with a
-:math:`2.6\,M_\odot` point mass, and continues evolving star 2.
+``inlist_extra``. Select each star's stopping condition with ``x_integer_ctrl(1)``
+in ``inlist1`` and ``inlist2``:
+
+* ``1``: central He-4 mass fraction at or below ``1d-8``.
+* ``2`` (default): central ``log10(T/K)`` at or above ``9d0``.
+
+Either star may finish first. At its first accepted model satisfying the
+selected condition, ``run_binary_extras`` saves that star's configured final
+model and ``final_profile.data``. The finished star becomes a point mass at
+its current mass, and the other star continues to its own stopping condition.
+Following Neev's handoff, the orbit is reset to a circular separation of
+``100000 Rsun``, with Eddington-limited retention and radiation-corrected
+transfer enabled. This is a prescribed handoff, not a supernova calculation.
+
+Both stellar models remain available in restart photos, but only the
+unfinished star is evolved. The run ends when no evolved star remains
+unfinished, including runs started with a point-mass companion. Other
+termination conditions, including the existing L2 checks, remain active.
 
 The configured final model names are ``MASS1donor_final.mod`` and
 ``MASS2accretor_final.mod``. The latter is the default input model for

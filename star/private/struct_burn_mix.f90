@@ -267,6 +267,7 @@
 
       subroutine save_start_values(s, ierr)
          use hydro_rsp2, only: set_etrb_start_vars
+         use hydro_riemann, only: do_uface_and_Pface
          use star_utils, only: eval_total_energy_integrals, set_luminosity_by_category, get_Peos_face_val
          use reconstructed_face_support, only: get_reconstructed_face_eos_kap_ad
          type (star_info), pointer :: s
@@ -318,6 +319,7 @@
             s% lnR_start(k) = s% lnR(k)
             s% u_start(k) = s% u(k)
             s% u_face_start(k) = 0d0  ! s% u_face_ad(k)%val
+            s% u_face_P_start(k) = 0d0
             s% P_face_start(k) = -1d0  ! mark as unset s% P_face_ad(k)%val
             s% L_start(k) = s% L(k)
             s% Y_face_start(k) = s% Y_face(k)
@@ -347,6 +349,13 @@
 
          if (s% RSP2_flag) then
             call set_etrb_start_vars(s,ierr)
+            if (ierr /= 0) return
+         end if
+
+         if (s% u_flag) then
+            ! Save the starting face state before changing the solver guess.
+            call do_uface_and_Pface(s,ierr)
+            if (ierr /= 0) return
          end if
 
          do k=1,s% nz
@@ -367,7 +376,7 @@
             s% total_radial_kinetic_energy_start, &
             s% total_rotational_kinetic_energy_start, &
             s% total_turbulent_energy_start, &
-            s% total_energy_start)
+            s% total_energy_start, use_TDC_mlt_vc_old=.true.)
 
       end subroutine save_start_values
 
@@ -459,9 +468,9 @@
                do k = 1, nz
                   s% xh(j1,k) = s% w(k)
                end do
-            else if (j1 == s% i_Hp .and. s% i_Hp <= nvar) then
+            else if (j1 == s% i_Y .and. s% i_Y <= nvar) then
                do k = 1, nz
-                  s% xh(j1,k) = s% Hp_face(k)
+                  s% xh(j1,k) = s% Y_face(k)
                end do
             else if (j1 == s% i_v .and. s% i_v <= nvar) then
                do k = 1, nz

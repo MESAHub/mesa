@@ -51,9 +51,9 @@ extra_controls_inlist_name(2) = 'inlist_extra'
 ! extra_terminal_output_file = 'log2'
 log_directory = 'LOGS2'
 
-! stop when the center mass fraction of h1 drops below this limit
-! xa_central_lower_limit_species(1) = 'he4'
-! xa_central_lower_limit(1) = 1d-3
+! Stopping condition: 1 = central he4 <= 1d-8; 2 = log10(T_center/K) >= 9.
+! Save this star and continue its companion to its own stopping condition.
+x_integer_ctrl(1) = 2
 
 ! !! smooth outer composition in the accretor
 ! smooth_outer_xa_big = 0.5

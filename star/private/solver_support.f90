@@ -379,7 +379,8 @@
          else
             skip3 = s% i_w
          end if
-         skip4 = s% i_Hp
+         ! Include signed Y with the default dimensionless x_scale.
+         skip4 = 0
 
          skip5 = 0
 
@@ -839,7 +840,7 @@
             skip_other_cgrav = .true.
          logical :: do_chem, try_again, do_edit_lnR, report_dx
          integer :: j, k, kk, klo, khi, i_var, &
-            i_lnd, i_lnT, i_lnR, i_lum, i_w, i_Hp, i_v, &
+            i_lnd, i_lnT, i_lnR, i_lum, i_w, i_Y, i_v, &
             i_u, i_alpha_RTI, i_w_div_wc, i_j_rot, &
             fe56, nvar_chem, species, nz, nvar_hydro
          real(dp), dimension(:, :), pointer :: xh_start, xa_start
@@ -899,7 +900,7 @@
          i_lnR = s% i_lnR
          i_lum = s% i_lum
          i_w = s% i_w
-         i_Hp = s% i_Hp
+         i_Y = s% i_Y
          i_v = s% i_v
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
@@ -1217,15 +1218,15 @@
                   end if
                   if (report) write(*,2) 'bad num w', k, s% w(k)
                end if
-               s% Hp_face(k) = x(i_Hp)
-               if (is_bad_num(s% Hp_face(k))) then
-                  s% retry_message = 'bad num for Hp_face'
+               s% Y_face(k) = x(i_Y)
+               if (is_bad_num(s% Y_face(k))) then
+                  s% retry_message = 'bad num for Y_face'
                   ierr = -1
                   if (s% stop_for_bad_nums) then
-                     write(*,2) 'set_vars_for_solver Hp_face', k, s% Hp_face(k)
+                     write(*,2) 'set_vars_for_solver Y_face', k, s% Y_face(k)
                      call mesa_error(__FILE__,__LINE__,'set_vars_for_solver')
                   end if
-                  if (report) write(*,2) 'bad num Hp_face', k, s% Hp_face(k)
+                  if (report) write(*,2) 'bad num Y_face', k, s% Y_face(k)
                end if
             end if
 

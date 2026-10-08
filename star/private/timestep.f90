@@ -2323,7 +2323,7 @@
                 j == s% i_u .or. &
                 j == s% i_v .or. &
                 j == s% i_w .or. &
-                j == s% i_Hp .or. &
+                j == s% i_Y .or. &
                 j == s% i_j_rot .or. &
                 j == s% i_w_div_wc .or. &
                 j == s% i_alpha_RTI .or. &

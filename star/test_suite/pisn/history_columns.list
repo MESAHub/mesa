@@ -44,10 +44,10 @@
    !## age
 
       star_age ! elapsed simulated time in years since the start of the run
-      star_age_sec ! elapsed simulated time in seconds since the start of the run
-      star_age_min ! elapsed simulated time in minutes since the start of the run
-      star_age_hr ! elapsed simulated time in hours since the start of the run
-      star_age_day ! elapsed simulated time in days since the start of the run
+      !star_age_sec ! elapsed simulated time in seconds since the start of the run
+      !star_age_min ! elapsed simulated time in minutes since the start of the run
+      !star_age_hr ! elapsed simulated time in hours since the start of the run
+      !star_age_day ! elapsed simulated time in days since the start of the run
       !day ! elapsed simulated time in days since the start of the run
 
       !log_star_age
@@ -55,12 +55,12 @@
 
    !## timestep
 
-      time_step ! timestep in years since previous model
-      time_step_sec ! timestep in seconds since previous model
-      time_step_days
+      !time_step ! timestep in years since previous model
+      !time_step_sec ! timestep in seconds since previous model
+      !time_step_days
       log_dt ! log10 time_step in years
-      log_dt_sec ! log10 time_step in seconds
-      log_dt_days ! log10 time_step in days
+      !log_dt_sec ! log10 time_step in seconds
+      !log_dt_days ! log10 time_step in days
 
    !## mass
 
@@ -75,7 +75,7 @@
 
    !## mass change
 
-      !star_mdot ! d(star_mass)/dt (in msolar per year)
+      star_mdot ! d(star_mass)/dt (in msolar per year)
       log_abs_mdot ! log10(abs(star_mdot)) (in msolar per year)
 
    !## imposed surface conditions
@@ -248,7 +248,7 @@
       !log_extra_L ! log10 extra_L
 
    !## neutrino losses
-      !log_Lneu ! log10 power emitted in neutrinos, nuclear and thermal (in Lsun units)
+      log_Lneu ! log10 power emitted in neutrinos, nuclear and thermal (in Lsun units)
       !log_Lneu_nuc ! log10 power emitted in neutrinos, nuclear sources only (in Lsun units)
       !log_Lneu_nonnuc ! log10 power emitted in neutrinos, thermal sources only (in Lsun units)
 
@@ -401,7 +401,7 @@
 
    !## iron core
       fe_core_mass
-      fe_core_radius
+      !fe_core_radius
       !fe_core_lgT
       !fe_core_lgRho
       !fe_core_L
@@ -435,7 +435,7 @@
 !# timescales
 
       !dynamic_timescale ! dynamic timescale (seconds) -- estimated by 2*pi*sqrt(r^3/(G*m))
-      kh_timescale ! kelvin-helmholtz timescale (years)
+      !kh_timescale ! kelvin-helmholtz timescale (years)
       !mdot_timescale ! star_mass/abs(star_mdot) (years)
       !kh_div_mdot_timescales ! kh_timescale/mdot_timescale
       !nuc_timescale ! nuclear timescale (years) -- proportional to mass divided by luminosity
@@ -462,7 +462,7 @@
 !# conditions at or near the surface of the model
 
    !## conditions at the photosphere
-      effective_T
+      !effective_T
       !Teff
       log_Teff ! log10 effective temperature
          ! Teff is calculated using Stefan-Boltzmann relation L = 4 pi R^2 sigma Teff^4,
@@ -496,7 +496,7 @@
 
    !## conditions at or near the surface of the model (outer edge of outer cell)
 
-      luminosity ! luminosity in Lsun units
+      !luminosity ! luminosity in Lsun units
       !luminosity_ergs_s ! luminosity in cgs units
       log_L ! log10 luminosity in Lsun units
       !log_L_ergs_s ! log10 luminosity in cgs units
@@ -506,10 +506,10 @@
       !log_R_cm
 
       log_g ! log10 gravity
-      !gravity
+      gravity
       !log_Ledd
-      log_L_div_Ledd ! log10(L/Leddington)
-      lum_div_Ledd
+      !log_L_div_Ledd ! log10(L/Leddington)
+      !lum_div_Ledd
       !log_surf_optical_depth
       !surface_optical_depth
 
@@ -523,8 +523,8 @@
       !surface_cell_entropy ! in units of kerg per baryon
           ! old name was surface_entropy
 
-      !v_surf ! (cm/s)
-      v_surf_km_s ! (km/s)
+      v_surf ! (cm/s)
+      !v_surf_km_s ! (km/s)
       v_div_csound_surf ! velocity divided by sound speed at outermost grid point
       !v_div_csound_max ! max value of velocity divided by sound speed at face
       !v_div_vesc
@@ -533,14 +533,14 @@
 
       !v_surf_div_v_kh ! v_surf/(photosphere_r/kh_timescale)
 
-      surf_avg_j_rot
-      surf_avg_omega
-      surf_avg_omega_crit
-      surf_avg_omega_div_omega_crit
-      surf_avg_v_rot ! km/sec rotational velocity at equator
-      surf_avg_v_crit ! critical rotational velocity at equator
-      surf_avg_v_div_v_crit
-      surf_avg_Lrad_div_Ledd
+      !surf_avg_j_rot
+      !surf_avg_omega
+      !surf_avg_omega_crit
+      !surf_avg_omega_div_omega_crit
+      !surf_avg_v_rot ! km/sec rotational velocity at equator
+      !surf_avg_v_crit ! critical rotational velocity at equator
+      !surf_avg_v_div_v_crit
+      !surf_avg_Lrad_div_Ledd
       !surf_avg_logT
       !surf_avg_logRho
       !surf_avg_opacity
@@ -566,7 +566,7 @@
             ! or v_wind = opacity*wind_mdot/(4*pi*R*tau) at photosphere
 
       !rotational_mdot_boost ! factor for increase in mass loss mdot due to rotation
-      log_rotational_mdot_boost ! log factor for increase in mass loss mdot due to rotation
+      !log_rotational_mdot_boost ! log factor for increase in mass loss mdot due to rotation
       !surf_r_equatorial_div_r_polar
       !surf_r_equatorial_div_r
       !surf_r_polar_div_r
@@ -577,15 +577,15 @@
 
       log_center_T ! temperature
       log_center_Rho ! density
-      !log_center_P ! pressure
+      log_center_P ! pressure
 
       ! shorter names for above
       log_cntr_P
       log_cntr_Rho
       log_cntr_T
 
-      center_T ! temperature
-      center_Rho ! density
+      !center_T ! temperature
+      !center_Rho ! density
       !center_P ! pressure
 
       !center_degeneracy ! the electron chemical potential in units of k*T
@@ -603,10 +603,10 @@
       !d_center_eps_nuc_dlnd
       !log_center_eps_nuc
 
-      center_entropy ! in units of kerg per baryon
+      !center_entropy ! in units of kerg per baryon
       !max_entropy ! in units of kerg per baryon
-      fe_core_infall
-      non_fe_core_infall
+      !fe_core_infall
+      !non_fe_core_infall
       !non_fe_core_rebound
       !max_infall_speed
 
@@ -617,8 +617,8 @@
       !mu4 ! dM(Msun)/dr(1000km) where entropy=4
 
 
-      center_omega
-      center_omega_div_omega_crit
+      !center_omega
+      !center_omega_div_omega_crit
 
 !----------------------------------------------------------------------------------------------
 
@@ -702,7 +702,7 @@
       
    !## info at location of max temperature
    !max_T
-   log_max_T
+   !log_max_T
 
 
 !----------------------------------------------------------------------------------------------
@@ -712,22 +712,22 @@
    !## info about outermost outward moving shock
       ! excluding locations with q > max_q_for_outer_mach1_location
       ! returns values at location of max velocity
-      shock_mass ! baryonic (Msun)
+      !shock_mass ! baryonic (Msun)
       !shock_mass_gm ! baryonic (grams)
       shock_q
       shock_radius ! (Rsun)
       !shock_radius_cm ! (cm)
-      shock_velocity
-      shock_csound
-      !shock_v_div_cs
-      shock_lgT
-      shock_lgRho
-      shock_lgP
-      shock_gamma1
-      shock_entropy
-      shock_tau
-      shock_k
-      shock_pre_lgRho
+      !shock_velocity
+      !shock_csound
+      shock_v_div_cs
+      !shock_lgT
+      !shock_lgRho
+      !shock_lgP
+      !shock_gamma1
+      !shock_entropy
+      !shock_tau
+      !shock_k
+      !shock_pre_lgRho
 
 !----------------------------------------------------------------------------------------------
 
@@ -762,8 +762,8 @@
 
 !# energy information
 
-      total_energy ! at end of step
-      log_total_energy ! log(abs(total_energy))
+      !total_energy ! at end of step
+      !log_total_energy ! log(abs(total_energy))
       !total_energy_after_adjust_mass ! after mass adjustments
 
       ! shorter versions of above
@@ -801,7 +801,7 @@
       !tot_Et
       !log_tot_Et
 
-      total_energy_foe
+      !total_energy_foe
 
       !tot_IE_div_IE_plus_KE
       !total_IE_div_IE_plus_KE
@@ -818,9 +818,9 @@
 
       !rel_run_E_err
 
-      rel_E_err
+      !rel_E_err
       !abs_rel_E_err
-      log_rel_E_err
+      !log_rel_E_err
 
       !tot_e_equ_err
       !tot_e_err
@@ -831,7 +831,7 @@
       !cumulative_energy_error ! = sum over all steps of abs(error_in_energy_conservation)
       !rel_cumulative_energy_error ! = cumulative_energy_error/total_energy
       !log_rel_cumulative_energy_error ! = log10 of rel_cumulative_energy_error
-      log_rel_run_E_err ! shorter name for rel_cumulative_energy_error
+      !log_rel_run_E_err ! shorter name for rel_cumulative_energy_error
 
       !rel_error_in_energy_conservation ! = error_in_energy_conservation/total_energy
       !log_rel_error_in_energy_conservation
@@ -884,7 +884,7 @@
    !## eos
       !logQ_max ! logQ = logRho - 2*logT + 12
       !logQ_min
-      gamma1_min
+      !gamma1_min
 
    !## core mixing
       !mass_semiconv_core
@@ -1015,7 +1015,7 @@
    !## solver iterations
 
       num_iters ! same as num_solver_iterations
-      num_solver_iterations ! iterations at this step
+      !num_solver_iterations ! iterations at this step
       !total_num_solver_iterations ! total iterations during the run
       !avg_num_solver_iters
 
@@ -1066,5 +1066,6 @@
       !elapsed_time ! time since start of run (seconds)
 
    !## Extras
-      burning_regions 80
+      burning_regions 40
       mixing_regions 40
+      mix_relr_regions 40

@@ -485,6 +485,8 @@
       ! for Riemann solver
       type(auto_diff_real_star_order1), pointer, dimension(:) :: &
          u_face_ad, P_face_ad ! 'ad' for auto_diff
+      type(auto_diff_real_star_order1), pointer :: u_face_P_ad(:) ! pressure jump contribution to u_face
+      real(dp), pointer :: u_face_P_start(:)
       real(dp), pointer, dimension(:) :: &
          u_face_val, &
          d_uface_domega, &
@@ -667,6 +669,7 @@
       real(dp) :: photosphere_m ! Msun units
       real(dp) :: photosphere_black_body_T ! black body with R and L at photosphere
       real(dp) :: photosphere_v ! cm/s
+      real(dp) :: photosphere_v_start ! cm/s at current photosphere location
       real(dp) :: photosphere_csound ! cm/s
       real(dp) :: photosphere_opacity
       real(dp) :: photosphere_column_density ! g/cm^2
@@ -835,7 +838,6 @@
          real(dp), pointer :: lnS_start(:) ! (nz)
          real(dp), pointer :: lnR_start(:) ! (nz)
          real(dp), pointer :: w_start(:) ! (nz)
-         real(dp), pointer :: Hp_face_start(:) ! (nz)
          real(dp), pointer :: v_start(:) ! (nz)
          real(dp), pointer :: u_start(:) ! (nz)
          real(dp), pointer :: L_start(:) ! (nz)
