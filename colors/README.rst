@@ -39,7 +39,7 @@ On startup, ``colors_setup_tables`` loads all data that will be needed at runtim
 Per-timestep computation
 -------------------------
 
-At each history output step, ``data_for_colors_history_columns`` is called with the current stellar parameters: T_eff, log g, metallicity [M/H], radius R, and distance d. The distance d is taken from the colors settings. The history interface uses photospheric quentities ``s%Teff``, ``s%photosphere_logg``, and ``photosphere_r * Rsun``. 
+At each history output step, ``data_for_colors_history_columns`` is called with the current stellar parameters: T_eff, log g, metallicity [M/H], radius R, and distance d. The distance d is taken from the colors settings. The history interface uses photospheric quentities ``s%Teff``, ``s%photosphere_logg``, and ``photosphere_r * Rsun``.
 
 **Step 1 — SED interpolation**
 
@@ -67,7 +67,7 @@ where R is the stellar radius and d is ``distance`` (default 10 pc, giving absol
 The bolometric flux is obtained by integrating the diluted SED over all wavelengths using adaptive Simpson's rule (falling back to the trapezoid rule for even-length arrays). The bolometric magnitude follows from the standard relation using the solar bolometric absolute magnitude.
 
 .. code-block:: text
-   
+
     F_bol,zp = Lsun × 10^(0.4 × mbolsun) / (4π × (10 pc)²)
     m_bol = -2.5 × log10(F_bol / F_bol,zp)
 
