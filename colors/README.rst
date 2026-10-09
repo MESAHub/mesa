@@ -13,7 +13,7 @@ MESA colors is a runtime module that generates observer-frame photometry directl
 
 The outputs are:
 
-* **Mag_bol** — bolometric magnitude, derived directly from the stellar luminosity
+* **Mag_bol** — bolometric magnitude, derived directly from the integrated and distance diluted SED
 * **Flux_bol** — bolometric flux at the specified distance
 * **Interp_rad** — distance in parameter space between the current stellar parameters and the nearest atmosphere grid point (diagnostic for interpolation quality)
 * **One column per filter** — synthetic magnitude in every filter listed in the instrument index file, named by the filter filename (``*.dat`` suffix stripped)
@@ -39,13 +39,17 @@ On startup, ``colors_setup_tables`` loads all data that will be needed at runtim
 Per-timestep computation
 -------------------------
 
-At each history output step, ``data_for_colors_history_columns`` is called with the current stellar parameters: T_eff, log g, metallicity [M/H], radius R, and distance d.
+At each history output step, ``data_for_colors_history_columns`` is called with the current stellar parameters: T_eff, log g, metallicity [M/H], radius R, and distance d. The distance d is taken from the colors settings. The history interface uses photospheric quentities ``s%Teff``, ``s%photosphere_logg``, and ``photosphere_r * Rsun``.
 
 **Step 1 — SED interpolation**
 
-The module locates the containing cell in the (T_eff, log g, [M/H]) grid and interpolates to produce a flux array F_λ at the stellar surface. Two paths exist:
+The module locates the containing cell in the (T_eff, log g, [M/H]) grid and interpolates to produce a flux array F_λ at the stellar surface. The default is bounded Hermite tensor interpolation: negligible negative undershoots are set to zero, and an unusable spectrum triggers a fallback to trilinear interpolation. An undershoot is negligible only when both its integrated magnitude and its peak amplitude are at most 0.1% of the corresponding positive flux quantities. The accepted spectrum must have a finite, positive integrated flux; if both interpolation methods return invalid spectra, the module reports an error.
 
-* **Flux cube path** (preferred): hermite tensor interpolation across the full pre-loaded 4D array. All lookups are in-memory array accesses.
+These safeguards enforce physical flux constraints but do not guarantee accuracy in sparsely sampled regions. Switching between Hermite and linear interpolation can also introduce changes in the smoothness of the resulting photometry. Linear, K-nearest-neighbour (KNN), and unbounded Hermite routines are available in the source, but there is no namelist control for selecting the interpolation method.
+
+Two data-loading paths exist, both using the same bounded Hermite procedure:
+
+* **Flux cube path** (preferred): interpolation across the full pre-loaded 4D array. All lookups are in-memory array accesses.
 * **Stencil fallback path** (low-RAM): an extended neighbourhood of SED files around the current grid cell is loaded on demand. Individual SED files are served from a bounded memory cache (256-slot circular buffer, ``sed_mem_cache_cap`` in ``colors_def.f90``) to avoid redundant disk reads. The stencil is invalidated and reloaded whenever the star moves into a new grid cell.
 
 **Step 2 — Distance dilution**
@@ -62,13 +66,18 @@ where R is the stellar radius and d is ``distance`` (default 10 pc, giving absol
 
 The bolometric flux is obtained by integrating the diluted SED over all wavelengths using adaptive Simpson's rule (falling back to the trapezoid rule for even-length arrays). The bolometric magnitude follows from the standard relation using the solar bolometric absolute magnitude.
 
+.. code-block:: text
+
+    F_bol,zp = Lsun × 10^(0.4 × mbolsun) / (4π × (10 pc)²)
+    m_bol = -2.5 × log10(F_bol / F_bol,zp)
+
 **Step 4 — Synthetic photometry**
 
 For each filter, the in-band flux is computed by integrating the product of the diluted SED and the filter transmission curve:
 
 .. code-block:: text
 
-   F_band = ∫ F_observed(λ) × T(λ) dλ  /  ∫ T(λ) dλ
+   F_band = ∫ F_observed(λ) × T(λ) × λ dλ  /  ∫ T(λ) × λ dλ
 
 The synthetic magnitude is then:
 
@@ -78,7 +87,7 @@ The synthetic magnitude is then:
 
 where F_zp is the precomputed zero-point for the selected magnitude system (Vega, AB, or ST).
 
-If the star's parameters fall outside the atmosphere grid, the module clamps to the nearest grid boundary. The ``Interp_rad`` column records the Euclidean distance (in normalised parameter space) between the stellar parameters and the nearest grid point.
+The ``Interp_rad`` column records the Euclidean distance (in normalised parameter space) between the stellar parameters and the nearest grid point; it is a grid-distance diagnostic, not an error estimate or an indicator of which interpolation method was used.
 
 Source files
 ============
@@ -97,6 +106,8 @@ Source files
    │   ├── synthetic.f90        — per-filter convolution and magnitude calculation,
    │   │                          SED CSV output (make_csv / sed_per_model)
    │   ├── hermite_interp.f90   — hermite tensor interpolation (cube path)
+   │   ├── hermite_interp_bounded.f90 — SED validation, negligible undershoot repair,
+   │   │                                and trilinear fallback
    │   ├── linear_interp.f90    — trilinear interpolation (cube path fallback)
    │   ├── knn_interp.f90       — k-nearest-neighbour interpolation
    │   ├── colors_utils.f90     — I/O (SED, filter, lookup table, flux cube),

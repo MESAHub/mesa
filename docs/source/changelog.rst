@@ -52,6 +52,15 @@ Additional controls are available for TDC envelope remeshing:
 Bug Fixes
 ---------
 
+The ``colors`` module now checks Hermite-interpolated spectra for unphysical
+fluxes, sets negligible negative undershoots to zero, and falls back to
+trilinear interpolation when necessary. Interpolation also handles atmosphere
+grid boundaries and axes with only one tabulated value more robustly.
+Filter transmission is now zero outside the tabulated passband, preventing
+spurious contributions to synthetic magnitudes and photometric zero-points.
+Bolometric magnitudes now include the bolometric flux zero point, correcting
+their absolute scale independently of the Vega, AB, or ST bandpass system.
+
 Removed duplicate treatment of ``n14(a,g)f18(e+nu)o18`` in networks that
 include both the explicit hot CNO reactions and the corresponding approximate
 reaction. See :ref:`the known bugs entry <duplicate_n14ag_rate_bug>` and
