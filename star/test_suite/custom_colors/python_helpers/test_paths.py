@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# ruff: noqa: BLE001, S112
 """
 path_test.py
 ============
@@ -38,8 +37,6 @@ from pathlib import Path
 import matplotlib
 
 matplotlib.use("Agg")
-import sys
-
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -96,7 +93,7 @@ CWD = os.getcwd()
 
 MESA_DIR = os.environ.get("MESA_DIR", "")
 if not MESA_DIR:
-    raise OSError("MESA_DIR is not set.")
+    raise EnvironmentError("MESA_DIR is not set.")
 
 
 def backup_inlist():
@@ -829,4 +826,4 @@ if __name__ == "__main__":
     """)
     )
 
-    sys.exit(0 if passed == total else 1)
+    exit(0 if passed == total else 1)

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# ruff: noqa: BLE001
 """
 compare_mag_systems.py
 
@@ -93,7 +92,6 @@ def run_mesa(mag_system, run_dir):
         result = subprocess.run(
             ["./rn"],
             capture_output=True,
-            check=False,
             text=True,
             timeout=3600,  # 1 hour timeout
         )
@@ -151,7 +149,7 @@ def read_mesa_history(logs_dir):
 
 def plot_cmd_comparison(results):
     """Plot CMD comparison for all mag systems."""
-    _fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+    fig, axes = plt.subplots(1, 2, figsize=(14, 6))
 
     # CMD 1: B-V vs V
     ax1 = axes[0]

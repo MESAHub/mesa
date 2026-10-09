@@ -1,4 +1,3 @@
-# ruff: noqa: BLE001, S110, S112
 import csv
 import os
 
@@ -157,13 +156,13 @@ class SEDChecker:
                 fontsize=10,
                 verticalalignment="top",
                 horizontalalignment="right",
-                bbox={
-                    "boxstyle": "round,pad=0.4",
-                    "facecolor": "white",
-                    "edgecolor": "lightblue",
-                    "alpha": 0.3,
-                    "linewidth": 1.5,
-                },
+                bbox=dict(
+                    boxstyle="round,pad=0.4",
+                    facecolor="white",
+                    edgecolor="lightblue",
+                    alpha=0.3,
+                    linewidth=1.5,
+                ),
             )
 
         # apply manual limits if they were set
@@ -542,7 +541,7 @@ class SEDChecker:
                             None,
                         )
                         filter_key = next(
-                            (k for k in legend_labels if k in file_path), None
+                            (k for k in legend_labels.keys() if k in file_path), None
                         )
                         color = (
                             filter_colors.get(filter_key, None) if filter_key else None
@@ -643,7 +642,7 @@ class SEDChecker:
             try:
                 writer = FFMpegWriter(
                     fps=self.video_fps,
-                    metadata={"title": "SED Animation", "artist": "MESA Colors"},
+                    metadata=dict(title="SED Animation", artist="MESA Colors"),
                     bitrate=5000,
                 )
                 self.animation = FuncAnimation(
