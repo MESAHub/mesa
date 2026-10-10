@@ -15,10 +15,11 @@
          double precision, parameter :: logT2_no_rad_default   = 7.7d0
                ! problems with HELM blend if logT2_no_rad_default is < logT1_no_rad_default
 
-         double precision, parameter :: logRho5 = -9.0d0
-         double precision, parameter :: logRho6 = -9.99d0
-         double precision, parameter :: logRho7 = -13.5d0
-         double precision, parameter :: logRho8 = -13.9d0
+         ! keep the generated table out of the warm low-density FreeEOS side
+         double precision, parameter :: logRho5 = -14.299d0
+         double precision, parameter :: logRho6 = -14.3d0
+         double precision, parameter :: logRho7 = -14.90d0
+         double precision, parameter :: logRho8 = -14.99d0
          double precision, parameter :: logT4   = 3.6d0
          double precision, parameter :: logT5   = 3.5d0
          ! 2.10 is lowest in SCVH; make mesa table use all of SCVH range at lowT end
@@ -33,7 +34,7 @@
          double precision, parameter :: logRho4 = logQ2 + 2*logT6 - 12
 
          double precision, parameter :: logT_HELM   = 3d0  ! smallest logT for HELM
-         double precision, parameter :: logQmin = -8.2d0
+         double precision, parameter :: logQmin = -8.05d0
          double precision, parameter :: logQmax = logQ1
 
          double precision :: alfa, beta, c_dx, c_dy, logRho_lo, logRho_hi, logT1, logT2

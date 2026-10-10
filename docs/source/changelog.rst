@@ -256,6 +256,27 @@ the reduction could be reset before ``extras_startup`` restored controls
 from ``run_star_extras``. If superadiabatic reduction remains disabled, the
 factor is reset on the first evolution step.
 
+Fixed a bug in the FreeEOS table builder where MESA fallback rows could write
+``lnPgas``, ``lnE``, and ``lnS`` values into table columns that are read as
+base-10 logarithms. This could create discontinuities and noisy EOS partial
+derivatives.
+
+At the low-density OPAL/SCVH edge, MESA now blends the OPAL/SCVH component to
+the ideal EOS over :math:`-10 \leq \log_{10}\rho \leq -8` in the low-T
+OPAL/SCVH region where MESA was previously falling back to HELM.
+
+Fixed the OPAL/SCVH blend between ``Z = 0.035`` and ``Z = 0.04``. This blend
+was not working properly, so the EOS was not actually blending in Z over that
+interval. For more details, see
+:ref:`the known bugs entry <freeeos_fallback_log_units_bug>` and
+`gh-997 <https://github.com/MESAHub/mesa/pull/997>`_.
+
+.. figure:: changelog_plots/eos_regions_x070_z002_compare.png
+   :alt: EOS regions in mesa-r26.4.1 and this release for X = 0.7, Z = 0.02
+
+   EOS regions for a solar-like composition in mesa-r26.4.1 and this release.
+
+
 .. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ``changelog_template.rst``).
 
 Other Changes

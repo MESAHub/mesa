@@ -248,7 +248,7 @@ contains
 
       ! set defaults
       mass_list = 'mass_frac.txt'
-      table_version = 51
+      table_version = 52
       eos_version = 1
 
       !set T range
@@ -564,7 +564,12 @@ contains
       end if
 
       eos_result(1:num_eos_basic_results) = res
-      eos_result(i_lnRho) = logRho
+
+      ! FreeEOS data files store these logarithms in base 10.
+      eos_result(i_lnPgas) = res(i_lnPgas)/ln10
+      eos_result(i_lnE) = res(i_lnE)/ln10
+      eos_result(i_lnS) = res(i_lnS)/ln10
+      eos_result(i_lnRho) = log10Rho
       eos_result(i_dpe) = 0._dp
       eos_result(i_dsp) = 0._dp
       eos_result(i_dse) = 0._dp

@@ -402,6 +402,11 @@ contains
          max_logP = logPs(kP)
       end if
 
+      if (logP < logP_min) then
+         info = -1
+         return
+      end if
+
       den_h = 10.0**interp_value(num_h_pts, denlog_h_si); if (info /= 0) return
       dddpress_ct_h = d_dlogP
       dddt_cp_h = d_dlogT
@@ -654,7 +659,6 @@ contains
          si0t, si1t, si2t, si0mt, si1mt, si2mt, si0p, si1p, si2p, si0mp, si1mp, si2mp, logRho_test, &
          logP_guess, epslogP, epslogRho, x1, x3, y1, y3, dfdlogP, &
          z, fi_h(36), fi_he(36), w0t, w1t, w2t, w0mt, w1mt, w2mt, w0p, w1p, w2p, w0mp, w1mp, w2mp
-
       include 'formats'
       info = 0
       ipar => ipar_array
@@ -936,10 +940,10 @@ contains
       chiT = dpressdt*T/P
 
       gamma3 = 1 + dpressdt/(Rho*dedt)
-      grad_ad = dtdpress_cs_hhe/(T*inv_P)
-      gamma1 = (gamma3 - 1)/grad_ad ! C&G 9.88 & 9.89
-
       Cp = Cv + P*chiT**2/(Rho*T*chiRho) ! C&G 9.86
+      ! Use total derivatives here since radiation may have been added above.
+      gamma1 = chiRho + chiT*(gamma3 - 1) ! C&G 9.88
+      grad_ad = (gamma3 - 1)/gamma1 ! C&G 9.89
 
       xnhp = max(0d0, min(1d0, 1 - (xnh2 + xnh)))
       xnhepp = max(0d0, min(1d0, 1 - (xnhep + xnhe)))

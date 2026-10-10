@@ -768,6 +768,12 @@
          ierr = 0
          ht => eos_ht
          helm_blend_width = 0.1d0
+         if (rq% use_FreeEOS .and. logT <= rq% logT_min_FreeEOS_lo) then
+            alfa = 1d0
+            d_alfa_dlogRho = 0d0
+            d_alfa_dlogT = 0d0
+            return
+         end if
 
          bounds(1,1) = ht% logdlo
          bounds(1,2) = ht% logthi
@@ -979,6 +985,7 @@
             rho, logRho, T, logT, remaining_fraction, &
             res, d_dlnd, d_dlnT, d_dxa, &
             skip, ierr)
+         use eosdt_support, only: Do_Blend
          integer, intent(in) :: handle
          logical, intent(in) :: dbg
          real(dp), intent(in) :: &
@@ -992,26 +999,103 @@
          real(dp), intent(inout), dimension(nv, species) :: d_dxa
          logical, intent(out) :: skip
          integer, intent(out) :: ierr
+         type (EoS_General_Info), pointer :: rq
+         real(dp), parameter :: logRho_tail_ideal = -10d0
+         real(dp), parameter :: logRho_tail_scvh = -8d0
+         real(dp), dimension(nv) :: res_scvh, d_dlnd_scvh, d_dlnT_scvh, &
+            res_ideal, d_dlnd_ideal, d_dlnT_ideal
+         real(dp), dimension(nv, species) :: d_dxa_scvh, d_dxa_ideal
+         real(dp) :: tail_alfa, d_tail_alfa_dlogRho, d_tail_alfa_dlogT, &
+            logT_tail_off
+         logical :: skip_scvh, skip_ideal
+
+         ierr = 0
+         skip = .false.
+         rq => eos_handles(handle)
+         logT_tail_off = rq% logT_min_FreeEOS_hi
+
+         if (logRho <= logRho_tail_ideal .and. logT <= logT_tail_off) then
+            call get_ideal_for_eosdt( &
+               handle, dbg, Z, X, abar, zbar, &
+               species, chem_id, net_iso, xa, &
+               rho, logRho, T, logT, remaining_fraction, &
+               res, d_dlnd, d_dlnT, d_dxa, &
+               skip, ierr)
+            return
+         end if
+
          call get1_for_eosdt( &
             handle, eosdt_OPAL_SCVH, dbg, &
             Z, X, abar, zbar, &
             species, chem_id, net_iso, xa, &
             rho, logRho, T, logT, remaining_fraction, &
-            res, d_dlnd, d_dlnT, d_dxa, &
-            skip, ierr)
+            res_scvh, d_dlnd_scvh, d_dlnT_scvh, d_dxa_scvh, &
+            skip_scvh, ierr)
+         if (ierr /= 0) return
+         if (skip_scvh) then
+            skip = .true.
+            return
+         end if
 
-         ! zero phase information
-         res(i_phase:i_latent_ddlnRho) = 0d0
-         d_dlnT(i_phase:i_latent_ddlnRho) = 0d0
-         d_dlnd(i_phase:i_latent_ddlnRho) = 0d0
+         call mark_opal_scvh_result(res_scvh, d_dlnd_scvh, d_dlnT_scvh)
 
-         ! zero all components
-         res(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
-         d_dlnd(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
-         d_dlnT(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+         if (logRho >= logRho_tail_scvh .or. logT >= logT_tail_off) then
+            res = res_scvh
+            d_dlnd = d_dlnd_scvh
+            d_dlnT = d_dlnT_scvh
+            d_dxa = d_dxa_scvh
+            skip = .false.
+            return
+         end if
 
-         ! mark this one
-         res(i_frac_OPAL_SCVH) = 1.0d0
+         call get_ideal_for_eosdt( &
+            handle, dbg, Z, X, abar, zbar, &
+            species, chem_id, net_iso, xa, &
+            rho, logRho, T, logT, remaining_fraction, &
+            res_ideal, d_dlnd_ideal, d_dlnT_ideal, d_dxa_ideal, &
+            skip_ideal, ierr)
+         if (ierr /= 0) return
+         if (skip_ideal) then
+            skip = .true.
+            return
+         end if
+
+         tail_alfa = (logRho_tail_scvh - logRho)/(logRho_tail_scvh - logRho_tail_ideal)
+         if (tail_alfa <= 0d0) then
+            tail_alfa = 0d0
+            d_tail_alfa_dlogRho = 0d0
+         else if (tail_alfa >= 1d0) then
+            tail_alfa = 1d0
+            d_tail_alfa_dlogRho = 0d0
+         else
+            d_tail_alfa_dlogRho = -1d0/(logRho_tail_scvh - logRho_tail_ideal)
+         end if
+         d_tail_alfa_dlogT = 0d0
+
+         call Do_Blend( &
+            rq, species, rho, logRho, T, logT, &
+            tail_alfa, d_tail_alfa_dlogT, d_tail_alfa_dlogRho, .false., &
+            res_ideal, d_dlnd_ideal, d_dlnT_ideal, d_dxa_ideal, &
+            res_scvh, d_dlnd_scvh, d_dlnT_scvh, d_dxa_scvh, &
+            res, d_dlnd, d_dlnT, d_dxa)
+         skip = .false.
+
+      contains
+
+         subroutine mark_opal_scvh_result(res_in, d_dlnd_in, d_dlnT_in)
+            real(dp), intent(inout), dimension(nv) :: res_in, d_dlnd_in, d_dlnT_in
+
+            res_in(i_phase:i_latent_ddlnRho) = 0d0
+            d_dlnT_in(i_phase:i_latent_ddlnRho) = 0d0
+            d_dlnd_in(i_phase:i_latent_ddlnRho) = 0d0
+
+            res_in(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+            d_dlnd_in(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+            d_dlnT_in(i_frac:i_frac+num_eos_frac_results-1) = 0.0d0
+
+            res_in(i_frac_OPAL_SCVH) = 1.0d0
+
+         end subroutine mark_opal_scvh_result
 
       end subroutine get_opal_scvh_for_eosdt
 
@@ -1448,11 +1532,11 @@
             end if
 
             if (Z > Z_no_HELM .and. Z < Z_all_HELM .and. alfa < 1d0) then
-               ! reduce alfa to reduce the HELM fraction
+               ! Increase alfa with Z to fade OPAL/SCVH into the next EOS.
                zfactor = (Z - Z_no_HELM)/(Z_all_HELM - Z_no_HELM)
-               alfa = alfa*zfactor
-               d_alfa_dlogRho = d_alfa_dlogRho*zfactor
-               d_alfa_dlogT = d_alfa_dlogT*zfactor
+               alfa = zfactor + (1d0 - zfactor)*alfa
+               d_alfa_dlogRho = (1d0 - zfactor)*d_alfa_dlogRho
+               d_alfa_dlogT = (1d0 - zfactor)*d_alfa_dlogT
             end if
 
          end subroutine set_alfa_and_partials
