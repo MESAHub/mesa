@@ -469,17 +469,22 @@
 
       end subroutine leak
 
-      subroutine calculate_eps_mdot(s, dt, velocity_remap_kinetic_energy, ierr)
+      subroutine calculate_eps_mdot( &
+            s, dt, velocity_remap_kinetic_energy, &
+            energy_without_radial_ke, kinetic_energy_removed, ierr)
          use adjust_mass, only: compute_prev_mesh_dm
 
          ! Inputs
          type (star_info), pointer :: s
          real(dp), intent(in) :: dt
          real(dp), intent(in) :: velocity_remap_kinetic_energy(:)
+         real(dp), intent(in) :: energy_without_radial_ke(:)
+         real(qp), intent(in) :: kinetic_energy_removed
          integer, intent(out) :: ierr
 
          ! Intermediates
          logical, parameter :: dbg = .false.
+         logical :: use_velocity_remap
          integer :: nz, j
          real(dp) :: delta_m, change_sum, leak_sum, err, abs_err, mdot_adiabatic_surface, gradT_mid
          real(dp), dimension(:), allocatable :: &
@@ -511,6 +516,8 @@
          ! Stellar properties
          nz = s%nz
          delta_m = s%mstar_dot * dt
+         use_velocity_remap = delta_m < 0d0 .and. (s% u_flag .or. s% v_flag) .and. &
+            .not. s% use_mass_corrections
 
          allocate(prev_mesh_dm(nz), dm(nz), change_in_dm(nz))
          call compute_prev_mesh_dm(s, prev_mesh_dm, dm, change_in_dm)
@@ -555,10 +562,18 @@
 
          !$OMP PARALLEL DO
          do j=1,nz
-            te(j) = s% total_energy_profile_before_adjust_mass(j) / prev_mesh_dm(j)
+            if (use_velocity_remap) then
+               te(j) = energy_without_radial_ke(j)
+            else
+               te(j) = s% total_energy_profile_before_adjust_mass(j) / prev_mesh_dm(j)
+            end if
          end do
          !$OMP END PARALLEL DO
-         call eval_total_energy_profile(s, s% total_energy_profile_after_adjust_mass)
+         ! A convection evaluation may already have changed mlt_vc.
+         ! Keep its physical evolution out of the mass-change correction.
+         call eval_total_energy_profile( &
+            s, s% total_energy_profile_after_adjust_mass, use_TDC_mlt_vc_old=.true., &
+            include_radial_kinetic_energy=.not. use_velocity_remap)
 
 
          !$OMP PARALLEL DO
@@ -573,6 +588,13 @@
          if (s% use_other_accreting_state) then
             call s%other_accreting_state(s%id, te_bar(1), p_bar(1), rho_bar(1), ierr)
             s% surface_cell_specific_total_energy_old = te_bar(1)
+         end if
+
+         if (use_velocity_remap) then
+            ! Radial kinetic energy is transported by the momentum overlaps.
+            ! Include its exact escaping energy in the surface energy diagnostic.
+            s% surface_cell_specific_total_energy_old = te_bar(1) + &
+               real(kinetic_energy_removed/real(-delta_m,qp),dp)
          end if
 
          ! Calculate grad_r_sub_grad_a
@@ -634,11 +656,8 @@
             ! but when composition changes this term also captures that.
             sum = sum - real(s% total_energy_profile_after_adjust_mass(j) - s%dm(j) * te(j), qp)
 
-            change_sum = change_sum + sum%value() / (dt)
-
-            ! Velocity averaging converts unresolved kinetic energy into heat.
-            ! Keep that local source out of the thermal leakage calculation.
-            sum = sum - real(velocity_remap_kinetic_energy(j),qp)
+            change_sum = change_sum + &
+               (sum%value() + velocity_remap_kinetic_energy(j))/dt
 
             ! Multiplicative factors
             eps_mdot_per_total_mass(j) = sum % value() / (s%dm(j) * dt) / total_mass_through_cell(j)
@@ -650,7 +669,7 @@
             err = err + eps_mdot_per_total_mass(j) * s%dm(j) * dt * total_mass_through_cell(j)
             err = err + velocity_remap_kinetic_energy(j)
          end do
-         err = err - s%mdot_acoustic_surface
+         err = err - s%mdot_acoustic_surface * dt
          err = err - te_bar(1) * delta_m
 
          ! Calculate leak fraction
@@ -664,6 +683,7 @@
                            total_mass_through_cell, eps_mdot_per_total_mass,&
                            accumulated, mdot_adiabatic_surface, leak_frac)
          do j=1,nz
+            ! Variance heat is generated in the retained material, after transport.
             s%eps_mdot(j) = accumulated(j) + &
                velocity_remap_kinetic_energy(j)/(s%dm(j)*dt)
          end do
@@ -682,7 +702,7 @@
                s% total_radial_kinetic_energy_after_adjust_mass, &
                s% total_rotational_kinetic_energy_after_adjust_mass, &
                s% total_turbulent_energy_after_adjust_mass, &
-               s% total_energy_after_adjust_mass)
+               s% total_energy_after_adjust_mass, use_TDC_mlt_vc_old=.true.)
 
          if (dbg) then
             write(*,*) 'Mdot',s%mstar_dot
@@ -696,7 +716,8 @@
             err = 0
             abs_err = 0
             do j=1,nz
-               err = err + s% total_energy_profile_after_adjust_mass(j) - te(j) * prev_mesh_dm(j)
+               err = err + s% total_energy_profile_after_adjust_mass(j) - &
+                  s% total_energy_profile_before_adjust_mass(j)
                err = err + s%eps_mdot(j) * dm(j) * dt
 !               abs_err = abs_err + abs(s% total_energy_profile_after_adjust_mass(j) - te(j) * prev_mesh_dm(j))
                abs_err = abs_err + abs(s% total_energy_profile_after_adjust_mass(j))
@@ -704,7 +725,8 @@
 !               s% total_energy_profile_after_adjust_mass(j) - te(j) * prev_mesh_dm(j), s%eps_mdot(j) * dm(j) * dt
             end do
 
-            err = err - te(1) * delta_m - (s%mdot_acoustic_surface + s%mdot_adiabatic_surface) * dt
+            err = err - s% surface_cell_specific_total_energy_old * delta_m - &
+               (s%mdot_acoustic_surface + s%mdot_adiabatic_surface) * dt
             write(*,*) 'Err:', err, err / abs_err, err / delta_m, delta_m / s%m(1), abs_err, s%mdot_acoustic_surface*dt
          end if
 

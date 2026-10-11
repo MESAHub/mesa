@@ -2443,18 +2443,22 @@
 
 
       real(dp) function cell_specific_total_energy( &
-            s, k, use_TDC_mlt_vc_old) result(cell_total)
+            s, k, use_TDC_mlt_vc_old, include_radial_kinetic_energy) result(cell_total)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          logical, intent(in), optional :: use_TDC_mlt_vc_old
+         logical, intent(in), optional :: include_radial_kinetic_energy
          real(dp) :: d_dv00, d_dvp1, d_dlnR00, d_dlnRp1
-         logical :: use_old_mlt_vc
+         logical :: use_old_mlt_vc, include_radial_ke
          include 'formats'
          use_old_mlt_vc = .false.
          if (present(use_TDC_mlt_vc_old)) &
             use_old_mlt_vc = use_TDC_mlt_vc_old
+         include_radial_ke = .true.
+         if (present(include_radial_kinetic_energy)) &
+            include_radial_ke = include_radial_kinetic_energy
          cell_total = s% energy(k)
-         if (s% v_flag .or. s% u_flag) &
+         if (include_radial_ke .and. (s% v_flag .or. s% u_flag)) &
             cell_total = cell_total + cell_specific_KE(s,k,d_dv00,d_dvp1)
          cell_total = cell_total + cell_specific_PE(s,k,d_dlnR00,d_dlnRp1)
          if (s% rotation_flag .and. s% include_rotation_in_total_energy) &
@@ -2584,20 +2588,31 @@
       end subroutine eval_deltaM_total_energy_integrals
 
 
-      subroutine eval_total_energy_profile(s, total_energy_profile)
+      subroutine eval_total_energy_profile( &
+            s, total_energy_profile, use_TDC_mlt_vc_old, include_radial_kinetic_energy)
          type (star_info), pointer :: s
          real(dp), intent(out), dimension(:) :: total_energy_profile
+         logical, intent(in), optional :: use_TDC_mlt_vc_old
+         logical, intent(in), optional :: include_radial_kinetic_energy
 
          integer :: k
          real(dp) :: dm, cell_total, cell1, d_dv00, d_dvp1, d_dlnR00, d_dlnRp1
+         logical :: use_old_mlt_vc, include_radial_ke
          include 'formats'
+
+         use_old_mlt_vc = .false.
+         if (present(use_TDC_mlt_vc_old)) &
+            use_old_mlt_vc = use_TDC_mlt_vc_old
+         include_radial_ke = .true.
+         if (present(include_radial_kinetic_energy)) &
+            include_radial_ke = include_radial_kinetic_energy
 
          do k=1, s%nz
             cell_total = 0
             dm = s% dm(k)
             cell1 = dm*s% energy(k)
             cell_total = cell_total + cell1
-            if (s% v_flag .or. s% u_flag) then
+            if (include_radial_ke .and. (s% v_flag .or. s% u_flag)) then
                cell1 = dm*cell_specific_KE(s,k,d_dv00,d_dvp1)
                cell_total = cell_total + cell1
             end if
@@ -2615,7 +2630,7 @@
             if (.not. s%RSP2_flag .and. s%MLT_option == 'TDC' .and. &
                   s%TDC_include_eturb_in_energy_equation) then
                cell_total = cell_total + &
-                  dm*tdc_cell_specific_turbulent_energy(s, k, .false.)
+                  dm*tdc_cell_specific_turbulent_energy(s, k, use_old_mlt_vc)
             end if
             if (s% rsp_flag) then
                cell1 = dm*s% RSP_Et(k)
