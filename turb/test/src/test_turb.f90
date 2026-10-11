@@ -2,13 +2,15 @@ program test_turb
 
    use math_lib
    use auto_diff
-   use const_def, only: dp, pi, rsun, lsun, msun, kerg, mp, boltz_sigma, standard_cgrav
+   use const_def, only: dp, pi, rsun, lsun, msun, kerg, mp, boltz_sigma, standard_cgrav, sqrt_2_div_3
    use turb
 
    implicit none
 
    call check_efficient_MLT_scaling()
    call check_TDC()
+   call check_TDC_zero_start()
+   call check_TDC_degenerate()
    call compare_TDC_and_Cox_MLT()
 
 contains
@@ -236,5 +238,108 @@ contains
       end do
 
    end subroutine check_TDC
+
+   subroutine check_TDC_zero_start()
+      use tdc, only: get_TDC_solution
+      use tdc_support, only: tdc_info, compute_Q, convert
+      type(tdc_info) :: info
+      type(auto_diff_real_tdc) :: Zlb, Zub, Y, Q, Af
+      type(auto_diff_real_star_order1) :: conv_vel, Y_face
+      real(dp) :: expected_Y, expected_Af
+      integer :: j, ierr, tdc_num_iters
+
+      info%report = .false.
+      info%include_mlt_corr_to_TDC = .false.
+      info%use_TDC_enthalpy_flux_limiter = .false.
+      info%mixing_length_alpha = 1d0
+      info%Lambda = 1d0
+      info%TDC_alpha_C = 1d0
+      info%TDC_alpha_S = 2d0/sqrt_2_div_3
+      info%TDC_alpha_D = 0d0
+      info%TDC_alpha_R = 0d0
+      info%TDC_alpha_Pt = 0d0
+      info%dt = 1d0
+      info%e = 0d0
+      info%c0 = 1d0
+      info%L = -1d0
+      info%L%d1Array(1) = 1d0
+      info%L0 = 1d0
+      info%gradL = 0d0
+      info%grada = 1d0
+      info%T = 1d0
+      info%rho = 1d0
+      info%dV = 0d0
+      info%Cp = 1d0
+      info%kap = 1d0
+      info%Hp = 1d0
+      info%Gamma = 0d0
+      info%P = 1d0
+      info%h = 1d0
+      Zlb = -50d0
+      Zub = 50d0
+      Zlb%d1val1 = 1d0
+      Zub%d1val1 = 1d0
+
+      do j = 1, 7
+         info%A0 = 0d0
+         info%Eq_div_w = 4d0
+         info%L = -1d0
+         info%L%d1Array(1) = 1d0
+         if (j == 2) info%A0 = 5d-11
+         if (j == 3) info%Eq_div_w = 0d0
+         if (j == 4) info%Eq_div_w = 0.5d0
+         if (j >= 5) info%L%val = 0d0
+         if (j == 6) info%Eq_div_w = 0d0
+         if (j == 7) info%A0 = 1d0
+         call get_TDC_solution(info, 1d0, Zlb, Zub, conv_vel, Y_face, tdc_num_iters, 0d0, ierr)
+         if (ierr /= 0) stop 1
+         Y = convert(Y_face)
+         call compute_Q(info, Y, Q, Af)
+         expected_Af = max(0d0, info%A0%val + 0.5d0*(Y_face%val + info%Eq_div_w%val))
+         if (abs(Af%val - expected_Af) > 1d-12 .or. &
+               abs(conv_vel%val/sqrt_2_div_3 - expected_Af) > 1d-12) stop 1
+         if (abs(Q%val) > 1d-7 .or. maxval(abs(Q%d1Array)) > 1d-6) then
+            write(*,*) 'Zero-start TDC luminosity closure failed', j, Q%val
+            stop 1
+         end if
+         if (j <= 2) then
+            ! Af = A0 + (4 + Y)/2, so Q = -1 - (3 + A0)*Y - Y**2/2.
+            expected_Y = -(3d0 + info%A0%val) + sqrt(pow2(3d0 + info%A0%val) - 2d0)
+            if (abs(Y_face%val - expected_Y) > 1d-7 .or. conv_vel%val <= 0d0) stop 1
+         else if (j <= 4) then
+            if (Y_face%val /= -1d0 .or. conv_vel%val /= 0d0 .or. tdc_num_iters /= 0) stop 1
+         else
+            if (Y_face%val /= 0d0 .or. tdc_num_iters /= 0) stop 1
+            if (j == 6) then
+               if (conv_vel%val /= 0d0) stop 1
+            else
+               if (conv_vel%val <= 0d0) stop 1
+            end if
+         end if
+      end do
+   end subroutine check_TDC_zero_start
+
+
+   subroutine check_TDC_degenerate()
+      use tdc_support, only: eval_Af
+      type(auto_diff_real_tdc) :: A0, xi0, xi1, xi2, Af
+
+      xi0 = -1d0
+      xi1 = 2d0
+      xi2 = -1d0
+      A0 = 0.5d0
+      ! This solution reaches zero before the pole of its continuation.
+      Af = eval_Af(10d0, A0, xi0, xi1, xi2)
+      if (Af%val /= 0d0 .or. maxval(abs(Af%d1Array)) /= 0d0) stop 1
+      A0 = 2d0
+      Af = eval_Af(10d0, A0, xi0, xi1, xi2)
+      if (abs(Af%val - 7d0/6d0) > 1d-14) stop 1
+      xi0 = 1d0
+      xi1 = 0d0
+      xi2 = 0d0
+      A0 = 0.5d0
+      Af = eval_Af(2d0, A0, xi0, xi1, xi2)
+      if (Af%val /= 1.5d0) stop 1
+   end subroutine check_TDC_degenerate
 
 end program test_turb

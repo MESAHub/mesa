@@ -56,14 +56,15 @@ contains
       integer, intent(out) :: tdc_num_iters, ierr
       real(dp), intent(in) :: Y_face_guess
 
-      logical :: Y_is_positive
-      type(auto_diff_real_tdc) :: Af, Y, Y0, Y1, Z0, Z1, radY
+      logical :: Y_is_positive, use_radY
+      type(auto_diff_real_tdc) :: Af, Af0, Y, Y0, Y1, Z0, Z1, radY
       type(auto_diff_real_tdc) :: Q, Q0
       logical :: has_root
       integer :: iter
       include 'formats'
 
       ierr = 0
+      tdc_num_iters = 0
       if (info%Lambda <= 0d0 .or. info%dt <= 0d0) then
          call mesa_error(__FILE__,__LINE__,'bad call to TDC get_TDC_solution')
       end if
@@ -76,7 +77,7 @@ contains
       ! If Q(Y=0) is negative then the luminosity can be carried by radiation alone, so we'll
       ! necessarily have Y < 0.
       Y = 0d0
-      call compute_Q(info, Y, Q0, Af)
+      call compute_Q(info, Y, Q0, Af0)
       if (Q0 > 0d0) then
          Y_is_positive = .true.
       else
@@ -95,7 +96,10 @@ contains
       end if
 
       ! Start down the chain of logic...
-      if (Y_is_positive) then
+      if (Q0 == 0d0) then
+         ! Retain the flux response at Y = 0, including shear-driven turbulence.
+         Y = Q0/(info%L0 + info%c0*Af0)
+      else if (Y_is_positive) then
          ! If Y > 0 then Q(Y) is monotone and we can jump straight to the search.
          call bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Zub, Y_face, Af, tdc_num_iters, &
             Y_face_guess, ierr)
@@ -108,15 +112,17 @@ contains
          ! One root we could have is the radiative solution (with Af==0), given by
          radY = (info%L - info%L0 * info%gradL) / info%L0
 
-         ! If A0 == 0 then, because Af(Y) is monotone-increasing in Y, we know that for Y < 0, Af(Y) = 0.
-         ! As a result we can directly write down the solution and get just radY.
-         ! For numerical reasons we impose a cutoff of 1d-10 cm/s (much smaller than this and the point where
-         ! A0 reaches zero could be at Z < lower_bound_Z).
+         ! Shear can drive turbulence even when the starting amplitude is zero.
+         ! Use the radiative solution only if its final amplitude is zero.
+         use_radY = .false.
          if (info%A0 < 1d-10) then
+            call compute_Q(info, radY, Q, Af)
+            use_radY = (Af == 0d0)
+         end if
+         if (use_radY) then
             Y = radY
-            if (info%report) write(*,*) 'A0 == 0, Y=',Y%val
+            if (info%report) write(*,*) 'Af(radY) == 0, Y=',Y%val
          else
-            if (info%report) write(*,*) 'A0 > 0.'
             ! Otherwise, we keep going.
 
             ! We divide the possible functions Af(Z) into three classes:
@@ -213,6 +219,7 @@ contains
          end if
       end if
 
+      if (ierr /= 0) return
 
       ! Process Y into the various outputs.
       call compute_Q(info, Y, Q, Af)
