@@ -89,6 +89,20 @@ contains
       call star_ptr(id, s, ierr)
       if (ierr /= 0) return
 
+      if (s% star_LNA_flag .and. s% star_LNA_set_initial_velocity .and. &
+            s% model_number == s% star_LNA_model_number) then
+         ! The driver calls Star LNA and applies the kick after extras_start_step.
+         call star_set_vars(id, 0d0, ierr)
+         if (ierr /= 0) return
+         call star_write_profile_info(id, 'profile_pre_kick.data', ierr)
+         if (ierr /= 0) return
+         ! Export the envelope faces without a center or atmosphere extension.
+         call star_export_pulse_data(id, 'GYRE', 'profile_pre_kick.gyre.data', &
+            .false., .true., .false., ierr)
+         if (ierr /= 0) return
+         write(*,'(a,i0)') 'saved pre-kick profile and GYRE data at model ', s% model_number
+      end if
+
       if (in_inlist_pulses .and. s% x_logical_ctrl(25)) &
          s% convergence_ignore_equL_residuals = s% model_number < 10
 

@@ -410,9 +410,11 @@
       ! D_conv_h is the entropy diffusivity inferred from the convective
       ! luminosity. mlt_Pturb0_face = mlt_Pturb_factor*rho_face*mlt_vc^2/3.
       !
-      ! The exported mixing length is Lambda = mixing_length_alpha*Hp_face.
-      ! The harmonic TDC length is not included; a warning is printed if
-      ! harmonic_dissipation_length_beta > 0.
+      ! Columns 39 to 48 give the ln T and ln rho derivatives of ln Cp,
+      ! grada, ln chiT and ln chiRho at fixed composition, the pressure
+      ! exponent of the selected scale height, and harmonic_dissipation_length_beta.
+      ! Older 38-column profiles omit these quantities and retain the
+      ! fixed-coefficient closure in GYRE.
       !
       ! With dt <= 0, export eps_grav = 0 as a static background assumption.
       ! A .mod file does not store eps_grav or the previous thermal state.

@@ -8,7 +8,7 @@ This example loads a saved stellar model, removes the core, constructs a TDC
 pulsation mesh, and applies a radial velocity perturbation from Star LNA. The
 nonlinear hydrodynamic calculation then measures the period, growth rate,
 radius variation, luminosity variation, and surface velocity of each cycle.
-GYRE is not used by this example.
+The example exports a GYRE model before the kick but does not run GYRE.
 
 The supplied ``standard_he_dep.mod`` is the 6 M core helium burning model from
 ``dev_TDC_Cepheid_6M``. The supplied ``model_00000800.mod`` is the 80 M
@@ -60,13 +60,42 @@ includes perturbations to convective flux, turbulent pressure, eddy viscosity,
 and turbulent energy. ``star_LNA_stop_after_run = .false.`` continues into the
 nonlinear calculation after the modes are written.
 
-The TDC section sets ``harmonic_dissipation_length_beta = 1``. The mixing and
-dissipation length is therefore
+The supplied inlist sets ``harmonic_dissipation_length_beta = 0``, giving
+``Lambda = mixing_length_alpha*Hp``. For a positive value ``beta``, the
+mixing and dissipation length is
 
 .. math::
 
    \frac{1}{\Lambda}
    = \frac{1}{\alpha_{\rm MLT}H_P} + \frac{1}{\beta r}.
+
+Pre-kick Export
+================
+
+At ``star_LNA_model_number``, ``extras_start_step`` writes
+``profile_pre_kick.data`` and ``profile_pre_kick.gyre.data`` in the run
+directory. The writes require ``star_LNA_flag`` and
+``star_LNA_set_initial_velocity``. They occur before the driver calls Star
+LNA and applies the velocity perturbation, so both files describe the
+background used for the saved modes in ``LNA``. An export failure stops
+the calculation before the kick. This hook covers the scheduled analysis,
+not the startup analysis selected by a negative ``star_LNA_model_number``.
+
+The GYRE file uses schema 130 with the TDC background columns. It keeps
+the envelope surface, with no artificial center or atmosphere extension.
+Its innermost point is the stored face ``r(nz)``, not the excised boundary
+``R_center``. The MESA profile header records ``R_center``; check their
+separation before comparing the inner boundary conditions. The explicit
+export does not require
+``write_pulse_data_with_profile``. Ordinary profile output is unchanged.
+These named files are replaced when a new run reaches the scheduled kick;
+retain them together with that run's ``LNA`` directory and inlist.
+
+Schema 130 has 48 columns, including the EOS response derivatives,
+scale-height pressure exponent and ``harmonic_dissipation_length_beta``.
+A compatible GYRE reader reconstructs the harmonic mixing length when
+``beta > 0``. Older 38-column profiles retain the fixed-coefficient
+closure in GYRE.
 
 Timestep Resolution
 ===================

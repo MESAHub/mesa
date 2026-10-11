@@ -27,6 +27,7 @@ module pulse_gyre
   use eps_grav
   use pulse_utils
   use star_utils, only: get_rho_face_val, get_scale_height_face_val
+  use eos_def, only: i_Cp, i_grad_ad, i_chiT, i_chiRho
 
   implicit none
 
@@ -36,7 +37,7 @@ module pulse_gyre
 
   integer, parameter :: gyre_schema_101_ncols = 18
   integer, parameter :: gyre_schema_120_ncols = 19
-  integer, parameter :: gyre_schema_130_ncols = 38
+  integer, parameter :: gyre_schema_130_ncols = 48
 
   integer, parameter :: i_tdc_l_conv0 = 20
   integer, parameter :: i_tdc_a0 = 21
@@ -57,6 +58,16 @@ module pulse_gyre
   integer, parameter :: i_tdc_include_mlt_corr = 36
   integer, parameter :: i_tdc_mlt_Pturb_factor = 37
   integer, parameter :: i_tdc_mlt_Pturb0 = 38
+  integer, parameter :: i_tdc_dlnCp_dlnT = 39
+  integer, parameter :: i_tdc_dlnCp_dlnrho = 40
+  integer, parameter :: i_tdc_dgrada_dlnT = 41
+  integer, parameter :: i_tdc_dgrada_dlnrho = 42
+  integer, parameter :: i_tdc_dlnchiT_dlnT = 43
+  integer, parameter :: i_tdc_dlnchiT_dlnrho = 44
+  integer, parameter :: i_tdc_dlnchiRho_dlnT = 45
+  integer, parameter :: i_tdc_dlnchiRho_dlnrho = 46
+  integer, parameter :: i_tdc_hp_dlnP = 47
+  integer, parameter :: i_tdc_harmonic_beta = 48
 
 contains
 
@@ -129,10 +140,6 @@ contains
           write(*,*) 'gyre_write_tdc_lna_background requires MLT_option = ''TDC'''
           ierr = -1
           return
-       end if
-       if (s%harmonic_dissipation_length_beta > 0d0) then
-          write(*,'(a)') 'WARNING: GYRE schema 130 does not support the harmonic TDC mixing length.'
-          write(*,'(a)') 'GYRE will use Lambda = mixing_length_alpha*Hp_face from the exported data.'
        end if
     end if
 
@@ -503,7 +510,7 @@ contains
 
       if (SIZE(point_data, 1) < gyre_schema_130_ncols) return
 
-      point_data(i_tdc_l_conv0:gyre_schema_130_ncols,j) = 0d0
+      point_data(i_tdc_l_conv0:,j) = 0d0
       if (.not. s%gyre_write_tdc_lna_background) return
 
       point_data(i_tdc_alpha_C,j) = s%TDC_alpha_C
@@ -514,6 +521,8 @@ contains
       point_data(i_tdc_alpha_M,j) = s%TDC_alpha_M
       point_data(i_tdc_include_mlt_corr,j) = merge(1d0, 0d0, s%include_mlt_corr_to_TDC)
       point_data(i_tdc_mlt_Pturb_factor,j) = s%mlt_Pturb_factor
+      point_data(i_tdc_hp_dlnP,j) = 1d0
+      point_data(i_tdc_harmonic_beta,j) = s%harmonic_dissipation_length_beta
 
     end subroutine store_tdc_lna_point_defaults
 
@@ -529,6 +538,7 @@ contains
       real(dp) :: Hp_face
       real(dp) :: Y_face
       real(dp) :: denom
+      real(dp) :: Hp_hse, Hp_alt
 
       call store_tdc_lna_point_defaults(j)
 
@@ -538,7 +548,7 @@ contains
       Cp_face = eval_face(s%dq, s%Cp, k, k_a, k_b)
       Y_face = s%gradT(k) - s%gradL(k)
 
-      ! Schema 130 exports the legacy Lambda = mixing_length_alpha*Hp_face.
+      ! GYRE constructs Lambda from alpha_MLT, Hp and the harmonic beta.
       point_data(i_tdc_hp_face,j) = Hp_face
       point_data(i_tdc_alpha_mlt_face,j) = s%mixing_length_alpha
       point_data(i_tdc_cp_face,j) = Cp_face
@@ -546,6 +556,35 @@ contains
       point_data(i_tdc_chiRho_face,j) = eval_face(s%dq, s%chiRho, k, k_a, k_b)
       point_data(i_tdc_gradL_face,j) = s%gradL(k)
       point_data(i_tdc_gradT_face,j) = s%gradT(k)
+
+      if (s%gyre_data_schema == 130) then
+         ! Independent EOS partials use the same face interpolation as their values.
+         point_data(i_tdc_dlnCp_dlnT,j) = &
+            eval_face(s%dq, s%d_eos_dlnT(i_Cp,:), k, k_a, k_b)/Cp_face
+         point_data(i_tdc_dlnCp_dlnrho,j) = &
+            eval_face(s%dq, s%d_eos_dlnd(i_Cp,:), k, k_a, k_b)/Cp_face
+         point_data(i_tdc_dgrada_dlnT,j) = &
+            eval_face(s%dq, s%d_eos_dlnT(i_grad_ad,:), k, k_a, k_b)
+         point_data(i_tdc_dgrada_dlnrho,j) = &
+            eval_face(s%dq, s%d_eos_dlnd(i_grad_ad,:), k, k_a, k_b)
+         point_data(i_tdc_dlnchiT_dlnT,j) = &
+            eval_face(s%dq, s%d_eos_dlnT(i_chiT,:), k, k_a, k_b)/point_data(i_tdc_chiT_face,j)
+         point_data(i_tdc_dlnchiT_dlnrho,j) = &
+            eval_face(s%dq, s%d_eos_dlnd(i_chiT,:), k, k_a, k_b)/point_data(i_tdc_chiT_face,j)
+         point_data(i_tdc_dlnchiRho_dlnT,j) = &
+            eval_face(s%dq, s%d_eos_dlnT(i_chiRho,:), k, k_a, k_b)/point_data(i_tdc_chiRho_face,j)
+         point_data(i_tdc_dlnchiRho_dlnrho,j) = &
+            eval_face(s%dq, s%d_eos_dlnd(i_chiRho,:), k, k_a, k_b)/point_data(i_tdc_chiRho_face,j)
+
+         Hp_hse = P(j)*r(j)**2/(rho(j)*s%cgrav(k)*s%m_grav(k))
+         if (s%harmonic_dissipation_length_beta > 0d0) then
+            Hp_face = Hp_hse
+            point_data(i_tdc_hp_face,j) = Hp_face
+         else if (s%alt_scale_height_flag) then
+            Hp_alt = sqrt(P(j)/s%cgrav(k))/rho(j)
+            if (Hp_alt < Hp_hse) point_data(i_tdc_hp_dlnP,j) = 0.5d0
+         end if
+      end if
 
       if (.not. tdc_lna_has_convective_velocity(k)) return
 

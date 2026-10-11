@@ -105,6 +105,10 @@
    star_LNA_perturb_turbulent_energy = .true.
    star_LNA_convection_treatment = 'perturbed'
 
+   ! TDC background for the GYRE export immediately before the Star LNA kick.
+   gyre_data_schema = 130
+   gyre_write_tdc_lna_background = .true.
+
    ! Pulsation diagnostics
    x_logical_ctrl(7) = .true. ! measure nonlinear pulsation cycles
    x_integer_ctrl(7) = -1 ! number of cycles before stopping; <= 0 disables
@@ -168,7 +172,7 @@
 
    num_cells_for_smooth_gradL_composition_term = 0
    mixing_length_alpha = 1.5d0
-   harmonic_dissipation_length_beta = 1d0 ! radial limiting length is beta*r
+   harmonic_dissipation_length_beta = 0d0!1d0 ! radial limiting length is beta*r
    TDC_alpha_C = 1d0
    TDC_alpha_S = 1d0
    TDC_alpha_D = 1d0

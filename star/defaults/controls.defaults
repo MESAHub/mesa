@@ -685,6 +685,8 @@
       ! data schema to use when passing model internally to GYRE, and/or
       ! writing files in GYRE/GSM format. For instance, to write v1.20 GYRE files
       ! use the value 120
+      ! TDC equilibrium data and closure EOS derivatives use 130, which
+      ! requires gyre_write_tdc_lna_background and a compatible GYRE reader.
 
       ! ::
 
