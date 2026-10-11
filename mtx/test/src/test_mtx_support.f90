@@ -27,6 +27,69 @@ module test_mtx_support
 
 contains
 
+   subroutine test_block_multiply_xa
+      integer :: nvar, nz, n, nvar2, i, j, k, row0, col0
+      real(dp), pointer :: lower(:), diagonal(:), upper(:), x(:), b(:)
+      real(dp), pointer :: lblk(:,:,:), dblk(:,:,:), ublk(:,:,:)
+      real(dp), allocatable :: a(:,:), expected(:)
+      real(dp) :: tolerance
+
+      write (*, *) 'test_block_multiply_xa'
+
+      do nvar = 1, 3
+         do nz = 1, 4
+            n = nvar*nz
+            nvar2 = nvar*nvar
+            allocate(lower(nvar2*nz), diagonal(nvar2*nz), upper(nvar2*nz), x(n), b(n))
+            allocate(a(n,n), expected(n))
+            lblk(1:nvar,1:nvar,1:nz) => lower
+            dblk(1:nvar,1:nvar,1:nz) => diagonal
+            ublk(1:nvar,1:nvar,1:nz) => upper
+            a = 0d0
+            do k = 1, nz
+               row0 = nvar*(k-1)
+               do j = 1, nvar
+                  do i = 1, nvar
+                     lblk(i,j,k) = -2d0*k + 0.3d0*i - 0.1d0*j
+                     dblk(i,j,k) = 3d0*k + 0.2d0*i - 0.4d0*j
+                     ublk(i,j,k) = 4d0*k - 0.5d0*i + 0.7d0*j
+                     a(row0+i,row0+j) = dblk(i,j,k)
+                     if (k > 1) then
+                        col0 = row0 - nvar
+                        a(row0+i,col0+j) = lblk(i,j,k)
+                     end if
+                     if (k < nz) then
+                        col0 = row0 + nvar
+                        a(row0+i,col0+j) = ublk(i,j,k)
+                     end if
+                  end do
+               end do
+            end do
+            do i = 1, n
+               x(i) = (-1d0)**i*(1d0 + 0.1d0*i)
+            end do
+            expected = matmul(transpose(a),x)
+            tolerance = 100d0*epsilon(1d0)*max(1d0,maxval(abs(expected)))
+            call block_multiply_xa(nvar, nz, lower, diagonal, upper, x, b)
+            if (maxval(abs(b-expected)) > tolerance) &
+               call mesa_error(__FILE__, __LINE__, 'block_multiply_xa')
+
+            ! The unused boundary blocks must not affect the product.
+            lblk(:,:,1) = 1d6
+            ublk(:,:,nz) = -1d6
+            call block_multiply_xa(nvar, nz, lower, diagonal, upper, x, b)
+            if (maxval(abs(b-expected)) > tolerance) &
+               call mesa_error(__FILE__, __LINE__, 'block_multiply_xa boundary blocks')
+            deallocate(lower, diagonal, upper, x, b, a, expected)
+            nullify(lblk, dblk, ublk)
+         end do
+      end do
+
+      write (*, *) 'okay'
+      write (*, *)
+   end subroutine test_block_multiply_xa
+
+
    subroutine test_format_conversion
       use mtx_def
       integer, parameter :: n = 6

@@ -27,3 +27,6 @@
  band_to_row_sparse
  okay
 
+ test_block_multiply_xa
+ okay
+
