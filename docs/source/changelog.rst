@@ -229,6 +229,10 @@ Added an optional floor on the atmospheric pressure used by the momentum
 outer boundary. The floor prevents a hydrostatic atmosphere from supplying
 less than the radiation pressure at its boundary temperature.
 
+Fixed velocity remapping during mass loss. Momentum is now conservatively
+remapped on the cell or dual cell mass coordinates, and unresolved kinetic
+energy is returned locally through ``eps_mdot`` instead of being lost.
+
 Fixed nonpositive surface optical depths after removing surface cells from a
 dynamic model. Surface removal now retains the existing optical depth when
 the hydrostatic pressure estimate is nonphysical. Split/merge metric zoning

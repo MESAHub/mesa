@@ -20,7 +20,7 @@
       module evolve
 
       use star_private_def
-      use const_def, only: dp, i8, pi, pi4, ln10, msun, lsun, crad, clight, secyer, secday
+      use const_def, only: dp, qp, i8, pi, pi4, ln10, msun, lsun, crad, clight, secyer, secday
       use utils_lib, only: is_bad
       use star_utils
       use auto_diff_support
@@ -601,7 +601,8 @@
             explicit_mdot, max_wind_mdot, wind_mdot, r_phot, kh_timescale, dmskhf, dmsfac, &
             too_large_wind_mdot, too_small_wind_mdot, boost, mstar_dot_nxt, &
             surf_omega_div_omega_crit_limit, dt
-         real(dp), allocatable :: specific_energy_before_adjust_mass(:)
+         real(dp), allocatable :: velocity_remap_kinetic_energy(:), specific_energy_before_adjust_mass(:)
+         real(qp) :: kinetic_energy_removed
 
          integer :: ph_k, mdot_action
          real(dp) :: implicit_mdot, ph_L, iwind_tolerance, iwind_lambda
@@ -628,7 +629,7 @@
          clock_rate = s% system_clock_rate
          trace = s% trace_evolve
          nz = s% nz
-         allocate(specific_energy_before_adjust_mass(nz))
+         allocate(velocity_remap_kinetic_energy(nz), specific_energy_before_adjust_mass(nz))
 
          call setup_for_implicit_mdot_loop
 
@@ -658,16 +659,17 @@
 
             else
 
-               do k=1,nz
-                  specific_energy_before_adjust_mass(k) = cell_specific_total_energy(s,k)
-               end do
-               call do_adjust_mass(s, s% species, ierr)
+               call do_adjust_mass( &
+                  s, s% species, specific_energy_before_adjust_mass, velocity_remap_kinetic_energy, &
+                  kinetic_energy_removed, ierr)
                if (failed('do_adjust_mass')) return
                s% star_mdot = s% mstar_dot/(Msun/secyer)      ! dm/dt in msolar per year
                call set_vars_if_needed(s, dt, 'after do_adjust_mass', ierr)
                if (failed('set_vars_if_needed after do_adjust_mass')) return
 
-               call calculate_eps_mdot(s, dt, specific_energy_before_adjust_mass, ierr)
+               call calculate_eps_mdot( &
+                  s, dt, specific_energy_before_adjust_mass, velocity_remap_kinetic_energy, &
+                  kinetic_energy_removed, ierr)
                if (failed('calculate_eps_mdot')) return
 
                if (s% mstar_dot /= 0d0) then
@@ -1281,13 +1283,9 @@
             ! and differences between this and the surface state are accounted for by the term mdot_adiabatic_surface.
             !
             ! By adding eps_mdot, we cause a change in energy during the Newton iterations which
-            ! cancels the change in (3). Thus eps_mdot does not enter into the energy *accounting*, just into
-            ! the energy equation. A consequence of this is that the sum
-            !
-            ! total_energy_change_from_mdot + (total energy before adjust_mass) + mdot_acoustic_surface
-            !
-            ! does not equal the total energy *after* adjust_mass and *before* the Newton iterations.
-            ! However it should equal the total energy at the end of the step.
+            ! cancels the change in (3). The net mass-change contribution is the energy change
+            ! from adjust_mass plus dt*sum(dm*eps_mdot). This already includes surface pressure
+            ! work and the adiabatic excess carried away by outgoing material.
 
             if (s% rotation_flag .and. &
                   (s% use_other_torque .or. s% use_other_torque_implicit .or. &
@@ -1365,12 +1363,6 @@
                total_radiation = dt*(L_surf - s% L_center)
             end if
 
-            !note: phase1_total_energy_from_mdot = &
-            !     s% mdot_acoustic_surface &
-            !   + s% total_energy_change_from_mdot &
-            !   + s% mdot_adiabatic_surface &
-            !   - phase2_total_energy_from_mdot
-
             ! during the newton iterations, m_grav remains fixed,
             ! even though the mass_corrections respond to the change in composition.
             ! This means there is a term
@@ -1385,9 +1377,10 @@
                total_energy_from_fixed_m_grav = 0
             end if
 
+            ! Surface adiabatic energy is already included through eps_mdot.
+            ! Adding its rate here would count that energy a second time.
             phase1_total_energy_from_mdot = &
-                 s% energy_change_from_do_adjust_mass_and_calculate_eps_mdot &
-               + s% mdot_adiabatic_surface  ! ??
+                 s% energy_change_from_do_adjust_mass_and_calculate_eps_mdot
 
             phase1_sources_and_sinks = &
                  phase1_total_energy_from_mdot &
