@@ -190,6 +190,7 @@ module turb
       Zub = upper_bound_Z
       Zlb = lower_bound_Z
       call get_TDC_solution(info, scale, Zlb, Zub, conv_vel, Y_face, tdc_num_iters, Y_face_guess, ierr)
+      if (ierr /= 0) return
 
       ! Cap conv_vel at max_conv_vel_div_csound*cs
       if (conv_vel%val > max_conv_vel) then
