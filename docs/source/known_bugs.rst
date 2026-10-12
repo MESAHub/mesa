@@ -94,6 +94,21 @@ instead.
 
 This is fixed in `gh-1003 <https://github.com/MESAHub/mesa/pull/1003>`_.
 
+.. _opal_scvh_high_z_blend_bug:
+
+EOS: OPAL/SCVH blends
+---------------------
+
+Another OPAL/SCVH blend issue affected the high-Z transition between
+``Z = 0.035`` and ``Z = 0.04``. In practice these regions were not being
+blended in Z: OPAL/SCVH remained fully active below ``Z = 0.04`` wherever it
+could be used, then switched discontinuously to the HELM/ideal layer at
+``Z = 0.04``. This happened because the Z ramp multiplied the existing fallback
+fraction, which was zero in pure OPAL/SCVH regions. The fix fades OPAL/SCVH
+into the HELM/ideal layer across this Z interval.
+
+This is fixed after ``r26.4.1``.
+
 .. _report_max_infall_inside_fe_core_bug:
 
 Controls: ``report_max_infall_inside_fe_core`` is ignored
