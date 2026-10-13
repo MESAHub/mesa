@@ -61,6 +61,9 @@ spurious contributions to synthetic magnitudes and photometric zero-points.
 Bolometric magnitudes now include the bolometric flux zero point, correcting
 their absolute scale independently of the Vega, AB, or ST bandpass system.
 
+The ``colors`` module now read Teff, photosphere logg and photosphere radius :
+``call data_for_colors_history_columns(s% Teff, s% photosphere_logg, s% photosphere_r * Rsun, ...``
+
 Removed duplicate treatment of ``n14(a,g)f18(e+nu)o18`` in networks that
 include both the explicit hot CNO reactions and the corresponding approximate
 reaction. See :ref:`the known bugs entry <duplicate_n14ag_rate_bug>` and
