@@ -173,12 +173,12 @@ contains
       real(dp), dimension(:), allocatable, intent(out) :: filter_wavelengths, filter_trans
 
       character(len=512) :: line
-      character(len=16) :: dtype
+      character(len=16) :: detector_type
       integer :: unit, n_rows, status, i, pos
       logical :: seen_column_header
       real(dp) :: temp_wavelength, temp_trans, peak_before, peak_after
 
-      dtype = 'photon'
+      detector_type = 'photon'
 
       open (newunit=unit, file=trim(directory), status='OLD', action='READ', iostat=status)
       if (status /= 0) then
@@ -196,8 +196,8 @@ contains
          if (line(1:1) == "#") then
             pos = index(line, 'DetectorType:')
             if (pos > 0 .and. index(line, 'DetectorTypeSource') == 0) then
-               dtype = adjustl(line(pos + len('DetectorType:'):))
-               call to_lower(dtype)
+               detector_type = adjustl(line(pos + len('DetectorType:'):))
+               call to_lower(detector_type)
             end if
          else if (.not. seen_column_header) then
             seen_column_header = .true.   ! "Wavelength,Transmission"
@@ -206,9 +206,9 @@ contains
          end if
       end do
 
-      if (trim(dtype) /= 'photon' .and. trim(dtype) /= 'energy') then
-         print *, "Warning: unknown DetectorType '", trim(dtype), "' in ", trim(directory), "; assuming photon"
-         dtype = 'photon'
+      if (trim(detector_type) /= 'photon' .and. trim(detector_type) /= 'energy') then
+         print *, "Warning: unknown DetectorType '", trim(detector_type), "' in ", trim(directory), "; assuming photon"
+         detector_type = 'photon'
       end if
 
       allocate (filter_wavelengths(n_rows))
@@ -236,7 +236,7 @@ contains
 
       close (unit)
 
-      if (trim(dtype) == 'energy' .and. n_rows > 0) then
+      if (trim(detector_type) == 'energy' .and. n_rows > 0) then
          peak_before = maxval(filter_trans)
          where (filter_wavelengths > 0.0_dp) filter_trans = filter_trans/filter_wavelengths
          peak_after = maxval(filter_trans)
