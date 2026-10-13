@@ -78,6 +78,10 @@ The parameter ``report_max_infall_inside_fe_core`` was ignored in versions r25.1
 
 ``fe_core_infall_limit`` now obeys ``when_to_stop_rtol`` and ``when_to_stop_atol`` again (broken since r11532).
 
+Fixed the OPAL/SCVH blend in metallicity, which could cause discontinuities
+in the EOS at ``Z = 0.04`` with the default blend limits. See
+:ref:`the known bugs entry <opal_scvh_high_z_blend_bug>`.
+
 .. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ``changelog_template.rst``).
 
 Other Changes
