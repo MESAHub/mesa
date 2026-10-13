@@ -68,7 +68,7 @@ then
             # if no file exists, that means the file was probably deleted and that's OK
             # if the file exists, but is short, then it is probably the bare LFS pointer
             #   and that indicates a problem retrieving the file
-            if [ -f "${LFS_FILE}" ] && [ $(du -k "${LFS_FILE}" | cut -f1) -le 4 ];
+            if [ -f "${LFS_FILE}" ] && [ $(wc -c < "${LFS_FILE}") -le 4096 ];
             then
                 echo
                 echo "${LFS_FILE} is smaller than expected for a file tracked by git LFS"
