@@ -14,11 +14,16 @@ Do not compile or run MESA. This note is updated during the work.
 - EOS upstream base: `f760b022f`.
 - Starting checkout: `EbF/eos_partials`, with no tracked modifications.
   Existing untracked notes, plots, model files, and outputs are user-owned.
-- Status: backup created; diffusion source reconstructed in
-  `/private/tmp/mesa-implicit-diffusion-stack-20261013`; reviewing the shared
-  MLT interfaces before updating the original branch.
+- Source commit: `3e4838bcc`, directly on the EOS parent.
+- Validation configuration commit: `40bb0a202`, directly after the source
+  commit. A documentation-only commit records the completed reconstruction.
+- Status: complete. `EbF/implicit_diffusion` now contains the reconstructed
+  layer on `EbF/eos_partials`; this checkout is on the diffusion branch.
+- The EOS branch and remote refs have not been changed. The existing
+  `origin/EbF/implicit_diffusion` history differs from the rewritten local
+  history. No push was performed.
 
-## Intended branch structure
+## Resulting branch structure
 
 ```text
 main
@@ -174,7 +179,14 @@ implementation files are changed by the diffusion layer.
 - MLT/thermohaline callers were checked against the combined AD/face interface.
 - EOS files, EOS documentation, and the retained EOS integration files are
   unchanged from `EbF/eos_partials`.
-- Pending final staged whitespace, ancestry, and backup checks.
+- Source and configuration staged whitespace checks passed. The full
+  `EbF/eos_partials..EbF/implicit_diffusion` diff passes `git diff --check`.
+- The EOS tip is an ancestor of the new diffusion tip; the source commit's
+  direct parent is the EOS tip. The backup still points to the original
+  diffusion tip.
+- The reconstructed layer has no EOS implementation/doc changes or generated
+  outputs. Its source and authored validation configurations are separate
+  commits. The final documentation commit changes only this note.
 - No compilation or MESA model execution has been performed. Numerical
   validation remains for the user, including control-off, thermohaline, Ledoux,
   `.mod` loading, photo restart, retries, and remeshing cases.
@@ -214,3 +226,33 @@ value during load. It predates this split and has not been changed here.
   inputs. Independent source review found no new integration errors in the
   solver, mixing coefficient, public API, or control paths.
 - Cleaned imported configuration whitespace reported by `git diff --check`.
+- Committed the diffusion-only source and initial tracking note as `3e4838bcc`,
+  with `2d70e611e` as its direct parent.
+- Committed the authored validation configurations as `40bb0a202` after the
+  source commit. Their settings are preserved, including flags that were off
+  in the original configurations.
+- Updated `EbF/implicit_diffusion` with a checked old-tip comparison, then
+  switched this checkout to it. Protected untracked and ignored files during
+  the switch; the only existing newly tracked path was this note, whose current
+  content was preserved and restored.
+- Confirmed the backup tip, unchanged EOS tip, EOS ancestry, unchanged EOS
+  files, and full-diff whitespace check. No MESA compilation or models were run.
+- Removed the clean temporary reconstruction checkout after its commits were
+  attached to the diffusion branch.
+
+## Reviewing and continuing the stack
+
+Review only the diffusion layer with
+
+```sh
+git diff EbF/eos_partials..EbF/implicit_diffusion
+git log --oneline EbF/eos_partials..EbF/implicit_diffusion
+git merge-base --is-ancestor EbF/eos_partials EbF/implicit_diffusion
+git diff --exit-code EbF/eos_partials EbF/implicit_diffusion -- eos docs/source/eos
+```
+
+The first diffusion review should use `EbF/eos_partials` as its base. Further EOS
+changes should be integrated beneath the diffusion layer while preserving its
+diffusion-only diff. Once the EOS layer reaches main, the diffusion review can
+use main as its base. The original combined implementation remains recoverable
+from `backup/EbF-implicit-diffusion-before-eos-stack-20261013`.
