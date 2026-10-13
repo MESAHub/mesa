@@ -197,6 +197,62 @@ The original diffusion branch calls ordinary `do_brunt_B` after `set_vars` in
 `finish_load_model`. This can temporarily replace the displayed implicit Brunt
 value during load. It predates this split and has not been changed here.
 
+## Independent review on 2026-10-13
+
+Reviewed stack `0c871ca687155b431da5f6be03ddd589b839f141` against the backup
+`2b4c496d223399f52c72ddf5a5bfc38c78ed2e3f` and EOS parent
+`2d70e611ecd1634710bbbf9fd7dfb33f60ec4e94`. No source files were edited, and no
+MESA compilation or models were run. This review updates only this note.
+
+No lost diffusion changes or stacking regressions were found in the source
+comparison. All 134 paths changed by the original branch are accounted for:
+
+| Classification | Paths | Review result |
+| --- | ---: | --- |
+| Source/configuration files identical to the backup | 20 | Includes the diffusion modules, residual/Jacobian, limiting, solver refresh, remesh copies, thermohaline AD code, and six test configurations. |
+| Work configurations with whitespace cleanup | 4 | Settings match the backup after ignoring trailing whitespace and final blank lines. |
+| Shared source/default files integrated with the EOS parent | 13 | Original diffusion changes retained with newer face interfaces, namelist readers, profile exposure, rotation restart handling, and EOS storage. |
+| Star-side files owned by the EOS parent | 6 | Retained unchanged from the EOS parent; older full-row storage and EOS-only plumbing were not reintroduced. |
+| EOS implementation and documentation paths | 25 | Retained unchanged from the EOS parent. |
+| EOS research/archive notes | 64 | Intentionally excluded from the diffusion layer and preserved in the backup. |
+| EOS research `.gitignore` addition | 1 | Intentionally excluded; no diffusion behavior. |
+| Generated `atm/test/test_output` drift | 1 | Intentionally excluded; no diffusion behavior. |
+
+The complete `eos/` tree has the same Git object on the EOS parent and the
+stack: `c4b773c3de06896c34cec0f706baa75ba57df588`. This includes file contents
+and modes, and confirms that the August 14 optimizations are retained exactly.
+`docs/source/eos` and the parent-owned star EOS integration files also match.
+
+The shared MLT changes retain both the EOS parent's eight reconstructed face
+inputs and the backup's AD composition-gradient input. The unique
+`do1_mlt_eval` caller matches its declaration. All `Get_results` callers retain
+the correct AD input; the public real-valued interface still converts locally.
+
+All nine job controls retain complete plumbing and guards. All nine diffusion
+work fields retain declaration, allocation, resizing/deallocation, and load
+initialization. Load/retry passes rebuild derived state, and remesh copies are
+identical to the backup. Implicit Brunt evaluates selected EOS rows into its
+own full-sized scratch, so it does not require full-sized persistent hydro EOS
+storage. The EOS ancestry and `git diff --check` checks passed.
+
+### Inherited EOS diagnostic issue
+
+`star/private/star_solver.f90:1338`, `get_grad_ad_partials`, reads
+`s% d_eos_dxa(i_grad_ad,...)` when testing a composition partial. The EOS
+definitions in `eos/public/eos_def.f90:108` and `:168` give `i_grad_ad=7` and
+`num_eos_d_dxa_results=2`; `star/private/alloc.f90` allocates the persistent
+array with those two rows. Therefore a `solver_test_partials` diagnostic for
+`grad_ad` with a composition variable accesses beyond the stored rows.
+
+This code and allocation are unchanged from `EbF/eos_partials`; the stacking
+work did not introduce it. The ordinary diffusion Brunt path uses separate
+scratch and is unaffected by this particular diagnostic access. A future
+EOS-layer fix should request the diagnostic row into scratch rather than undo
+the storage optimization. No fix is included in this review.
+
+Source preservation is established by this review. Numerical convergence and
+runtime behavior remain to be checked by the user.
+
 ## Work log
 
 - Inspected Git history and confirmed that the two branches are siblings.
@@ -256,3 +312,50 @@ changes should be integrated beneath the diffusion layer while preserving its
 diffusion-only diff. Once the EOS layer reaches main, the diffusion review can
 use main as its base. The original combined implementation remains recoverable
 from `backup/EbF-implicit-diffusion-before-eos-stack-20261013`.
+
+## EOS diagnostic correction in progress
+
+Requested on 2026-10-13: fix the `grad_ad` composition-partial diagnostic on
+`EbF/eos_partials`, then update the diffusion stack. Preserve the existing
+review record and the EOS optimizations. Do not compile or run MESA.
+
+The diagnostic should request only `i_grad_ad` from `eosDT_get_dxa_rows` into
+local full-sized scratch. It must not read that row from the two-row persistent
+hydro storage. At fixed density and temperature, the existing species/sink
+perturbation is
+
+\[
+X_p\rightarrow X_p+\epsilon,\qquad X_q\rightarrow X_q-\epsilon,
+\qquad
+\frac{d\nabla_{\rm ad}}{d\epsilon}
+=\frac{\partial\nabla_{\rm ad}}{\partial X_p}
+-\frac{\partial\nabla_{\rm ad}}{\partial X_q}.
+\]
+
+Implement this in `star/private/star_solver.f90`, `get_grad_ad_partials`, with
+explicit `ierr` propagation to `test3_partials`. Keep the existing density and
+temperature derivative branches and persistent EOS allocation. The diagnostic
+uses the EOS parent's established blend-derivative convention documented in
+`docs/source/eos/overview.rst`.
+
+Status: fix implemented in an isolated `EbF/eos_partials` checkout. Independent
+source/API review and `git diff --check` passed. Preserving this review note
+before committing the EOS fix and updating the stack.
+
+- Added a single-row EOS request into local
+  `d_dxa(num_eos_basic_results,s% species)` scratch in `get_grad_ad_partials`.
+- Passed current `xa`, `rho`, `T`, `lnd/ln10`, and `lnT/ln10`; the EOS API
+  recomputes the composition moments from the current abundance vector.
+- Retained the species-minus-sink derivative, zero neighbor contributions, and
+  unchanged density/temperature diagnostic branches.
+- Added explicit `ierr` propagation and a return before reading failed EOS
+  output or starting numerical comparisons.
+- The diagnostic requests the row regardless of
+  `include_eos_composition_partials`. That control still governs production
+  hydro partials. No EOS components, persistent allocation, or production
+  solver equations are modified.
+- The EOS API retains its existing fixed blend-weight convention and existing
+  component derivative coverage; this fix does not change those conventions.
+- Backed up the old EOS tip as
+  `backup/EbF-eos-partials-before-grad-ad-fix-20261013` and the current stack as
+  `backup/EbF-implicit-diffusion-before-grad-ad-fix-20261013`.
