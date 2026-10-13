@@ -22,9 +22,10 @@ Do not compile or run MESA. This note is updated during the work.
   record the reconstruction, review, and diagnostic correction.
 - Status: complete. `EbF/implicit_diffusion` now contains the reconstructed
   layer on `EbF/eos_partials`; this checkout is on the diffusion branch.
-- The EOS branch includes diagnostic fix `df059ac22`. Remote refs have not
-  been changed. The existing `origin/EbF/implicit_diffusion` history differs
-  from the rewritten local history. No push was performed.
+- The EOS branch includes diagnostic fix `df059ac22`. Both branches were
+  published to `origin` on 2026-10-13. The rewritten diffusion history was
+  updated using an explicit upstream lease; the original implementation
+  remains preserved in the backup branches.
 
 ## Resulting branch structure
 
@@ -396,3 +397,24 @@ source and validation commits are `3003654d9` and `4cd070fa2`.
   with `include_eos_composition_partials` both false and true. Existing EOS
   derivative conventions still apply to that numerical comparison.
 - Removed the clean temporary EOS checkout after the fix and restack.
+
+## Upstream publication on 2026-10-13
+
+The user authorized pushing both branches. Read the live upstream refs before
+publication and confirmed that they matched the expected starting points:
+
+| Branch | Previous upstream tip | Published code tip |
+| --- | --- | --- |
+| `EbF/eos_partials` | `2d70e611ecd1634710bbbf9fd7dfb33f60ec4e94` | `df059ac22ce97910a7483837c18ecddf9f6021ff` |
+| `EbF/implicit_diffusion` | `3e5dbe6c3f2ef1eda05e83b1c1fb003321ecd404` | `ede83860371ed2c36a19c9c72406ad9254119170` |
+
+Published both refs to `https://github.com/MESAHub/mesa.git` in one successful
+atomic push, with an explicit `--force-with-lease` expectation for each ref.
+The EOS update was a fast-forward. The diffusion update replaced the old
+combined history with the reviewed stack. The previous upstream diffusion tip
+is an ancestor of the original diffusion backup.
+
+The branches retain the fixed diagnostic and identical EOS implementation.
+The diffusion source and configuration patches remain unchanged. This
+publication record is a documentation-only follow-up to the code tips above.
+No MESA compilation or model execution was performed.
