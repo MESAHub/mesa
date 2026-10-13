@@ -1327,15 +1327,28 @@
 
          subroutine get_grad_ad_partials(s, &
                k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-               dvardx0_m1, dvardx0_00, dvardx0_p1)
-            use eos_def, only: i_grad_ad
+               dvardx0_m1, dvardx0_00, dvardx0_p1, ierr)
+            use const_def, only: ln10
+            use eos_def, only: i_grad_ad, num_eos_basic_results
+            use eos_lib, only: eosDT_get_dxa_rows
             type (star_info), pointer :: s
             integer, intent(in) :: k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index
             real(dp), intent(out) :: dvardx0_m1, dvardx0_00, dvardx0_p1
+            integer, intent(out) :: ierr
+            real(dp) :: res(num_eos_basic_results), d_dlnd(num_eos_basic_results), &
+               d_dlnT(num_eos_basic_results), d_dxa(num_eos_basic_results,s% species)
+            integer, parameter :: dxa_rows(1) = [i_grad_ad]
+            ierr = 0
             dvardx0_m1 = 0d0; dvardx0_00 = 0d0; dvardx0_p1 = 0d0
             if (i_var_xa_index > 0) then
+               ! This diagnostic row is not stored in the hydro EOS partials.
+               call eosDT_get_dxa_rows( &
+                  s% eos_handle, s% species, s% chem_id, s% net_iso, s% xa(:,k), &
+                  s% rho(k), s% lnd(k)/ln10, s% T(k), s% lnT(k)/ln10, dxa_rows, &
+                  res, d_dlnd, d_dlnT, d_dxa, ierr)
+               if (ierr /= 0) return
                dvardx0_00 = &
-                  (s% d_eos_dxa(i_grad_ad,i_var_xa_index,k) - s% d_eos_dxa(i_grad_ad,i_var_sink_xa_index,k))
+                  d_dxa(i_grad_ad,i_var_xa_index) - d_dxa(i_grad_ad,i_var_sink_xa_index)
             else if (i_var == s% i_lnd) then
                dvardx0_00 = s% d_eos_dlnd(i_grad_ad,k)
             else if (i_var == s% i_lnT) then
@@ -1499,7 +1512,8 @@
             else if (i_equ == -8) then  ! 'grad_ad'
                call get_grad_ad_partials(s, &
                   k, i_var, i_var_sink, i_var_xa_index, i_var_sink_xa_index, &
-                  dvardx0_m1, dvardx0_00, dvardx0_p1)
+                  dvardx0_m1, dvardx0_00, dvardx0_p1, ierr)
+               if (ierr /= 0) return
             end if
             if (k > 1) then
                call test1_partial(s, &
