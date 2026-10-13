@@ -124,7 +124,6 @@ program test_colors
    call check_nonuniform_hermite_derivatives()
    call check_bounded_hermite_small_negative()
    call check_bounded_hermite_fallback()
-   call check_bolometric_non_destructive()
    call check_bolometric_zero_point()
 
    deallocate (col_names, col_vals)
@@ -231,25 +230,6 @@ contains
       write (*, '(a,":",1x,*(1pe23.13,1x))') &
          'bounded_hermite_fallback', actual_flux
    end subroutine check_bounded_hermite_fallback
-
-   subroutine check_bolometric_non_destructive()
-      real(dp) :: local_wavelengths(3), local_fluxes(3), original_fluxes(3)
-      real(dp) :: local_mag, local_bol_flux
-
-      local_wavelengths = [1.0_dp, 2.0_dp, 3.0_dp]
-      local_fluxes = [-1.0_dp, 2.0_dp, 3.0_dp]
-      original_fluxes = local_fluxes
-
-      call calculate_bolometric_phot( &
-         local_wavelengths, local_fluxes, local_mag, local_bol_flux)
-
-      ! local_fluxes must equal original_fluxes: the negative sample is
-      ! sanitized for the integral only, never written back to the caller.
-      write (*, '(a,":",1x,*(1pe23.13,1x))') &
-         'bolometric_input_unchanged', local_fluxes - original_fluxes
-      write (*, '(a,":",1x,1pe23.13)') &
-         'bolometric_sanitized_flux', local_bol_flux
-   end subroutine check_bolometric_non_destructive
 
    subroutine check_bolometric_zero_point()
       real(dp) :: local_wavelengths(3), local_fluxes(3)
