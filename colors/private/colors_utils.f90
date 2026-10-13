@@ -162,13 +162,23 @@ contains
       close (unit)
    end subroutine load_vega_sed
 
+   ! reads a filter curve. header lines starting with "#" are skipped for the data
+   ! but scanned for "# DetectorType: photon|energy" (default photon).
+   ! all integrals in the colors module assume a photon-counting response
+   ! (flux weighted by lambda), so energy-counting curves are converted to
+   ! photon-counting here: R_photon ~ R_energy/lambda (Bessell & Murphy 2012, eq. A9),
+   ! renormalised to keep the peak transmission unchanged.
    subroutine load_filter(directory, filter_wavelengths, filter_trans)
       character(len=*), intent(in) :: directory
       real(dp), dimension(:), allocatable, intent(out) :: filter_wavelengths, filter_trans
 
       character(len=512) :: line
-      integer :: unit, n_rows, status, i
-      real(dp) :: temp_wavelength, temp_trans
+      character(len=16) :: dtype
+      integer :: unit, n_rows, status, i, pos
+      logical :: seen_column_header
+      real(dp) :: temp_wavelength, temp_trans, peak_before, peak_after
+
+      dtype = 'photon'
 
       open (newunit=unit, file=trim(directory), status='OLD', action='READ', iostat=status)
       if (status /= 0) then
@@ -176,45 +186,71 @@ contains
          call mesa_error(__FILE__, __LINE__)
       end if
 
-      read (unit, '(A)', iostat=status) line
-      if (status /= 0) then
-         print *, "Error: Could not read the file", trim(directory)
-         call mesa_error(__FILE__, __LINE__)
-      end if
-
+      ! pass 1: parse metadata and count data rows
       n_rows = 0
+      seen_column_header = .false.
       do
          read (unit, '(A)', iostat=status) line
          if (status /= 0) exit
-         n_rows = n_rows + 1
+         if (len_trim(line) == 0) cycle
+         if (line(1:1) == "#") then
+            pos = index(line, 'DetectorType:')
+            if (pos > 0 .and. index(line, 'DetectorTypeSource') == 0) then
+               dtype = adjustl(line(pos + len('DetectorType:'):))
+               call to_lower(dtype)
+            end if
+         else if (.not. seen_column_header) then
+            seen_column_header = .true.   ! "Wavelength,Transmission"
+         else
+            n_rows = n_rows + 1
+         end if
       end do
+
+      if (trim(dtype) /= 'photon' .and. trim(dtype) /= 'energy') then
+         print *, "Warning: unknown DetectorType '", trim(dtype), "' in ", trim(directory), "; assuming photon"
+         dtype = 'photon'
+      end if
 
       allocate (filter_wavelengths(n_rows))
       allocate (filter_trans(n_rows))
 
-      ! rewind to the first non-comment line
+      ! pass 2: read data
       rewind (unit)
-      do
-         read (unit, '(A)', iostat=status) line
-         if (status /= 0) then
-            print *, "Error: Could not rewind file", trim(directory)
-            call mesa_error(__FILE__, __LINE__)
-         end if
-         if (line(1:1) /= "#") exit
-      end do
-
+      seen_column_header = .false.
       i = 0
       do
-         read (unit, *, iostat=status) temp_wavelength, temp_trans
+         read (unit, '(A)', iostat=status) line
+         if (status /= 0) exit
+         if (len_trim(line) == 0) cycle
+         if (line(1:1) == "#") cycle
+         if (.not. seen_column_header) then
+            seen_column_header = .true.
+            cycle
+         end if
+         read (line, *, iostat=status) temp_wavelength, temp_trans
          if (status /= 0) exit
          i = i + 1
-
          filter_wavelengths(i) = temp_wavelength
          filter_trans(i) = temp_trans
       end do
 
       close (unit)
+
+      if (trim(dtype) == 'energy' .and. n_rows > 0) then
+         peak_before = maxval(filter_trans)
+         where (filter_wavelengths > 0.0_dp) filter_trans = filter_trans/filter_wavelengths
+         peak_after = maxval(filter_trans)
+         if (peak_after > 0.0_dp) filter_trans = filter_trans*(peak_before/peak_after)
+      end if
    end subroutine load_filter
+
+   subroutine to_lower(str)
+      character(len=*), intent(inout) :: str
+      integer :: k
+      do k = 1, len_trim(str)
+         if (str(k:k) >= 'A' .and. str(k:k) <= 'Z') str(k:k) = achar(iachar(str(k:k)) + 32)
+      end do
+   end subroutine to_lower
 
    ! parses a csv lookup table mapping atmosphere grid parameters to SED filenames
    subroutine load_lookup_table(lookup_file, lookup_table, out_file_names, &
