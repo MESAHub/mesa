@@ -653,6 +653,35 @@
        return
     end if
 
+    if (s% job% implicit_diffusion_flag) then
+       if (s% job% implicit_diffusion_include_dsig_dxa) &
+          s% include_eos_composition_partials = .true.
+       if (s% use_other_brunt) then
+          write(*,'(A)')
+          write(*,*) "Invalid controls: implicit_diffusion_flag is not compatible " // &
+             "with use_other_brunt"
+          write(*,'(A)')
+          ierr = -1
+          return
+       end if
+       if (s% use_other_brunt_smoothing) then
+          write(*,'(A)')
+          write(*,*) "Invalid controls: implicit_diffusion_flag is not compatible " // &
+             "with use_other_brunt_smoothing"
+          write(*,'(A)')
+          ierr = -1
+          return
+       end if
+       if (s% use_other_mlt_results) then
+          write(*,'(A)')
+          write(*,*) "Invalid controls: implicit_diffusion_flag is not compatible " // &
+             "with use_other_mlt_results"
+          write(*,'(A)')
+          ierr = -1
+          return
+       end if
+    end if
+
  end subroutine check_controls
 
 

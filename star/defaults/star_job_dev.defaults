@@ -95,6 +95,129 @@
    use_j_rot_flag_with_rotation = .false.
 
 
+      ! implicit_diffusion_flag
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! if ``implicit_diffusion_flag`` is true, split ``D_mix`` into the
+      ! autodiff ``Dmix_implicit`` bucket and the real ``Dmix_explicit``
+      ! remainder. ``D_mix`` remains the final value used by existing callers.
+      ! It is not compatible with ``use_other_brunt``,
+      ! ``use_other_brunt_smoothing``, or ``use_other_mlt_results``.
+
+      ! ::
+
+   implicit_diffusion_flag = .false.
+
+
+      ! implicit_diffusion_include_dsig_structure
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! if ``implicit_diffusion_include_dsig_structure`` is true, include the
+      ! structure-Jacobian terms from the dependence of the implicit diffusion
+      ! coefficient on the current MLT/TDC state.  This is the main nonlinear
+      ! implicit-Dmix coupling.  It can be turned off to diagnose convergence
+      ! problems while leaving the fixed-coefficient composition solve implicit.
+      ! It is off by default while the nonlinear coefficient coupling is being
+      ! validated.
+
+      ! ::
+
+   implicit_diffusion_include_dsig_structure = .false.
+
+
+      ! implicit_diffusion_include_dsig_dxa
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! if ``implicit_diffusion_include_dsig_dxa`` is true, include the
+      ! species-Jacobian terms from the composition dependence of the implicit
+      ! diffusion coefficient, i.e. ``d_sig_dxa_m1`` and ``d_sig_dxa_00``.
+      ! This term is only used when ``use_Ledoux_criterion`` is true.
+      ! When enabled with ``implicit_diffusion_flag``, this also forces
+      ! ``include_eos_composition_partials`` on for the hydro Jacobian.
+      ! This is a high-gain convective-boundary coupling and is off by default
+      ! while the implicit diffusion path is being validated.
+
+      ! ::
+
+   implicit_diffusion_include_dsig_dxa = .false.
+
+
+      ! implicit_diffusion_use_brunt_finite_difference_value
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! if ``implicit_diffusion_use_brunt_finite_difference_value`` is true,
+      ! the implicit Brunt path uses the same finite two-composition EOS
+      ! pressure difference as the ordinary Brunt path for the stored Brunt
+      ! value.  The implicit derivatives still use the linearized face/path
+      ! EOS pressure-composition partials.  If false, the stored value also
+      ! uses the linearized EOS partial contraction.  It is false by default
+      ! while the EOS-partial Brunt value is being tested.  In the MESA II
+      ! notation, false uses an Eq. (6)-style standard Ledoux partial sum,
+      ! while true uses the Eq. (8)-style New Ledoux finite difference.
+
+      ! ::
+
+   implicit_diffusion_use_brunt_finite_difference_value = .false.
+
+
+      ! implicit_diffusion_use_brunt_gauss_path
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! if ``implicit_diffusion_use_brunt_gauss_path`` is true, evaluate the
+      ! implicit Brunt pressure-composition derivative coefficient by a
+      ! two-point Gauss path average in composition. This costs two extra
+      ! row-scoped face EOS calls per face and is off by default.
+
+      ! ::
+
+   implicit_diffusion_use_brunt_gauss_path = .false.
+
+
+      ! implicit_diffusion_debug_thermohaline
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! if ``implicit_diffusion_debug_thermohaline`` is true, write diagnostic
+      ! output for the thermohaline path through MLT/TDC, the implicit-Dmix
+      ! split, sigma construction, profile-column access, and the accepted-step
+      ! summary. This is off by default.
+
+      ! ::
+
+   implicit_diffusion_debug_thermohaline = .false.
+
+
+      ! implicit_diffusion_debug_thermohaline_k
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! cell selector for ``implicit_diffusion_debug_thermohaline``.  If zero,
+      ! only cells with thermohaline labels, negative Ledoux composition term,
+      ! nonzero implicit Dmix, nonzero MLT D, or nonzero D_mix are reported.  If
+      ! positive, only that cell is reported.  If negative, all cells are
+      ! reported.
+
+      ! ::
+
+   implicit_diffusion_debug_thermohaline_k = 0
+
+
+      ! implicit_diffusion_debug_thermohaline_k_min
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! implicit_diffusion_debug_thermohaline_k_max
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! optional inclusive cell range for
+      ! ``implicit_diffusion_debug_thermohaline``. These are used only when
+      ! ``implicit_diffusion_debug_thermohaline_k`` is zero. If either bound is
+      ! positive, diagnostics are written for cells in the requested range.
+      ! A non-positive lower bound defaults to 1; a non-positive upper bound
+      ! defaults to nz.
+
+      ! ::
+
+   implicit_diffusion_debug_thermohaline_k_min = 0
+   implicit_diffusion_debug_thermohaline_k_max = 0
+
+
       ! load_saved_photo
       ! ~~~~~~~~~~~~~~~~
       ! saved_photo_name

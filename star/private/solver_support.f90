@@ -1100,6 +1100,16 @@
             return
          end if
 
+         if (s% job% implicit_diffusion_flag .and. s% do_mix) then
+            ! set_hydro_vars rebuilt D_mix from current Dmix_implicit plus
+            ! fixed Dmix_explicit; rebuild sigmas before residual assembly.
+            call get_convection_sigmas(s, dt, ierr)
+            if (ierr /= 0) then
+               if (s% report_ierr) write(*,2) 'get_convection_sigmas returned ierr', ierr
+               return
+            end if
+         end if
+
          if (s% rotation_flag) then
             ! Moments of inertia are kept fixed as those at the start of the hydro solver
             ! neither omege nor irot enter the equations directly

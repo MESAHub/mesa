@@ -26,6 +26,7 @@
       use num_lib
       use utils_lib
       use auto_diff_support
+      use implicit_Dmix, only: implicit_Dmix_debug_mlt
 
       implicit none
 
@@ -93,7 +94,8 @@
          type(auto_diff_real_star_order1) :: &
             T_face_ad, P_face_ad, energy_face_ad, opacity_face_ad, rho_face_ad, chiRho_face_ad, chiT_face_ad, Cp_face_ad, &
             grada_face_ad, scale_height_ad, gradr_ad, &
-            gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad
+            gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, &
+            gradL_composition_term_ad
          include 'formats'
 
          ierr = 0
@@ -114,10 +116,17 @@
 
          if (present(gradL_composition_term_in)) then
             gradL_composition_term = gradL_composition_term_in
+            gradL_composition_term_ad = gradL_composition_term
          else if (s% use_Ledoux_criterion) then
             gradL_composition_term = s% gradL_composition_term(k)
+            if (s% job% implicit_diffusion_flag) then
+               gradL_composition_term_ad = s% gradL_composition_term_ad(k)
+            else
+               gradL_composition_term_ad = gradL_composition_term
+            end if
          else
             gradL_composition_term = 0d0
+            gradL_composition_term_ad = 0d0
          end if
 
          ! Assemble the full set of face thermodynamic quantities for the
@@ -229,7 +238,7 @@
             return
          end if
 
-         call do1_mlt_eval(s, k, s% MLT_option, gradL_composition_term, &
+         call do1_mlt_eval(s, k, s% MLT_option, gradL_composition_term_ad, &
             T_face_ad, P_face_ad, energy_face_ad, opacity_face_ad, rho_face_ad, chiRho_face_ad, chiT_face_ad, Cp_face_ad, &
             gradr_ad, grada_face_ad, scale_height_ad, mixing_length_alpha, &
             mixing_type, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, ierr)
@@ -241,6 +250,10 @@
          end if
 
          call store_results
+         call implicit_Dmix_debug_mlt(s, 'after do1_mlt_eval store_results', k, &
+            s% mlt_mixing_type(k), s% mlt_D(k), gradL_composition_term_ad%val, &
+            gradr_ad%val, grada_face_ad%val, s% gradT(k), s% Y_face(k), &
+            s% mlt_vc(k))
 
          if (s% mlt_gradT_fraction >= 0d0 .and. s% mlt_gradT_fraction <= 1d0) then
             f = s% mlt_gradT_fraction
@@ -284,7 +297,7 @@
             s% gradr_ad(k) = gradr_ad
             s% gradr(k) = s% gradr_ad(k)%val
 
-            s% gradL_ad(k) = s% grada_face_ad(k) + gradL_composition_term
+            s% gradL_ad(k) = s% grada_face_ad(k) + gradL_composition_term_ad
             s% gradL(k) = s% gradL_ad(k)%val
 
             s% scale_height_ad(k) = scale_height_ad

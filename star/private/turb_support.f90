@@ -26,6 +26,7 @@ use utils_lib
 use auto_diff_support
 use star_utils
 use turb
+use implicit_Dmix, only: implicit_Dmix_debug_thermohaline
 
 implicit none
 
@@ -70,7 +71,8 @@ contains
       integer, intent(out) :: mixing_type, ierr
       type(auto_diff_real_star_order1) :: &
          gradr_ad, grada_ad, scale_height_ad, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, &
-         Gamma_ad, r_ad, L_ad, T_ad, P_ad, opacity_ad, rho_ad, dV_ad, chiRho_ad, chiT_ad, Cp_ad, energy_ad
+         Gamma_ad, r_ad, L_ad, T_ad, P_ad, opacity_ad, rho_ad, dV_ad, &
+         chiRho_ad, chiT_ad, Cp_ad, energy_ad, gradL_composition_term_ad
       ierr = 0
       r_ad = r
       L_ad = L
@@ -84,6 +86,7 @@ contains
       Cp_ad = Cp
       gradr_ad = gradr
       grada_ad = grada
+      gradL_composition_term_ad = gradL_composition_term
       energy_ad = 0d0 ! correct to a value
       scale_height_ad = scale_height
       if (s% use_other_mlt_results) then
@@ -97,7 +100,7 @@ contains
          call Get_results(s, 0, MLT_option, &
             r_ad, L_ad, T_ad, P_ad, opacity_ad, rho_ad, dV_ad, chiRho_ad, &
             chiT_ad, Cp_ad, gradr_ad, grada_ad, scale_height_ad, &
-            iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
+            iso, XH1, cgrav, m, gradL_composition_term_ad, mixing_length_alpha, &
             s% alpha_semiconvection, s% thermohaline_coeff, &
             mixing_type, gradT_ad, Y_face_ad, mlt_vc_ad, D_ad, Gamma_ad, energy_ad, ierr)
       end if
@@ -123,7 +126,8 @@ contains
       type(auto_diff_real_star_order1), intent(in) :: &
          T_in, P_in, energy_in, opacity_in, rho_in, chiRho_in, chiT_in, Cp_in, &
          gradr_in, grada, scale_height
-      real(dp), intent(in) :: gradL_composition_term, mixing_length_alpha
+      type(auto_diff_real_star_order1), intent(in) :: gradL_composition_term
+      real(dp), intent(in) :: mixing_length_alpha
       integer, intent(out) :: mixing_type
       type(auto_diff_real_star_order1), intent(out) :: &
          gradT, Y_face, mlt_vc, D, Gamma
@@ -184,7 +188,7 @@ contains
       if (s% use_other_mlt_results) then
          call s% other_mlt_results(s% id, k, MLT_option, &
             r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, &
-            iso, XH1, cgrav, m, gradL_composition_term, mixing_length_alpha, &
+            iso, XH1, cgrav, m, gradL_composition_term% val, mixing_length_alpha, &
             s% alpha_semiconvection, s% thermohaline_coeff, &
             mixing_type, gradT, Y_face, mlt_vc, D, Gamma, energy, ierr)
       else
@@ -216,9 +220,9 @@ contains
       type(auto_diff_real_star_order1), intent(in) :: &
          r, L, T, P, opacity, rho, dV, chiRho, chiT, Cp, gradr, grada, scale_height, energy
       integer, intent(in) :: iso
+      type(auto_diff_real_star_order1), intent(in) :: gradL_composition_term
       real(dp), intent(in) :: &
-         XH1, cgrav, m, gradL_composition_term, &
-         mixing_length_alpha, alpha_semiconvection, thermohaline_coeff
+         XH1, cgrav, m, mixing_length_alpha, alpha_semiconvection, thermohaline_coeff
       integer, intent(out) :: mixing_type
       type(auto_diff_real_star_order1), intent(out) :: gradT, Y_face, conv_vel, D, Gamma
       integer, intent(out) :: ierr
@@ -418,9 +422,13 @@ contains
 
       ! If we're not convecting, try thermohaline and semiconvection.
       if (mixing_type == no_mixing) then
-         if (gradL_composition_term < 0) then
+         call implicit_Dmix_debug_thermohaline(s, 'before thermohaline/semiconvection gate', &
+            k, mixing_type, D%val, gradL_composition_term%val, gradr%val, &
+            grada%val, gradL%val, gradT%val, Y_face%val, conv_vel%val)
+         if (gradL_composition_term% val < 0) then
             if (report) write(*,3) 'call set_thermohaline', k, s% solver_iter
-            call set_thermohaline(s%thermohaline_option, Lambda, grada, gradr, T, opacity, rho, Cp, gradL_composition_term, &
+            call set_thermohaline(s%thermohaline_option, Lambda, grada, gradr, T, opacity, rho, Cp, &
+                              gradL_composition_term, &
                               iso, XH1, thermohaline_coeff, &
                               D, gradT, Y_face, conv_vel, mixing_type, ierr)
             if (ierr /= 0) then
@@ -431,13 +439,16 @@ contains
             if (report) write(*,3) 'call set_semiconvection', k, s% solver_iter
             call set_semiconvection(L, Lambda, m, T, Ptot, Pr, beta, opacity, rho, alpha_semiconvection, &
                                     s% semiconvection_option, cgrav, Cp, gradr, grada, gradL, &
-                                    gradL_composition_term, &
+                                    gradL_composition_term% val, &
                                     gradT, Y_face, conv_vel, D, mixing_type, ierr)
             if (ierr /= 0) then
                if (s% report_ierr) write(*,*) 'ierr from set_semiconvection'
                return
             end if
          end if
+         call implicit_Dmix_debug_thermohaline(s, 'after thermohaline/semiconvection gate', &
+            k, mixing_type, D%val, gradL_composition_term%val, gradr%val, &
+            grada%val, gradL%val, gradT%val, Y_face%val, conv_vel%val)
       end if
 
       ! If there's too-little mixing to bother, or we hit a bad value, fall back on no mixing.

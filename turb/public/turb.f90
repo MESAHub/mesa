@@ -55,20 +55,17 @@ module turb
       use thermohaline
       character(len=*), intent(in) :: thermohaline_option
       type(auto_diff_real_star_order1), intent(in) :: Lambda, grada, gradr, T, opacity, rho, Cp
-      real(dp), intent(in) :: gradL_composition_term, XH1, thermohaline_coeff
+      type(auto_diff_real_star_order1), intent(in) :: gradL_composition_term
+      real(dp), intent(in) :: XH1, thermohaline_coeff
       integer, intent(in) :: iso
 
       type(auto_diff_real_star_order1), intent(out) :: gradT, Y_face, conv_vel, D
       integer, intent(out) :: mixing_type, ierr
 
-      real(dp) :: D_thrm
-
-      call get_D_thermohaline(&
-         thermohaline_option, grada%val, gradr%val, T%val, opacity%val, rho%val, &
-         Cp%val, gradL_composition_term, &
-         iso, XH1, thermohaline_coeff, D_thrm, ierr)
-
-      D = D_thrm
+      call get_D_thermohaline_ad(&
+         thermohaline_option, grada, gradr, T, opacity, rho, &
+         Cp, gradL_composition_term, &
+         iso, XH1, thermohaline_coeff, D, ierr)
       gradT = gradr
       Y_face = gradT - grada
       conv_vel = 3d0*D/Lambda
