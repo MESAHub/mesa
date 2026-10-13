@@ -96,18 +96,22 @@ This is fixed in `gh-1003 <https://github.com/MESAHub/mesa/pull/1003>`_.
 
 .. _opal_scvh_high_z_blend_bug:
 
-EOS: OPAL/SCVH blends
----------------------
+EOS: OPAL/SCVH metallicity blend
+--------------------------------
 
-Another OPAL/SCVH blend issue affected the high-Z transition between
-``Z = 0.035`` and ``Z = 0.04``. In practice these regions were not being
-blended in Z: OPAL/SCVH remained fully active below ``Z = 0.04`` wherever it
-could be used, then switched discontinuously to the HELM/ideal layer at
-``Z = 0.04``. This happened because the Z ramp multiplied the existing fallback
-fraction, which was zero in pure OPAL/SCVH regions. The fix fades OPAL/SCVH
-into the HELM/ideal layer across this Z interval.
+The blend from OPAL/SCVH to HELM/ideal used incorrect weights between
+``Z_all_OPAL`` and ``Z_all_HELM`` (default values ``0.035`` and ``0.04``).
+In regions using pure OPAL/SCVH, its contribution remained unchanged
+throughout this interval, then dropped to zero at the upper limit.
 
-This is fixed after ``r26.4.1``.
+This could cause discontinuities during stellar evolution. In the model
+reported in `gh-921 <https://github.com/MESAHub/mesa/issues/921>`_, element
+diffusion lowered the surface metallicity through ``Z = 0.04``, causing an
+abrupt change in effective temperature.
+
+The fix corrects the blend weights and their temperature and density
+derivatives so that OPAL/SCVH blends continuously into HELM/ideal across this
+interval. This is fixed after ``r26.4.1``.
 
 .. _report_max_infall_inside_fe_core_bug:
 
