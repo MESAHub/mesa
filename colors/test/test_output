@@ -9,6 +9,4 @@ nonuniform_hermite_3d:     1.0225000000000E+02
 nonuniform_hermite_4d:     1.0225000000000E+02     1.0225000000000E+02     1.0225000000000E+02
 bounded_hermite_small_negative:     1.0000000000000E+02     0.0000000000000E+00     1.0000000000000E+02
 bounded_hermite_fallback:     1.0000000000000E+00     1.0000000000000E+00     1.0000000000000E+00
-bolometric_input_unchanged:     0.0000000000000E+00     0.0000000000000E+00     0.0000000000000E+00
-bolometric_sanitized_flux:     3.6666666666667E+00
 bolometric_solar_zero_point:     4.7400000000000E+00
