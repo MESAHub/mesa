@@ -9,19 +9,22 @@ Do not compile or run MESA. This note is updated during the work.
 - Original diffusion tip: `2b4c496d223399f52c72ddf5a5bfc38c78ed2e3f`.
 - Backup: `backup/EbF-implicit-diffusion-before-eos-stack-20261013`, at the
   original diffusion tip.
-- EOS parent: `2d70e611ecd1634710bbbf9fd7dfb33f60ec4e94`.
+- Original EOS parent: `2d70e611ecd1634710bbbf9fd7dfb33f60ec4e94`.
+- Current EOS parent: `df059ac22`, including the `grad_ad` diagnostic fix.
 - Original diffusion upstream base: `9c454e556f91f295d8419bfd1b75ff363aacbda0`.
 - EOS upstream base: `f760b022f`.
 - Starting checkout: `EbF/eos_partials`, with no tracked modifications.
   Existing untracked notes, plots, model files, and outputs are user-owned.
-- Source commit: `3e4838bcc`, directly on the EOS parent.
-- Validation configuration commit: `40bb0a202`, directly after the source
-  commit. A documentation-only commit records the completed reconstruction.
+- Original source commit: `3e4838bcc`; rebased source commit: `3003654d9`,
+  directly on the current EOS parent.
+- Original validation configuration commit: `40bb0a202`; rebased commit:
+  `4cd070fa2`, directly after the source commit. Documentation-only commits
+  record the reconstruction, review, and diagnostic correction.
 - Status: complete. `EbF/implicit_diffusion` now contains the reconstructed
   layer on `EbF/eos_partials`; this checkout is on the diffusion branch.
-- The EOS branch and remote refs have not been changed. The existing
-  `origin/EbF/implicit_diffusion` history differs from the rewritten local
-  history. No push was performed.
+- The EOS branch includes diagnostic fix `df059ac22`. Remote refs have not
+  been changed. The existing `origin/EbF/implicit_diffusion` history differs
+  from the rewritten local history. No push was performed.
 
 ## Resulting branch structure
 
@@ -235,20 +238,21 @@ identical to the backup. Implicit Brunt evaluates selected EOS rows into its
 own full-sized scratch, so it does not require full-sized persistent hydro EOS
 storage. The EOS ancestry and `git diff --check` checks passed.
 
-### Inherited EOS diagnostic issue
+### Inherited EOS diagnostic issue (resolved)
 
-`star/private/star_solver.f90:1338`, `get_grad_ad_partials`, reads
+At reviewed commit `0c871ca68`, `star/private/star_solver.f90:1338`,
+`get_grad_ad_partials`, read
 `s% d_eos_dxa(i_grad_ad,...)` when testing a composition partial. The EOS
 definitions in `eos/public/eos_def.f90:108` and `:168` give `i_grad_ad=7` and
 `num_eos_d_dxa_results=2`; `star/private/alloc.f90` allocates the persistent
 array with those two rows. Therefore a `solver_test_partials` diagnostic for
 `grad_ad` with a composition variable accesses beyond the stored rows.
 
-This code and allocation are unchanged from `EbF/eos_partials`; the stacking
-work did not introduce it. The ordinary diffusion Brunt path uses separate
-scratch and is unaffected by this particular diagnostic access. A future
-EOS-layer fix should request the diagnostic row into scratch rather than undo
-the storage optimization. No fix is included in this review.
+This code and allocation matched the original EOS parent `2d70e611e`; the
+stacking work did not introduce it. The ordinary diffusion Brunt path uses
+separate scratch and is unaffected by this particular diagnostic access. The
+later correction below resolves it on the EOS branch by requesting the
+diagnostic row into scratch, preserving the storage optimization.
 
 Source preservation is established by this review. Numerical convergence and
 runtime behavior remain to be checked by the user.
@@ -313,7 +317,7 @@ diffusion-only diff. Once the EOS layer reaches main, the diffusion review can
 use main as its base. The original combined implementation remains recoverable
 from `backup/EbF-implicit-diffusion-before-eos-stack-20261013`.
 
-## EOS diagnostic correction in progress
+## EOS diagnostic correction
 
 Requested on 2026-10-13: fix the `grad_ad` composition-partial diagnostic on
 `EbF/eos_partials`, then update the diffusion stack. Preserve the existing
@@ -338,9 +342,9 @@ temperature derivative branches and persistent EOS allocation. The diagnostic
 uses the EOS parent's established blend-derivative convention documented in
 `docs/source/eos/overview.rst`.
 
-Status: fix implemented in an isolated `EbF/eos_partials` checkout. Independent
-source/API review and `git diff --check` passed. Preserving this review note
-before committing the EOS fix and updating the stack.
+Status: complete. Fix `df059ac22` is committed on `EbF/eos_partials`, and the
+diffusion stack was rebased onto it without conflicts. The current diffusion
+source and validation commits are `3003654d9` and `4cd070fa2`.
 
 - Added a single-row EOS request into local
   `d_dxa(num_eos_basic_results,s% species)` scratch in `get_grad_ad_partials`.
@@ -359,3 +363,36 @@ before committing the EOS fix and updating the stack.
 - Backed up the old EOS tip as
   `backup/EbF-eos-partials-before-grad-ad-fix-20261013` and the current stack as
   `backup/EbF-implicit-diffusion-before-grad-ad-fix-20261013`.
+- Committed the review/progress record as `87a4941ae` before restacking; it is
+  retained in the rebased stack as `d2cf5e4b3`.
+- Committed only `star/private/star_solver.f90` on the EOS branch in
+  `df059ac22`, with 18 added and 4 removed lines.
+- Replayed the four diffusion/configuration/documentation commits on the
+  fixed EOS parent. `git range-diff` reports all four patches unchanged:
+  `3e4838bcc` to `3003654d9`, `40bb0a202` to `4cd070fa2`, `0c871ca68` to
+  `cb524bbff`, and `87a4941ae` to `d2cf5e4b3`.
+
+### Validation of the correction and updated stack
+
+- Independent source reviews confirmed all 15 EOS API arguments match their
+  formal order, scratch has the full EOS row/species shape, and only the
+  requested `i_grad_ad` row is consumed.
+- Both error guards precede scratch reads or numerical comparisons. The only
+  `get_grad_ad_partials` caller passes the new `ierr` argument.
+- Persistent `s% d_eos_dxa` indexed consumers now use only `i_lnPgas` and
+  `i_lnE`; the invalid `i_grad_ad` read is absent.
+- The entire `eos/` subtree and the persistent allocation/storage files match
+  the original optimized EOS parent exactly. Density and temperature
+  diagnostic branches are unchanged.
+- Before the final documentation update, the only tree difference between
+  the previous stack `87a4941ae` and the rebased stack `d2cf5e4b3` was the
+  diagnostic fix in `star_solver.f90`. All diffusion source and test settings
+  were preserved.
+- The fixed `star_solver.f90`, `eos/`, and `docs/source/eos/` match between the
+  EOS branch and the diffusion branch. The updated EOS tip is an ancestor of
+  the diffusion tip. Source and full-stack whitespace checks passed.
+- No compilation or MESA models were run. User-side verification should use
+  a `grad_ad` composition diagnostic with valid variable and sink species,
+  with `include_eos_composition_partials` both false and true. Existing EOS
+  derivative conventions still apply to that numerical comparison.
+- Removed the clean temporary EOS checkout after the fix and restack.
