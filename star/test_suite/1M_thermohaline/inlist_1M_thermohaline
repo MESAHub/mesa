@@ -61,7 +61,7 @@
          trace_history_value_name(3) = 'he_core_mass'
 
          ! limit max_model_number as part of test_suite
-         max_model_number = 6500
+         max_model_number = 7000
 
          initial_mass = 1.0
          initial_z = 2d-2
