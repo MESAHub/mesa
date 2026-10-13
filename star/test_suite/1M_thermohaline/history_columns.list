@@ -340,7 +340,8 @@
 
       ! you might want to get a more complete list of burning regions by using the following
 
-      !burning_regions <integer>
+      burning_regions 30
+      mixing_regions 30
          ! the <integer> is the number of regions to report
          ! there will be 2*<integer> columns for this in the log file, 2 for each region.
          ! the first column for a region gives int(sign(val)*log10(max(1,abs(val))))

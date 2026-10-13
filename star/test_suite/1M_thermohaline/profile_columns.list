@@ -440,7 +440,7 @@
 
 !# Convection
    !mlt_mixing_length ! mixing length for mlt (cm)
-   !mlt_mixing_type ! value returned by mlt
+   mlt_mixing_type ! value returned by mlt
    !mlt_Pturb
    !alpha_mlt
 
@@ -463,7 +463,7 @@
    !grad_temperature ! smoothed dlnT/dlnP at cell boundary
    !grad_density ! smoothed dlnRho/dlnP at cell boundary
    
-   !gradL ! gradient for Ledoux criterion for convection
+   gradL ! gradient for Ledoux criterion for convection
    !sch_stable ! 1 if grada > gradr, 0 otherwise
    !ledoux_stable ! 1 if gradL > gradr, 0 otherwise
 
@@ -479,7 +479,7 @@
    !log_mlt_Gamma ! convective efficiency
    !conv_vel_div_csound ! convection velocity divided by sound speed
    !conv_vel_div_L_vel ! L_vel is velocity needed to carry L by convection; L = 4*pi*r^2*rho*vel**3
-   !log_mlt_D_mix ! log10 diffusion coefficient for mixing from mlt (cm^2/sec)
+   log_mlt_D_mix ! log10 diffusion coefficient for mixing from mlt (cm^2/sec)
 
    !gradr_div_grada ! gradr/grada_face; > 1 => Schwarzschild unstable for convection
    !gradr_sub_grada ! gradr - grada_face; > 0 => Schwarzschild unstable for convection
@@ -511,16 +511,19 @@
    !log_Lconv_div_L
 
 !# Mixing
-   !mixing_type ! mixing types are defined in mesa/const/public/const_def   
+   mixing_type ! mixing types are defined in mesa/const/public/const_def
    !log_D_mix ! log10 diffusion coefficient for mixing in units of cm^2/second (Eulerian)
-   !log_D_mix_non_rotation
+   log_D_mix_non_rotation
    !log_D_mix_rotation
+   log_Dmix_implicit ! implicit part of D_mix in units of cm^2/second
+   log_Dmix_explicit ! explicit part of D_mix in units of cm^2/second
+   Dmix_implicit_dB ! derivative of Dmix_implicit with respect to implicit Brunt B
 
    !log_D_conv ! D_mix for regions where mix_type = convective_mixing
    !log_D_leftover ! D_mix for regions where mix_type = leftover_convective_mixing
-   !log_D_semi ! D_mix for regions where mix_type = semiconvective_mixing
+   log_D_semi ! D_mix for regions where mix_type = semiconvective_mixing
    !log_D_ovr ! D_mix for regions where mix_type = overshoot_mixing
-   !log_D_thrm ! D_mix for regions where mix_type = thermohaline_mixing
+   log_D_thrm ! D_mix for regions where mix_type = thermohaline_mixing
    !log_D_minimum ! D_mix for regions where mix_type = minimum_mixing
    !log_D_rayleigh_taylor ! D_mix for regions where mix_type = rayleigh_taylor_mixing
    !log_D_anon ! D_mix for regions where mix_type = anonymous_mixing
@@ -531,7 +534,7 @@
    
    !dominant_isoA_for_thermohaline
    !dominant_isoZ_for_thermohaline
-   !gradL_composition_term
+   gradL_composition_term
    
    mix_type
 
@@ -662,7 +665,7 @@
    !log_brunt_N2 ! log10(brunt_N2)
    !log_brunt_N2_dimensionless ! log10(brunt_N2_dimensionless)
       
-   !brunt_B ! smoothed numerical difference
+   brunt_B ! smoothed numerical difference
    !brunt_nonB ! = grada - gradT
    !log_brunt_B ! smoothed numerical difference
    !log_brunt_nonB ! = grada - gradT
