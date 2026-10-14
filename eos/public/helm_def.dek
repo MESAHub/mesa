@@ -598,49 +598,49 @@
          double precision :: denhi ! 10**logdhi
          double precision :: logdstp
          double precision :: logdstpi
-         double precision, dimension(:), pointer :: d ! (imax)
-         double precision, dimension(:), pointer :: t ! (jmax)
+         double precision, dimension(:), allocatable :: d ! (imax)
+         double precision, dimension(:), allocatable :: t ! (jmax)
 
          !..for the helmholtz free energy tables
-         double precision, dimension(:,:), pointer :: f ! (imax,jmax)
-         double precision, dimension(:,:), pointer :: fd ! (imax,jmax)
-         double precision, dimension(:,:), pointer :: ft ! (imax,jmax)
-         double precision, dimension(:,:), pointer :: fdd ! (imax,jmax)
-         double precision, dimension(:,:), pointer :: ftt ! (imax,jmax)
-         double precision, dimension(:,:), pointer :: fdt ! (imax,jmax)
-         double precision, dimension(:,:), pointer :: fddt ! (imax,jmax)
-         double precision, dimension(:,:), pointer :: fdtt ! (imax,jmax)
-         double precision, dimension(:,:), pointer :: fddtt ! (imax,jmax)
+         double precision, dimension(:,:), allocatable :: f ! (imax,jmax)
+         double precision, dimension(:,:), allocatable :: fd ! (imax,jmax)
+         double precision, dimension(:,:), allocatable :: ft ! (imax,jmax)
+         double precision, dimension(:,:), allocatable :: fdd ! (imax,jmax)
+         double precision, dimension(:,:), allocatable :: ftt ! (imax,jmax)
+         double precision, dimension(:,:), allocatable :: fdt ! (imax,jmax)
+         double precision, dimension(:,:), allocatable :: fddt ! (imax,jmax)
+         double precision, dimension(:,:), allocatable :: fdtt ! (imax,jmax)
+         double precision, dimension(:,:), allocatable :: fddtt ! (imax,jmax)
 
          !..for the pressure derivative with density tables
-         double precision, dimension(:,:), pointer :: dpdf ! (imax,jmax)
-         double precision, dimension(:,:), pointer :: dpdfd ! (imax,jmax)
-         double precision, dimension(:,:), pointer :: dpdft ! (imax,jmax)
-         double precision, dimension(:,:), pointer :: dpdfdt ! (imax,jmax)
+         double precision, dimension(:,:), allocatable :: dpdf ! (imax,jmax)
+         double precision, dimension(:,:), allocatable :: dpdfd ! (imax,jmax)
+         double precision, dimension(:,:), allocatable :: dpdft ! (imax,jmax)
+         double precision, dimension(:,:), allocatable :: dpdfdt ! (imax,jmax)
 
          !..for chemical potential tables
-         double precision, dimension(:,:), pointer :: ef ! (imax,jmax)
-         double precision, dimension(:,:), pointer :: efd ! (imax,jmax)
-         double precision, dimension(:,:), pointer :: eft ! (imax,jmax)
-         double precision, dimension(:,:), pointer :: efdt ! (imax,jmax)
+         double precision, dimension(:,:), allocatable :: ef ! (imax,jmax)
+         double precision, dimension(:,:), allocatable :: efd ! (imax,jmax)
+         double precision, dimension(:,:), allocatable :: eft ! (imax,jmax)
+         double precision, dimension(:,:), allocatable :: efdt ! (imax,jmax)
 
          !..for the number density tables
-         double precision, dimension(:,:), pointer :: xf ! (imax,jmax)
-         double precision, dimension(:,:), pointer :: xfd ! (imax,jmax)
-         double precision, dimension(:,:), pointer :: xft ! (imax,jmax)
-         double precision, dimension(:,:), pointer :: xfdt ! (imax,jmax)
+         double precision, dimension(:,:), allocatable :: xf ! (imax,jmax)
+         double precision, dimension(:,:), allocatable :: xfd ! (imax,jmax)
+         double precision, dimension(:,:), allocatable :: xft ! (imax,jmax)
+         double precision, dimension(:,:), allocatable :: xfdt ! (imax,jmax)
 
          !..for storing the differences
-         double precision, dimension(:), pointer :: dt_sav ! (jmax)
-         double precision, dimension(:), pointer :: dt2_sav ! (jmax)
-         double precision, dimension(:), pointer :: dti_sav ! (jmax)
-         double precision, dimension(:), pointer :: dt2i_sav ! (jmax)
-         double precision, dimension(:), pointer :: dt3i_sav ! (jmax)
-         double precision, dimension(:), pointer :: dd_sav ! (imax)
-         double precision, dimension(:), pointer :: dd2_sav ! (imax)
-         double precision, dimension(:), pointer :: ddi_sav ! (imax)
-         double precision, dimension(:), pointer :: dd2i_sav ! (imax)
-         double precision, dimension(:), pointer :: dd3i_sav ! (jmax)
+         double precision, dimension(:), allocatable :: dt_sav ! (jmax)
+         double precision, dimension(:), allocatable :: dt2_sav ! (jmax)
+         double precision, dimension(:), allocatable :: dti_sav ! (jmax)
+         double precision, dimension(:), allocatable :: dt2i_sav ! (jmax)
+         double precision, dimension(:), allocatable :: dt3i_sav ! (jmax)
+         double precision, dimension(:), allocatable :: dd_sav ! (imax)
+         double precision, dimension(:), allocatable :: dd2_sav ! (imax)
+         double precision, dimension(:), allocatable :: ddi_sav ! (imax)
+         double precision, dimension(:), allocatable :: dd2i_sav ! (imax)
+         double precision, dimension(:), allocatable :: dd3i_sav ! (jmax)
 
       end type Helm_Table
 

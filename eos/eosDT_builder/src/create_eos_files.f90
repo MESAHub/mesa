@@ -68,8 +68,6 @@ program create_eosDT_files
 
    if (whichz == 0) call Make_EoS_Files(whichz, 1d0, irad /= 0)
 
-   call free_helm_table(eos_ht)
-
 contains
 
    subroutine do_stop(str)
