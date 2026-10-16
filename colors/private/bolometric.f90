@@ -19,7 +19,7 @@
 
 module bolometric
 
-   use const_def, only: dp, pi, pc, Lsun, mbolsun
+   use const_def, only: dp, f_bol_zero_point
    use colors_def, only: Colors_General_Info
    use colors_utils, only: simpson_integration
    use hermite_interp, only: construct_sed_hermite
@@ -32,18 +32,6 @@ module bolometric
 
    private
    public :: calculate_bolometric, calculate_bolometric_phot
-
-
-
-   ! IAU 2015 Resolution B2 zero-point for the bolometric magnitude scale:
-   ! the irradiance corresponding to M_bol = 0. Defined so that a source with
-   ! L = L_sun observed from 10 pc has M_bol = 4.74. This is a fixed constant
-   ! and is unrelated to the Vega/AB/ST conventions in synthetic.f90, which
-   ! apply to bandpass magnitudes only.
-   real(dp), parameter :: f_bol_zero_point = &
-      Lsun*10.0_dp**(0.4_dp*mbolsun)/(4.0_dp*pi*(10.0_dp*pc)**2)  ! erg s^-1 cm^-2
-
-
 
 contains
 
