@@ -2047,7 +2047,6 @@
       integer, dimension(max_num_pgstar_grid_plots) :: &
          Grid9_plot_row, Grid9_plot_rowspan, &
          Grid9_plot_col, Grid9_plot_colspan
-      
       logical :: Max_eq_resid_win_flag, Max_eq_resid_file_flag
       logical :: do_Max_eq_resid_win, do_Max_eq_resid_file
       integer :: Max_eq_resid_file_interval
@@ -2063,7 +2062,6 @@
          Max_eq_resid_txt_scale
       character (len=strlen) :: Max_eq_resid_title
       integer :: Max_eq_resid_max_width
-      
       logical :: Kipp_residuals_win_flag, Kipp_residuals_file_flag
       logical :: do_Kipp_residuals_win, do_Kipp_residuals_file
       integer :: Kipp_residuals_file_interval

@@ -23,11 +23,18 @@ module pgstar_equation_residuals
    use const_def, only: dp
    use pgstar_support
    use star_pgstar
+   use pgstar_colors
 
    implicit none
 
    private
    public :: Max_eq_resid_plot, do_Max_eq_resid_plot, Max_eq_resid_record
+
+      ! same line colors as pgstar_abundance
+   integer, parameter :: line_colors(14) = [ &
+      clr_Gold, clr_LightSkyBlue, clr_Crimson, clr_LightSkyGreen, clr_MediumSlateBlue, &
+      clr_Coral, clr_Goldenrod, clr_DarkGray, clr_Lilac, &
+      clr_Tan, clr_IndianRed, clr_Teal, clr_Silver, clr_BrightBlue ]
 
    real(dp), parameter :: resid_floor = 1d-20, resid_ceil = 1d30
    integer, parameter :: default_capacity = 128
@@ -173,13 +180,13 @@ contains
       ymax = ymax + 0.05 * (ymax - ymin)
 
       call pgsave
-      call pgsci(0)                       ! background
+      call pgsci(clr_Background)                       ! background
       call pgsvp(win_xleft, win_xright, win_ybot, win_ytop)
       call pgrect(0.0, 1.0, 0.0, 1.0)     ! pseudo erase
       call pgswin(xmin, xmax, ymin, ymax)
       call pgsch(txt_scale)
       call pgscf(1)
-      call pgsci(1)
+      call pgsci(clr_Foreground)
       call pgbox('BCNST', 0.0, 0, 'BCNST', 0.0, 0)
       call pgmtxt('B', 2.5, 0.5, 0.5, 'Model Number')
       call pgmtxt('L', 3.0, 0.5, 0.5, 'log\d10\u max\dk\u |residual|')
@@ -187,7 +194,7 @@ contains
 
       do i_eq = 1, h% nvar
          yvec = log10(h% vals(i_eq, 1:n))
-         call pgsci(mod(i_eq - 1, 13) + 2)
+         call pgsci(line_colors(mod(i_eq - 1, size(line_colors)) + 1))
          if (n == 1) then
             call pgpt(1, xvec, yvec, 17)
          else
@@ -198,7 +205,7 @@ contains
       call pgsch(0.75 * txt_scale)
       dy_leg = min(0.08, 1.0 / real(h% nvar))
       do i_eq = 1, h% nvar
-         call pgsci(mod(i_eq - 1, 13) + 2)
+         call pgsci(line_colors(mod(i_eq - 1, size(line_colors)) + 1))
          call pgmtxt('RV', 0.5, 1.0 - (real(i_eq) - 0.5) * dy_leg, 0.0, &
             trim(h% names(i_eq)))
       end do

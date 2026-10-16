@@ -1,6 +1,0 @@
-&pgstar
-
-Kipp_residuals_win_flag = .true.
-
-
-/ ! end of pgstar namelist

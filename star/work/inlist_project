@@ -44,7 +44,7 @@ Zbase = 0.02
 ! see star/defaults/controls.defaults
 
 ! starting specifications
-initial_mass = 15 ! in Msun units
+initial_mass = 50 ! in Msun units
 initial_z = 0.02
 
 ! when to stop
@@ -54,11 +54,15 @@ initial_z = 0.02
 ! stop_near_zams = .true.
 
 ! stop when the center mass fraction of h1 drops below this limit
-xa_central_lower_limit_species(1) = 'h1'
-xa_central_lower_limit(1) = 1d-4
+! xa_central_lower_limit_species(1) = 'h1'
+! xa_central_lower_limit(1) = 1d-4
 
 ! wind
-
+hot_wind_scheme = 'Bjorklund'
+cool_wind_RGB_scheme = 'Dutch'
+cool_wind_AGB_scheme = 'Dutch'
+Bjorklund_scaling_factor = 1.0d0
+Dutch_scaling_factor = 1.0d0
 ! atmosphere
 
 ! rotation
@@ -79,5 +83,6 @@ energy_eqn_option = 'dedt'
 use_gold_tolerances = .true.
 
 ! output
+report_solver_progress = .true.
 
 / ! end of controls namelist
