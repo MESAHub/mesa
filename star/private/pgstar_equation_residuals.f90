@@ -17,9 +17,8 @@
 !
 ! ***********************************************************************
 
-
 module pgstar_equation_residuals
-
+   ! Composition equations are not included.
    use star_private_def
    use const_def, only: dp
    use pgstar_support
@@ -27,14 +26,28 @@ module pgstar_equation_residuals
 
    implicit none
 
+   private
+   public :: Max_eq_resid_plot, do_Max_eq_resid_plot, Max_eq_resid_record
+
+   real(dp), parameter :: resid_floor = 1d-20, resid_ceil = 1d30
+   integer, parameter :: default_capacity = 128
+
+   ! per-star history; indexed by s% id so multiple stars (binaries) don't mix
+   type resid_hist_t
+      integer :: nvar = 0
+      integer :: count = 0
+      integer, allocatable :: model(:)
+      real, allocatable :: vals(:, :)  ! (nvar, capacity)
+      character(len=name_len), allocatable :: names(:)
+   end type resid_hist_t
+
+   type(resid_hist_t), target, save :: hist(max_star_handles)
+
 contains
 
    subroutine Max_eq_resid_plot(id, device_id, ierr)
-
-      integer, intent(in)  :: id
-      integer, intent(in)  :: device_id
+      integer, intent(in)  :: id, device_id
       integer, intent(out) :: ierr
-
       type (star_info), pointer :: s
 
       ierr = 0
@@ -50,160 +63,187 @@ contains
          s% pg% Max_eq_resid_ybot, s% pg% Max_eq_resid_ytop, .false., &
          s% pg% Max_eq_resid_title, s% pg% Max_eq_resid_txt_scale, &
          s% pg% Max_eq_resid_max_width, ierr)
-      if (ierr /= 0) return
 
       call pgebuf()
 
    end subroutine Max_eq_resid_plot
 
 
+   subroutine Max_eq_resid_record(s, max_width, ierr)
+      type (star_info), pointer :: s
+      integer, intent(in) :: max_width  ! <= 0: unlimited
+      integer, intent(out) :: ierr
 
-   ! history of residuals for each structure equation
+      type(resid_hist_t), pointer :: h
+      integer :: nvar, nz, i_eq, k, c
+
+      ierr = 0
+      if (s% id < 1 .or. s% id > max_star_handles) then
+         ierr = -1
+         return
+      end if
+      h => hist(s% id)
+
+      nvar = s% nvar_hydro
+      nz = s% nz
+      if (nvar <= 0 .or. nz <= 0 .or. .not. associated(s% equ)) return
+      if (size(s% equ, 1) < nvar .or. size(s% equ, 2) < nz) return
+
+      ! (re)initialize on first call or if the set of equations changed
+      if (.not. allocated(h% model) .or. h% nvar /= nvar) then
+         if (max_width > 0) then
+            c = max_width
+         else
+            c = default_capacity
+         end if
+         call reset_hist(h, nvar, c, ierr)
+         if (ierr /= 0) return
+         do i_eq = 1, nvar
+            h% names(i_eq) = s% nameofequ(i_eq)
+         end do
+      end if
+
+      ! drop entries that are not older than the current model
+      do while (h% count > 0)
+         if (h% model(h% count) < s% model_number) exit
+         h% count = h% count - 1
+      end do
+
+      if (max_width > 0 .and. h% count >= max_width) then
+         ! roll: keep the newest max_width-1 entries
+         k = h% count - max_width + 1
+         h% model(1:h% count - k) = h% model(k + 1:h% count)
+         h% vals(:, 1:h% count - k) = h% vals(:, k + 1:h% count)
+         h% count = h% count - k
+      end if
+
+      if (h% count >= size(h% model)) then
+         call grow_hist(h, 2 * size(h% model), ierr)
+         if (ierr /= 0) return
+      end if
+
+      h% count = h% count + 1
+      h% model(h% count) = s% model_number
+      do i_eq = 1, nvar
+         h% vals(i_eq, h% count) = real(min(resid_ceil, &
+            max(resid_floor, maxval(abs(s% equ(i_eq, 1:nz))))))
+      end do
+
+   end subroutine Max_eq_resid_record
+
+
    subroutine do_Max_eq_resid_plot(s, id, &
          win_xleft, win_xright, win_ybot, win_ytop, subplot, title, txt_scale, &
          max_width, ierr)
 
+      type (star_info), pointer :: s
       integer, intent(in) :: id, max_width
       logical, intent(in) :: subplot
-      real, intent(in) :: &
-         win_xleft, win_xright, win_ybot, win_ytop, txt_scale
+      real, intent(in) :: win_xleft, win_xright, win_ybot, win_ytop, txt_scale
       character (len=*), intent(in) :: title
       integer, intent(out) :: ierr
-      type (star_info), pointer :: s
 
-      integer :: i_eq, initial_width
-      integer :: n
-      integer, save :: resid_hist_nvar
-      integer, save :: init_model
-      real :: xmin, xmax
-      real :: ymin, ymax
-
-      ! use save, we set these once, and they are reused in later calls of this function
-      real, allocatable, dimension(:), save :: xvec, yvec, resid_hist_model
-      real, allocatable, dimension(:, :), save :: resid_hist_vals
-      character(len=strlen), allocatable, dimension(:), save :: resid_equ_names
+      type(resid_hist_t), pointer :: h
+      real, allocatable :: xvec(:), yvec(:)
+      real :: xmin, xmax, ymin, ymax, dy_leg
+      integer :: i_eq, n
 
       ierr = 0
-
-      call star_ptr(id, s, ierr)
+      call Max_eq_resid_record(s, max_width, ierr)
       if (ierr /= 0) return
 
-      if (.not. allocated(resid_hist_model)) then
-         init_model = s% model_number - 1
-      end if
+      h => hist(s% id)
+      n = h% count
+      if (n < 1) return
 
-      if (max_width < 0) then
-         n = s% model_number - init_model
-      else
-         n = min(s% model_number - init_model, max_width)
-      end if
-
-      if (.not. allocated(resid_hist_model)) then
-         resid_hist_nvar = s% nvar_hydro
-         if (max_width < 0) then
-            initial_width = 100
-         else
-            initial_width = max_width
-         end if
-         allocate(resid_hist_model(initial_width))
-         allocate(resid_hist_vals(resid_hist_nvar, initial_width))
-         allocate(resid_equ_names(resid_hist_nvar))
-         allocate(xvec(initial_width), yvec(initial_width), stat=ierr)
-         if (ierr /= 0) then
-            write(*,*) 'allocate failed for PGSTAR'
-            return
-         end if
-
-         do i_eq = 1, resid_hist_nvar  ! set names
-            resid_equ_names(i_eq) = trim(s% nameofequ(i_eq))
-         end do
-      else if (s% model_number - init_model >= size(resid_hist_model) .and. max_width < 0) then
-         call realloc_resid_hist(2*size(resid_hist_model))  ! grow the arrays
-      end if
-
-      ! roll if using a max width and you go over the limit
-      if (max_width > 1 .and. s% model_number - init_model > max_width) then
-         resid_hist_model(1:n-1) = resid_hist_model(2:n)
-         resid_hist_vals(:,1:n-1) = resid_hist_vals(:,2:n)
-      end if
-
-      resid_hist_model(n) = s% model_number
-
-      ! get the max resid values for this step
-      do i_eq = 1, resid_hist_nvar
-         resid_hist_vals(i_eq, n) = &
-            real(max(1d-40, maxval(abs(s% equ(i_eq, 1:s% nz)))))
-      end do
-
-      xvec(1:n) = real(resid_hist_model(1:n))
+      allocate(xvec(n), yvec(n))
+      xvec = real(h% model(1:n))
 
       xmin = xvec(1)
       xmax = xvec(n)
-
       if (xmin >= xmax) xmax = xmin + 1.0
 
-      ymin = minval(resid_hist_vals(:, 1:n))
-      ymax = maxval(resid_hist_vals(:, 1:n))
-      ymin = max(ymin, 1e-20)
-      ymax = max(ymax, 10.0*ymin)
+      ymin = log10(minval(h% vals(:, 1:n)))
+      ymax = log10(maxval(h% vals(:, 1:n)))
+      if (ymax - ymin < 1.0) then
+         ymin = ymin - 0.5
+         ymax = ymax + 0.5
+      end if
+      ymin = ymin - 0.05 * (ymax - ymin)
+      ymax = ymax + 0.05 * (ymax - ymin)
 
       call pgsave
-      call pgsci(0)                       ! color index 0 = background
+      call pgsci(0)                       ! background
       call pgsvp(win_xleft, win_xright, win_ybot, win_ytop)
-      call pgrect(0.0, 1.0, 0.0, 1.0)   ! pseudo erase
-      call pgswin(xmin, xmax, log10(ymin), log10(ymax))
+      call pgrect(0.0, 1.0, 0.0, 1.0)     ! pseudo erase
+      call pgswin(xmin, xmax, ymin, ymax)
       call pgsch(txt_scale)
       call pgscf(1)
       call pgsci(1)
-      call pgbox('BCNST',0.0,0,'BCNST',0.0,0)
-      call pgmtxt('B',2.5,0.5,0.5,'Model Number')
-      call pgmtxt('L',3.0,0.5,0.5,'log10(max |residual|)')
-      call pgmtxt('T',1.0,0.5,0.5, title)
+      call pgbox('BCNST', 0.0, 0, 'BCNST', 0.0, 0)
+      call pgmtxt('B', 2.5, 0.5, 0.5, 'Model Number')
+      call pgmtxt('L', 3.0, 0.5, 0.5, 'log\d10\u max\dk\u |residual|')
+      call pgmtxt('T', 1.0, 0.5, 0.5, title)
 
-      ! draw lines
-      do i_eq = 1, resid_hist_nvar
-         yvec(1:n) = log10(resid_hist_vals(i_eq, 1:n))
-         call pgsci(mod(i_eq-1,13) + 2)
-         call pgline(n, xvec(1:n), yvec(1:n))
+      do i_eq = 1, h% nvar
+         yvec = log10(h% vals(i_eq, 1:n))
+         call pgsci(mod(i_eq - 1, 13) + 2)
+         if (n == 1) then
+            call pgpt(1, xvec, yvec, 17)
+         else
+            call pgline(n, xvec, yvec)
+         end if
       end do
 
-      ! legend
       call pgsch(0.75 * txt_scale)
-
-      do i_eq = 1, resid_hist_nvar
-         call pgsci(mod(i_eq-1,13)+2)
-         call pgptxt( &
-            xmax + 0.03, &
-            log10(ymax) - (0.03 + 0.06*real(i_eq-1))*(log10(ymax)-log10(ymin)), &
-            0.0, 0.0, &
-            trim(resid_equ_names(i_eq)))
+      dy_leg = min(0.08, 1.0 / real(h% nvar))
+      do i_eq = 1, h% nvar
+         call pgsci(mod(i_eq - 1, 13) + 2)
+         call pgmtxt('RV', 0.5, 1.0 - (real(i_eq) - 0.5) * dy_leg, 0.0, &
+            trim(h% names(i_eq)))
       end do
 
-      call pgsci(1)
       call pgunsa
-
-      contains
-
-      subroutine realloc_resid_hist(new_size)
-         integer, intent(in) :: new_size
-         real, allocatable :: tmp_model(:)
-         real, allocatable :: tmp_vals(:,:)
-
-         call move_alloc(resid_hist_model, tmp_model)
-         call move_alloc(resid_hist_vals,  tmp_vals)
-
-         allocate(resid_hist_model(new_size))
-         allocate(resid_hist_vals(resid_hist_nvar, new_size))
-
-         deallocate(xvec, yvec)
-         allocate(xvec(new_size), yvec(new_size))
-
-         resid_hist_model(1:n) = tmp_model(1:n)
-         resid_hist_vals(:,1:n) = tmp_vals(:,1:n)
-
-         deallocate(tmp_model, tmp_vals)
-      end subroutine
+      deallocate(xvec, yvec)
 
    end subroutine do_Max_eq_resid_plot
 
+
+   subroutine reset_hist(h, nvar, capacity, ierr)
+      type(resid_hist_t), intent(inout) :: h
+      integer, intent(in) :: nvar, capacity
+      integer, intent(out) :: ierr
+
+      if (allocated(h% model)) deallocate(h% model)
+      if (allocated(h% vals)) deallocate(h% vals)
+      if (allocated(h% names)) deallocate(h% names)
+      allocate(h% model(capacity), h% vals(nvar, capacity), h% names(nvar), stat=ierr)
+      if (ierr /= 0) then
+         write(*, *) 'Max_eq_resid: allocate failed'
+         return
+      end if
+      h% nvar = nvar
+      h% count = 0
+   end subroutine reset_hist
+
+
+   subroutine grow_hist(h, new_capacity, ierr)
+      type(resid_hist_t), intent(inout) :: h
+      integer, intent(in) :: new_capacity
+      integer, intent(out) :: ierr
+      integer, allocatable :: tmp_model(:)
+      real, allocatable :: tmp_vals(:, :)
+
+      call move_alloc(h% model, tmp_model)
+      call move_alloc(h% vals, tmp_vals)
+      allocate(h% model(new_capacity), h% vals(h% nvar, new_capacity), stat=ierr)
+      if (ierr /= 0) then
+         write(*, *) 'Max_eq_resid: allocate failed'
+         return
+      end if
+      h% model(1:h% count) = tmp_model(1:h% count)
+      h% vals(:, 1:h% count) = tmp_vals(:, 1:h% count)
+   end subroutine grow_hist
+
 end module pgstar_equation_residuals
+
