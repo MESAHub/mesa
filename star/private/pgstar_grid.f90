@@ -566,9 +566,9 @@ contains
          do_Color_Magnitude1_plot, do_Color_Magnitude2_plot, do_Color_Magnitude3_plot, &
          do_Color_Magnitude4_plot, do_Color_Magnitude5_plot, do_Color_Magnitude6_plot, &
          do_Color_Magnitude7_plot, do_Color_Magnitude8_plot, do_Color_Magnitude9_plot
-      use pgstar_equation_residuals, only : &
+      use pgstar_equation_residuals, only: &
          do_Max_eq_resid_plot
-      use pgstar_kipp_residuals, only : &
+      use pgstar_kipp_residuals, only: &
          do_Kipp_residuals_plot
 
       type (star_info), pointer :: s

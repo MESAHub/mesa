@@ -30,7 +30,7 @@ module pgstar_equation_residuals
    private
    public :: Max_eq_resid_plot, do_Max_eq_resid_plot, Max_eq_resid_record
 
-      ! same line colors as pgstar_abundance
+   ! same line colors as pgstar_abundance
    integer, parameter :: line_colors(14) = [ &
       clr_Gold, clr_LightSkyBlue, clr_Crimson, clr_LightSkyGreen, clr_MediumSlateBlue, &
       clr_Coral, clr_Goldenrod, clr_DarkGray, clr_Lilac, &
