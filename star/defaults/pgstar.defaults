@@ -7837,6 +7837,7 @@
       ! ::
 
    Max_eq_resid_file_flag = .false.
+   Max_eq_resid_file_interval = 5
    Max_eq_resid_file_dir = 'png'
    Max_eq_resid_file_prefix = 'max_eq_resid_'
    Max_eq_resid_file_width = -1
@@ -7868,6 +7869,7 @@
       ! ::
 
    Kipp_residuals_file_flag = .false.
+   Kipp_residuals_file_interval = 5
    Kipp_residuals_file_dir = 'png'
    Kipp_residuals_file_prefix = 'kipp_residuals_'
    Kipp_residuals_file_width = -1
