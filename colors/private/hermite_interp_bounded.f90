@@ -114,8 +114,6 @@ contains
       call simpson_integration(wavelengths, flux_part, positive_integral)
       positive_peak = maxval(flux_part)
 
-      deallocate (flux_part)
-
       if (is_nan(negative_integral) .or. is_inf(negative_integral)) return
       if (is_nan(positive_integral) .or. is_inf(positive_integral)) return
       if (is_nan(negative_peak) .or. is_inf(negative_peak)) return

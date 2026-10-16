@@ -101,8 +101,6 @@ contains
 
       call simpson_integration(wavelengths, clean_fluxes, bolometric_flux)
 
-      deallocate (clean_fluxes)
-
       if (bolometric_flux <= 0.0d0) then
          print *, "Error: Flux integration resulted in non-positive value."
          bolometric_magnitude = 99.0d0

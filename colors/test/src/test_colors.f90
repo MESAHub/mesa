@@ -126,7 +126,6 @@ program test_colors
    call check_bounded_hermite_fallback()
    call check_bolometric_zero_point()
 
-   deallocate (col_names, col_vals)
    call free_colors_handle(handle)
    call colors_shutdown()
 
