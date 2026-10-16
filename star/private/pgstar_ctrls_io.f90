@@ -3057,6 +3057,9 @@
             Kipp_residuals_title, &
             Kipp_residuals_max_width, &
             Kipp_residuals_yaxis_name, &
+            Kipp_residuals_max_residual, &
+            Kipp_residuals_min_residual, &
+
 
             annotation1_ci, &
             annotation1_ch, &
@@ -6232,7 +6235,8 @@
          s% pg% Kipp_residuals_title = Kipp_residuals_title
          s% pg% Kipp_residuals_max_width = Kipp_residuals_max_width
          s% pg% Kipp_residuals_yaxis_name = Kipp_residuals_yaxis_name
-
+         s% pg% Kipp_residuals_max_residual = Kipp_residuals_max_residual
+         s% pg% Kipp_residuals_min_residual = Kipp_residuals_min_residual
 
          s% pg% annotation1_ci = annotation1_ci
          s% pg% annotation1_ch = annotation1_ch

@@ -185,20 +185,21 @@ contains
       call pgsvp(win_xleft, win_xright, win_ybot, win_ytop)
       call pgrect(0.0, 1.0, 0.0, 1.0)     ! pseudo erase
       call render(n, nr_model_buf, nr_zone_buf, nr_resid_buf, nr_ycoord_buf, &
-         max(2, s% nz), yaxis_name, title, txt_scale)
+         max(2, s% nz), yaxis_name, title, txt_scale, &
+         s% pg% Kipp_residuals_min_residual, s% pg% Kipp_residuals_max_residual)
       call pgunsa
 
    end subroutine do_Kipp_residuals_plot
 
 
    subroutine render(nx, model_buf, zone_buf, resid_buf, ycoord_buf, &
-         ny, yaxis_name, title, txt_scale)
+         ny, yaxis_name, title, txt_scale, cbar_min, cbar_max)
       integer, intent(in) :: nx, ny
       integer, intent(in) :: model_buf(:), zone_buf(:)
       real, intent(in) :: resid_buf(:, :), ycoord_buf(:, :)
       character(len=*), intent(in) :: yaxis_name, title
       real, intent(in) :: txt_scale
-
+      real, intent(in) :: cbar_min, cbar_max
       real, allocatable :: col(:, :), coord_grid(:)
       real :: tr(6), fg, bg, missing, xlo, xhi, xl, xr
       real :: clo, chi, dcoord, resid_hi, resid_lo
@@ -207,7 +208,8 @@ contains
 
       ! --- data ranges over all stored columns ---
       have_data = .false.
-      chi = -huge(1.0); clo = huge(1.0)
+      chi = -huge(1.0)
+      clo = huge(1.0)
       resid_hi = -huge(1.0); resid_lo = huge(1.0)
       do i = 1, nx
          nz_i = zone_buf(i)
@@ -231,9 +233,23 @@ contains
       end do
 
       ! --- color scale ---
-      fg = resid_hi
-      bg = resid_lo
-      if (fg - bg < 1.0) bg = fg - 1.0
+      if (cbar_max /= -101.0) then
+         fg = cbar_max
+      else
+         fg = resid_hi
+      end if
+      if (cbar_min /= -101.0) then
+         bg = cbar_min
+      else
+         bg = resid_lo
+      end if
+      if (fg - bg < 1.0) then
+         if (cbar_min /= -101.0 .and. cbar_max == -101.0) then
+            fg = bg + 1.0
+         else
+            bg = fg - 1.0
+         end if
+      end if
       missing = bg - 1.0   ! marker only, never drawn
 
       call pgqcir(cir_lo_save, cir_hi_save)

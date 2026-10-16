@@ -2075,7 +2075,8 @@
          Kipp_residuals_ybot, Kipp_residuals_ytop, &
          prev_Kipp_residuals_win_width, prev_Kipp_residuals_win_ratio, &
          Kipp_residuals_file_width, Kipp_residuals_file_aspect_ratio, &
-         prev_Kipp_residuals_file_width, prev_Kipp_residuals_file_ratio
+         prev_Kipp_residuals_file_width, prev_Kipp_residuals_file_ratio, &
+         Kipp_residuals_max_residual, Kipp_residuals_min_residual
       character (len=strlen) :: Kipp_residuals_title, Kipp_residuals_yaxis_name
       real :: Kipp_residuals_txt_scale
       integer :: Kipp_residuals_max_width
