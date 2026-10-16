@@ -2165,12 +2165,3 @@
             trho_use_decorator, &
             tmaxrho_use_decorator, &
             trho_profile_use_decorator
-
-
-      ! for Kippenhahn-like visualization of max residual across all equations
-      logical :: Kipp_residuals_win_flag, Kipp_residuals_file_flag
-      real :: Kipp_residuals_win_width, Kipp_residuals_win_aspect_ratio, &
-           Kipp_residuals_file_width, Kipp_residuals_file_aspect_ratio, &
-           Kipp_residuals_min, Kipp_residuals_max
-      character (len=strlen) :: Kipp_residuals_file_dir, Kipp_residuals_file_prefix
-      integer :: Kipp_residuals_file_interval
