@@ -1278,7 +1278,7 @@ contains
       p% file_interval = s% pg% max_eq_resid_file_interval
       p% file_width = s% pg% max_eq_resid_file_width
       p% file_aspect_ratio = s% pg% max_eq_resid_file_aspect_ratio
-      
+
       p => s% pg% pgstar_win_file_ptr(i_Kipp_residuals)
       p% plot => Kipp_residuals_plot
       p% id = i_Kipp_residuals
