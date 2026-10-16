@@ -113,6 +113,7 @@ contains
 
    subroutine set_win_file_data(s, ierr)
       use pgstar_kipp, only : Kipp_Plot
+      use pgstar_rti, only : rti_Plot
       use pgstar_L_R, only : L_R_Plot
       use pgstar_L_v, only : L_v_Plot
       use pgstar_L_Teff, only : L_Teff_Plot
@@ -463,6 +464,34 @@ contains
       p% file_width = s% pg% logL_Teff_file_width
       p% file_aspect_ratio = s% pg% logL_Teff_file_aspect_ratio
 
+      p => s% pg% pgstar_win_file_ptr(i_logL_R)
+      p% plot => logL_R_Plot
+      p% id = i_logL_R
+      p% name = 'logL_R'
+      p% win_flag = s% pg% logL_R_win_flag
+      p% win_width = s% pg% logL_R_win_width
+      p% win_aspect_ratio = s% pg% logL_R_win_aspect_ratio
+      p% file_flag = s% pg% logL_R_file_flag
+      p% file_dir = s% pg% logL_R_file_dir
+      p% file_prefix = s% pg% logL_R_file_prefix
+      p% file_interval = s% pg% logL_R_file_interval
+      p% file_width = s% pg% logL_R_file_width
+      p% file_aspect_ratio = s% pg% logL_R_file_aspect_ratio
+
+      p => s% pg% pgstar_win_file_ptr(i_logL_v)
+      p% plot => logL_v_Plot
+      p% id = i_logL_v
+      p% name = 'logL_v'
+      p% win_flag = s% pg% logL_v_win_flag
+      p% win_width = s% pg% logL_v_win_width
+      p% win_aspect_ratio = s% pg% logL_v_win_aspect_ratio
+      p% file_flag = s% pg% logL_v_file_flag
+      p% file_dir = s% pg% logL_v_file_dir
+      p% file_prefix = s% pg% logL_v_file_prefix
+      p% file_interval = s% pg% logL_v_file_interval
+      p% file_width = s% pg% logL_v_file_width
+      p% file_aspect_ratio = s% pg% logL_v_file_aspect_ratio
+
       p => s% pg% pgstar_win_file_ptr(i_L_Teff)
       p% plot => L_Teff_Plot
       p% id = i_L_Teff
@@ -630,6 +659,20 @@ contains
       p% file_interval = s% pg% Mixing_file_interval
       p% file_width = s% pg% Mixing_file_width
       p% file_aspect_ratio = s% pg% Mixing_file_aspect_ratio
+
+      p => s% pg% pgstar_win_file_ptr(i_rti)
+      p% plot => rti_Plot
+      p% id = i_rti
+      p% name = 'rti'
+      p% win_flag = s% pg% rti_win_flag
+      p% win_width = s% pg% rti_win_width
+      p% win_aspect_ratio = s% pg% rti_win_aspect_ratio
+      p% file_flag = s% pg% rti_file_flag
+      p% file_dir = s% pg% rti_file_dir
+      p% file_prefix = s% pg% rti_file_prefix
+      p% file_interval = s% pg% rti_file_interval
+      p% file_width = s% pg% rti_file_width
+      p% file_aspect_ratio = s% pg% rti_file_aspect_ratio
 
       p => s% pg% pgstar_win_file_ptr(i_Kipp)
       p% plot => Kipp_Plot

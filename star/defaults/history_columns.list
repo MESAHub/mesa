@@ -712,7 +712,6 @@
 !# information about shocks
 
    !## info about outermost outward moving shock
-      ! excluding locations with q > max_q_for_outer_mach1_location
       ! returns values at location of max velocity
       !shock_mass ! baryonic (Msun)
       !shock_mass_gm ! baryonic (grams)
@@ -938,6 +937,11 @@
 
    !## RTI
       !rti_regions <num>
+      ! Consecutive regions from center to surface, with type 1 for alpha_RTI > 0,
+      ! type 0 for inactive cells, and type -1 for unused slots. Requires RTI_flag
+      ! for active regions. Each region also records its outer face q coordinate.
+      ! Independent of mixing_regions and mixing_D_limit_for_log; no regions are merged.
+      ! Only the first <num> regions are saved; increase <num> to cover the full star.
 
    !## Ni & Co
       !total_ni_co_56

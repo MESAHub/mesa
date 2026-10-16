@@ -521,6 +521,7 @@ contains
 
       use utils_lib, only : StrLowCase
       use pgstar_kipp, only : do_Kipp_Plot
+      use pgstar_rti, only : do_rti_Plot
       use pgstar_L_R, only : do_L_R_Plot
       use pgstar_L_v, only : do_L_v_Plot
       use pgstar_L_Teff, only : do_L_Teff_Plot
@@ -903,6 +904,10 @@ contains
             call do_Kipp_plot(&
                s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Kipp_title, &
                Grid_txt_scale_factor(i) * s% pg% Kipp_txt_scale, ierr)
+         case ('rti')
+            call do_rti_Plot(&
+               s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% rti_title, &
+               Grid_txt_scale_factor(i) * s% pg% rti_txt_scale, ierr)
          case ('network')
             call do_Network_plot(&
                s, id, device_id, xleft, xright, ybot, ytop, grid_subplot, s% pg% Network_title, &
@@ -969,6 +974,7 @@ contains
                write(*, '(a)') &
                   'here are the valid names', &
                   'Kipp', &
+                  'rti', &
                   'HR', &
                   'TRho', &
                   'R_Teff', &

@@ -773,7 +773,6 @@
       integer :: neutron_rich_core_k ! boundary is in this cell
 
       ! info about outermost outward moving shock
-      ! excluding locations with q > max_q_for_outer_mach1_location
       real(dp) :: shock_mass ! baryonic (Msun)
       real(dp) :: shock_q
       real(dp) :: shock_radius ! (Rsun)
@@ -917,7 +916,7 @@
          real(dp) :: initial_v_center
          real(dp) :: tau_center
          real(dp) :: super_eddington_wind_mdot
-         real(dp) :: min_conv_time_scale, max_conv_time_scale, max_QHSE_time_scale
+         real(dp) :: min_conv_time_scale, max_conv_time_scale
 
          integer :: num_solver_iterations ! for this step
          integer :: num_diffusion_solver_iters
