@@ -250,6 +250,11 @@ contains
       end if
       h% model(1:h% count) = tmp_model(1:h% count)
       h% vals(:, 1:h% count) = tmp_vals(:, 1:h% count)
+
+      ! explicitly free temporaries
+      if (allocated(tmp_model)) deallocate(tmp_model)
+      if (allocated(tmp_vals)) deallocate(tmp_vals)
+
    end subroutine grow_hist
 
 end module pgstar_equation_residuals
