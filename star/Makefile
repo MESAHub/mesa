@@ -240,7 +240,7 @@ MODULES += pgstar_abundance.mod \
            pgstar_decorator.mod \
            pgstar_dpg_dnu.mod \
            pgstar_dynamo.mod \
-	   pgstar_equation_residuals.mod \
+           pgstar_equation_residuals.mod \
            pgstar_grid.mod \
            pgstar_history_panels.mod \
            pgstar_hist_track.mod \

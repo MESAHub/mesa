@@ -6203,6 +6203,7 @@
          s% pg% Max_eq_resid_win_aspect_ratio = Max_eq_resid_win_aspect_ratio
          s% pg% Max_eq_resid_file_flag = Max_eq_resid_file_flag
          s% pg% Max_eq_resid_file_width = Max_eq_resid_file_width
+         s% pg% Max_eq_resid_file_interval = Max_eq_resid_file_interval
          s% pg% Max_eq_resid_file_aspect_ratio = Max_eq_resid_file_aspect_ratio
          s% pg% Max_eq_resid_file_dir = Max_eq_resid_file_dir
          s% pg% Max_eq_resid_file_prefix = Max_eq_resid_file_prefix
@@ -6219,6 +6220,7 @@
          s% pg% Kipp_residuals_win_aspect_ratio = Kipp_residuals_win_aspect_ratio
          s% pg% Kipp_residuals_file_flag = Kipp_residuals_file_flag
          s% pg% Kipp_residuals_file_width = Kipp_residuals_file_width
+         s% pg% Kipp_residuals_file_interval = Kipp_residuals_file_interval
          s% pg% Kipp_residuals_file_aspect_ratio = Kipp_residuals_file_aspect_ratio
          s% pg% Kipp_residuals_file_dir = Kipp_residuals_file_dir
          s% pg% Kipp_residuals_file_prefix = Kipp_residuals_file_prefix

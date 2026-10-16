@@ -32,7 +32,7 @@ module pgstar_kipp_residuals
    real(dp), parameter :: resid_floor = 1d-20
 
    ! Grid points with no data (e.g, because of mass loss)
-   ! drawn and show the background color.
+   ! are not drawn and show the background color.
    integer, parameter :: c1 = colormap_offset + 1
    integer, parameter :: c2 = colormap_offset + colormap_length
 
@@ -59,7 +59,7 @@ contains
          s% pg% Kipp_residuals_max_width, s% pg% Kipp_residuals_yaxis_name, ierr)
 
       call pgebuf()
-      if (ierr /=0) return
+
    end subroutine Kipp_residuals_plot
 
 
