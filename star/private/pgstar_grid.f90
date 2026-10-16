@@ -1011,6 +1011,7 @@ contains
                   'History_Panels1,..,9', &
                   'History_Tracks1,..,9', &
                   'Color_Magnitude1,..,9', &
+                  'Kipp_residuals', &
                   'Max_eq_resid', &
                   'and if you are using star/astero', &
                   'Echelle', &
