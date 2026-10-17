@@ -34,11 +34,11 @@
       real(dp), pointer, public :: lkap_ross_pcg(:)
       integer, public, parameter :: ngp = 2
       real(dp), public :: lgamm_pcg(ngp,17,1648), lkap_face_pcg(ngp,1648), logT_pcg(ngp,1648), logRho_pcg(ngp,1648)
-      integer, parameter :: nzm = 3000
-      real(dp), public :: fk_old(nzm,17), fk_old_grad(nzm,17)
-      real(dp), public ::logT_grid_old(nzm,4,4), logRho_grid_old(nzm,4,4), fk_pcg(17), fk_grad_pcg(ngp,17)
-      real(dp), public :: lkap_grid_old(nzm,4,4), logT_cntr_old(nzm), logRho_cntr_old(nzm)
-      logical :: initialize_fk_old = .true.
+      real(dp), public :: fk_pcg(17), fk_grad_pcg(ngp,17)
+      ! per-cell cache for 'mombarg' op_mono, sized by kap_mombarg_cache_alloc
+      real(dp), allocatable, public :: fk_old(:,:), fk_old_grad(:,:)
+      real(dp), allocatable, public :: logT_grid_old(:,:,:), logRho_grid_old(:,:,:)
+      real(dp), allocatable, public :: lkap_grid_old(:,:,:), logT_cntr_old(:), logRho_cntr_old(:)
       contains  ! the procedure interface for the library
       ! client programs should only call these routines.
 
@@ -765,6 +765,28 @@
 
       end subroutine call_compute_gamma_grid_mombarg
 
+      subroutine kap_mombarg_cache_alloc(nz, ierr)
+        ! make sure the per-cell 'mombarg' cache has room for cells 1:nz.
+        ! not thread safe: call outside of OpenMP parallel regions.
+        integer, intent(in) :: nz
+        integer, intent(out) :: ierr
+
+        ierr = 0
+        if (allocated(fk_old)) then
+           if (size(fk_old,1) >= nz) return
+           deallocate(fk_old, fk_old_grad, logT_grid_old, logRho_grid_old, &
+              lkap_grid_old, logT_cntr_old, logRho_cntr_old)
+        end if
+        allocate(fk_old(nz,17), fk_old_grad(nz,17), &
+           logT_grid_old(nz,4,4), logRho_grid_old(nz,4,4), lkap_grid_old(nz,4,4), &
+           logT_cntr_old(nz), logRho_cntr_old(nz), stat=ierr)
+        if (ierr /= 0) return
+        fk_old = 0  ! marks every cell as not yet cached
+        fk_old_grad = 0
+        logT_cntr_old = 0
+        logRho_cntr_old = 0
+      end subroutine kap_mombarg_cache_alloc
+
       subroutine call_compute_kappa_mombarg(handle, k,&
         fk, logT_cntr, logRho_cntr,&
         zbar, lnfree_e, d_lnfree_e_dlnRho, d_lnfree_e_dlnT, &
@@ -786,6 +808,8 @@
 
         integer ::  eid(17), ke
         real(dp) :: dlnkap_rad_dlnT, dlnkap_rad_dlnRho, kap_rad, delta, delta2  !,fk(17),fk_norm_fac
+        real(dp), dimension(4,4) :: logT_grid, logRho_grid, lkap_grid
+        logical :: use_cache
         type (Kap_General_Info), pointer :: rq
 
         ierr = 0
@@ -800,21 +824,22 @@
         eid = [ ih1, ihe4, ic12, in14, io16, ine20, ina23, &
         img24, ial27, isi28, is32, iar40, ica40, icr52, imn55, ife56, ini58 ]
 
-        if (initialize_fk_old) then
-        fk_old = 0
-        initialize_fk_old = .false.
-        end if
-
+        ! only cache cells that fit in the cache allocated by kap_mombarg_cache_alloc
+        use_cache = allocated(fk_old)
+        if (use_cache) use_cache = (k >= 1 .and. k <= size(fk_old,1))
 
         delta  = MAXVAL(ABS(fk - fk_pcg)/fk_pcg, MASK=fk_pcg>0 )
-        delta2 = MAXVAL(ABS(fk - fk_old(k,:))/fk_old(k,:), MASK=fk_old(k,:)>0 )
-        if (SUM(fk_old(k,:)) == 0) then
-          delta2 = 1d99
-        end if
 
-
-
-        if (delta > 1d-4) then
+        if (delta > 1d-4 .and. .not. use_cache) then
+          call compute_kappa(k,&
+            fk, logT_cntr, logRho_cntr, &
+            log_kap_rad_cell, dlnkap_rad_dlnT, dlnkap_rad_dlnRho, ierr,&
+            ite,jne,epatom,amamu,sig,logT_grid,logRho_grid,lkap_grid)
+        else if (delta > 1d-4) then
+          delta2 = MAXVAL(ABS(fk - fk_old(k,:))/fk_old(k,:), MASK=fk_old(k,:)>0 )
+          if (SUM(fk_old(k,:)) == 0) then
+            delta2 = 1d99
+          end if
           if (delta2 > 1d-4 .or. ABS(logT_cntr - logT_cntr_old(k)) > 0.01d0 &
           .or. ABS(logRho_cntr - logRho_cntr_old(k)) > 0.1d0) then
             call compute_kappa(k,&
