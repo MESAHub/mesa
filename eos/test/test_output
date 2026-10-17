@@ -410,9 +410,9 @@
 
                    actual logT  4.7999999999999989E+00
                     guess logT  5.1010299956639793E+00
-                    found logT  4.8009613155595554E+00
+                    found logT  4.8009654664974457E+00
                    wanted logP  5.9454245456689820E+00
-                      got logP  5.9454292539337024E+00
+                      got logP  5.9454340392078686E+00
 
 
  test1_eosPT
