@@ -57,7 +57,7 @@ We aim for 50-50 gender representation (50% men, 50% women and gender minorities
 
 - Close applications
 
-- Make selections among applications. Contact the MESA developers for guidance on admissions rubrics, including those used for the 2022, 2023, and 2024 Summer School programs.
+- Make selections among applications. Contact the MESA developers for guidance on admissions rubrics, including those used for the 2022+ Summer School programs.
 
 - Email the supervisors of potential attendees to confirm that they have their advisor's permission and funding to attend. Be aware that some prospective students may apply without having secured funding and without their advisor's knowledge.
 
