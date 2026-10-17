@@ -21,8 +21,8 @@ module pgstar
 
    use star_private_def
    use const_def, only: dp
-   use chem_def, only : category_name
-   use rates_def, only : i_rate
+   use chem_def, only: category_name
+   use rates_def, only: i_rate
    use pgstar_support
    use star_pgstar
 
@@ -31,7 +31,7 @@ module pgstar
 contains
 
    subroutine do_create_file_name(s, dir, prefix, name)
-      use pgstar_support, only : create_file_name
+      use pgstar_support, only: create_file_name
       type (star_info), pointer :: s
       character (len = *), intent(in) :: dir, prefix
       character (len = *), intent(out) :: name
@@ -40,8 +40,8 @@ contains
 
 
    subroutine do_write_plot_to_file(s, p, filename, ierr)
-      use star_def, only : star_info
-      use pgstar_support, only : write_plot_to_file
+      use star_def, only: star_info
+      use pgstar_support, only: write_plot_to_file
       type (star_info), pointer :: s
       type (pgstar_win_file_data), pointer :: p
       character (len = *), intent(in) :: filename
@@ -52,7 +52,7 @@ contains
 
    subroutine do_show_pgstar_annotations(&
       s, show_annotation1, show_annotation2, show_annotation3)
-      use pgstar_support, only : show_annotations
+      use pgstar_support, only: show_annotations
       type (star_info), pointer :: s
       logical, intent(in) :: &
          show_annotation1, show_annotation2, show_annotation3
@@ -95,7 +95,7 @@ contains
 
 
    subroutine do_read_pgstar_controls(s, inlist_fname, ierr)
-      use pgstar_ctrls_io, only : read_pgstar
+      use pgstar_ctrls_io, only: read_pgstar
       type (star_info), pointer :: s
       character(*), intent(in) :: inlist_fname
       integer, intent(out) :: ierr
@@ -112,55 +112,59 @@ contains
 
 
    subroutine set_win_file_data(s, ierr)
-      use pgstar_kipp, only : Kipp_Plot
-      use pgstar_L_R, only : L_R_Plot
-      use pgstar_L_v, only : L_v_Plot
-      use pgstar_L_Teff, only : L_Teff_Plot
-      use pgstar_logL_R, only : logL_R_Plot
-      use pgstar_logL_v, only : logL_v_Plot
-      use pgstar_logL_Teff, only : logL_Teff_Plot
-      use pgstar_r_L, only : R_L_Plot
-      use pgstar_r_Teff, only : R_Teff_Plot
-      use pgstar_logg_Teff, only : logg_Teff_Plot
-      use pgstar_logg_logT, only : logg_logT_Plot
-      use pgstar_dPg_dnu, only : dPg_dnu_Plot
-      use pgstar_hr, only : HR_Plot
-      use pgstar_trho, only : TRho_Plot
-      use pgstar_tmaxrho, only : TmaxRho_Plot
-      use pgstar_dynamo, only : Dynamo_plot
-      use pgstar_mixing_Ds, only : Mixing_plot
-      use pgstar_trho_profile, only : TRho_Profile_plot
-      use pgstar_power, only : power_plot
-      use pgstar_mode_prop, only : mode_propagation_plot
-      use pgstar_abundance, only : abundance_plot
-      use pgstar_summary_burn, only : summary_burn_plot
-      use pgstar_summary_profile, only : summary_profile_plot
-      use pgstar_summary_history, only : summary_history_plot
-      use pgstar_grid, only : &
+      use pgstar_kipp, only: Kipp_Plot
+      use pgstar_L_R, only: L_R_Plot
+      use pgstar_L_v, only: L_v_Plot
+      use pgstar_L_Teff, only: L_Teff_Plot
+      use pgstar_logL_R, only: logL_R_Plot
+      use pgstar_logL_v, only: logL_v_Plot
+      use pgstar_logL_Teff, only: logL_Teff_Plot
+      use pgstar_r_L, only: R_L_Plot
+      use pgstar_r_Teff, only: R_Teff_Plot
+      use pgstar_logg_Teff, only: logg_Teff_Plot
+      use pgstar_logg_logT, only: logg_logT_Plot
+      use pgstar_dPg_dnu, only: dPg_dnu_Plot
+      use pgstar_hr, only: HR_Plot
+      use pgstar_trho, only: TRho_Plot
+      use pgstar_tmaxrho, only: TmaxRho_Plot
+      use pgstar_dynamo, only: Dynamo_plot
+      use pgstar_mixing_Ds, only: Mixing_plot
+      use pgstar_trho_profile, only: TRho_Profile_plot
+      use pgstar_power, only: power_plot
+      use pgstar_mode_prop, only: mode_propagation_plot
+      use pgstar_abundance, only: abundance_plot
+      use pgstar_summary_burn, only: summary_burn_plot
+      use pgstar_summary_profile, only: summary_profile_plot
+      use pgstar_summary_history, only: summary_history_plot
+      use pgstar_grid, only: &
          grid1_plot, grid2_plot, grid3_plot, grid4_plot, &
          grid5_plot, grid6_plot, grid7_plot, grid8_plot, grid9_plot
-      use pgstar_summary, only : &
+      use pgstar_summary, only: &
          Text_Summary1_Plot, Text_Summary2_Plot, Text_Summary3_Plot, &
          Text_Summary4_Plot, Text_Summary5_Plot, Text_Summary6_Plot, &
          Text_Summary7_Plot, Text_Summary8_Plot, Text_Summary9_Plot
-      use pgstar_profile_panels, only : &
+      use pgstar_profile_panels, only: &
          Profile_Panels1_plot, Profile_Panels2_plot, Profile_Panels3_plot, &
          Profile_Panels4_plot, Profile_Panels5_plot, Profile_Panels6_plot, &
          Profile_Panels7_plot, Profile_Panels8_plot, Profile_Panels9_plot
-      use pgstar_history_panels, only : &
+      use pgstar_history_panels, only: &
          History_Panels1_plot, History_Panels2_plot, History_Panels3_plot, &
          History_Panels4_plot, History_Panels5_plot, History_Panels6_plot, &
          History_Panels7_plot, History_Panels8_plot, History_Panels9_plot
-      use pgstar_hist_track, only : &
+      use pgstar_hist_track, only: &
          History_Track1_plot, History_Track2_plot, History_Track3_plot, &
          History_Track4_plot, History_Track5_plot, History_Track6_plot, &
          History_Track7_plot, History_Track8_plot, History_Track9_plot
-      use pgstar_network, only : Network_plot
-      use pgstar_production, only : Production_plot
-      use pgstar_Color_Magnitude, only : &
+      use pgstar_network, only: Network_plot
+      use pgstar_production, only: Production_plot
+      use pgstar_Color_Magnitude, only: &
          Color_Magnitude1_plot, Color_Magnitude2_plot, Color_Magnitude3_plot, &
          Color_Magnitude4_plot, Color_Magnitude5_plot, Color_Magnitude6_plot, &
          Color_Magnitude7_plot, Color_Magnitude8_plot, Color_Magnitude9_plot
+      use pgstar_equation_residuals, only: &
+         Max_eq_resid_plot
+      use pgstar_kipp_residuals, only: &
+         Kipp_residuals_plot
       type (star_info), pointer :: s
       integer, intent(out) :: ierr
 
@@ -1261,6 +1265,34 @@ contains
       p% file_width = s% pg% Grid9_file_width
       p% file_aspect_ratio = s% pg% Grid9_file_aspect_ratio
 
+      p => s% pg% pgstar_win_file_ptr(i_max_eq_resid)
+      p% plot => Max_eq_resid_plot
+      p% id = i_max_eq_resid
+      p% name = 'Max_eq_resid'
+      p% win_flag = s% pg% max_eq_resid_win_flag
+      p% win_width = s% pg% max_eq_resid_win_width
+      p% win_aspect_ratio = s% pg% max_eq_resid_win_aspect_ratio
+      p% file_flag = s% pg% max_eq_resid_file_flag
+      p% file_dir = s% pg% max_eq_resid_file_dir
+      p% file_prefix = s% pg% max_eq_resid_file_prefix
+      p% file_interval = s% pg% max_eq_resid_file_interval
+      p% file_width = s% pg% max_eq_resid_file_width
+      p% file_aspect_ratio = s% pg% max_eq_resid_file_aspect_ratio
+
+      p => s% pg% pgstar_win_file_ptr(i_Kipp_residuals)
+      p% plot => Kipp_residuals_plot
+      p% id = i_Kipp_residuals
+      p% name = 'Kipp_resid'
+      p% win_flag = s% pg% Kipp_residuals_win_flag
+      p% win_width = s% pg% Kipp_residuals_win_width
+      p% win_aspect_ratio = s% pg% Kipp_residuals_win_aspect_ratio
+      p% file_flag = s% pg% Kipp_residuals_file_flag
+      p% file_dir = s% pg% Kipp_residuals_file_dir
+      p% file_prefix = s% pg% Kipp_residuals_file_prefix
+      p% file_interval = s% pg% Kipp_residuals_file_interval
+      p% file_width = s% pg% Kipp_residuals_file_width
+      p% file_aspect_ratio = s% pg% Kipp_residuals_file_aspect_ratio
+
       do i = 1, max_num_Other_plots
          p => s% pg% pgstar_win_file_ptr(i_Other + i - 1)
          p% win_flag = .false.
@@ -1343,8 +1375,8 @@ contains
       use utils_lib
       use chem_def
       use net_def
-      use net_lib, only : get_net_reaction_table
-      use const_def, only : Msun, Rsun
+      use net_lib, only: get_net_reaction_table
+      use const_def, only: Msun, Rsun
 
       type (star_info), pointer :: s
       logical :: must_write_files_in
@@ -1412,7 +1444,7 @@ contains
       do i = 1, num_pgstar_plots
          p => s% pg% pgstar_win_file_ptr(i)
 
-         if(show_plot_now) then
+         if (show_plot_now) then
             ! call to check_window opens device
             call check_window(s, p, ierr)
             if (failed('check_window')) return
@@ -1568,7 +1600,7 @@ contains
 
 
    subroutine update_pgstar_data(s, ierr)
-      use star_utils, only : eval_csound
+      use star_utils, only: eval_csound
 
       type (star_info), pointer :: s
       integer, intent(out) :: ierr
@@ -1595,7 +1627,7 @@ contains
    contains
 
       subroutine get_hist_values(num, ierr)
-         use history, only : do_get_data_for_history_columns
+         use history, only: do_get_data_for_history_columns
          integer, intent(in) :: num
          integer, intent(out) :: ierr
          integer :: i
