@@ -1,0 +1,14 @@
+&kap
+Zbase = 1.6d-3
+/ ! end of kap namelist
+
+&star_job
+new_omega_div_omega_crit = 0.10d0
+/ ! end of controls namelist
+
+&controls
+initial_mass = 200d0
+initial_Y = 0.9984d0
+initial_Z = 1.6d-3
+initial_he3 = 0d0
+/ ! end of controls namelist

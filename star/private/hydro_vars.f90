@@ -272,7 +272,7 @@
          use star_utils, only: set_qs, set_dm_bar, set_m_and_dm
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
-         integer :: i_lnd, i_lnT, i_lnR, i_w, i_Hp, &
+         integer :: i_lnd, i_lnT, i_lnR, i_w, i_Y, &
             i_lum, i_v, i_u, i_alpha_RTI, i_Et_RSP, &
             j, k, species, nvar_chem, nz, k_below_just_added
          include 'formats'
@@ -286,7 +286,7 @@
          i_lnR = s% i_lnR
          i_lum = s% i_lum
          i_w = s% i_w
-         i_Hp = s% i_Hp
+         i_Y = s% i_Y
          i_v = s% i_v
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
@@ -320,9 +320,9 @@
                      s% w(k) = s% RSP2_w_fix_if_neg
                   end if
                end do
-            else if (j == i_Hp) then
+            else if (j == i_Y) then
                do k=1,nz
-                  s% Hp_face(k) = s% xh(i_Hp, k)
+                  s% Y_face(k) = s% xh(i_Y, k)
                end do
             else if (j == i_lum) then
                do k=1,nz
@@ -354,7 +354,7 @@
          if (i_v == 0) s% v(1:nz) = 0d0
          if (i_u == 0) s% u(1:nz) = 0d0
          if (i_w == 0) s% w(1:nz) = 0d0
-         if (i_Hp == 0) s% Hp_face(1:nz) = 0d0
+         if (i_Y == 0) s% Hp_face(1:nz) = 0d0
 
          call set_qs(s, nz, s% q, s% dq, ierr)
          if (ierr /= 0) then
@@ -542,8 +542,8 @@
             if (failed('set_rotation_info')) return
          end if
 
-         ! Invalidate before MLT rebuilds the face cache for the current state.
-         if (.not. skip_mlt .and. .not. s% RSP_flag) &
+         ! Invalidate before MLT or RSP2 rebuilds the current face state.
+         if ((.not. skip_mlt .or. s% RSP2_flag) .and. .not. s% RSP_flag) &
             s% reconstructed_face_state_valid(1:s%nz) = .false.
 
          if (.not. skip_grads) then
@@ -612,14 +612,25 @@
                end if
             end if
 
-            call set_mlt_vars(s, nzlo, nzhi, ierr, &
-               set_tau_conv = .not. skip_grads)
-            if (failed('set_mlt_vars')) return
-            if (dbg) write(*,*) 'call check_for_redo_MLT'
+            if (.not. s% RSP2_flag) then
+               call set_mlt_vars(s, nzlo, nzhi, ierr, &
+                  set_tau_conv = .not. skip_grads)
+               if (failed('set_mlt_vars')) return
+               if (dbg) write(*,*) 'call check_for_redo_MLT'
 
-            call check_for_redo_MLT(s, nzlo, nzhi, ierr)
-            if (failed('check_for_redo_MLT')) return
+               call check_for_redo_MLT(s, nzlo, nzhi, ierr)
+               if (failed('check_for_redo_MLT')) return
+            end if
 
+         end if
+
+         if (s% RSP2_flag) then
+            call set_RSP2_vars(s,ierr)
+            if (ierr /= 0) then
+               if (len_trim(s% retry_message) == 0) s% retry_message = 'set_RSP2_vars failed'
+               if (s% report_ierr) write(*,*) 'ierr from set_RSP2_vars'
+               return
+            end if
          end if
 
          if (.not. skip_brunt) then  ! skip_brunt during solver iterations
@@ -640,16 +651,6 @@
                write(*,*) 'failed in compute_j_fluxes'
             end if
          end if
-
-         if (s% RSP2_flag) then
-            call set_RSP2_vars(s,ierr)
-            if (ierr /= 0) then
-               if (len_trim(s% retry_message) == 0) s% retry_message = 'set_RSP2_vars failed'
-               if (s% report_ierr) write(*,*) 'ierr from set_RSP2_vars'
-               return
-            end if
-         end if
-
 
          if (s% doing_timing) &
             call update_time(s, time0, total, s% time_set_hydro_vars)

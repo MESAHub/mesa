@@ -207,12 +207,12 @@
             if (failed('do_v')) return
          end if
 
+         ! Cell-centered u and w use cell boundaries, not the dual face grid.
          if (s% u_flag) then  ! calculate new u to conserve kinetic energy
             if (dbg) write(*,*) 'call do_u'
             call do_u( &
                s, nz, nz_old, cell_type, comes_from, &
-               xq_old, xq, dq_old, dq, xh, xh_old, &
-               xout_old, xout_new, tmp1, ierr)
+               xq_old, xq, dq_old, dq, xh, xh_old, tmp1, ierr)
             if (failed('do_u')) return
          end if
 
@@ -220,15 +220,14 @@
             if (dbg) write(*,*) 'call do_etrb'
             call do_etrb( &
                s, nz, nz_old, cell_type, comes_from, &
-               xq_old, xq, dq_old, dq, xh, xh_old, &
-               xout_old, xout_new, tmp1, ierr)
+               xq_old, xq, dq_old, dq, xh, xh_old, tmp1, ierr)
             if (failed('do_etrb')) return
-            if (dbg) write(*,*) 'call do_Hp_face'
-            call do_Hp_face( &
+            if (dbg) write(*,*) 'call do_Y_face'
+            call do_Y_face( &
                s, nz, nz_old, nzlo, nzhi, comes_from, &
                xh, xh_old, xq, xq_old_plus1, xq_new, &
                work, tmp1, tmp2, ierr)
-            if (failed('do_Hp_face')) return
+            if (failed('do_Y_face')) return
          end if
 
          if (s% rotation_flag) then
@@ -2394,14 +2393,13 @@
 
       subroutine do_u( &
             s, nz, nz_old, cell_type, comes_from, &
-            old_xq, new_xq, old_dq, new_dq, xh, xh_old, &
-            xout_old, xout_new, old_ke, ierr)
+            old_xq, new_xq, old_dq, new_dq, xh, xh_old, old_ke, ierr)
          use alloc
          type (star_info), pointer :: s
          integer, intent(in) :: nz, nz_old
          integer, dimension(:) :: cell_type, comes_from
          real(dp), dimension(:) :: &
-            xout_old, xout_new, old_xq, new_xq, old_dq, new_dq, old_ke
+            old_xq, new_xq, old_dq, new_dq, old_ke
          real(dp), dimension(:,:) :: xh, xh_old
          integer, intent(out) :: ierr
 
@@ -2423,7 +2421,7 @@
          do k = 1, nz
             op_err = 0
             call adjust1_u( &
-               s, k, nz, nz_old, cell_type, comes_from, xout_old, xout_new, &
+               s, k, nz, nz_old, cell_type, comes_from, old_xq, new_xq, &
                old_dq, new_dq, old_ke, i_u, xh, xh_old, op_err)
             if (op_err /= 0) ierr = op_err
          end do
@@ -2453,14 +2451,14 @@
 
 
       subroutine adjust1_u( &
-            s, k, nz, nz_old, cell_type, comes_from, xout_old, xout_new, &
+            s, k, nz, nz_old, cell_type, comes_from, old_xq, new_xq, &
             old_dq, new_dq, old_ke, i_u, xh, xh_old, ierr)
          ! set new value for s% u(k) to conserve kinetic energy
          type (star_info), pointer :: s
          integer, intent(in) :: k, nz, nz_old, i_u
          integer, dimension(:) :: cell_type, comes_from
          real(dp), dimension(:), intent(in) :: &
-            xout_old, xout_new, old_dq, new_dq, old_ke
+            old_xq, new_xq, old_dq, new_dq, old_ke
          real(dp), dimension(:,:) :: xh, xh_old
          integer, intent(out) :: ierr
 
@@ -2486,7 +2484,7 @@
             end if
          end if
 
-         xq_outer = xout_new(k)
+         xq_outer = new_xq(k)
          new_cell_dq = new_dq(k)
          if (k < nz) then
             xq_inner = xq_outer + new_cell_dq
@@ -2502,12 +2500,12 @@
 
          dq_sum = 0d0
          ke_sum = 0
-         if (xq_outer >= xout_old(nz_old)) then
+         if (xq_outer >= old_xq(nz_old)) then
             ! new contained entirely in old center zone
             k_outer = nz_old
             if (k == k_dbg) &
                write(*,2) 'new contained in old center', &
-                  k_outer, xout_old(k_outer)
+                  k_outer, old_xq(k_outer)
          else if (k == 1) then
             k_outer = 1
          else
@@ -2519,7 +2517,7 @@
             if (kk == nz_old) then
                xq1 = 1d0
             else
-               xq1 = xout_old(kk+1)
+               xq1 = old_xq(kk+1)
             end if
             if (xq1 <= xq_outer) cycle
 
@@ -2528,7 +2526,7 @@
                return
             end if
 
-            xq0 = xout_old(kk)
+            xq0 = old_xq(kk)
             if (xq0 >= xq_outer .and. xq1 <= xq_inner) then  ! entire old kk is in new k
 
                dq = old_dq(kk)
@@ -2536,7 +2534,7 @@
 
                if (dq_sum > new_cell_dq) then
                   ! dq too large -- numerical roundoff problems
-                  dq = dq - (new_cell_dq - dq_sum)
+                  dq = dq - (dq_sum - new_cell_dq)
                   dq_sum = new_cell_dq
                end if
 
@@ -2626,9 +2624,9 @@
       end subroutine adjust1_u
 
 
-      subroutine do_Hp_face( &
+      subroutine do_Y_face( &
             s, nz, nz_old, nzlo, nzhi, comes_from, xh, xh_old, &
-            xq, xq_old_plus1, xq_new, work, Hp_face_old_plus1, Hp_face_new, ierr)
+            xq, xq_old_plus1, xq_new, work, Y_face_old_plus1, Y_face_new, ierr)
          use interp_1d_def
          use interp_1d_lib
          type (star_info), pointer :: s
@@ -2636,64 +2634,65 @@
          real(dp), dimension(:,:), pointer :: xh, xh_old
          real(dp), dimension(:), pointer :: work
          real(dp), dimension(:) :: &
-            xq, xq_old_plus1, Hp_face_old_plus1, Hp_face_new, xq_new
+            xq, xq_old_plus1, Y_face_old_plus1, Y_face_new, xq_new
          integer, intent(out) :: ierr
 
-         integer :: n, i_Hp, k
+         integer :: n, i_Y, k
 
          include 'formats'
 
          ierr = 0
-         i_Hp = s% i_Hp
-         if (i_Hp == 0) return
+         i_Y = s% i_Y
+         if (i_Y == 0) return
          n = nzhi - nzlo + 1
 
          do k=1,nz_old
-            Hp_face_old_plus1(k) = xh_old(i_Hp,k)
+            Y_face_old_plus1(k) = xh_old(i_Y,k)
          end do
-         Hp_face_old_plus1(nz_old+1) = Hp_face_old_plus1(nz_old)
+         Y_face_old_plus1(nz_old+1) = Y_face_old_plus1(nz_old)
 
          call interpolate_vector( &
                nz_old+1, xq_old_plus1, n, xq_new, &
-               Hp_face_old_plus1, Hp_face_new, interp_pm, nwork, work, &
-               'mesh_adjust do_Hp_face', ierr)
+               Y_face_old_plus1, Y_face_new, interp_pm, nwork, work, &
+               'mesh_adjust do_Y_face', ierr)
          if (ierr /= 0) then
             return
-            write(*,*) 'interpolate_vector failed in do_Hp_face for remesh'
-            call mesa_error(__FILE__,__LINE__,'debug: mesh adjust: do_Hp_face')
+            write(*,*) 'interpolate_vector failed in do_Y_face for remesh'
+            call mesa_error(__FILE__,__LINE__,'debug: mesh adjust: do_Y_face')
          end if
 
          do k=nzlo,nzhi
-            xh(i_Hp,k) = Hp_face_new(k+1-nzlo)
+            xh(i_Y,k) = Y_face_new(k+1-nzlo)
          end do
 
          n = nzlo - 1
          if (n > 0) then
             do k=1,n
-               xh(i_Hp,k) = xh_old(i_Hp,k)
+               xh(i_Y,k) = xh_old(i_Y,k)
             end do
          end if
 
          if (nzhi < nz) then
             n = nz - nzhi - 1  ! nz-n = nzhi+1
             do k=0,n
-               xh(i_Hp,nz-k) = xh_old(i_Hp,nz_old-k)
+               xh(i_Y,nz-k) = xh_old(i_Y,nz_old-k)
             end do
          end if
 
-      end subroutine do_Hp_face
+         xh(i_Y,1) = 0d0
+
+      end subroutine do_Y_face
 
 
       subroutine do_etrb( &  ! same logic as do_u
             s, nz, nz_old, cell_type, comes_from, &
-            old_xq, new_xq, old_dq, new_dq, xh, xh_old, &
-            xout_old, xout_new, old_eturb, ierr)
+            old_xq, new_xq, old_dq, new_dq, xh, xh_old, old_eturb, ierr)
          use alloc
          type (star_info), pointer :: s
          integer, intent(in) :: nz, nz_old
          integer, dimension(:) :: cell_type, comes_from
          real(dp), dimension(:) :: &
-            xout_old, xout_new, old_xq, new_xq, old_dq, new_dq, old_eturb
+            old_xq, new_xq, old_dq, new_dq, old_eturb
          real(dp), dimension(:,:) :: xh, xh_old
          integer, intent(out) :: ierr
 
@@ -2715,7 +2714,7 @@
          do k = 1, nz
             op_err = 0
             call adjust1_etrb( &
-               s, k, nz, nz_old, cell_type, comes_from, xout_old, xout_new, &
+               s, k, nz, nz_old, cell_type, comes_from, old_xq, new_xq, &
                old_dq, new_dq, old_eturb, i_w, xh, xh_old, op_err)
             if (op_err /= 0) ierr = op_err
          end do
@@ -2745,14 +2744,14 @@
 
 
       subroutine adjust1_etrb( &
-            s, k, nz, nz_old, cell_type, comes_from, xout_old, xout_new, &
+            s, k, nz, nz_old, cell_type, comes_from, old_xq, new_xq, &
             old_dq, new_dq, old_eturb, i_w, xh, xh_old, ierr)
          ! set new value for s% w(k) to conserve turbulent energy
          type (star_info), pointer :: s
          integer, intent(in) :: k, nz, nz_old, i_w
          integer, dimension(:) :: cell_type, comes_from
          real(dp), dimension(:), intent(in) :: &
-            xout_old, xout_new, old_dq, new_dq, old_eturb
+            old_xq, new_xq, old_dq, new_dq, old_eturb
          real(dp), dimension(:,:) :: xh, xh_old
          integer, intent(out) :: ierr
 
@@ -2779,7 +2778,7 @@
             end if
          end if
 
-         xq_outer = xout_new(k)
+         xq_outer = new_xq(k)
          new_cell_dq = new_dq(k)
          if (k < nz) then
             xq_inner = xq_outer + new_cell_dq
@@ -2795,12 +2794,12 @@
 
          dq_sum = 0d0
          eturb_sum = 0
-         if (xq_outer >= xout_old(nz_old)) then
+         if (xq_outer >= old_xq(nz_old)) then
             ! new contained entirely in old center zone
             k_outer = nz_old
             if (k == k_dbg) &
                write(*,2) 'new contained in old center', &
-                  k_outer, xout_old(k_outer)
+                  k_outer, old_xq(k_outer)
          else if (k == 1) then
             k_outer = 1
          else
@@ -2812,7 +2811,7 @@
             if (kk == nz_old) then
                xq1 = 1d0
             else
-               xq1 = xout_old(kk+1)
+               xq1 = old_xq(kk+1)
             end if
             if (xq1 <= xq_outer) cycle
 
@@ -2821,7 +2820,7 @@
                return
             end if
 
-            xq0 = xout_old(kk)
+            xq0 = old_xq(kk)
             if (xq0 >= xq_outer .and. xq1 <= xq_inner) then  ! entire old kk is in new k
 
                dq = old_dq(kk)
@@ -2829,7 +2828,7 @@
 
                if (dq_sum > new_cell_dq) then
                   ! dq too large -- numerical roundoff problems
-                  dq = dq - (new_cell_dq - dq_sum)
+                  dq = dq - (dq_sum - new_cell_dq)
                   dq_sum = new_cell_dq
                end if
 

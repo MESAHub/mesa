@@ -18,7 +18,6 @@
 x_logical_ctrl(1) = .true. ! resynchronize at each step by star2 = star1
 
 ! RSP2
-   RSP2_assume_HSE = .true.
    include_w_in_correction_limits = .true.
    include_v_in_correction_limits = .false.
    include_L_in_correction_limits = .false.

@@ -20,7 +20,7 @@
       module auto_diff_support
 
       use star_private_def
-      use const_def, only: dp, sqrt_2_div_3
+      use const_def, only: dp, sqrt_2_div_3, ln10
       use auto_diff
 
       implicit none
@@ -61,7 +61,7 @@
             dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, &
             dL_m1, dL_00, dL_p1, &
-            dHp_m1, dHp_00, dHp_p1, &
+            dY_m1, dY_00, dY_p1, &
             dw_div_wc_m1, dw_div_wc_00, dw_div_wc_p1, &
             djrot_m1, djrot_00, djrot_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
@@ -71,7 +71,7 @@
             val, dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
             dw_m1, dw_00, dw_p1, dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
-            dHp_m1, dHp_00, dHp_p1, &
+            dY_m1, dY_00, dY_p1, &
             dw_div_wc_m1, dw_div_wc_00, dw_div_wc_p1, &
             djrot_m1, djrot_00, djrot_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
@@ -95,9 +95,9 @@
          dL_m1 = var%d1Array(i_L_m1)
          dL_00 = var%d1Array(i_L_00)
          dL_p1 = var%d1Array(i_L_p1)
-         dHp_m1 = var%d1Array(i_Hp_m1)
-         dHp_00 = var%d1Array(i_Hp_00)
-         dHp_p1 = var%d1Array(i_Hp_p1)
+         dY_m1 = var%d1Array(i_Y_m1)
+         dY_00 = var%d1Array(i_Y_00)
+         dY_p1 = var%d1Array(i_Y_p1)
          dw_div_wc_m1 = var%d1Array(i_w_div_wc_m1)
          dw_div_wc_00 = var%d1Array(i_w_div_wc_00)
          dw_div_wc_p1 = var%d1Array(i_w_div_wc_p1)
@@ -119,7 +119,7 @@
             dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, &
             dL_m1, dL_00, dL_p1, &
-            dHp_m1, dHp_00, dHp_p1, &
+            dY_m1, dY_00, dY_p1, &
             dw_div_wc_m1, dw_div_wc_00, dw_div_wc_p1, &
             djrot_m1, djrot_00, djrot_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
@@ -129,7 +129,7 @@
             val, dlnd_m1, dlnd_00, dlnd_p1, dlnT_m1, dlnT_00, dlnT_p1, &
             dw_m1, dw_00, dw_p1, dlnR_m1, dlnR_00, dlnR_p1, &
             dv_m1, dv_00, dv_p1, dL_m1, dL_00, dL_p1, &
-            dHp_m1, dHp_00, dHp_p1, &
+            dY_m1, dY_00, dY_p1, &
             dw_div_wc_m1, dw_div_wc_00, dw_div_wc_p1, &
             djrot_m1, djrot_00, djrot_p1, &
             dxtra1_m1, dxtra1_00, dxtra1_p1, &
@@ -153,9 +153,9 @@
          var%d1Array(i_L_m1) = dL_m1
          var%d1Array(i_L_00) = dL_00
          var%d1Array(i_L_p1) = dL_p1
-         var%d1Array(i_Hp_m1) = dHp_m1
-         var%d1Array(i_Hp_00) = dHp_00
-         var%d1Array(i_Hp_p1) = dHp_p1
+         var%d1Array(i_Y_m1) = dY_m1
+         var%d1Array(i_Y_00) = dY_00
+         var%d1Array(i_Y_p1) = dY_p1
          var%d1Array(i_w_div_wc_m1) = dw_div_wc_m1
          var%d1Array(i_w_div_wc_00) = dw_div_wc_00
          var%d1Array(i_w_div_wc_p1) = dw_div_wc_p1
@@ -406,8 +406,13 @@
          if (k == 1) then
             cv = 0d0
          else
-            alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
-            beta = 1d0 - alfa
+            if (s% RSP2_use_mass_interp_face_values) then
+               alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
+               beta = 1d0 - alfa
+            else
+               alfa = 0.5d0
+               beta = 0.5d0
+            end if
             cv = sqrt_2_div_3*(alfa*s% w(k) + beta*s% w(k-1))
          end if
       end function get_RSP2_conv_velocity
@@ -1162,9 +1167,7 @@
             if (s% using_velocity_time_centering) &
                v_tc = 0.5d0*(v_tc + s% v_start(k-1))
          else if (s% u_flag) then
-            v_tc = wrap_u_face_m1(s,k)
-            if (s% using_velocity_time_centering) &
-               v_tc = 0.5d0*(v_tc + s% u_face_start(k-1))
+            v_tc = shift_m1(wrap_opt_time_center_v_00(s,k-1))
          end if
       end function wrap_opt_time_center_v_m1
 
@@ -1172,6 +1175,7 @@
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1) :: v_tc
+         real(dp) :: P_theta
          v_tc = 0
          if (s% v_flag) then
             v_tc = wrap_v_00(s,k)
@@ -1179,8 +1183,15 @@
                v_tc = 0.5d0*(v_tc + s% v_start(k))
          else if (s% u_flag) then
             v_tc = wrap_u_face_00(s,k)
-            if (s% using_velocity_time_centering) &
+            if (s% using_velocity_time_centering) then
                v_tc = 0.5d0*(v_tc + s% u_face_start(k))
+               P_theta = 1d0
+               if (s% include_P_in_velocity_time_centering .and. &
+                     s% lnT(k)/ln10 <= s% max_logT_for_include_P_and_L_in_velocity_time_centering) &
+                  P_theta = s% P_theta_for_velocity_time_centering
+               ! Use the pressure weight for the pressure jump, keeping fluid velocity centered.
+               v_tc = v_tc + (P_theta - 0.5d0)*(s% u_face_P_ad(k) - s% u_face_P_start(k))
+            end if
          end if
       end function wrap_opt_time_center_v_00
 
@@ -1195,9 +1206,7 @@
             if (s% using_velocity_time_centering) &
                v_tc = 0.5d0*(v_tc + s% v_start(k+1))
          else if (s% u_flag) then
-            v_tc = wrap_u_face_p1(s,k)
-            if (s% using_velocity_time_centering) &
-               v_tc = 0.5d0*(v_tc + s% u_face_start(k+1))
+            v_tc = shift_p1(wrap_opt_time_center_v_00(s,k+1))
          end if
       end function wrap_opt_time_center_v_p1
 
@@ -1267,36 +1276,36 @@
       end function wrap_opt_time_center_u_p1
 
 
-      function wrap_Hp_m1(s, k) result(Hp_m1)
+      function wrap_Y_m1(s, k) result(Y_m1)
          type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: Hp_m1
+         type(auto_diff_real_star_order1) :: Y_m1
          integer, intent(in) :: k
-         Hp_m1 = 0d0
+         Y_m1 = 0d0
          if (k > 1) then
-            Hp_m1 % val = s%Hp_face(k-1)
-            Hp_m1 % d1Array(i_Hp_m1) = 1d0
+            Y_m1 % val = s%Y_face(k-1)
+            Y_m1 % d1Array(i_Y_m1) = 1d0
          end if
-      end function wrap_Hp_m1
+      end function wrap_Y_m1
 
-      function wrap_Hp_00(s, k) result(Hp_00)
+      function wrap_Y_00(s, k) result(Y_00)
          type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: Hp_00
+         type(auto_diff_real_star_order1) :: Y_00
          integer, intent(in) :: k
-         Hp_00 = 0d0
-         Hp_00 % val = s%Hp_face(k)
-         Hp_00 % d1Array(i_Hp_00) = 1d0
-      end function wrap_Hp_00
+         Y_00 = 0d0
+         Y_00 % val = s%Y_face(k)
+         Y_00 % d1Array(i_Y_00) = 1d0
+      end function wrap_Y_00
 
-      function wrap_Hp_p1(s, k) result(Hp_p1)
+      function wrap_Y_p1(s, k) result(Y_p1)
          type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: Hp_p1
+         type(auto_diff_real_star_order1) :: Y_p1
          integer, intent(in) :: k
-         Hp_p1 = 0d0
+         Y_p1 = 0d0
          if (k < s%nz) then
-            Hp_p1 % val = s%Hp_face(k+1)
-            Hp_p1 % d1Array(i_Hp_p1) = 1d0
+            Y_p1 % val = s%Y_face(k+1)
+            Y_p1 % d1Array(i_Y_p1) = 1d0
          end if
-      end function wrap_Hp_p1
+      end function wrap_Y_p1
 
 
       function wrap_w_div_wc_m1(s, k) result(w_div_wc_m1)

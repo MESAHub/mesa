@@ -1,0 +1,86 @@
+&star_job
+   load_saved_model = .true.
+   change_net = .false.
+   change_v_flag = .true.
+   new_v_flag = .false.
+   change_u_flag = .true.
+   new_u_flag = .false.
+   change_rotation_flag = .true.
+   new_rotation_flag = .false.
+   pgstar_flag = .false.
+   warn_run_star_extras = .false.
+   show_log_description_at_start = .false.
+   save_model_when_terminate = .false.
+   write_profile_when_terminate = .false.
+/
+&controls
+   energy_eqn_option = 'dedt'
+   use_P_d_1_div_rho_form_of_work = .false.
+
+   star_LNA_flag = .true.
+   star_LNA_model_number = -1
+   star_LNA_stop_after_run = .true.
+   star_LNA_set_initial_velocity = .false.
+   star_LNA_solver = 'dense'
+   star_LNA_T_inner = 1d7 ! restrict the eigenproblem; keep the loaded model intact
+   star_LNA_num_modes = 15
+   star_LNA_min_mode_frequency_uHz = 1d-3
+   star_LNA_min_first_mode_eta = -3d0
+   star_LNA_min_mode_eta = -5d0
+   star_LNA_max_abs_mode_eta = 10d0
+   star_LNA_max_eigenvector_residual = 1d-6
+   star_LNA_output_directory = 'LNA'
+   star_LNA_output_file_prefix = 'star_LNA'
+   star_LNA_write_matrix_summary = .true.
+   star_LNA_write_period_growth = .true.
+   star_LNA_write_eigenfunctions = .true.
+   star_LNA_write_work_integrals = .true.
+   star_LNA_include_tdc = .true.
+   star_LNA_include_rsp2 = .false.
+   star_LNA_convection_treatment = 'perturbed'
+   star_LNA_perturb_convective_flux = .true.
+   star_LNA_perturb_turbulent_pressure = .true.
+   star_LNA_perturb_eddy_viscosity = .true.
+   star_LNA_perturb_turbulent_energy = .true.
+
+   MLT_option = 'TDC'
+   steps_before_use_TDC = 0
+   use_Ledoux_criterion = .true.
+   TDC_include_eturb_in_energy_equation = .true.
+   TDC_use_dynamical_gradL = .true.
+   TDC_alpha_C = 1d0
+   TDC_alpha_S = 1d0
+   TDC_alpha_D = 1d0
+   TDC_alpha_R = 0d0
+   TDC_alpha_Pt = 0d0
+   TDC_alpha_M = 0.15d0
+   mlt_Pturb_factor = 0d0
+   include_mlt_corr_to_TDC = .true.
+   use_face_reconstruction = .false.
+   use_TDC_enthalpy_flux_limiter = .false.
+   harmonic_dissipation_length_beta = 0d0
+   num_cells_for_smooth_gradL_composition_term = 0
+   use_dPrad_dm_form_of_T_gradient_eqn = .false.
+
+   atm_option = 'T_tau'
+   atm_T_tau_relation = 'Eddington'
+   atm_T_tau_opacity = 'fixed'
+   use_momentum_outer_BC = .true.
+   floor_momentum_outer_BC_at_Prad = .true.
+   use_compression_outer_BC = .false.
+   use_Pvsc_art_visc = .false.
+
+   ! Export the loaded snapshot with dt = 0 and background eps_grav = 0.
+   ! A .mod file has no saved eps_grav or previous thermal state, even
+   ! with energy_eqn_option = 'dedt'. Zero is a static assumption.
+   ! The LNA thermal perturbation is retained.
+   gyre_data_schema = 130
+   gyre_write_tdc_lna_background = .true.
+   calculate_Brunt_N2 = .true.
+   add_center_point_to_pulse_data = .true.
+   keep_surface_point_for_pulse_data = .true.
+   ! Keep the GYRE outer boundary at the MESA surface for comparison.
+   ! True appends a T(tau) atmosphere to the export only.
+   add_atmosphere_to_pulse_data = .false.
+   write_profiles_flag = .false.
+/

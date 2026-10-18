@@ -85,8 +85,9 @@ contains
 
     w = s%cz_bdy_dq(k)/s%dq(k)
 
-    if (w < 0._dp .OR. w > 1._dp) then
-       write(*,*) 'Invalid weight for convective boundary: i, w=', i, w
+    if (is_bad_num(w) .or. w < 0d0 .or. w > 1d0) then
+       write(*,'(a,i0,1x,es26.16e3)') &
+          'Invalid weight for convective boundary: i, w=', i, w
        ierr = -1
        return
     end if
@@ -94,8 +95,15 @@ contains
     associate (k_o => k, &
                k_i => k+1)
 
-      r = pow((      w)*s%r(k_i)*s%r(k_i)*s%r(k_i) + &
-                 (1._dp-w)*s%r(k_o)*s%r(k_o)*s%r(k_o), 1._dp/3._dp)
+      ! Preserve a boundary that lies exactly on a mesh face.
+      if (w == 0d0) then
+         r = s%r(k_o)
+      else if (w == 1d0) then
+         r = s%r(k_i)
+      else
+         r = pow(w*s%r(k_i)*s%r(k_i)*s%r(k_i) + &
+              (1d0-w)*s%r(k_o)*s%r(k_o)*s%r(k_o), 1d0/3d0)
+      end if
 
     end associate
 
@@ -242,6 +250,7 @@ contains
     real(dp) :: Hp_cb
     real(dp) :: w
     real(dp) :: lambda
+    real(dp) :: ri, ro
 
     ! Evaluate parameters (cell index k, radius r, diffusion
     ! coefficients D and cdc) for the overshoot boundary associated
@@ -308,60 +317,44 @@ contains
 
     end if
 
-    if (.NOT. (s%r(k+1) <= r .AND. s%r(k) >= r)) then
-       write(*,*) 'r_ob not correctly bracketed: r(k+1), r, r(k)=', s%r(k+1), r, s%r(k)
+    ri = s%r(k+1)
+    ro = s%r(k)
+
+    if (is_bad_num(ri) .or. is_bad_num(ro) .or. &
+        is_bad_num(r) .or. is_bad_num(r_cb)) then
+       write(*,'(a,i0)') 'Nonfinite overshoot interpolation radius; k=', k
        ierr = -1
        return
     end if
 
-    ! Interpolate mixing parameters
-
-    w = (s%r(k)*s%r(k)*s%r(k) - r*r*r)/ &
-        (s%r(k)*s%r(k)*s%r(k) - s%r(k+1)*s%r(k+1)*s%r(k+1))
-
-    lambda = (1._dp-w)*s%mlt_mixing_length(k) + w*s%mlt_mixing_length(k+1)
-
-    if (s%conv_vel(k) /= 0._dp .AND. s%conv_vel(k+1) /= 0._dp) then
-
-       ! Both faces of cell have non-zero mixing; interpolate vc between faces
-
-       vc = (1._dp-w)*s%conv_vel(k) + w*s%conv_vel(k+1)
-
-    elseif (s%conv_vel(k) /= 0._dp .AND. s%conv_vel(k+1) == 0._dp) then
-
-       ! Outer face of cell has non-zero mixing; interpolate vc
-       ! between this face and r_cb, assuming vc = 0 at the latter
-
-        if(s%r(k) /= r_cb) then
-          w = (s%r(k)*s%r(k)*s%r(k) - r*r*r)/ &
-           (s%r(k)*s%r(k)*s%r(k) - r_cb*r_cb*r_cb)
-        else
-          w = 0d0
-        end if
-
-       vc = (1._dp-w)*s%conv_vel(k)
-
-    elseif (s%conv_vel(k) == 0._dp .AND. s%conv_vel(k+1) /= 0._dp) then
-
-       ! Inner face of cell has non-zero mixing; interpolate vc
-       ! between this face and r_cb, assuming vc = 0 at the latter
-
-       if(s%r(k+1) /= r_cb) then
-          w = (r_cb*r_cb*r_cb - r*r*r)/ &
-           (r_cb*r_cb*r_cb - s%r(k+1)*s%r(k+1)*s%r(k+1))
-       else
-          w = 0d0
-       end if
-
-       vc = w*s%conv_vel(k+1)
-
-    else
-
-       ! Neither face of cell has non-zero mixing; return
-
-       vc = 0._dp
-
+    if (.not. (ri >= 0d0 .and. ro > ri .and. ri <= r .and. r <= ro)) then
+       write(*,'(a,i0,3(1x,es26.16e3))') &
+          'Invalid overshoot interpolation cell: k, ri, r, ro=', k, ri, r, ro
+       ierr = -1
+       return
     end if
+
+    ! Interpolate the mixing length on the original mesh faces.
+
+    w = ((ro-r)/(ro-ri))* &
+        (1d0 + r/ro + pow2(r/ro))/ &
+        (1d0 + ri/ro + pow2(ri/ro))
+    w = min(1d0, max(0d0, w))
+    lambda = (1d0-w)*s%mlt_mixing_length(k) + &
+             w*s%mlt_mixing_length(k+1)
+
+    ! Use vc = 0 at r_cb only if it brackets r with the other face.
+    if (s%conv_vel(k) /= 0d0 .and. s%conv_vel(k+1) == 0d0) then
+       if (ri <= r_cb .and. r_cb < ro .and. r >= r_cb) ri = r_cb
+    else if (s%conv_vel(k) == 0d0 .and. s%conv_vel(k+1) /= 0d0) then
+       if (ri < r_cb .and. r_cb <= ro .and. r <= r_cb) ro = r_cb
+    end if
+
+    w = ((ro-r)/(ro-ri))* &
+        (1d0 + r/ro + pow2(r/ro))/ &
+        (1d0 + ri/ro + pow2(ri/ro))
+    w = min(1d0, max(0d0, w))
+    vc = (1d0-w)*s%conv_vel(k) + w*s%conv_vel(k+1)
 
     ! Evaluate the diffusion coefficient
 

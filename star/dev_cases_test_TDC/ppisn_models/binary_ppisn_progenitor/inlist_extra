@@ -1,10 +1,10 @@
 &star_job
-new_Z = 0.00146d0
+new_Z = 0.0001d0
 /
 
 
 &kap
-Zbase = 0.00146d0
+Zbase = 0.0001d0
 /
 
 &eos

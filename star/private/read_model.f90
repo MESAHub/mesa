@@ -526,7 +526,7 @@
             q, dq, omega, j_rot
          integer, intent(out) :: ierr
 
-         integer :: j, k, n, i_lnd, i_lnT, i_lnR, i_lum, i_w, i_Hp, &
+         integer :: j, k, n, i_lnd, i_lnT, i_lnR, i_lum, i_w, i_Y, &
             i_Et_RSP, i_erad_RSP, i_Fr_RSP, i_v, i_u, i_alpha_RTI, ii
          real(dp), target :: vec_ary(species + nvar_hydro + max_increment)
          real(dp), pointer :: vec(:)
@@ -542,7 +542,7 @@
          i_lnR = s% i_lnR
          i_lum = s% i_lum
          i_w = s% i_w
-         i_Hp = s% i_Hp
+         i_Y = s% i_Y
          i_v = s% i_v
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
@@ -558,7 +558,7 @@
          if (s% am_nu_rot_flag) n = n+increment_for_am_nu_rot_flag  ! read am_nu_rot
          if (s% RTI_flag) n = n+increment_for_RTI_flag  ! read alpha_RTI
          if (s% RSP_flag) n = n+increment_for_RSP_flag  ! read RSP_et, erad, Fr
-         if (s% RSP2_flag) n = n+increment_for_RSP2_flag  ! read w, Hp
+         if (s% RSP2_flag) n = n+increment_for_RSP2_flag  ! read w, Y_face
 
 !$omp critical (read1_model_loop)
 ! make this a critical section to so don't have to dynamically allocate buf
@@ -594,7 +594,7 @@
                j=j+1; xh(i_Fr_RSP,k) = vec(j)
             else if (s% RSP2_flag) then
                j=j+1; xh(i_w,k) = vec(j)
-               j=j+1; xh(i_Hp,k) = vec(j)
+               j=j+1; xh(i_Y,k) = vec(j)
             end if
             if (i_lum /= 0) then
                j=j+1; xh(i_lum,k) = vec(j)

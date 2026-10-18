@@ -1,5 +1,5 @@
 &pgstar
-pgstar_interval = 1
+pgstar_interval = 10
 !pause = .true.
 
 pgstar_age_disp = 2.5

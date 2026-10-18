@@ -21,7 +21,7 @@ module atm_T_tau_varying
 
   use const_def, only: dp, ln10, cgas
   use math_lib
-  use utils_lib, only: mesa_error
+  use utils_lib, only: mesa_error, is_bad
 
   implicit none
 
@@ -40,7 +40,7 @@ contains
        Teff, &
        lnT, dlnT_dL, dlnT_dlnR, dlnT_dlnM, dlnT_dlnkap, &
        lnP, dlnP_dL, dlnP_dlnR, dlnP_dlnM, dlnP_dlnkap, &
-       ierr)
+       ierr, Rho_outer)
 
     use atm_def, only: atm_eos_iface, atm_kap_iface
 
@@ -67,10 +67,15 @@ contains
     real(dp), intent(out)      :: dlnP_dlnM
     real(dp), intent(out)      :: dlnP_dlnkap
     integer, intent(out)       :: ierr
+    real(dp), optional, intent(in) :: Rho_outer
 
     real(dp), parameter :: DLNTEFF = 1.E-4_dp
+    real(dp), parameter :: DLNG = 1d-4
 
     real(dp) :: g
+    real(dp) :: lng
+    real(dp) :: lng_p
+    real(dp) :: lng_m
     real(dp) :: lnTeff
     real(dp) :: lnTeff_p
     real(dp) :: lnTeff_m
@@ -84,12 +89,22 @@ contains
     real(dp) :: dlnTeff_dL
     real(dp) :: dlnT_dlnTeff
     real(dp) :: dlnP_dlnTeff
+    real(dp) :: dlnP_dlng
+    real(dp) :: rho_outer_value
 
     ierr = 0
 
     ! Sanity checks
 
     if (L <= 0._dp .OR. R <= 0._dp .OR. M <= 0._dp) then
+       ierr = -1
+       return
+    end if
+
+    rho_outer_value = 1d-10
+    if (present(Rho_outer)) rho_outer_value = Rho_outer
+    if (is_bad(rho_outer_value) .or. rho_outer_value <= 0._dp) then
+       write(*,*) 'atm: Rho_outer must be finite and positive'
        ierr = -1
        return
     end if
@@ -107,7 +122,7 @@ contains
        call eval_data( &
             tau_surf, Teff, g, &
             T_tau_id, eos_proc, kap_proc, errtol, max_steps, &
-            lnT, lnP, ierr)
+            lnT, lnP, ierr, rho_outer_value)
 
        if (ierr /= 0) then
           write(*,*) 'atm: Call to eval_data failed in atm_t_tau_varying'
@@ -143,21 +158,21 @@ contains
        call eval_data( &
             tau_surf, exp(lnTeff), g, &
             T_tau_id, eos_proc, kap_proc, errtol, max_steps, &
-            lnT, lnP, ierr)
+            lnT, lnP, ierr, rho_outer_value)
 
        !$OMP SECTION
 
        call eval_data( &
             tau_surf, exp(lnTeff_p), g, &
             T_tau_id, eos_proc, kap_proc, errtol, max_steps, &
-            lnT_p, lnP_p, ierr_p)
+            lnT_p, lnP_p, ierr_p, rho_outer_value)
 
        !$OMP SECTION
 
        call eval_data( &
             tau_surf, exp(lnTeff_m), g, &
             T_tau_id, eos_proc, kap_proc, errtol, max_steps, &
-            lnT_m, lnP_m, ierr_m)
+            lnT_m, lnP_m, ierr_m, rho_outer_value)
 
        !$OMP END SECTIONS
 
@@ -180,9 +195,44 @@ contains
        dlnT_dlnkap = 0._dp
 
        dlnP_dlnTeff = (lnP_p - lnP_m) / (lnTeff_p - lnTeff_m)
+
+       ! Include the gravity response at fixed Teff.
+
+       lng = log(g)
+       lng_p = lng + DLNG
+       lng_m = lng - DLNG
+
+       !$OMP SECTIONS
+
+       !$OMP SECTION
+
+       call eval_data( &
+            tau_surf, exp(lnTeff), exp(lng_p), &
+            T_tau_id, eos_proc, kap_proc, errtol, max_steps, &
+            lnT_p, lnP_p, ierr_p, rho_outer_value)
+
+       !$OMP SECTION
+
+       call eval_data( &
+            tau_surf, exp(lnTeff), exp(lng_m), &
+            T_tau_id, eos_proc, kap_proc, errtol, max_steps, &
+            lnT_m, lnP_m, ierr_m, rho_outer_value)
+
+       !$OMP END SECTIONS
+
+       if (ierr_p /= 0) ierr = ierr_p
+       if (ierr_m /= 0) ierr = ierr_m
+       if (ierr /= 0) then
+          write(*,*) 'Call to eval_data failed in atm_t_tau_varying_opacity gravity partials'
+          return
+       end if
+
+       dlnP_dlng = (lnP_p - lnP_m) / (lng_p - lng_m)
+
+       ! Teff is proportional to (L/R^2)^(1/4), and g to M/R^2.
        dlnP_dL = dlnP_dlnTeff*dlnTeff_dL
-       dlnP_dlnR = dlnP_dlnTeff*dlnTeff_dlnR
-       dlnP_dlnM = 0._dp
+       dlnP_dlnR = dlnP_dlnTeff*dlnTeff_dlnR - 2._dp*dlnP_dlng
+       dlnP_dlnM = dlnP_dlng
        dlnP_dlnkap = 0._dp
 
     end if
@@ -197,7 +247,7 @@ contains
   subroutine eval_data( &
        tau_surf, Teff, g, &
        T_tau_id, eos_proc, kap_proc, errtol, max_steps, &
-       lnT, lnP, ierr)
+       lnT, lnP, ierr, Rho_outer)
 
     use atm_def, only: atm_eos_iface, atm_kap_iface
 
@@ -212,6 +262,7 @@ contains
     real(dp), intent(out)      :: lnT
     real(dp), intent(out)      :: lnP
     integer, intent(out)       :: ierr
+    real(dp), intent(in)       :: Rho_outer
 
     real(dp), parameter :: TAU_OUTER_FACTOR = 1.E-5_dp
     integer, parameter  :: MAX_TRIES = 3
@@ -231,7 +282,7 @@ contains
        call eval_data_try( &
             tau_surf, Teff, g, tau_outer_curr, &
             T_tau_id, eos_proc, kap_proc, errtol_curr, max_steps, &
-            lnT, lnP, ierr)
+            lnT, lnP, ierr, Rho_outer)
        if (ierr == 0) exit try_loop
 
        tau_outer_curr = tau_outer_curr*TRY_SCALE
@@ -247,7 +298,7 @@ contains
   subroutine eval_data_try( &
        tau_surf, Teff, g, tau_outer, &
        T_tau_id, eos_proc, kap_proc, errtol, max_steps, &
-       lnT, lnP, ierr)
+       lnT, lnP, ierr, Rho_outer)
 
     use eos_lib, only: radiation_pressure
     use atm_def, only: atm_eos_iface, atm_kap_iface
@@ -266,6 +317,7 @@ contains
     real(dp), intent(out)      :: lnT
     real(dp), intent(out)      :: lnP
     integer, intent(out)       :: ierr
+    real(dp), intent(in)       :: Rho_outer
 
     integer, parameter :: NUM_VARS = 1
     integer, parameter :: NRDENS = 0
@@ -274,7 +326,6 @@ contains
     integer, parameter :: IOUT = 0
     integer, parameter :: LOUT = 0
 
-    real(dp), parameter :: RHO_OUTER = 1.E-10_dp
     real(dp), parameter :: DLNTAU_SURF = 1.E-3_dp
     real(dp), parameter :: DLNTAU_MAX = 0._dp
 

@@ -4,7 +4,7 @@
 	mass_list = 'mass_frac_solar.txt'
 	
         !MESA/eos table version number
-	table_version = 51
+	table_version = 52
 
         !FreeEOS option suite, see FreeEOS README for details
 	eos_version = 1

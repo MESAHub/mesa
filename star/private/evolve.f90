@@ -20,7 +20,7 @@
       module evolve
 
       use star_private_def
-      use const_def, only: dp, i8, pi, pi4, msun, lsun, crad, clight, secyer, secday
+      use const_def, only: dp, qp, i8, pi, pi4, msun, lsun, crad, clight, secyer, secday
       use utils_lib, only: is_bad
       use star_utils
       use auto_diff_support
@@ -376,6 +376,11 @@
 
          if (first_try) then  ! i.e., not a redo or retry
             s% have_new_generation = .false.
+            ! Remesh the start state with the same time centering as the solve.
+            if ((s% steps_before_use_velocity_time_centering == 0) .or. &
+                (s% steps_before_use_velocity_time_centering > 0 .and. &
+                   s% model_number >= s% steps_before_use_velocity_time_centering)) &
+               s% using_velocity_time_centering = .true.
             do_step_part1 = prepare_for_new_step(s)
             if (do_step_part1 /= keep_going) then
                if (s% report_ierr) &
@@ -384,10 +389,6 @@
             end if
             s% have_new_generation = .true.
             s% have_new_cz_bdy_info = .false.
-            if ((s% steps_before_use_velocity_time_centering == 0) .or. &
-                (s% steps_before_use_velocity_time_centering > 0 .and. &
-                   s% model_number >= s% steps_before_use_velocity_time_centering)) &
-               s% using_velocity_time_centering = .true.
             if (.not. s% doing_relax .and. s% steps_before_use_TDC > 0) then
                if (s% model_number >= s% steps_before_use_TDC) then
                   s% MLT_option = 'TDC'
@@ -434,10 +435,11 @@
                s% total_radial_kinetic_energy_old, &
                s% total_rotational_kinetic_energy_old, &
                s% total_turbulent_energy_old, &
-               s% total_energy_old)
+               s% total_energy_old, use_TDC_mlt_vc_old=.true.)
          end if
 
-         s% surface_cell_specific_total_energy_old = cell_specific_total_energy(s,1)
+         s% surface_cell_specific_total_energy_old = &
+            cell_specific_total_energy(s, 1, use_TDC_mlt_vc_old=.true.)
 
          if (.not. s% have_initial_energy_integrals) then
             s% total_internal_energy_initial = &
@@ -533,7 +535,8 @@
             explicit_mdot, max_wind_mdot, wind_mdot, r_phot, kh_timescale, dmskhf, dmsfac, &
             too_large_wind_mdot, too_small_wind_mdot, boost, mstar_dot_nxt, &
             surf_omega_div_omega_crit_limit, dt
-         real(dp), allocatable :: velocity_remap_kinetic_energy(:)
+         real(dp), allocatable :: velocity_remap_kinetic_energy(:), energy_without_radial_ke(:)
+         real(qp) :: kinetic_energy_removed
 
          integer :: ph_k, mdot_action
          real(dp) :: implicit_mdot, ph_L, iwind_tolerance, iwind_lambda
@@ -560,7 +563,7 @@
          clock_rate = s% system_clock_rate
          trace = s% trace_evolve
          nz = s% nz
-         allocate(velocity_remap_kinetic_energy(nz))
+         allocate(velocity_remap_kinetic_energy(nz), energy_without_radial_ke(nz))
 
          call setup_for_implicit_mdot_loop
 
@@ -590,13 +593,17 @@
 
             else
 
-               call do_adjust_mass(s, s% species, velocity_remap_kinetic_energy, ierr)
+               call do_adjust_mass( &
+                  s, s% species, velocity_remap_kinetic_energy, &
+                  energy_without_radial_ke, kinetic_energy_removed, ierr)
                if (failed('do_adjust_mass')) return
                s% star_mdot = s% mstar_dot/(Msun/secyer)      ! dm/dt in msolar per year
                call set_vars_if_needed(s, dt, 'after do_adjust_mass', ierr)
                if (failed('set_vars_if_needed after do_adjust_mass')) return
 
-               call calculate_eps_mdot(s, dt, velocity_remap_kinetic_energy, ierr)
+               call calculate_eps_mdot( &
+                  s, dt, velocity_remap_kinetic_energy, &
+                  energy_without_radial_ke, kinetic_energy_removed, ierr)
                if (failed('calculate_eps_mdot')) return
 
                if (s% mstar_dot /= 0d0) then
@@ -1207,13 +1214,9 @@
             ! and differences between this and the surface state are accounted for by the term mdot_adiabatic_surface.
             !
             ! By adding eps_mdot, we cause a change in energy during the Newton iterations which
-            ! cancels the change in (3). Thus eps_mdot does not enter into the energy *accounting*, just into
-            ! the energy equation. A consequence of this is that the sum
-            !
-            ! total_energy_change_from_mdot + (total energy before adjust_mass) + mdot_acoustic_surface
-            !
-            ! does not equal the total energy *after* adjust_mass and *before* the Newton iterations.
-            ! However it should equal the total energy at the end of the step.
+            ! cancels the change in (3). The net mass-change contribution is the energy change
+            ! from adjust_mass plus dt*sum(dm*eps_mdot). This already includes surface pressure
+            ! work and the adiabatic excess carried away by outgoing material.
 
             if (s% rotation_flag .and. &
                   (s% use_other_torque .or. s% use_other_torque_implicit .or. &
@@ -1291,12 +1294,6 @@
                total_radiation = dt*(L_surf - s% L_center)
             end if
 
-            !note: phase1_total_energy_from_mdot = &
-            !     s% mdot_acoustic_surface &
-            !   + s% total_energy_change_from_mdot &
-            !   + s% mdot_adiabatic_surface &
-            !   - phase2_total_energy_from_mdot
-
             ! during the newton iterations, m_grav remains fixed,
             ! even though the mass_corrections respond to the change in composition.
             ! This means there is a term
@@ -1311,9 +1308,10 @@
                total_energy_from_fixed_m_grav = 0
             end if
 
+            ! Surface adiabatic energy is already included through eps_mdot.
+            ! Adding its rate here would count that energy a second time.
             phase1_total_energy_from_mdot = &
-                 s% energy_change_from_do_adjust_mass_and_calculate_eps_mdot &
-               + s% mdot_adiabatic_surface  ! ??
+                 s% energy_change_from_do_adjust_mass_and_calculate_eps_mdot
 
             phase1_sources_and_sinks = &
                  phase1_total_energy_from_mdot &
@@ -1817,17 +1815,19 @@
          use chem_def
          use star_utils, only: use_xh_to_set_rho_to_dm_div_dV, set_phot_info
          use hydro_vars, only: set_vars_if_needed
+         use set_flags, only: set_pulsation_envelope_mesh
 
          type (star_info), pointer :: s
 
          integer :: ierr, k
          real(dp) :: force_timestep_min, force_timestep
-         logical :: trace
+         logical :: trace, did_TDC_remesh
 
          include 'formats'
 
          ierr = 0
          trace = s% trace_evolve
+         did_TDC_remesh = .false.
 
          prepare_for_new_step = keep_going
 
@@ -1860,6 +1860,16 @@
             if (failed('use_xh_to_set_rho_to_dm_div_dV ierr')) return
          end if
 
+         ! Remesh before saving prev_mesh so retries retain the TDC mesh.
+         if (s% steps_before_remesh_for_TDC_pulsations > 0 .and. &
+               s% job% load_saved_model .and. &
+               s% model_number == s% init_model_number + &
+                  s% steps_before_remesh_for_TDC_pulsations) then
+            call set_pulsation_envelope_mesh(s% id, ierr)
+            if (failed('set_pulsation_envelope_mesh ierr')) return
+            did_TDC_remesh = .true.
+         end if
+
          if (.not. s% RSP_flag) then  ! store mesh info for following step eps_mdot
             do k=1, s% nz
                s% prev_mesh_xa(:,k) = s% xa(:,k)
@@ -1884,7 +1894,7 @@
             end if
          end if
 
-         if (s% okay_to_remesh) then
+         if (s% okay_to_remesh .and. .not. did_TDC_remesh) then
             if (s% rsp_flag .or. .not. s% doing_first_model_of_run) then
                call set_start_of_step_info(s, 'before do_mesh', ierr)
                if (failed('set_start_of_step_info ierr')) return

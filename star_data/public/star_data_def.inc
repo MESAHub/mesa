@@ -1,7 +1,7 @@
 
       character(len=24) :: version_number ! mesa version from file $MESA_DIR/data/version_number
 
-      integer, parameter :: star_def_version = 19
+      integer, parameter :: star_def_version = 20
 
       integer, parameter :: nz_alloc_extra = 200
 
@@ -270,9 +270,9 @@
       integer, parameter :: i_L_m1 = 16
       integer, parameter :: i_L_00 = 17
       integer, parameter :: i_L_p1 = 18
-      integer, parameter :: i_hp_m1 = 19
-      integer, parameter :: i_hp_00 = 20
-      integer, parameter :: i_hp_p1 = 21
+      integer, parameter :: i_Y_m1 = 19
+      integer, parameter :: i_Y_00 = 20
+      integer, parameter :: i_Y_p1 = 21
       integer, parameter :: i_w_div_wc_m1 = 22
       integer, parameter :: i_w_div_wc_00 = 23
       integer, parameter :: i_w_div_wc_p1 = 24

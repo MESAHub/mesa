@@ -1,4 +1,4 @@
-         if (logT >= logT1 .or. logT <= logT7 .or. logRho >= logRho1) then
+         if (logT >= logT1 .or. logT < logT7 .or. logRho >= logRho1) then
             iregion = pure_helm
          else if (logRho - 2*logT + 12 < logQmin) then
             iregion = pure_helm

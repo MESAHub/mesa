@@ -632,7 +632,8 @@ contains
       real(dp), intent(in) :: dt
       type(auto_diff_real_tdc), intent(in) :: A0, xi0, xi1, xi2
       type(auto_diff_real_tdc) :: Af  ! output
-      type(auto_diff_real_tdc) :: J2, J, Jt4, num, den, y_for_atan, root
+      type(auto_diff_real_tdc) :: J2, J, Jt4, num, den, y_for_atan, root, H
+      real(dp) :: b
 
       J2 = pow2(xi1) - 4d0 * xi0 * xi2
 
@@ -675,7 +676,16 @@ contains
             Af = 0d0
          end if
       else  ! if (J2 == 0d0) then
-         Af = A0
+         ! Limit of tanh(b*sqrt(J2))/sqrt(J2), retaining the AD derivatives.
+         b = 0.25d0*dt
+         H = b - pow3(b)*J2/3d0 + (2d0/15d0)*pow5(b)*pow2(J2)
+         num = A0 + H*(2d0*xi0 + A0*xi1)
+         den = 1d0 - H*(xi1 + 2d0*A0*xi2)
+         if (num < 0d0) then
+            Af = 0d0
+         else
+            Af = num/den
+         end if
       end if
 
    end function eval_Af
