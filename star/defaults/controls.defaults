@@ -3834,7 +3834,10 @@
 
       !     f = 1  when logT <= D_mix_rotation_max_logT_full_on = full_on
       !       = 0  when logT >= D_mix_rotation_min_logT_full_off = full_off
-      !       = (log(T)-full_on)/(full_off-full_on) else
+      !       = (full_off-log(T))/(full_off-full_on) else
+
+      ! ``f`` is further multiplied by a factor that ramps linearly from 0 at
+      ! ``tau <= D_mix_rotation_min_tau_full_off`` to 1 at ``tau >= D_mix_rotation_min_tau_full_on``.
 
       ! note that for regions with brunt N^2 < 0, we set Richardson number to 1
       ! which is > Ri_critical and therefore turns off DSI and SSI

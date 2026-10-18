@@ -1573,7 +1573,7 @@
             am_nu_ES_factor, &
             am_nu_GSF_factor, &
             am_nu_ST_factor, &
-            f, lgT, full_off, full_on, &
+            f, f_tau, lgT, full_off, full_on, &
             full_off_tau, full_on_tau
          real(dp), dimension(:), allocatable :: &  ! work vectors for tridiagonal solve
             sig, rhs, d, du, dl, bp, vp, xp, x
@@ -1607,17 +1607,18 @@
             else if (lgT >= full_off) then
                f = 0d0
             else  ! lgT > full_on and < full_off
-               f = (lgT - full_on) / (full_off - full_on)
+               f = (full_off - lgT) / (full_off - full_on)
             end if
 
             ! using tau to limit D_mix rotation in surface regions
             if (s% tau(k) >= full_on_tau) then
-               f = 1d0
+               f_tau = 1d0
             else if (s% tau(k) <= full_off_tau) then
-               f = 0d0
+               f_tau = 0d0
             else  ! tau > full_off_tau and < full_on_tau
-               f = (lgT - full_on) / (full_off - full_on)
+               f_tau = (s% tau(k) - full_off_tau) / (full_on_tau - full_off_tau)
             end if
+            f = f*f_tau
 
             if (s% D_omega_flag) then
                s% D_mix_rotation(k) = f*s% am_D_mix_factor*s% D_omega(k)
