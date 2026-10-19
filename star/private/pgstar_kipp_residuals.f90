@@ -33,7 +33,13 @@ module pgstar_kipp_residuals
 
    ! Grid points with no data (e.g, because of mass loss)
    ! are not drawn and show the background color.
-   integer, parameter :: c1 = colormap_offset + 1
+   ! The upper half of pgstar's own colormap (pgstar_colors), which
+   ! runs from near-white to pure red. These indices are set once per device
+   ! by set_device_colors, so no color representation is changed here (safe
+   ! for PNG and other file devices). Small residuals -> white, large -> red.
+   ! Grid points with no data (e.g, because of mass loss)
+   ! are not drawn and show the background color.
+   integer, parameter :: c1 = colormap_offset + (colormap_length + 1)/2
    integer, parameter :: c2 = colormap_offset + colormap_length
 
 contains
@@ -271,6 +277,13 @@ contains
       else
          call pgswin(xlo, xhi, chi + 0.5*dcoord, clo - 0.5*dcoord)
       end if
+
+      ! fill the plot area with grey first: points without data (e.g. above
+      ! the surface after mass loss) stay grey, distinct from white (small
+      ! residuals) and from the background, whether black or white
+      call pgsci(clr_Gray)
+      call pgsfs(1)
+      call pgrect(xlo, xhi, clo - 0.5*dcoord, chi + 0.5*dcoord)
 
       ! --- one pgimag call per stored model, placed at its model number ---
       tr(3) = 0.0
