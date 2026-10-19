@@ -113,17 +113,8 @@ contains
    end subroutine calculate_bolometric_phot
 
    real(dp) function flux_to_magnitude(flux)
-      real(dp), intent(in) :: flux
-      logical, save :: warned = .false.
-      if (flux <= 0.0d0) then
-         if (.not. warned) then
-            print *, "colors: non-positive bolometric flux; Mag_bol set to 99"
-            warned = .true.
-         end if
-         flux_to_magnitude = 99.0d0
-      else
-         flux_to_magnitude = -2.5d0*log10(flux/f_bol_zero_point)
-      end if
+      real(dp), intent(in) :: flux  ! must be positive; checked by the caller
+      flux_to_magnitude = -2.5d0*log10(flux/f_bol_zero_point)
    end function flux_to_magnitude
 
    ! scalar metric: distance to nearest grid point in normalized space

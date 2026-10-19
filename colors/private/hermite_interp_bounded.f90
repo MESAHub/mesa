@@ -35,38 +35,33 @@ contains
       character(len=*), intent(in) :: stellar_model_dir
       real(dp), allocatable, intent(out) :: wavelengths(:), fluxes(:)
 
-      real(dp), allocatable :: interp_wave(:), interp_flux(:)
       real(dp) :: integrated_flux
       logical :: interp_ok
 
       call construct_sed_hermite(rq, teff, log_g, metallicity, R, d, &
-                                 stellar_model_dir, interp_wave, interp_flux)
+                                 stellar_model_dir, wavelengths, fluxes)
 
       ! Accept Hermite whenever it is finite and physically usable.  Negligible
       ! negative undershoots are projected onto the physical flux bound.
-      interp_ok = valid_sed(interp_wave, interp_flux, .false.)
-      if (interp_ok) call repair_negative_flux(interp_wave, interp_flux, interp_ok)
+      interp_ok = valid_sed(wavelengths, fluxes, .false.)
+      if (interp_ok) call repair_negative_flux(wavelengths, fluxes, interp_ok)
 
       if (interp_ok) then
-         call simpson_integration(interp_wave, interp_flux, integrated_flux)
+         call simpson_integration(wavelengths, fluxes, integrated_flux)
          interp_ok = .not. is_nan(integrated_flux) .and. &
                      .not. is_inf(integrated_flux) .and. integrated_flux > 0.0_dp
       end if
 
-      if (interp_ok) then
-         call move_alloc(interp_wave, wavelengths)
-         call move_alloc(interp_flux, fluxes)
-         return
-      end if
+      if (interp_ok) return
 
       ! Hermite was unusable.  Fall back to the positivity-preserving linear
       ! interpolant so a Colors failure does not terminate the MESA run.
       call construct_sed_linear(rq, teff, log_g, metallicity, R, d, &
-                                stellar_model_dir, interp_wave, interp_flux)
+                                stellar_model_dir, wavelengths, fluxes)
 
-      interp_ok = valid_sed(interp_wave, interp_flux, .true.)
+      interp_ok = valid_sed(wavelengths, fluxes, .true.)
       if (interp_ok) then
-         call simpson_integration(interp_wave, interp_flux, integrated_flux)
+         call simpson_integration(wavelengths, fluxes, integrated_flux)
          interp_ok = .not. is_nan(integrated_flux) .and. &
                      .not. is_inf(integrated_flux) .and. integrated_flux > 0.0_dp
       end if
@@ -75,9 +70,6 @@ contains
          write (*, *) 'colors: Hermite and linear interpolation returned invalid SEDs'
          call mesa_error(__FILE__, __LINE__)
       end if
-
-      call move_alloc(interp_wave, wavelengths)
-      call move_alloc(interp_flux, fluxes)
    end subroutine construct_sed_hermite_bounded
 
    subroutine repair_negative_flux(wavelengths, fluxes, repair_ok)
