@@ -663,12 +663,14 @@ module auto_diff_real_tdc_module
       type(auto_diff_real_tdc) :: unary
       real(dp) :: q1
       real(dp) :: q0
+      real(dp) :: x_safe
+      x_safe = max(x%val, 1.E-99_dp)
       q0 = sqrt(x%val*Heaviside(x%val))
-      q1 = 0.5_dp*q0*powm1(x%val)
+      q1 = 0.5_dp*q0*powm1(x_safe)
       unary%val = q0
       unary%d1val1 = q1*x%d1val1
       unary%d1Array(1:33) = q1*x%d1Array(1:33)
-      unary%d1val1_d1Array(1:33) = 0.25_dp*q0*(2.0_dp*x%d1val1_d1Array(1:33)*x%val - x%d1Array(1:33)*x%d1val1)*powm1(pow2(x%val))
+      unary%d1val1_d1Array(1:33) = 0.25_dp*q0*(2.0_dp*x%d1val1_d1Array(1:33)*x_safe - x%d1Array(1:33)*x%d1val1)*powm1(pow2(x_safe))
    end function safe_sqrt_self
 
    function unary_minus_self(x) result(unary)
@@ -756,11 +758,13 @@ module auto_diff_real_tdc_module
       type(auto_diff_real_tdc), intent(in) :: x
       type(auto_diff_real_tdc) :: unary
       real(dp) :: q0
-      q0 = powm1(x%val)
+      real(dp) :: x_safe
+      x_safe = max(x%val, 1.E-99_dp)
+      q0 = powm1(x_safe)
       unary%val = safe_log(x%val)
       unary%d1val1 = q0*x%d1val1
       unary%d1Array(1:33) = q0*x%d1Array(1:33)
-      unary%d1val1_d1Array(1:33) = (-x%d1Array(1:33)*x%d1val1 + x%d1val1_d1Array(1:33)*x%val)*powm1(pow2(x%val))
+      unary%d1val1_d1Array(1:33) = (-x%d1Array(1:33)*x%d1val1 + x%d1val1_d1Array(1:33)*x_safe)*powm1(pow2(x_safe))
    end function safe_log_self
 
    function log10_self(x) result(unary)
@@ -781,12 +785,14 @@ module auto_diff_real_tdc_module
       type(auto_diff_real_tdc) :: unary
       real(dp) :: q1
       real(dp) :: q0
+      real(dp) :: x_safe
+      x_safe = max(x%val, 1.E-99_dp)
       q0 = powm1(ln10)
-      q1 = q0*powm1(x%val)
+      q1 = q0*powm1(x_safe)
       unary%val = q0*safe_log(x%val)
       unary%d1val1 = q1*x%d1val1
       unary%d1Array(1:33) = q1*x%d1Array(1:33)
-      unary%d1val1_d1Array(1:33) = q0*(-x%d1Array(1:33)*x%d1val1 + x%d1val1_d1Array(1:33)*x%val)*powm1(pow2(x%val))
+      unary%d1val1_d1Array(1:33) = q0*(-x%d1Array(1:33)*x%d1val1 + x%d1val1_d1Array(1:33)*x_safe)*powm1(pow2(x_safe))
    end function safe_log10_self
 
    function log2_self(x) result(unary)
