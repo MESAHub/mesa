@@ -1053,6 +1053,7 @@
             show_HR_classical_instability_strip, &
             show_HR_Mira_instability_region, &
             show_HR_WD_instabilities, &
+            show_HR_radius_lines, &
             show_HR_target_box, &
             HR_target_n_sigma, &
             HR_target_logL, &
@@ -4192,6 +4193,7 @@
          s% pg% show_HR_classical_instability_strip = show_HR_classical_instability_strip
          s% pg% show_HR_Mira_instability_region = show_HR_Mira_instability_region
          s% pg% show_HR_WD_instabilities = show_HR_WD_instabilities
+         s% pg% show_HR_radius_lines = show_HR_radius_lines
          s% pg% show_HR_target_box = show_HR_target_box
          s% pg% HR_target_n_sigma = HR_target_n_sigma
          s% pg% HR_target_logL = HR_target_logL

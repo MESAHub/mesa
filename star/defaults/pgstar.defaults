@@ -1643,6 +1643,7 @@
     show_HR_classical_instability_strip = .false.
     show_HR_Mira_instability_region = .false.
     show_HR_WD_instabilities = .false.
+    show_HR_radius_lines = .false.
 
       ! ::
 

@@ -489,7 +489,7 @@
       logical :: do_HR_win, do_HR_file
       logical :: show_HR_annotation1, show_HR_annotation2, show_HR_annotation3
       logical :: show_HR_target_box, show_HR_classical_instability_strip, &
-         show_HR_Mira_instability_region, show_HR_WD_instabilities
+         show_HR_Mira_instability_region, show_HR_WD_instabilities, show_HR_radius_lines
       integer :: id_HR_win, id_HR_file, HR_file_interval
       integer :: HR_step_min, HR_step_max, HR_target_n_sigma
       character (len=strlen) :: HR_file_dir, HR_file_prefix, HR_title, HR_fname
