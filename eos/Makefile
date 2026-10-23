@@ -72,7 +72,7 @@ include $(MAKE_DIR)/Makefile
 	touch $@
 
 ../data/eosPC_support_data/.extract-completed:
-	rm -rf eosPC_support_data
+	rm -rf ../data/eosPC_support_data
 	mkdir -p ../data/eosPC_support_data
 	mkdir -p ../data/eosPC_support_data/cache
 	touch $@
