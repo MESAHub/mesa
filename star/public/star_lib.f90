@@ -70,6 +70,8 @@
            star_weighted_smoothing => weighted_smoothing, &
            star_threshold_smoothing => threshold_smoothing
 
+      use profiler, only: prof_push, prof_pop
+
       implicit none
 
       contains
@@ -555,9 +557,14 @@
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          if (s% doing_timing) call start_time(s, time0, total)
+         call prof_push('star_evolve_step_part1')
          star_evolve_step = star_evolve_step_part1(id, first_try)
-         if (star_evolve_step == keep_going) &
+         call prof_pop()
+         if (star_evolve_step == keep_going) then
+            call prof_push('star_evolve_step_part2')
             star_evolve_step = star_evolve_step_part2(id, first_try)
+            call prof_pop()
+         end if
          if (s% doing_timing) call update_time(s, time0, total, s% time_evolve_step)
       end function star_evolve_step
 

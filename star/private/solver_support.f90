@@ -22,6 +22,7 @@
       use star_private_def
       use utils_lib, only: is_bad
       use const_def, only: dp, msun, secyer, ln10, four_thirds_pi
+      use profiler, only: prof_push, prof_pop
       use num_def
 
       implicit none
@@ -128,7 +129,9 @@
                end do
             end do
             if (dbg) write(*, *) 'call eval_equ'
+            call prof_push('eval_equ')
             call eval_equ(s, nvar, ierr)
+            call prof_pop()
             if (ierr /= 0) then
                if (s% report_ierr) &
                   write(*, *) 'eval_equations: eval_equ returned ierr', ierr
