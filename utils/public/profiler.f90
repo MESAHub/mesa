@@ -21,17 +21,13 @@
 ! prof_push/prof_pop and form a call tree: a region is identified by its
 ! name together with its parent.
 !
-! The profiler is always compiled in but only records anything when the
-! environment variable MESA_PROFILE is set to a value other than '', '0',
-! 'no' or 'false'. Otherwise prof_push, prof_pop and prof_report return
-! immediately.
+! The profiler is enabled via the environment variable MESA_PROFILE=1
+! e.g., MESA_PROFILE=1 ./rn
 !
-! Regions are meant to be placed outside of OpenMP parallel regions.
-! Calls made from inside a parallel region are ignored, so a routine
-! that is called both serially and from parallel loops can be
-! instrumented safely; only its serial calls are timed.
-!
-! TODO(astrobarker): r vs s labeling
+! These profiling regions are meant to be used outside of performance
+! critical code -- around an intensive kernel or chunk of code.
+! They should not trigger if used inside of a parallel region, but
+! try not to do that.
 
 module profiler
 
@@ -50,7 +46,7 @@ module profiler
    ! per region data, indexed by region id
    character(len=name_len) :: rname(max_regions)
    integer :: rparent(max_regions) = 0  ! 0 for top level regions
-   integer(i8) :: rcalls(max_regions) = 0
+   integer(i8) :: rcalls(max_regions) = 0 ! number of calls into the region
    integer(i8) :: rincl(max_regions) = 0  ! inclusive clock ticks
    integer(i8) :: rexcl(max_regions) = 0  ! exclusive clock ticks (excluding children)
    integer :: nr = 0
@@ -59,7 +55,7 @@ module profiler
    integer :: sid(max_depth)  ! region id
    integer(i8) :: sstart(max_depth)  ! clock at push
    integer(i8) :: schild(max_depth)  ! ticks spent in children so far
-   integer :: depth = 0
+   integer :: depth = 0  ! current stack depth
 
    integer(i8) :: t_first = 0
    logical :: started = .false.
@@ -82,12 +78,7 @@ contains
       ! status -1 means truncated, which is still a non-empty value
       if (status > 0 .or. length == 0) return
 
-      ! lower case for comparison
-      do i = 1, len_trim(val)
-         if (val(i:i) >= 'A' .and. val(i:i) <= 'Z') &
-            val(i:i) = achar(iachar(val(i:i)) + 32)
-      end do
-      enabled = .not. (val == '0' .or. val == 'no' .or. val == 'false')
+      enabled = (val == '1')
    end subroutine prof_init
 
    logical function prof_enabled()
@@ -108,10 +99,13 @@ contains
       if (in_parallel()) return
       if (.not. prof_enabled()) return
 
+      ! If we are inside of a stack, grab our parent's id
       parent = 0
       if (depth > 0) parent = sid(depth)
 
-      ! find the region for (name, parent), adding it if new
+      ! find the region for (name, parent)
+      ! TODO(astrobarker): This search could likely be optimized, but likely
+      ! it does not matter.
       id = 0
       do i = 1, nr
          if (rparent(i) == parent .and. rname(i) == name) then
@@ -120,7 +114,9 @@ contains
          end if
       end do
 
+      ! If the region does not yet exist, create it.
       if (id == 0) then
+         ! Fail if we have hit max_regions. Should not happen..
          if (nr == max_regions) &
             call mesa_error(__FILE__, __LINE__, 'profiler: too many regions (raise max_regions)')
          nr = nr + 1
@@ -129,9 +125,11 @@ contains
          rparent(id) = parent
       end if
 
+      ! Max depth check -- also should not trigger..
       if (depth == max_depth) &
          call mesa_error(__FILE__, __LINE__, 'profiler: nesting too deep (missing prof_pop? or raise max_depth)')
 
+      ! Finally, push the region onto the stack.
       depth = depth + 1
       rcalls(id) = rcalls(id) + 1
       sid(depth) = id
@@ -139,12 +137,16 @@ contains
 
       ! read the clock last so the bookkeeping above is not timed
       call system_clock(sstart(depth))
+
+      ! Init global start time as needed.
       if (.not. started) then
          t_first = sstart(depth)
          started = .true.
       end if
    end subroutine prof_push
 
+   ! Stop timing the current region, record its inclusive and exclusive time
+   ! and increment timers.
    subroutine prof_pop()
       integer(i8) :: t, elapsed
       integer :: id
@@ -165,7 +167,11 @@ contains
       ! time spent in child regions, which is then credited to the parent
       rincl(id) = rincl(id) + elapsed
       rexcl(id) = rexcl(id) + elapsed - schild(depth)
+
+      ! Pop the stack
       depth = depth - 1
+
+      ! To track cumulative elapsed time of children
       if (depth > 0) schild(depth) = schild(depth) + elapsed
    end subroutine prof_pop
 
