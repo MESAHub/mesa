@@ -29,6 +29,7 @@ module run_binary_support
    use binary_do_one_utils
    use binary_ce
    use binary_photos
+   use profiler, only: prof_push, prof_pop
 
    implicit none
 
@@ -107,6 +108,7 @@ contains
       ierr = 0
       call system_clock(time0, clock_rate)
 
+      call prof_push('startup')
       call resolve_inlist_fname(inlist_fname, inlist_fname_arg)
       MESA_INLIST_RESOLVED = .true.  ! Now any call to resolve_inlist_fname will only return inlist_fname_arg or 'inlist'
 
@@ -127,12 +129,14 @@ contains
       binary_id = alloc_binary(ierr)
       if (ierr /= 0) then
          write(*, *) 'failed in alloc_binary'
+         call prof_pop()
          return
       end if
 
       call binary_ptr(binary_id, b, ierr)
       if (ierr /= 0) then
          write(*, *) 'failed in binary_ptr'
+         call prof_pop()
          return
       end if
 
@@ -146,6 +150,7 @@ contains
       call do_read_binary_job(b, inlist_fname, ierr)
       if (ierr /= 0) then
          write(*, *) 'failed in read_binary_job'
+         call prof_pop()
          return
       end if
 
@@ -215,7 +220,10 @@ contains
       if (doing_restart) then
          restart_filename = trim(trim(b% photo_directory) // '/b_' // photo_filename)
          call binary_load_photo(b, restart_filename, ierr)
-         if (failed('binary_load_photo', ierr)) return
+         if (failed('binary_load_photo', ierr)) then
+            call prof_pop()
+            return
+         end if
       end if
 
       b% donor_id = -1
@@ -229,7 +237,10 @@ contains
          end if
 
          call do_read_star_job(b% job% inlist_names(i), ierr)
-         if (failed('do_read_star_job', ierr)) return
+         if (failed('do_read_star_job', ierr)) then
+            call prof_pop()
+            return
+         end if
 
          if (i==1) then
             restart_filename = trim('1_' // photo_filename)
@@ -243,10 +254,16 @@ contains
             id_from_read_star_job, b% job% inlist_names(i), restart_filename, &
             .false., binary_id, id, ierr)
 
-         if (ierr /= 0) return
+         if (ierr /= 0) then
+            call prof_pop()
+            return
+         end if
 
          call star_ptr(id, s, ierr)
-         if (failed('star_ptr', ierr)) return
+         if (failed('star_ptr', ierr)) then
+            call prof_pop()
+            return
+         end if
          b% star_ids(i) = id
 
          s% include_binary_history_in_log_file = b% append_to_star_history
@@ -304,36 +321,51 @@ contains
       ! setup pgbinary
       if (.not. doing_restart) then
          call start_new_run_for_pgbinary(b, ierr)
-         if (failed('start_new_run_for_pgbinary', ierr)) return
+         if (failed('start_new_run_for_pgbinary', ierr)) then
+            call prof_pop()
+            return
+         end if
       else
          call restart_run_for_pgbinary(b, ierr)
-         if (failed('restart_run_for_pgbinary', ierr)) return
+         if (failed('restart_run_for_pgbinary', ierr)) then
+            call prof_pop()
+            return
+         end if
       end if
 
       if (b% job% show_binary_log_description_at_start .and. .not. doing_restart) then
          write(*, '(A)')
          call do_show_binary_log_description(id, ierr)
-         if (failed('show_log_description', ierr)) return
+         if (failed('show_log_description', ierr)) then
+            call prof_pop()
+            return
+         end if
       end if
 
       if (b% point_mass_i /= 1 .and. b% do_initial_orbit_sync_1 .and. &
          .not. doing_restart) then
+         call prof_push('relax_uniform_omega')
          call star_relax_uniform_omega(&
             b% s1% id, 0, (2 * pi) / b% period, b% s1% job% num_steps_to_relax_rotation, &
             b% s1% job% relax_omega_max_yrs_dt, ierr)
+         call prof_pop()
          if (ierr /= 0) then
             write(*, *) 'failed in initial orbital sync'
+            call prof_pop()
             return
          end if
       end if
 
       if (b% point_mass_i /= 2 .and. b% do_initial_orbit_sync_2 .and. &
          .not. doing_restart) then
+         call prof_push('relax_uniform_omega')
          call star_relax_uniform_omega(&
             b% s2% id, 0, (2 * pi) / b% period, b% s2% job% num_steps_to_relax_rotation, &
             b% s2% job% relax_omega_max_yrs_dt, ierr)
+         call prof_pop()
          if (ierr /= 0) then
             write(*, *) 'failed in initial orbital sync'
+            call prof_pop()
             return
          end if
       end if
@@ -343,17 +375,25 @@ contains
       i_prev = 0
 
       binary_startup = b% extras_binary_startup(b% binary_id, doing_restart, ierr)
-      if (ierr /= 0) return
+      if (ierr /= 0) then
+         call prof_pop()
+         return
+      end if
 
       ! perform changes specified by binary_job variables
       call do_binary_job_controls_after(b% binary_id, b, doing_restart, ierr)
-      if (ierr /= 0) return
+      if (ierr /= 0) then
+         call prof_pop()
+         return
+      end if
 
       ! setup things for common envelope in case of a restart
       if (doing_restart .and. b% CE_flag .and. b% CE_init) then
          call ce_init(b, doing_restart, ierr)
       end if
+      call prof_pop()
 
+      call prof_push('evolve')
       evolve_loop : do while(continue_evolve_loop)  ! evolve one step per loop
 
          if (b% point_mass_i /= 0) then
@@ -371,9 +411,17 @@ contains
 
             id = b% star_ids(i)
             call star_ptr(id, s, ierr)
-            if (failed('star_ptr', ierr)) return
+            if (failed('star_ptr', ierr)) then
+               call prof_pop()
+               return
+            end if
+            call prof_push('before_step_loop')
             call before_step_loop(id, ierr)
-            if (ierr /= 0) return
+            call prof_pop()
+            if (ierr /= 0) then
+               call prof_pop()
+               return
+            end if
 
             result = s% extras_start_step(id)
             if (result /= keep_going) then
@@ -396,6 +444,7 @@ contains
             result = b% extras_binary_start_step(b% binary_id, ierr)
             if (ierr /= 0) then
                write(*, *) "error in extras_binary_start_step"
+               call prof_pop()
                return
             end if
             if (result /= keep_going) exit evolve_loop
@@ -424,6 +473,7 @@ contains
                end if
             end if
 
+            call prof_push('star_evolve_step')
             do l = 1, num_stars
 
                if (b% point_mass_i /= 0) then  ! if any point mass, evolve the other one
@@ -452,8 +502,10 @@ contains
                   b% t_sync_2 = 0
                end if
 
+               call prof_push('star_evolve_step_part1')
                result = worst_result(result, &
                   star_evolve_step_part1(id, first_try))
+               call prof_pop()
 
             end do
 
@@ -467,12 +519,14 @@ contains
                if (b% s_accretor% mstar_dot > 0) then
                   write(*, *) "ERROR: both stars accreting, terminating evolution"
                   result = terminate
+                  call prof_pop()
                   exit step_loop
                end if
                k = b% a_i  ! donor is gaining while accretor is losing, accretor plays donor in this step
             else if (b% point_mass_i /= 0 .and. b% s_donor% mstar_dot > 0) then
                write(*, *) "ERROR: donor accreting, terminating evolution"
                result = terminate
+               call prof_pop()
                exit step_loop
             end if
 
@@ -499,14 +553,17 @@ contains
                      if (i == 2) call set_accretion_composition(b, j)
                   end if
 
+                  call prof_push('star_evolve_step_part2')
                   result = worst_result(result, &
                      star_evolve_step_part2(id, first_try))
+                  call prof_pop()
 
                end do
             end if
 
             ! do not evolve binary step on failure, its unnecessary and some variables are not properly
             ! set when the newton solver fails.
+            call prof_push('binary_evolve_step')
             if (result == keep_going) then
                if (.not. b% CE_flag) then
                   result = worst_result(result, binary_evolve_step(b))
@@ -514,7 +571,10 @@ contains
                   result = worst_result(result, CE_binary_evolve_step(b))
                end if
             end if
+            call prof_pop()
+            call prof_pop()
 
+            call prof_push('check_model')
             if (result == keep_going) then
                result = worst_result(result, binary_check_model(b))
             end if
@@ -536,9 +596,11 @@ contains
 
             partial_result = b% extras_binary_check_model(b% binary_id)
             result = worst_result(result, partial_result)
+            call prof_pop()
 
             ! solve first binary timestep limit because star_pick_next_timestep needs it
             ! check redos as well to stop the implicit solver if a hard limit is hit
+            call prof_push('pick_next_timestep')
             if (result == keep_going .or. result == redo) then
                result = worst_result(result, binary_pick_next_timestep(b))
             end if
@@ -552,10 +614,15 @@ contains
                   end if
                   id = b% star_ids(i)
                   call star_ptr(id, s, ierr)
-                  if (failed('star_ptr', ierr)) return
+                  if (failed('star_ptr', ierr)) then
+                     call prof_pop()
+                     call prof_pop()
+                     return
+                  end if
                   result = worst_result(result, star_pick_next_timestep(id))
                end do
             end if
+            call prof_pop()
             if (result == keep_going) then
                exit step_loop
             end if
@@ -569,11 +636,17 @@ contains
 
                id = b% star_ids(i)
                model_number = get_model_number(id, ierr)
-               if (failed('get_model_number', ierr)) return
+               if (failed('get_model_number', ierr)) then
+                  call prof_pop()
+                  return
+               end if
 
                result_reason = get_result_reason(id, ierr)
                if (result == retry) then
-                  if (failed('get_result_reason', ierr)) return
+                  if (failed('get_result_reason', ierr)) then
+                     call prof_pop()
+                     return
+                  end if
                   if (s% job% report_retries) &
                      write(*, '(i6,3x,a,/)') model_number, &
                         'retry reason ' // trim(result_reason_str(result_reason))
@@ -582,6 +655,7 @@ contains
             end do
 
             b% generations = b% s_donor% generations
+            call prof_push('prepare_redo_retry')
             if (result == redo) then
                do l = 1, num_stars
                   if (l == 1 .and. b% point_mass_i == 1) then
@@ -613,6 +687,7 @@ contains
                end do
                result = worst_result(result, binary_prepare_to_retry(b))
             end if
+            call prof_pop()
 
             !correct pointers to stars after retry
             if (b% d_i == 1) then
@@ -651,6 +726,8 @@ contains
 
          end do step_loop
 
+         call prof_push('after_step_loop')
+         call prof_push('binary_finish_step')
          partial_result = b% extras_binary_finish_step(b% binary_id)
          result = worst_result(result, partial_result)
 
@@ -687,6 +764,7 @@ contains
                b% need_to_update_binary_history_now = .false.
             end if
          end if
+         call prof_pop()
 
          do l = 1, num_stars
             if (l == 1 .and. b% point_mass_i == 1) then
@@ -699,7 +777,11 @@ contains
             partial_result = result
             call after_step_loop(id, b% job% inlist_names(i), &
                .false., partial_result, ierr)
-            if (ierr /= 0) return
+            if (ierr /= 0) then
+               call prof_pop()
+               call prof_pop()
+               return
+            end if
             result = worst_result(result, partial_result)
          end do
 
@@ -713,13 +795,24 @@ contains
             end if
             if (will_read_pgbinary_inlist) then
                call read_pgbinary_inlist(b, inlist_fname, ierr)
-               if (failed('read_pgbinary_controls', ierr)) return
+               if (failed('read_pgbinary_controls', ierr)) then
+                  call prof_pop()
+                  call prof_pop()
+                  return
+               end if
             end if
          end if
          if (result == keep_going .and. b% job% pgbinary_flag) then
+            call prof_push('pgbinary')
             call update_pgbinary_plots(b, .false., ierr)
-            if (failed('update_pgbinary_plots', ierr)) return
+            call prof_pop()
+            if (failed('update_pgbinary_plots', ierr)) then
+               call prof_pop()
+               call prof_pop()
+               return
+            end if
          end if
+         call prof_pop()
 
          if (result /= keep_going) then
             if (result /= terminate) then
@@ -741,7 +834,10 @@ contains
                   partial_result = result
                   call terminate_normal_evolve_loop(id, &
                      .false., partial_result, ierr)
-                  if (ierr /= 0) return
+                  if (ierr /= 0) then
+                     call prof_pop()
+                     return
+                  end if
                   result = worst_result(result, partial_result)
 
                end if
@@ -751,6 +847,7 @@ contains
             exit evolve_loop
          end if
 
+         call prof_push('do_saves')
          do l = 1, num_stars
             if (l == 1 .and. b% point_mass_i == 1) then
                i = 2
@@ -762,7 +859,11 @@ contains
 
             call do_saves(&
                id, ierr)
-            if (ierr /= 0) return
+            if (ierr /= 0) then
+               call prof_pop()
+               call prof_pop()
+               return
+            end if
 
             if (s% doing_timing) then
                call system_clock(s% job% time1_extra, s% job% clock_rate)
@@ -775,16 +876,26 @@ contains
          end do
          if (b% photo_interval > 0 .and. mod(b% model_number, b% photo_interval) == 0) then
             call do_saves_for_binary(b, ierr)
-            if (ierr /= 0) return
+            if (ierr /= 0) then
+               call prof_pop()
+               call prof_pop()
+               return
+            end if
          end if
+         call prof_pop()
 
          if (b% doing_first_model_of_run) b% doing_first_model_of_run = .false.
 
       end do evolve_loop
+      call prof_pop()
 
+      call prof_push('after_evolve')
       ! save photos at end of the run
       call do_saves_for_binary(b, ierr)
-      if (ierr /= 0) return
+      if (ierr /= 0) then
+         call prof_pop()
+         return
+      end if
 
       ! deallocate arrays used for calculation of phase dependent variables
       deallocate(b% theta_co, b% time_co, b% mdot_donor_theta)
@@ -793,11 +904,13 @@ contains
       ierr = binary_after_evolve(b)
       if (ierr /= 0) then
          write(*, *) "Error in binary_after_evolve"
+         call prof_pop()
          return
       end if
       call b% extras_binary_after_evolve(b% binary_id, ierr)
       if (ierr /= 0) then
          write(*, *) "Error in extras_binary_after_evolve"
+         call prof_pop()
          return
       end if
 
@@ -828,6 +941,7 @@ contains
          end if
 
       end do
+      call prof_pop()
 
       call starlib_shutdown
 

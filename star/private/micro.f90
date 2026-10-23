@@ -23,6 +23,7 @@ module micro
   use const_def, only: dp, i8, ln10, crad, qe, avo, kerg, one_third, four_thirds_pi
   use star_utils, only: foreach_cell
   use utils_lib, only: is_bad
+  use profiler, only: prof_push, prof_pop
 
   implicit none
 
@@ -158,8 +159,7 @@ contains
 
        if (s% doing_timing) call start_time(s, time0, total)
 
-
-
+       call prof_push('opac')
        !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
        do k = nzlo, nzhi
           op_err = 0
@@ -167,6 +167,7 @@ contains
           if (op_err /= 0) ierr = op_err
        end do
        !$OMP END PARALLEL DO
+       call prof_pop()
        if (s% doing_timing) call update_time(s, time0, total, s% time_neu_kap)
        if (ierr /= 0) then
           if (s% report_ierr) write(*,*) 'do1_neu_kap returned ierr', ierr
@@ -180,7 +181,9 @@ contains
     if (.not. skip_net) then
 
        if (dbg) write(*,*) 'micro: call do_net'
+       call prof_push('net')
        call do_net(s, nzlo, nzhi, ierr)
+       call prof_pop()
        if (dbg) write(*,*) 'micro: done do_net'
        if (ierr /= 0) then
           if (s% report_ierr) write(*,*) 'do_net returned ierr', ierr
@@ -197,7 +200,9 @@ contains
       ierr = 0
       if (dbg) write(*,*) 'call do_eos'
       if (s% doing_timing) call start_time(s, time0, total)
+      call prof_push('eos')
       call do_eos(s,nzlo,nzhi,ierr)
+      call prof_pop()
       if (s% doing_timing) call update_time(s, time0, total, s% time_eos)
       if (ierr /= 0) then
          if (s% report_ierr) write(*,*) 'do_eos returned ierr', ierr

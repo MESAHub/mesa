@@ -26,11 +26,13 @@
          use binary_lib, only: run1_binary
          use run_star_extras
          use run_binary_extras
+         use profiler, only: prof_push, prof_pop, prof_report
 
          logical, intent(in) :: tst
 
          integer :: ierr
 
+         call prof_push('binary')
          call run1_binary(tst, &
             ! star extras
             extras_controls, &
@@ -38,6 +40,8 @@
             extras_binary_controls, &
             ierr)
 
+         call prof_pop()
+         call prof_report()
       end subroutine do_run_binary
 
       end module run_binary
