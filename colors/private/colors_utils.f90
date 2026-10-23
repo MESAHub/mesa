@@ -162,13 +162,17 @@ contains
       close (unit)
    end subroutine load_vega_sed
 
-   subroutine load_filter(directory, filter_wavelengths, filter_trans)
+   subroutine load_filter(directory, filter_wavelengths, filter_trans, photon_counting)
+      use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
       character(len=*), intent(in) :: directory
       real(dp), dimension(:), allocatable, intent(out) :: filter_wavelengths, filter_trans
+      logical, optional, intent(out) :: photon_counting
 
       character(len=512) :: line
-      integer :: unit, n_rows, status, i
-      real(dp) :: temp_wavelength, temp_trans
+      integer :: unit, n_rows, status, i, pass
+      real(dp) :: temp_wavelength, temp_trans, previous_wavelength
+
+      if (present(photon_counting)) photon_counting = .true.
 
       open (newunit=unit, file=trim(directory), status='OLD', action='READ', iostat=status)
       if (status /= 0) then
@@ -176,41 +180,65 @@ contains
          call mesa_error(__FILE__, __LINE__)
       end if
 
-      read (unit, '(A)', iostat=status) line
-      if (status /= 0) then
-         print *, "Error: Could not read the file", trim(directory)
-         call mesa_error(__FILE__, __LINE__)
-      end if
-
-      n_rows = 0
-      do
-         read (unit, '(A)', iostat=status) line
-         if (status /= 0) exit
-         n_rows = n_rows + 1
-      end do
-
-      allocate (filter_wavelengths(n_rows))
-      allocate (filter_trans(n_rows))
-
-      ! rewind to the first non-comment line
-      rewind (unit)
-      do
-         read (unit, '(A)', iostat=status) line
-         if (status /= 0) then
-            print *, "Error: Could not rewind file", trim(directory)
-            call mesa_error(__FILE__, __LINE__)
+      do pass = 1, 2
+         rewind (unit)
+         i = 0
+         previous_wavelength = -huge(1.0_dp)
+         do
+            read (unit, '(A)', iostat=status) line
+            if (status < 0) exit
+            if (status /= 0) then
+               print *, 'Error reading filter ', trim(directory)
+               call mesa_error(__FILE__, __LINE__)
+            end if
+            line = adjustl(line)
+            if (len_trim(line) == 0) cycle
+            if (line(1:1) == '#') then
+               if (pass == 1 .and. present(photon_counting)) then
+                  if (index(line, '# DetectorType:') == 1) then
+                     select case (trim(adjustl(line(16:))))
+                     case ('photon')
+                        photon_counting = .true.
+                     case ('energy')
+                        photon_counting = .false.
+                     case default
+                        print *, 'Unknown DetectorType in ', trim(directory)
+                        call mesa_error(__FILE__, __LINE__)
+                     end select
+                  end if
+               end if
+               cycle
+            end if
+            if (index(line, 'Wavelength,Transmission') == 1) cycle
+            read (line, *, iostat=status) temp_wavelength, temp_trans
+            if (status /= 0) then
+               print *, 'Malformed filter row in ', trim(directory)
+               call mesa_error(__FILE__, __LINE__)
+            end if
+            if (.not. ieee_is_finite(temp_wavelength) .or. .not. ieee_is_finite(temp_trans)) then
+               print *, 'Non-finite filter row in ', trim(directory)
+               call mesa_error(__FILE__, __LINE__)
+            end if
+            if (temp_wavelength <= previous_wavelength .or. temp_wavelength <= 0.0_dp .or. &
+                temp_trans < 0.0_dp) then
+               print *, 'Invalid wavelength or transmission in ', trim(directory)
+               call mesa_error(__FILE__, __LINE__)
+            end if
+            i = i + 1
+            previous_wavelength = temp_wavelength
+            if (pass == 2) then
+               filter_wavelengths(i) = temp_wavelength
+               filter_trans(i) = temp_trans
+            end if
+         end do
+         if (pass == 1) then
+            n_rows = i
+            if (n_rows < 2) then
+               print *, 'Filter needs at least two samples: ', trim(directory)
+               call mesa_error(__FILE__, __LINE__)
+            end if
+            allocate (filter_wavelengths(n_rows), filter_trans(n_rows))
          end if
-         if (line(1:1) /= "#") exit
-      end do
-
-      i = 0
-      do
-         read (unit, *, iostat=status) temp_wavelength, temp_trans
-         if (status /= 0) exit
-         i = i + 1
-
-         filter_wavelengths(i) = temp_wavelength
-         filter_trans(i) = temp_trans
       end do
 
       close (unit)

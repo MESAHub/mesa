@@ -37,6 +37,7 @@ program test_colors
    use const_def, only: dp, pi, pc, rsun, Lsun
    use utils_lib, only: mesa_error
    use synthetic, only: calculate_synthetic, compute_vega_zero_point
+   use colors_utils, only: load_filter
    use hermite_interp, only: hermite_tensor_interp3d
    use hermite_interp_bounded, only: construct_sed_hermite_bounded
    use bolometric, only: calculate_bolometric_phot
@@ -121,6 +122,7 @@ program test_colors
    end do
 
    call check_filter_support()
+   call check_tagged_energy_filter()
    call check_nonuniform_hermite_derivatives()
    call check_bounded_hermite_small_negative()
    call check_bounded_hermite_fallback()
@@ -130,6 +132,38 @@ program test_colors
    call colors_shutdown()
 
 contains
+
+   subroutine check_tagged_energy_filter()
+      real(dp), allocatable :: filter_wave(:), transmission(:)
+      real(dp) :: sed_wave(5), energy_mag, photon_mag
+      logical :: photon_counting
+      integer :: unit, local_ierr
+
+      open (newunit=unit, file='filter_reader_test.dat', status='replace')
+      write (unit, '(a)') '# FilterID: Test/Camera.g'
+      write (unit, '(a)') '# DetectorType: energy'
+      write (unit, '(a)') 'Wavelength,Transmission'
+      write (unit, '(a)') '1,1', '3,1', '5,1'
+      close (unit)
+
+      call load_filter('filter_reader_test.dat', filter_wave, transmission, photon_counting)
+      open (newunit=unit, file='filter_reader_test.dat', status='old')
+      close (unit, status='delete')
+      if (photon_counting .or. size(filter_wave) /= 3) call mesa_error(__FILE__, __LINE__)
+      if (any(filter_wave /= [1.0_dp, 3.0_dp, 5.0_dp])) call mesa_error(__FILE__, __LINE__)
+
+      sed_wave = [1.0_dp, 2.0_dp, 3.0_dp, 4.0_dp, 5.0_dp]
+      energy_mag = calculate_synthetic(0.0_dp, 0.0_dp, 0.0_dp, local_ierr, &
+         sed_wave, sed_wave, filter_wave, transmission, 1.0_dp, 'energy.dat', &
+         .false., .false., '.', 0, photon_counting)
+      if (local_ierr /= 0) call mesa_error(__FILE__, __LINE__)
+      photon_mag = calculate_synthetic(0.0_dp, 0.0_dp, 0.0_dp, local_ierr, &
+         sed_wave, sed_wave, filter_wave, transmission, 1.0_dp, 'photon.dat', &
+         .false., .false., '.', 0, .true.)
+      if (local_ierr /= 0) call mesa_error(__FILE__, __LINE__)
+      if (abs(energy_mag + 2.5_dp*log10(3.0_dp)) > 1.0e-10_dp) call mesa_error(__FILE__, __LINE__)
+      if (photon_mag >= energy_mag) call mesa_error(__FILE__, __LINE__)
+   end subroutine check_tagged_energy_filter
 
    subroutine check_filter_support()
       real(dp) :: sed_wave(5), filter_wave(3), sed_flux(5), transmission(3)

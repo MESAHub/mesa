@@ -135,7 +135,8 @@ contains
                                                              zero_point, &
                                                              color_filter_names(i), &
                                                              make_sed, cs%sed_per_model, &
-                                                             cs%colors_results_directory, model_number)
+                                                             cs%colors_results_directory, model_number, &
+                                                             cs%filters(i)%photon_counting)
 
                if (ierr /= 0) vals(i + filter_offset) = -1.0_dp
             else

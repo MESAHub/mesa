@@ -174,12 +174,16 @@ An unformatted Fortran binary file produced by SED_Tools. It encodes the full at
 Filter files (.dat)
 -------------------
 
-Two-column text files, one row per wavelength point. Lines beginning with ``#`` are treated as comments and skipped:
+Two-column text files, one row per wavelength point. Comma-separated and whitespace-separated samples are accepted. Leading ``#`` metadata and the ``Wavelength,Transmission`` CSV header are skipped:
 
 .. code-block:: text
 
-   # optional comment lines
-   wavelength(Å)   transmission(0–1)
+   # DetectorType: energy
+   Wavelength,Transmission
+   4000,0.2
+   5000,0.8
+
+``DetectorType`` may be ``energy`` or ``photon``. The colors module uses that convention for both synthetic flux and Vega/AB/ST zero points. Files without this field retain the legacy photon-counting convention. Wavelengths must be positive and strictly increasing; transmissions must be finite and nonnegative. Invalid files stop the run with a named error rather than producing a magnitude.
 
 The instrument directory must also contain an index file whose name matches the instrument (e.g. ``Johnson``), listing one filter filename per line. The module loads every filter listed in this index.
 

@@ -38,7 +38,8 @@ contains
                                          wavelengths, fluxes, &
                                          filter_wavelengths, filter_trans, &
                                          zero_point_flux, &
-                                         filter_name, make_sed, sed_per_model, colors_results_directory, model_number)
+                                         filter_name, make_sed, sed_per_model, colors_results_directory, model_number, &
+                                         photon_counting)
       real(dp), intent(in) :: temperature, gravity, metallicity
       character(len=*), intent(in) :: filter_name, colors_results_directory
       integer, intent(out) :: ierr
@@ -48,6 +49,7 @@ contains
       real(dp), intent(in) :: zero_point_flux  ! precomputed at initialization
       logical, intent(in) :: make_sed, sed_per_model
       integer, intent(in) :: model_number
+      logical, optional, intent(in) :: photon_counting
 
       real(dp), dimension(:), allocatable :: convolved_flux, filter_on_sed_grid
       character(len=256) :: csv_file
@@ -107,7 +109,7 @@ contains
          close (10)
       end if
 
-      call calculate_synthetic_flux(wavelengths, convolved_flux, filter_on_sed_grid, synthetic_flux)
+      call calculate_synthetic_flux(wavelengths, convolved_flux, filter_on_sed_grid, synthetic_flux, photon_counting)
 
       if (zero_point_flux > 0.0_dp .and. synthetic_flux > 0.0_dp) then
          calculate_synthetic = -2.5d0*log10(synthetic_flux/zero_point_flux)
@@ -118,7 +120,8 @@ contains
          if (synthetic_flux <= 0.0_dp) then
             print *, "Error: Synthetic flux is zero or negative for filter ", trim(filter_name)
          end if
-         calculate_synthetic = huge(1.0_dp)
+         ierr = 1
+         calculate_synthetic = -1.0_dp
       end if
 
       deallocate (convolved_flux, filter_on_sed_grid)
@@ -146,16 +149,24 @@ contains
       end do
    end subroutine zero_filter_outside_support
 
-   ! photon-counting synthetic flux (numerator and denominator weighted by lambda)
-   subroutine calculate_synthetic_flux(wavelengths, convolved_flux, filter_on_sed_grid, synthetic_flux)
+   ! Mean flux through an energy or photon-counting response.
+   subroutine calculate_synthetic_flux(wavelengths, convolved_flux, filter_on_sed_grid, synthetic_flux, photon_counting)
       real(dp), dimension(:), intent(in) :: wavelengths, convolved_flux, filter_on_sed_grid
       real(dp), intent(out) :: synthetic_flux
+      logical, optional, intent(in) :: photon_counting
 
       real(dp) :: integrated_flux, integrated_filter
+      logical :: use_photons
 
-      ! photon-counting: weight by wavelength
-      call simpson_integration(wavelengths, convolved_flux*wavelengths, integrated_flux)
-      call simpson_integration(wavelengths, filter_on_sed_grid*wavelengths, integrated_filter)
+      use_photons = .true.
+      if (present(photon_counting)) use_photons = photon_counting
+      if (use_photons) then
+         call simpson_integration(wavelengths, convolved_flux*wavelengths, integrated_flux)
+         call simpson_integration(wavelengths, filter_on_sed_grid*wavelengths, integrated_filter)
+      else
+         call simpson_integration(wavelengths, convolved_flux, integrated_flux)
+         call simpson_integration(wavelengths, filter_on_sed_grid, integrated_filter)
+      end if
 
       if (integrated_filter > 0.0_dp) then
          synthetic_flux = integrated_flux/integrated_filter
@@ -166,11 +177,11 @@ contains
    end subroutine calculate_synthetic_flux
 
    ! vega zero-point -- called once at init, result cached in filter_data
-   real(dp) function compute_vega_zero_point(vega_wave, vega_flux, filt_wave, filt_trans)
+   real(dp) function compute_vega_zero_point(vega_wave, vega_flux, filt_wave, filt_trans, photon_counting)
       real(dp), dimension(:), intent(in) :: vega_wave, vega_flux
       real(dp), dimension(:), intent(in) :: filt_wave, filt_trans
+      logical, optional, intent(in) :: photon_counting
 
-      real(dp) :: int_flux, int_filter
       real(dp), allocatable :: filt_on_vega_grid(:), conv_flux(:)
 
       allocate (filt_on_vega_grid(size(vega_wave)))
@@ -181,25 +192,18 @@ contains
 
       conv_flux = vega_flux*filt_on_vega_grid
 
-      ! photon-counting integration
-      call simpson_integration(vega_wave, vega_wave*conv_flux, int_flux)
-      call simpson_integration(vega_wave, vega_wave*filt_on_vega_grid, int_filter)
-
-      if (int_filter > 0.0_dp) then
-         compute_vega_zero_point = int_flux/int_filter
-      else
-         compute_vega_zero_point = -1.0_dp
-      end if
+      call calculate_synthetic_flux(vega_wave, conv_flux, filt_on_vega_grid, &
+                                    compute_vega_zero_point, photon_counting)
 
       deallocate (filt_on_vega_grid, conv_flux)
    end function compute_vega_zero_point
 
    ! ab zero-point -- f_nu = 3631 Jy, converted to f_lambda = f_nu * c / lambda^2
    ! called once at init, result cached in filter_data
-   real(dp) function compute_ab_zero_point(filt_wave, filt_trans)
+   real(dp) function compute_ab_zero_point(filt_wave, filt_trans, photon_counting)
       real(dp), dimension(:), intent(in) :: filt_wave, filt_trans
+      logical, optional, intent(in) :: photon_counting
 
-      real(dp) :: int_flux, int_filter
       real(dp), allocatable :: ab_sed_flux(:)
       integer :: i
 
@@ -215,39 +219,25 @@ contains
          end if
       end do
 
-      ! photon-counting integration
-      call simpson_integration(filt_wave, ab_sed_flux*filt_trans*filt_wave, int_flux)
-      call simpson_integration(filt_wave, filt_wave*filt_trans, int_filter)
-
-      if (int_filter > 0.0_dp) then
-         compute_ab_zero_point = int_flux/int_filter
-      else
-         compute_ab_zero_point = -1.0_dp
-      end if
+      call calculate_synthetic_flux(filt_wave, ab_sed_flux*filt_trans, filt_trans, &
+                                    compute_ab_zero_point, photon_counting)
 
       deallocate (ab_sed_flux)
    end function compute_ab_zero_point
 
    ! st zero-point -- f_lambda = 3.63e-9 erg/s/cm^2/A (flat spectrum)
    ! called once at init, result cached in filter_data
-   real(dp) function compute_st_zero_point(filt_wave, filt_trans)
+   real(dp) function compute_st_zero_point(filt_wave, filt_trans, photon_counting)
       real(dp), dimension(:), intent(in) :: filt_wave, filt_trans
+      logical, optional, intent(in) :: photon_counting
 
-      real(dp) :: int_flux, int_filter
       real(dp), allocatable :: st_sed_flux(:)
 
       allocate (st_sed_flux(size(filt_wave)))
       st_sed_flux = 3.63d-9
 
-      ! photon-counting integration
-      call simpson_integration(filt_wave, st_sed_flux*filt_trans*filt_wave, int_flux)
-      call simpson_integration(filt_wave, filt_wave*filt_trans, int_filter)
-
-      if (int_filter > 0.0_dp) then
-         compute_st_zero_point = int_flux/int_filter
-      else
-         compute_st_zero_point = -1.0_dp
-      end if
+      call calculate_synthetic_flux(filt_wave, st_sed_flux*filt_trans, filt_trans, &
+                                    compute_st_zero_point, photon_counting)
 
       deallocate (st_sed_flux)
    end function compute_st_zero_point

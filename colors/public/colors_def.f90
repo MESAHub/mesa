@@ -35,6 +35,7 @@ module colors_def
       character(len=100) :: name
       real(dp), allocatable :: wavelengths(:)
       real(dp), allocatable :: transmission(:)
+      logical :: photon_counting = .true.
       ! precomputed zero-point fluxes, computed once at init
       real(dp) :: vega_zero_point = -1.0_dp
       real(dp) :: ab_zero_point = -1.0_dp

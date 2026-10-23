@@ -173,18 +173,22 @@ contains
          do i = 1, num_color_filters
             rq%filters(i)%name = color_filter_names(i)
             filter_filepath = trim(filter_dir)//'/'//trim(color_filter_names(i))
-            call load_filter(filter_filepath, rq%filters(i)%wavelengths, rq%filters(i)%transmission)
+            call load_filter(filter_filepath, rq%filters(i)%wavelengths, rq%filters(i)%transmission, &
+                             rq%filters(i)%photon_counting)
 
             ! precompute zero-points for all magnitude systems
             rq%filters(i)%vega_zero_point = compute_vega_zero_point( &
                                             rq%vega_wavelengths, rq%vega_fluxes, &
-                                            rq%filters(i)%wavelengths, rq%filters(i)%transmission)
+                                            rq%filters(i)%wavelengths, rq%filters(i)%transmission, &
+                                            rq%filters(i)%photon_counting)
 
             rq%filters(i)%ab_zero_point = compute_ab_zero_point( &
-                                          rq%filters(i)%wavelengths, rq%filters(i)%transmission)
+                                          rq%filters(i)%wavelengths, rq%filters(i)%transmission, &
+                                          rq%filters(i)%photon_counting)
 
             rq%filters(i)%st_zero_point = compute_st_zero_point( &
-                                          rq%filters(i)%wavelengths, rq%filters(i)%transmission)
+                                          rq%filters(i)%wavelengths, rq%filters(i)%transmission, &
+                                          rq%filters(i)%photon_counting)
          end do
 
          rq%filters_loaded = .true.
