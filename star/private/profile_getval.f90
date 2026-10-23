@@ -291,7 +291,7 @@
             else if (lgT >= full_off) then
                f = 0d0
             else                   ! lgT > full_on and < full_off
-               f = (lgT - full_on) / (full_off - full_on)
+               f = (full_off - lgT) / (full_off - full_on)
             end if
             am_nu_factor = f*s% am_nu_factor
          else
