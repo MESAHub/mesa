@@ -118,7 +118,7 @@ interval. This is fixed after ``r26.4.1``.
 Controls: ``report_max_infall_inside_fe_core`` is ignored
 ---------------------------------------------------------
 
-The parameter ``report_max_infall_inside_fe_core`` was ignored in versions r25.12.1 and r26.4.1 and always had it's default value. See `gh-981 https://github.com/MESAHub/mesa/pull/981`_.
+The parameter ``report_max_infall_inside_fe_core`` was ignored in versions r25.12.1 and r26.4.1 and always had it's default value. See `gh-981 <https://github.com/MESAHub/mesa/pull/981>`_.
 
 r25.12.1
 ========
