@@ -10,13 +10,6 @@
       character (len=strlen), dimension(max_extra_inlists) :: extra_binary_job_inlist_name
 
       logical :: evolve_both_stars
-      logical :: relax_primary_to_th_eq
-      real(dp) :: log_Lnuc_div_L_for_relax_primary_to_th_eq
-      real(dp) :: min_age_for_relax_primary_to_th_eq
-      integer :: max_steps_for_relax_primary_to_th_eq
-      logical :: no_history_during_relax_primary_to_th_eq
-      logical :: reset_age_for_relax_primary_to_th_eq
-      real(dp) :: tsync_for_relax_primary_to_th_eq
 
       logical :: change_ignore_rlof_flag
       logical :: change_initial_ignore_rlof_flag

@@ -1519,6 +1519,7 @@
 
    History_Panels5_other_yaxis_name(:) = ''
    History_Panels5_other_yaxis_reversed(:) = .false.
+   History_Panels5_other_yaxis_log(:) = .false.
    History_Panels6_other_yaxis_log(:) = .false.
    History_Panels5_other_ymin(:) = -101d0
    History_Panels5_other_ymax(:) = -101d0

@@ -44,7 +44,6 @@
             s% pg% logL_v_xleft, s% pg% logL_v_xright, &
             s% pg% logL_v_ybot, s% pg% logL_v_ytop, .false., &
             s% pg% logL_v_title, s% pg% logL_v_txt_scale, ierr)
-         if (ierr /= 0) return
 
          call pgebuf()
 

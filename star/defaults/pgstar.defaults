@@ -1339,7 +1339,9 @@
       !     and if you have set M_center > 0, then also include
       !            log_xmstar
 
-      ! Display history of Rayleigh-Taylor Instability
+      ! Display regions with alpha_RTI > 0, independently of the mixing type.
+      ! Increase ``rti_regions`` to include all active and inactive regions.
+      ! Use ``rti`` as the plot name to include this plot in a grid.
 
       ! ::
 
@@ -1370,16 +1372,16 @@
     rti_step_xmax = -1
     rti_xaxis_name = 'model_number'
 
-      ! If ``rti_max_width`` is negative, then all steps will be shown,
-      ! thereby overriding ``rti_step_xmin``
+      ! Positive ``rti_max_width`` limits the model-number span ending at ``rti_step_xmax``.
+      ! Nonpositive values leave the selected ``rti_step_xmin``/``rti_step_xmax`` range in effect.
 
       ! ::
 
     rti_max_width = -1
 
-      ! Changes to ``rti_xaxis_log``, ``rti_xmin``, ``rti_xmax``, ``rti_xmargin``,
-      ! ``rti_xaxis_reversed``, ``rti_xaxis_in_seconds``, ``rti_xaxis_in_Myr``,
-      ! and ``rti_xaxis_time_from_present`` all require ``rti_xaxis_name = star_age``
+      ! Axis limits, margins, logarithms and reversal apply to either x-axis.
+      ! Only ``rti_xaxis_in_seconds``, ``rti_xaxis_in_Myr`` and
+      ! ``rti_xaxis_time_from_present`` require ``rti_xaxis_name = 'star_age'``.
 
       ! ::
 
@@ -1409,6 +1411,7 @@
 
       ! ``rti_interval`` sets the model number step in between
       ! updates of the displayed rti data
+      ! Values less than 1 are treated as 1.
       ! ::
 
     rti_line_weight = 10
@@ -1578,6 +1581,13 @@
       ! ::
 
     TmaxRho_fname = ''
+
+      ! ``TmaxRho_use_decorator`` enables calling a subroutine to add extra information to a plot,
+      ! see ``$MESA_DIR/star/other/pgstar_decorator.f90``
+
+      ! ::
+
+    TmaxRho_use_decorator = .false.
 
       ! **File output**
 
@@ -3118,6 +3128,7 @@
 
       ! ::
 
+    Profile_Panels4_same_yaxis_range(:) = .false.
     Profile_Panels4_yaxis_name(:) = ''
     Profile_Panels4_yaxis_reversed(:) = .false.
     Profile_Panels4_yaxis_log(:) = .false.
@@ -4857,6 +4868,7 @@
 
     History_Panels5_other_yaxis_name(:) = ''
     History_Panels5_other_yaxis_reversed(:) = .false.
+    History_Panels5_other_yaxis_log(:) = .false.
     History_Panels6_other_yaxis_log(:) = .false.
     History_Panels5_other_ymin(:) = -101d0
     History_Panels5_other_ymax(:) = -101d0
@@ -5254,6 +5266,8 @@
 ! ======================
 
       ! Plots either color-color, color-magnitude, magnitude-color or magnitude-magnitude
+      ! Log-axis flags apply log10(max(tiny,abs(value))) after subtracting the two columns.
+      ! Axis bounds are in the resulting plotted units.
 
 
       ! Color_magnitude1
@@ -5285,8 +5299,8 @@
     Color_magnitude1_xaxis2_name = ''
     Color_magnitude1_xmin = -101d0
     Color_magnitude1_xmax = -101d0
-    Color_magnitude1_max_width = 100
     Color_magnitude1_dxmin = -1
+    Color_Magnitude1_xmargin = 0.0
     Color_magnitude1_xaxis_reversed = .false.
     Color_magnitude1_xaxis_log = .false.
 
@@ -5330,7 +5344,6 @@
     Color_magnitude1_xaxis2_name = ''
     Color_magnitude1_xmin = -101d0
     Color_magnitude1_xmax = -101d0
-    Color_magnitude1_max_width = 100
     Color_magnitude1_dxmin = -1
     Color_magnitude1_xaxis_reversed = .false.
     Color_magnitude1_xaxis_log = .false.
@@ -5409,8 +5422,8 @@
     Color_magnitude2_xaxis2_name = ''
     Color_magnitude2_xmin = -101d0
     Color_magnitude2_xmax = -101d0
-    Color_magnitude2_max_width = 100
     Color_magnitude2_dxmin = -1
+    Color_Magnitude2_xmargin = 0.0
     Color_magnitude2_xaxis_reversed = .false.
     Color_magnitude2_xaxis_log = .false.
 
@@ -5454,7 +5467,6 @@
     Color_magnitude2_xaxis2_name = ''
     Color_magnitude2_xmin = -101d0
     Color_magnitude2_xmax = -101d0
-    Color_magnitude2_max_width = 100
     Color_magnitude2_dxmin = -1
     Color_magnitude2_xaxis_reversed = .false.
     Color_magnitude2_xaxis_log = .false.
@@ -5533,8 +5545,8 @@
     Color_magnitude3_xaxis2_name = ''
     Color_magnitude3_xmin = -101d0
     Color_magnitude3_xmax = -101d0
-    Color_magnitude3_max_width = 100
     Color_magnitude3_dxmin = -1
+    Color_Magnitude3_xmargin = 0.0
     Color_magnitude3_xaxis_reversed = .false.
     Color_magnitude3_xaxis_log = .false.
 
@@ -5578,7 +5590,6 @@
     Color_magnitude3_xaxis2_name = ''
     Color_magnitude3_xmin = -101d0
     Color_magnitude3_xmax = -101d0
-    Color_magnitude3_max_width = 100
     Color_magnitude3_dxmin = -1
     Color_magnitude3_xaxis_reversed = .false.
     Color_magnitude3_xaxis_log = .false.
@@ -5657,8 +5668,8 @@
     Color_magnitude4_xaxis2_name = ''
     Color_magnitude4_xmin = -101d0
     Color_magnitude4_xmax = -101d0
-    Color_magnitude4_max_width = 100
     Color_magnitude4_dxmin = -1
+    Color_Magnitude4_xmargin = 0.0
     Color_magnitude4_xaxis_reversed = .false.
     Color_magnitude4_xaxis_log = .false.
 
@@ -5702,7 +5713,6 @@
     Color_magnitude4_xaxis2_name = ''
     Color_magnitude4_xmin = -101d0
     Color_magnitude4_xmax = -101d0
-    Color_magnitude4_max_width = 100
     Color_magnitude4_dxmin = -1
     Color_magnitude4_xaxis_reversed = .false.
     Color_magnitude4_xaxis_log = .false.
@@ -5781,8 +5791,8 @@
     Color_magnitude5_xaxis2_name = ''
     Color_magnitude5_xmin = -101d0
     Color_magnitude5_xmax = -101d0
-    Color_magnitude5_max_width = 100
     Color_magnitude5_dxmin = -1
+    Color_Magnitude5_xmargin = 0.0
     Color_magnitude5_xaxis_reversed = .false.
     Color_magnitude5_xaxis_log = .false.
 
@@ -5826,7 +5836,6 @@
     Color_magnitude5_xaxis2_name = ''
     Color_magnitude5_xmin = -101d0
     Color_magnitude5_xmax = -101d0
-    Color_magnitude5_max_width = 100
     Color_magnitude5_dxmin = -1
     Color_magnitude5_xaxis_reversed = .false.
     Color_magnitude5_xaxis_log = .false.
@@ -5905,8 +5914,8 @@
     Color_magnitude6_xaxis2_name = ''
     Color_magnitude6_xmin = -101d0
     Color_magnitude6_xmax = -101d0
-    Color_magnitude6_max_width = 100
     Color_magnitude6_dxmin = -1
+    Color_Magnitude6_xmargin = 0.0
     Color_magnitude6_xaxis_reversed = .false.
     Color_magnitude6_xaxis_log = .false.
 
@@ -5950,7 +5959,6 @@
     Color_magnitude6_xaxis2_name = ''
     Color_magnitude6_xmin = -101d0
     Color_magnitude6_xmax = -101d0
-    Color_magnitude6_max_width = 100
     Color_magnitude6_dxmin = -1
     Color_magnitude6_xaxis_reversed = .false.
     Color_magnitude6_xaxis_log = .false.
@@ -6029,8 +6037,8 @@
     Color_magnitude7_xaxis2_name = ''
     Color_magnitude7_xmin = -101d0
     Color_magnitude7_xmax = -101d0
-    Color_magnitude7_max_width = 100
     Color_magnitude7_dxmin = -1
+    Color_Magnitude7_xmargin = 0.0
     Color_magnitude7_xaxis_reversed = .false.
     Color_magnitude7_xaxis_log = .false.
 
@@ -6074,7 +6082,6 @@
     Color_magnitude7_xaxis2_name = ''
     Color_magnitude7_xmin = -101d0
     Color_magnitude7_xmax = -101d0
-    Color_magnitude7_max_width = 100
     Color_magnitude7_dxmin = -1
     Color_magnitude7_xaxis_reversed = .false.
     Color_magnitude7_xaxis_log = .false.
@@ -6153,8 +6160,8 @@
     Color_magnitude8_xaxis2_name = ''
     Color_magnitude8_xmin = -101d0
     Color_magnitude8_xmax = -101d0
-    Color_magnitude8_max_width = 100
     Color_magnitude8_dxmin = -1
+    Color_Magnitude8_xmargin = 0.0
     Color_magnitude8_xaxis_reversed = .false.
     Color_magnitude8_xaxis_log = .false.
 
@@ -6198,7 +6205,6 @@
     Color_magnitude8_xaxis2_name = ''
     Color_magnitude8_xmin = -101d0
     Color_magnitude8_xmax = -101d0
-    Color_magnitude8_max_width = 100
     Color_magnitude8_dxmin = -1
     Color_magnitude8_xaxis_reversed = .false.
     Color_magnitude8_xaxis_log = .false.
@@ -6277,8 +6283,8 @@
     Color_magnitude9_xaxis2_name = ''
     Color_magnitude9_xmin = -101d0
     Color_magnitude9_xmax = -101d0
-    Color_magnitude9_max_width = 100
     Color_magnitude9_dxmin = -1
+    Color_Magnitude9_xmargin = 0.0
     Color_magnitude9_xaxis_reversed = .false.
     Color_magnitude9_xaxis_log = .false.
 
@@ -6322,7 +6328,6 @@
     Color_magnitude9_xaxis2_name = ''
     Color_magnitude9_xmin = -101d0
     Color_magnitude9_xmax = -101d0
-    Color_magnitude9_max_width = 100
     Color_magnitude9_dxmin = -1
     Color_magnitude9_xaxis_reversed = .false.
     Color_magnitude9_xaxis_log = .false.

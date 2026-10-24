@@ -186,9 +186,6 @@
          remove_initial_center_at_inner_max_abs_v, &
          remove_initial_fe_core, &
 
-         zero_initial_inner_v_by_mass_Msun, &
-         zero_inner_v_by_mass_Msun, &
-
          remove_surface_at_cell_k, &
          remove_surface_at_he_core_boundary, &
          remove_surface_by_optical_depth, &
@@ -320,9 +317,6 @@
          change_initial_u_flag, &
          new_u_flag, &
 
-         change_reconstruction_flag, &
-         change_initial_reconstruction_flag, &
-         new_reconstruction_flag, &
 
          center_ye_limit_for_v_flag, &
          change_rotation_flag, &
@@ -730,9 +724,6 @@
          s% job% remove_center_adjust_L_center = remove_center_adjust_L_center
          s% job% remove_center_logRho_limit = remove_center_logRho_limit
 
-         s% job% zero_initial_inner_v_by_mass_Msun = zero_initial_inner_v_by_mass_Msun
-         s% job% zero_inner_v_by_mass_Msun = zero_inner_v_by_mass_Msun
-
          s% job% remove_initial_surface_at_cell_k = remove_initial_surface_at_cell_k
          s% job% remove_initial_surface_at_he_core_boundary = remove_initial_surface_at_he_core_boundary
          s% job% remove_initial_surface_by_optical_depth = remove_initial_surface_by_optical_depth
@@ -856,9 +847,6 @@
          s% job% change_initial_u_flag = change_initial_u_flag
          s% job% new_u_flag = new_u_flag
 
-         s% job% change_reconstruction_flag = change_reconstruction_flag
-         s% job% change_initial_reconstruction_flag = change_initial_reconstruction_flag
-         s% job% new_reconstruction_flag = new_reconstruction_flag
 
          s% job% center_ye_limit_for_v_flag = center_ye_limit_for_v_flag
          s% job% change_rotation_flag = change_rotation_flag
@@ -1269,9 +1257,6 @@
          remove_initial_center_at_inner_max_abs_v = s% job% remove_initial_center_at_inner_max_abs_v
          remove_initial_fe_core = s% job% remove_initial_fe_core
 
-         zero_initial_inner_v_by_mass_Msun = s% job% zero_initial_inner_v_by_mass_Msun
-         zero_inner_v_by_mass_Msun = s% job% zero_inner_v_by_mass_Msun
-
          remove_surface_at_cell_k = s% job% remove_surface_at_cell_k
          remove_surface_at_he_core_boundary = s% job% remove_surface_at_he_core_boundary
          remove_surface_by_optical_depth = s% job% remove_surface_by_optical_depth
@@ -1394,9 +1379,6 @@
          change_initial_u_flag = s% job% change_initial_u_flag
          new_u_flag = s% job% new_u_flag
 
-         change_reconstruction_flag = s% job% change_reconstruction_flag
-         change_initial_reconstruction_flag = s% job% change_initial_reconstruction_flag
-         new_reconstruction_flag = s% job% new_reconstruction_flag
 
          center_ye_limit_for_v_flag = s% job% center_ye_limit_for_v_flag
          change_rotation_flag = s% job% change_rotation_flag

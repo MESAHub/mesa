@@ -64,11 +64,10 @@
             s% pg% Color_Magnitude1_xmax, &
             s% pg% Color_Magnitude1_dxmin, &
             s% pg% Color_Magnitude1_xmargin, &
-            s% pg% Color_Magnitude1_max_width, &
             s% pg% Color_Magnitude1_num_panels, &
             s% pg% Color_Magnitude1_other_ymin, &
             s% pg% Color_Magnitude1_other_ymax, &
-            s% pg% Color_Magnitude1_yaxis_reversed, &
+            s% pg% Color_Magnitude1_other_yaxis_reversed, &
             s% pg% Color_Magnitude1_other_yaxis_log, &
             s% pg% Color_Magnitude1_other_dymin, &
             s% pg% Color_Magnitude1_other_ymargin, &
@@ -126,11 +125,10 @@
             s% pg% Color_Magnitude2_xmax, &
             s% pg% Color_Magnitude2_dxmin, &
             s% pg% Color_Magnitude2_xmargin, &
-            s% pg% Color_Magnitude2_max_width, &
             s% pg% Color_Magnitude2_num_panels, &
             s% pg% Color_Magnitude2_other_ymin, &
             s% pg% Color_Magnitude2_other_ymax, &
-            s% pg% Color_Magnitude2_yaxis_reversed, &
+            s% pg% Color_Magnitude2_other_yaxis_reversed, &
             s% pg% Color_Magnitude2_other_yaxis_log, &
             s% pg% Color_Magnitude2_other_dymin, &
             s% pg% Color_Magnitude2_other_ymargin, &
@@ -188,11 +186,10 @@
             s% pg% Color_Magnitude3_xmax, &
             s% pg% Color_Magnitude3_dxmin, &
             s% pg% Color_Magnitude3_xmargin, &
-            s% pg% Color_Magnitude3_max_width, &
             s% pg% Color_Magnitude3_num_panels, &
             s% pg% Color_Magnitude3_other_ymin, &
             s% pg% Color_Magnitude3_other_ymax, &
-            s% pg% Color_Magnitude3_yaxis_reversed, &
+            s% pg% Color_Magnitude3_other_yaxis_reversed, &
             s% pg% Color_Magnitude3_other_yaxis_log, &
             s% pg% Color_Magnitude3_other_dymin, &
             s% pg% Color_Magnitude3_other_ymargin, &
@@ -250,11 +247,10 @@
             s% pg% Color_Magnitude4_xmax, &
             s% pg% Color_Magnitude4_dxmin, &
             s% pg% Color_Magnitude4_xmargin, &
-            s% pg% Color_Magnitude4_max_width, &
             s% pg% Color_Magnitude4_num_panels, &
             s% pg% Color_Magnitude4_other_ymin, &
             s% pg% Color_Magnitude4_other_ymax, &
-            s% pg% Color_Magnitude4_yaxis_reversed, &
+            s% pg% Color_Magnitude4_other_yaxis_reversed, &
             s% pg% Color_Magnitude4_other_yaxis_log, &
             s% pg% Color_Magnitude4_other_dymin, &
             s% pg% Color_Magnitude4_other_ymargin, &
@@ -312,11 +308,10 @@
             s% pg% Color_Magnitude5_xmax, &
             s% pg% Color_Magnitude5_dxmin, &
             s% pg% Color_Magnitude5_xmargin, &
-            s% pg% Color_Magnitude5_max_width, &
             s% pg% Color_Magnitude5_num_panels, &
             s% pg% Color_Magnitude5_other_ymin, &
             s% pg% Color_Magnitude5_other_ymax, &
-            s% pg% Color_Magnitude5_yaxis_reversed, &
+            s% pg% Color_Magnitude5_other_yaxis_reversed, &
             s% pg% Color_Magnitude5_other_yaxis_log, &
             s% pg% Color_Magnitude5_other_dymin, &
             s% pg% Color_Magnitude5_other_ymargin, &
@@ -374,11 +369,10 @@
             s% pg% Color_Magnitude6_xmax, &
             s% pg% Color_Magnitude6_dxmin, &
             s% pg% Color_Magnitude6_xmargin, &
-            s% pg% Color_Magnitude6_max_width, &
             s% pg% Color_Magnitude6_num_panels, &
             s% pg% Color_Magnitude6_other_ymin, &
             s% pg% Color_Magnitude6_other_ymax, &
-            s% pg% Color_Magnitude6_yaxis_reversed, &
+            s% pg% Color_Magnitude6_other_yaxis_reversed, &
             s% pg% Color_Magnitude6_other_yaxis_log, &
             s% pg% Color_Magnitude6_other_dymin, &
             s% pg% Color_Magnitude6_other_ymargin, &
@@ -436,11 +430,10 @@
             s% pg% Color_Magnitude7_xmax, &
             s% pg% Color_Magnitude7_dxmin, &
             s% pg% Color_Magnitude7_xmargin, &
-            s% pg% Color_Magnitude7_max_width, &
             s% pg% Color_Magnitude7_num_panels, &
             s% pg% Color_Magnitude7_other_ymin, &
             s% pg% Color_Magnitude7_other_ymax, &
-            s% pg% Color_Magnitude7_yaxis_reversed, &
+            s% pg% Color_Magnitude7_other_yaxis_reversed, &
             s% pg% Color_Magnitude7_other_yaxis_log, &
             s% pg% Color_Magnitude7_other_dymin, &
             s% pg% Color_Magnitude7_other_ymargin, &
@@ -498,11 +491,10 @@
             s% pg% Color_Magnitude8_xmax, &
             s% pg% Color_Magnitude8_dxmin, &
             s% pg% Color_Magnitude8_xmargin, &
-            s% pg% Color_Magnitude8_max_width, &
             s% pg% Color_Magnitude8_num_panels, &
             s% pg% Color_Magnitude8_other_ymin, &
             s% pg% Color_Magnitude8_other_ymax, &
-            s% pg% Color_Magnitude8_yaxis_reversed, &
+            s% pg% Color_Magnitude8_other_yaxis_reversed, &
             s% pg% Color_Magnitude8_other_yaxis_log, &
             s% pg% Color_Magnitude8_other_dymin, &
             s% pg% Color_Magnitude8_other_ymargin, &
@@ -560,11 +552,10 @@
             s% pg% Color_Magnitude9_xmax, &
             s% pg% Color_Magnitude9_dxmin, &
             s% pg% Color_Magnitude9_xmargin, &
-            s% pg% Color_Magnitude9_max_width, &
             s% pg% Color_Magnitude9_num_panels, &
             s% pg% Color_Magnitude9_other_ymin, &
             s% pg% Color_Magnitude9_other_ymax, &
-            s% pg% Color_Magnitude9_yaxis_reversed, &
+            s% pg% Color_Magnitude9_other_yaxis_reversed, &
             s% pg% Color_Magnitude9_other_yaxis_log, &
             s% pg% Color_Magnitude9_other_dymin, &
             s% pg% Color_Magnitude9_other_ymargin, &
@@ -591,7 +582,7 @@
             vp_xleft, vp_xright, vp_ybot, vp_ytop, subplot, title, txt_scale, &
             color_xaxis1_name,color_xaxis2_name,&
             color_xmin_in, color_xmax, dxmin,color_xmargin, &
-            color_max_width, color_num_panels, &
+            color_num_panels, &
             color_other_ymin, color_other_ymax, &
             color_other_yaxis_reversed, color_other_yaxis_log, &
             color_other_dymin, color_other_ymargin, &
@@ -613,7 +604,7 @@
          character (len=*), intent(in) :: title, color_xaxis1_name,color_xaxis2_name
          real, intent(in) :: &
             vp_xleft, vp_xright, vp_ybot, vp_ytop, txt_scale, &
-            color_xmin_in, color_xmax, color_max_width, color_xmargin, dxmin
+            color_xmin_in, color_xmax, color_xmargin, dxmin
          real, intent(in), dimension(:) :: &
             color_other_ymin, color_other_ymax, &
             color_other_dymin, color_other_ymargin, &
@@ -653,6 +644,7 @@
          step_max = s% model_number
 
          n = count_hist_points(s, step_min, step_max)
+         if (n == 0) return
 
          allocate(xvec1(n), xvec2(n), yvec1(n), yvec2(n), other_yvec1(n), other_yvec2(n), stat=ierr)
          if (ierr /= 0) then
@@ -713,6 +705,12 @@
 
          deallocate(xvec1,xvec2)
 
+         if (color_xaxis_log) then
+            do i=1,n
+               xvec(i) = log10(max(tiny(xvec(i)),abs(xvec(i))))
+            end do
+         end if
+
          call set_xleft_xright( &
             n, xvec, color_xmin, color_xmax, color_xmargin, &
             color_xaxis_reversed, dxmin, xleft, xright)
@@ -770,24 +768,35 @@
 
             if ((.not. have_yaxis) .and. (.not. have_other_yaxis)) cycle
 
-            yvec=yvec1
-            if(have_yaxis2) yvec=yvec-yvec2
+            if (have_yaxis) then
+               yvec=yvec1
+               if (have_yaxis2) yvec=yvec-yvec2
+               if (color_yaxis_log(j)) then
+                  do i=1,n
+                     yvec(i) = log10(max(tiny(yvec(i)),abs(yvec(i))))
+                  end do
+               end if
+               ! Make sure limits are sensible for plotting.
+               do i=lbound(yvec,dim=1),ubound(yvec,dim=1)
+                  if (yvec(i)>100) yvec(i)=100
+                  if (yvec(i)<-100) yvec(i)=-100
+               end do
+            end if
 
-         ! Make sure limits are sensible for plotting
-            do i=lbound(yvec,dim=1),ubound(yvec,dim=1)
-               if (yvec(i)>100) yvec(i)=100
-               if (yvec(i)<-100) yvec(i)=-100
-            end do
-
-            other_yvec=other_yvec1
-            if(have_other_yaxis2) other_yvec=other_yvec-other_yvec2
-
-         ! Make sure limits are sensible for plotting
-            do i=lbound(other_yvec,dim=1),ubound(other_yvec,dim=1)
-               if (other_yvec(i)>100) other_yvec(i)=100
-               if (other_yvec(i)<-100) other_yvec(i)=-100
-            end do
-
+            if (have_other_yaxis) then
+               other_yvec=other_yvec1
+               if (have_other_yaxis2) other_yvec=other_yvec-other_yvec2
+               if (color_other_yaxis_log(j)) then
+                  do i=1,n
+                     other_yvec(i) = log10(max(tiny(other_yvec(i)),abs(other_yvec(i))))
+                  end do
+               end if
+               ! Make sure limits are sensible for plotting.
+               do i=lbound(other_yvec,dim=1),ubound(other_yvec,dim=1)
+                  if (other_yvec(i)>100) other_yvec(i)=100
+                  if (other_yvec(i)<-100) other_yvec(i)=-100
+               end do
+            end if
 
             panel_ytop = vp_ytop - real(j-1)*panel_dy
             panel_ybot = panel_ytop - panel_dy
@@ -814,9 +823,9 @@
                call pgsci(other_y_color)
 
                if (have_other_yaxis2) then
-                  call show_right_yaxis_label_pgstar(s,trim(create_label(other_yname1,other_yname2)))
+                  call show_right_yaxis_label_pgstar(s,trim(create_label(other_yname1,other_yname2,color_other_yaxis_log(j))))
                else
-                  call show_right_yaxis_label_pgstar(s,trim(create_label(other_yname1,'')))
+                  call show_right_yaxis_label_pgstar(s,trim(create_label(other_yname1,'',color_other_yaxis_log(j))))
                end if
 
                call pgslw(s% pg% pgstar_lw)
@@ -847,9 +856,9 @@
                end if
                call pgsci(y_color)
                if(have_yaxis2)then
-                   call show_left_yaxis_label_pgstar(s,trim(create_label(yname1,yname2)))
+                   call show_left_yaxis_label_pgstar(s,trim(create_label(yname1,yname2,color_yaxis_log(j))))
                else
-                  call show_left_yaxis_label_pgstar(s,trim(create_label(yname1,'')))
+                  call show_left_yaxis_label_pgstar(s,trim(create_label(yname1,'',color_yaxis_log(j))))
                end if
                call pgslw(s% pg% pgstar_lw)
                call pgline(n, xvec, yvec)
@@ -863,9 +872,9 @@
          end do
 
          if (have_xaxis2) then
-            call show_xaxis_label_pgstar(s,trim(create_label(color_xaxis1_name,color_xaxis2_name)))
+            call show_xaxis_label_pgstar(s,trim(create_label(color_xaxis1_name,color_xaxis2_name,color_xaxis_log)))
          else
-            call show_xaxis_label_pgstar(s,trim(create_label(color_xaxis1_name,'')))
+            call show_xaxis_label_pgstar(s,trim(create_label(color_xaxis1_name,'',color_xaxis_log)))
          end if
 
          call pgunsa
@@ -884,8 +893,9 @@
             get1_yvec = get1_hist_yvec(s, step_min, step_max, n, name, vec)
          end function get1_yvec
 
-         function create_label(str1,str2) result(new_str)
+         function create_label(str1,str2,log_axis) result(new_str)
             character(len=*) :: str1,str2
+            logical, intent(in) :: log_axis
             integer :: len1,len2,endStr1
             character(len=strlen) :: new_str
 
@@ -913,9 +923,11 @@
                else if(str1(1:1)=='a') then
                   new_str(endStr1+1:)=' - M\d'//str2(9:len2)//'\u'
                else
-                  new_str(endStr1+1:)=str2(1:len2)
+                  new_str(endStr1+1:)=' - '//str2(1:len2)
                end if
             end if
+
+            if (log_axis) new_str = 'log |'//trim(new_str)//'|'
 
          end function create_label
 

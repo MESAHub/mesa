@@ -173,6 +173,7 @@ SRCS += \
    private/pgstar_support.f90 \
    private/pgstar_hist_track.f90 \
    private/pgstar_kipp.f90 \
+   private/pgstar_rti.f90 \
    private/pgstar_dpg_dnu.f90 \
    private/pgstar_trho.f90 \
    private/pgstar_tmaxrho.f90 \
@@ -259,6 +260,7 @@ MODULES += pgstar_abundance.mod \
            pgstar_profile_panels.mod \
            pgstar_r_l.mod \
            pgstar_r_teff.mod \
+           pgstar_rti.mod \
            pgstar_summary_burn.mod \
            pgstar_summary_history.mod \
            pgstar_summary.mod \
