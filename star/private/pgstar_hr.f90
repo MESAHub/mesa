@@ -62,6 +62,7 @@
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
+         if (s% pg% show_HR_radius_lines) call HR_radius_lines()
          if (s% pg% show_HR_Mira_instability_region) then
             logL1 = 2.8
             logL2 = 4.0
@@ -135,6 +136,86 @@
             call pgunsa
          end if
       end subroutine HR_decorate
+
+
+      subroutine HR_radius_lines()
+         use const_def, only: pi, boltz_sigma, Rsun, Lsun
+         use math_lib, only: log10
+         use pgstar_colors, only: clr_Gray
+         character(len=48) :: label
+         character(len=16) :: radius
+         real :: xmin, xmax, ymin, ymax
+         real :: x(2), y(2), xlo, xhi, ylo, yhi, dx, dy
+         real :: intercept, label_lo, label_hi, label_x, char_height
+         real :: solar_intercept
+         integer :: i, imin, imax
+
+         call pgqwin(xmin, xmax, ymin, ymax)
+         ! HR temperature axes run from hot to cool; handle either ordering.
+         xlo = min(xmin, xmax)
+         xhi = max(xmin, xmax)
+         ylo = min(ymin, ymax)
+         yhi = max(ymin, ymax)
+         dx = xhi - xlo
+         dy = yhi - ylo
+         if (dx <= 0.0 .or. dy <= 0.0) return
+
+         ! save the current drawing settings -- we'll restore them later
+         ! so other decorations don't inherit this style
+         call pgsave
+
+         call pgsci(clr_Gray)
+         call pgsls(Line_Type_Dash)
+         call pgslw(1)
+         call pgqch(char_height)
+         ! do_Hist_Track leaves the multiplied the character size by 2.8, so undo
+         ! that here.
+         call pgsch(0.7*char_height/2.8)
+
+         ! log10(L/Lsun) = 4*log10(Teff) + 2*log10(R/Rsun) + solar_intercept.
+         solar_intercept = real(log10(4.0_dp*pi*boltz_sigma*Rsun**2/Lsun))
+
+         ! figure out which radii (powers of 10) are visible
+         ! smallest visible line is at highest Teff and lowest L (xhi, ylo)
+         ! largest visible line is at lowest Teff and highest L (xlo, yhi)
+         imin = ceiling(0.5*(ylo - 4.0*xhi - solar_intercept))
+         imax = floor(0.5*(yhi - 4.0*xlo - solar_intercept))
+
+         do i = imin, imax
+            ! get the intercept for the current radius
+            intercept = solar_intercept + 2.0*i
+
+            ! Clip the line to the current axes before drawing it.
+            x(1) = max(xlo, (ylo-intercept)/4.0)
+            x(2) = min(xhi, (yhi-intercept)/4.0)
+            if (x(1) >= x(2)) cycle
+            y = 4.0*x + intercept
+            call pgline(2, x, y)
+
+            ! Label an interior segment so labels follow changing axis limits.
+            label_lo = max(xlo + 0.12*dx, (ylo + 0.08*dy-intercept)/4.0)
+            label_hi = min(xhi - 0.12*dx, (yhi - 0.12*dy-intercept)/4.0)
+
+            if (label_lo >= label_hi) cycle
+
+            label_x = 0.5*(label_lo + label_hi)
+
+            if (i >= 0 .and. i <= 3) then
+               write(radius, '(i0)') 10**i
+               label = trim(radius) // ' R\d\(2281)\u'
+            else
+               write(radius, '(i0)') i
+               label = '10\u' // trim(radius) // '\d R\d\(2281)\u'
+            end if
+
+            call pgptxt(label_x, 4.0*label_x + intercept + 0.02*dy, &
+               0.0, 0.5, trim(label))
+         end do
+
+         ! restore the drawing settings
+         call pgunsa
+
+      end subroutine HR_radius_lines
 
 
       subroutine do_HR_Plot(s, id, device_id, &
