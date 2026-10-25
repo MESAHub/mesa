@@ -120,7 +120,8 @@
    !                  uses R_V. The law used by PARSEC/CMD and YBC (Chen et al. 2019).
    !   'F99'        : Fitzpatrick (1999), Milky Way, uses R_V.
    !   'FM07'       : Fitzpatrick & Massa (2007) Milky Way average, fixed at
-   !                  R_V = 3.1. The law used by MIST v2.5 (Dotter et al. 2026).
+   !                  R_V = 3.1, as implemented in the extinction package
+   !                  (Barbary 2016). The law cited by MIST v2.5 (Dotter et al. 2026).
    !   'G23'        : Gordon et al. (2023), Milky Way, uses R_V; covers
    !                  0.0912-32 micron, including the 10 and 20 micron silicate features.
    !   'G03_SMCBar' : Gordon et al. (2003) SMC bar average, fixed at R_V = 2.74.
