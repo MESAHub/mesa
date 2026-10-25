@@ -1,3 +1,7 @@
 # runtime/output products
 LOGS/
 SED/
+
+# python_helpers/plot_zero_points.py
+LOGS_*/
+mag_system_comparison.png
