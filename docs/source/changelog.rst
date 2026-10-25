@@ -41,6 +41,8 @@ GYRE has been upgraded to 9.1.1, the most recent stable release. Changes since t
 
 The `MESA SDK <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__ recommended for compiling MESA has been updated to 26.6.1. Although this newer SDK is not required to successfully build MESA, it brings the benefit of restoring the cross-platform bit-for-bit compatibility that MESA once enjoyed (meaning that runs on Linux/Intel, MacOS/Intel and MacOS/ARM give identical results).
 
+The colors module now reads the ``DetectorType=photon|energy`` metadata field that SED_Tools writes on the column-name row of filter files, and weights energy-counting filter curves (e.g. Johnson--Cousins) accordingly, following `Bessell & Murphy (2012) <https://ui.adsabs.harvard.edu/abs/2012PASP..124..140B/abstract>`_. Filters without a ``DetectorType`` field are still treated as photon-counting. The Johnson filters shipped in ``data/colors_data`` are energy-counting, and the shipped 2MASS J, H and Ks curves are tagged ``energy`` because they already include the λ factor, so Johnson magnitudes differ from earlier versions by up to about 0.1 mag depending on the star, and 2MASS magnitudes by up to about 0.01 mag. See :doc:`colors/overview`.
+
 Additional controls are available for TDC envelope remeshing:
 
 - ``remesh_for_TDC_pulsations_when_load`` remeshes a model after loading it from a ``.mod`` file.

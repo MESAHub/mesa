@@ -20,7 +20,7 @@
 module colors_utils
    use const_def, only: dp, strlen, mesa_dir
    use colors_def, only: Colors_General_Info, sed_mem_cache_cap
-   use utils_lib, only: mesa_error
+   use utils_lib, only: mesa_error, StrLowCase
 
    implicit none
 
@@ -162,53 +162,50 @@ contains
       close (unit)
    end subroutine load_vega_sed
 
-   ! reads a filter curve. header lines starting with "#" are skipped for the data
-   ! but scanned for "# DetectorType: photon|energy" (default photon).
-   ! all integrals in the colors module assume a photon-counting response
-   ! (flux weighted by lambda), so energy-counting curves are converted to
-   ! photon-counting here: R_photon ~ R_energy/lambda (Bessell & Murphy 2012, eq. A9),
-   ! renormalised to keep the peak transmission unchanged.
+   ! reads a filter curve in the SED_Tools format, with wavelengths in Angstrom. the only
+   ! metadata field used is DetectorType: photon|energy, the response convention of the curve
+   ! (default photon). it is read from the column-name row:
+   !    Wavelength,Transmission,...;DetectorType=energy;...
+   ! (case-insensitive value; a missing or unrecognised value is treated as photon).
+   ! all integrals in the colors module weight by lambda, i.e. they assume a photon-counting
+   ! response. an energy-counting curve T_E is converted to its photon-counting equivalent
+   ! T_E/lambda (Bessell & Murphy 2012, eq. A9), which makes the lambda-weighted band average
+   ! equal to int(F T_E)/int(T_E). the curve is rescaled to keep its peak transmission;
+   ! the normalisation cancels in every ratio that uses it.
    subroutine load_filter(directory, filter_wavelengths, filter_trans)
       character(len=*), intent(in) :: directory
       real(dp), dimension(:), allocatable, intent(out) :: filter_wavelengths, filter_trans
 
-      character(len=512) :: line
-      character(len=16) :: detector_type
-      integer :: unit, n_rows, status, i, pos
-      logical :: seen_column_header
-      real(dp) :: temp_wavelength, temp_trans, peak_before, peak_after
+      character(len=4096) :: line
+      character(len=32) :: detector_type
+      integer :: unit, n_rows, status, i
+      real(dp) :: temp_wavelength, temp_trans, peak
 
-      detector_type = 'photon'
+      detector_type = "photon"
 
-      open (newunit=unit, file=trim(directory), status='OLD', action='READ', iostat=status)
+      open (newunit=unit, file=trim(directory), status="OLD", action="READ", iostat=status)
       if (status /= 0) then
          print *, "Error: Could not open file ", trim(directory)
          call mesa_error(__FILE__, __LINE__)
       end if
 
-      ! pass 1: parse metadata and count data rows
+      ! pass 1: header fields and number of data rows (the column-name row is not numeric)
       n_rows = 0
-      seen_column_header = .false.
       do
          read (unit, '(A)', iostat=status) line
          if (status /= 0) exit
-         if (len_trim(line) == 0) cycle
-         if (line(1:1) == "#") then
-            pos = index(line, 'DetectorType:')
-            if (pos > 0 .and. index(line, 'DetectorTypeSource') == 0) then
-               detector_type = adjustl(line(pos + len('DetectorType:'):))
-               call to_lower(detector_type)
-            end if
-         else if (.not. seen_column_header) then
-            seen_column_header = .true.   ! "Wavelength,Transmission"
-         else
+         if (line(1:1) == "#") cycle
+         read (line, *, iostat=status) temp_wavelength, temp_trans
+         if (status == 0) then
             n_rows = n_rows + 1
+         else
+            call read_row_field(line, "DetectorType", detector_type)
          end if
       end do
 
-      if (trim(detector_type) /= 'photon' .and. trim(detector_type) /= 'energy') then
+      if (detector_type /= "photon" .and. detector_type /= "energy") then
          print *, "Warning: unknown DetectorType '", trim(detector_type), "' in ", trim(directory), "; assuming photon"
-         detector_type = 'photon'
+         detector_type = "photon"
       end if
 
       allocate (filter_wavelengths(n_rows))
@@ -216,19 +213,13 @@ contains
 
       ! pass 2: read data
       rewind (unit)
-      seen_column_header = .false.
       i = 0
       do
          read (unit, '(A)', iostat=status) line
          if (status /= 0) exit
-         if (len_trim(line) == 0) cycle
          if (line(1:1) == "#") cycle
-         if (.not. seen_column_header) then
-            seen_column_header = .true.
-            cycle
-         end if
          read (line, *, iostat=status) temp_wavelength, temp_trans
-         if (status /= 0) exit
+         if (status /= 0) cycle
          i = i + 1
          filter_wavelengths(i) = temp_wavelength
          filter_trans(i) = temp_trans
@@ -236,21 +227,29 @@ contains
 
       close (unit)
 
-      if (trim(detector_type) == 'energy' .and. n_rows > 0) then
-         peak_before = maxval(filter_trans)
+      if (detector_type == "energy" .and. n_rows > 0) then
+         peak = maxval(filter_trans)
          where (filter_wavelengths > 0.0_dp) filter_trans = filter_trans/filter_wavelengths
-         peak_after = maxval(filter_trans)
-         if (peak_after > 0.0_dp) filter_trans = filter_trans*(peak_before/peak_after)
+         if (maxval(filter_trans) > 0.0_dp) filter_trans = filter_trans*(peak/maxval(filter_trans))
       end if
    end subroutine load_filter
 
-   subroutine to_lower(str)
-      character(len=*), intent(inout) :: str
-      integer :: k
-      do k = 1, len_trim(str)
-         if (str(k:k) >= 'A' .and. str(k:k) <= 'Z') str(k:k) = achar(iachar(str(k:k)) + 32)
-      end do
-   end subroutine to_lower
+   ! if line is a column-name row carrying "key=value" items after its second comma,
+   ! sets value to the lower-cased value of the item
+   subroutine read_row_field(line, key, value)
+      character(len=*), intent(in) :: line, key
+      character(len=*), intent(inout) :: value
+
+      integer :: i, j
+
+      i = index(line, ";"//key//"=")
+      if (i == 0) i = index(line, ","//key//"=")
+      if (i == 0) return
+      i = i + len(key) + 2
+      j = scan(line(i:), ";, "//char(13)) - 1
+      if (j < 0) j = len_trim(line(i:))
+      value = StrLowCase(line(i:i + j - 1))
+   end subroutine read_row_field
 
    ! parses a csv lookup table mapping atmosphere grid parameters to SED filenames
    subroutine load_lookup_table(lookup_file, lookup_table, out_file_names, &

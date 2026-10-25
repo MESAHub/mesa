@@ -68,7 +68,9 @@ For each filter, the in-band flux is computed by integrating the product of the 
 
 .. code-block:: text
 
-   F_band = ∫ F_observed(λ) × T(λ) dλ  /  ∫ T(λ) dλ
+   F_band = ∫ F_observed(λ) × T(λ) × λ dλ  /  ∫ T(λ) × λ dλ
+
+where T is the photon-counting response (see `Filter files (.dat)`_ for energy-counting curves).
 
 The synthetic magnitude is then:
 
@@ -163,12 +165,20 @@ An unformatted Fortran binary file produced by SED_Tools. It encodes the full at
 Filter files (.dat)
 -------------------
 
-Two-column text files, one row per wavelength point. Lines beginning with ``#`` are treated as comments and skipped:
+Comma-separated ``Wavelength,Transmission`` files in the format written by SED_Tools (0.4 or later). Metadata is stored as ``Key=value`` items, separated by ``;``, after the second comma of the column-name row. The wavelength column must be in Å:
 
 .. code-block:: text
 
-   # optional comment lines
-   wavelength(Å)   transmission(0–1)
+   Wavelength,Transmission,FilterID=GAIA/GAIA3.G;DetectorType=photon;DetectorTypeSource=svo;WavelengthUnit=Angstrom
+   3200.0,2.37e-08
+   ...
+
+``DetectorType`` states how the transmission curve is integrated, which is not always the same as the detector type. All other metadata fields, including ``WavelengthUnit``, are ignored by MESA.
+
+* ``photon`` — the curve is the fraction of photons detected at each wavelength (e.g. Gaia, JWST, TESS), so the photometry weights it by λ T(λ). It is used as given.
+* ``energy`` — the curve is to be integrated directly against F_λ. This covers energy-counting responses such as Bessell's Johnson–Cousins curves, and the 2MASS J, H and Ks curves, which the 2MASS team already multiplied by λ (`2MASS Explanatory Supplement §VI.4a <https://irsa.ipac.caltech.edu/data/2MASS/docs/releases/allsky/doc/sec6_4a.html>`_). The photometry weights it by T(λ) rather than λ T(λ), which MESA implements by converting the curve to T(λ)/λ, rescaled to keep its peak transmission (`Bessell & Murphy 2012 <https://ui.adsabs.harvard.edu/abs/2012PASP..124..140B/abstract>`_, eq. A9). The ``make_csv`` SED files list this converted curve.
+
+Files without a ``DetectorType`` field are treated as ``photon``, which is what MESA assumed before the header existed. Using the wrong convention shifts a magnitude by up to a few tenths: for Gaia G (Vega system), about 0.11 mag for a Sun-like star, 0.2–0.3 mag for M dwarfs, and 0.04–0.07 mag in the other direction for hot stars (20–40 kK); ``sed-tools filters-detector`` tags existing SED_Tools filter files in place.
 
 The instrument directory must also contain an index file whose name matches the instrument (e.g. ``Johnson``), listing one filter filename per line. The module loads every filter listed in this index.
 

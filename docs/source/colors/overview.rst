@@ -21,6 +21,8 @@ The colors module is controlled via the ``&colors`` namelist with key options:
 - ``make_csv``: Output detailed spectral energy distributions
 - ``colors_results_directory``: Directory for output files
 
+Filter files are SED_Tools ``.dat`` files. Their ``DetectorType=photon|energy`` metadata field selects the photon- or energy-counting integration convention; filters without a ``DetectorType`` field are treated as photon-counting. See ``colors/README.rst`` for the file format.
+
 Filter-specific magnitude columns are automatically added to history output based on the selected instrument.
 
 See the ``star/test_suite/custom_colors`` test suite case for usage examples.
