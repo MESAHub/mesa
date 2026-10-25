@@ -5255,6 +5255,10 @@
 
       ! Plots either color-color, color-magnitude, magnitude-color or magnitude-magnitude
 
+      ! Each axis name is a history column, or the difference of two history
+      ! columns written as e.g. ``'B - V'``. The ``xaxis2``, ``yaxis2`` and
+      ! ``other_yaxis2`` names are subtracted from the corresponding ``1`` names.
+
 
       ! Color_magnitude1
       ! ----------------
@@ -6372,13 +6376,529 @@
     Color_magnitude9_file_aspect_ratio = -1
 
 
-    SED1_title = 'SED Plot 1'
-    SED1_lambda_min = 3000.0d0
-    SED1_lambda_max = 12000.0d0
-    SED1_flux_min = -101.0d0
-    SED1_flux_max = -101.0d0
-    SED1_txt_scale = 1.0d0
+! SED Panels
+! ==========
+
+      ! Plots the spectral energy distribution (SED) that the colors module
+      ! computed for the current model, with the transmission curves of the
+      ! filters drawn over it. The SED is the one convolved with the filters,
+      ! i.e. the flux received at ``distance`` (set in the ``&colors`` namelist),
+      ! shown as ``log10`` of the flux density in erg s^-1 cm^-2 Angstrom^-1.
+      ! Requires ``use_colors = .true.`` in the ``&colors`` namelist. In a grid
+      ! these plots are called ``SED1`` to ``SED9``.
+
+
+      ! SED1
+      ! ----
+
+      ! ::
+
+    SED1_win_flag = .false.
+
+      ! ::
+
+    SED1_win_width = 6
+    SED1_win_aspect_ratio = 0.75
+
+      ! ::
+
+    SED1_xleft = 0.15
+    SED1_xright = 0.85
+    SED1_ybot = 0.15
+    SED1_ytop = 0.85
+    SED1_txt_scale = 1.0
+    SED1_title = 'SED1'
+
+      ! Wavelength range of the plot in Angstrom. Set ``SED1_lambda_min`` or
+      ! ``SED1_lambda_max`` to -101 to use the edge of the SED.
+
+      ! ::
+
+    SED1_lambda_min = 3000
+    SED1_lambda_max = 12000
+
+      ! Range of ``log10`` flux density. -101 means set by the data in the
+      ! wavelength range.
+
+      ! ::
+
+    SED1_flux_min = -101
+    SED1_flux_max = -101
+
+      ! Height of the filter transmission curves as a fraction of the plot
+      ! height. Each curve is scaled so that its peak transmission reaches the
+      ! top of the plot. 0 hides the filter curves.
+
+      ! ::
+
     SED1_filter_scale = 0.5
+
+      ! **File output**
+
+      ! ::
+
+    SED1_file_flag = .false.
+    SED1_file_dir = 'png'
+    SED1_file_prefix = 'SED1_'
+    SED1_file_interval = 5
+    SED1_file_width = -1
+    SED1_file_aspect_ratio = -1
+
+
+      ! SED2
+      ! ----
+
+      ! ::
+
+    SED2_win_flag = .false.
+
+      ! ::
+
+    SED2_win_width = 6
+    SED2_win_aspect_ratio = 0.75
+
+      ! ::
+
+    SED2_xleft = 0.15
+    SED2_xright = 0.85
+    SED2_ybot = 0.15
+    SED2_ytop = 0.85
+    SED2_txt_scale = 1.0
+    SED2_title = 'SED2'
+
+      ! Wavelength range of the plot in Angstrom. Set ``SED2_lambda_min`` or
+      ! ``SED2_lambda_max`` to -101 to use the edge of the SED.
+
+      ! ::
+
+    SED2_lambda_min = 3000
+    SED2_lambda_max = 12000
+
+      ! Range of ``log10`` flux density. -101 means set by the data in the
+      ! wavelength range.
+
+      ! ::
+
+    SED2_flux_min = -101
+    SED2_flux_max = -101
+
+      ! Height of the filter transmission curves as a fraction of the plot
+      ! height. Each curve is scaled so that its peak transmission reaches the
+      ! top of the plot. 0 hides the filter curves.
+
+      ! ::
+
+    SED2_filter_scale = 0.5
+
+      ! **File output**
+
+      ! ::
+
+    SED2_file_flag = .false.
+    SED2_file_dir = 'png'
+    SED2_file_prefix = 'SED2_'
+    SED2_file_interval = 5
+    SED2_file_width = -1
+    SED2_file_aspect_ratio = -1
+
+
+      ! SED3
+      ! ----
+
+      ! ::
+
+    SED3_win_flag = .false.
+
+      ! ::
+
+    SED3_win_width = 6
+    SED3_win_aspect_ratio = 0.75
+
+      ! ::
+
+    SED3_xleft = 0.15
+    SED3_xright = 0.85
+    SED3_ybot = 0.15
+    SED3_ytop = 0.85
+    SED3_txt_scale = 1.0
+    SED3_title = 'SED3'
+
+      ! Wavelength range of the plot in Angstrom. Set ``SED3_lambda_min`` or
+      ! ``SED3_lambda_max`` to -101 to use the edge of the SED.
+
+      ! ::
+
+    SED3_lambda_min = 3000
+    SED3_lambda_max = 12000
+
+      ! Range of ``log10`` flux density. -101 means set by the data in the
+      ! wavelength range.
+
+      ! ::
+
+    SED3_flux_min = -101
+    SED3_flux_max = -101
+
+      ! Height of the filter transmission curves as a fraction of the plot
+      ! height. Each curve is scaled so that its peak transmission reaches the
+      ! top of the plot. 0 hides the filter curves.
+
+      ! ::
+
+    SED3_filter_scale = 0.5
+
+      ! **File output**
+
+      ! ::
+
+    SED3_file_flag = .false.
+    SED3_file_dir = 'png'
+    SED3_file_prefix = 'SED3_'
+    SED3_file_interval = 5
+    SED3_file_width = -1
+    SED3_file_aspect_ratio = -1
+
+
+      ! SED4
+      ! ----
+
+      ! ::
+
+    SED4_win_flag = .false.
+
+      ! ::
+
+    SED4_win_width = 6
+    SED4_win_aspect_ratio = 0.75
+
+      ! ::
+
+    SED4_xleft = 0.15
+    SED4_xright = 0.85
+    SED4_ybot = 0.15
+    SED4_ytop = 0.85
+    SED4_txt_scale = 1.0
+    SED4_title = 'SED4'
+
+      ! Wavelength range of the plot in Angstrom. Set ``SED4_lambda_min`` or
+      ! ``SED4_lambda_max`` to -101 to use the edge of the SED.
+
+      ! ::
+
+    SED4_lambda_min = 3000
+    SED4_lambda_max = 12000
+
+      ! Range of ``log10`` flux density. -101 means set by the data in the
+      ! wavelength range.
+
+      ! ::
+
+    SED4_flux_min = -101
+    SED4_flux_max = -101
+
+      ! Height of the filter transmission curves as a fraction of the plot
+      ! height. Each curve is scaled so that its peak transmission reaches the
+      ! top of the plot. 0 hides the filter curves.
+
+      ! ::
+
+    SED4_filter_scale = 0.5
+
+      ! **File output**
+
+      ! ::
+
+    SED4_file_flag = .false.
+    SED4_file_dir = 'png'
+    SED4_file_prefix = 'SED4_'
+    SED4_file_interval = 5
+    SED4_file_width = -1
+    SED4_file_aspect_ratio = -1
+
+
+      ! SED5
+      ! ----
+
+      ! ::
+
+    SED5_win_flag = .false.
+
+      ! ::
+
+    SED5_win_width = 6
+    SED5_win_aspect_ratio = 0.75
+
+      ! ::
+
+    SED5_xleft = 0.15
+    SED5_xright = 0.85
+    SED5_ybot = 0.15
+    SED5_ytop = 0.85
+    SED5_txt_scale = 1.0
+    SED5_title = 'SED5'
+
+      ! Wavelength range of the plot in Angstrom. Set ``SED5_lambda_min`` or
+      ! ``SED5_lambda_max`` to -101 to use the edge of the SED.
+
+      ! ::
+
+    SED5_lambda_min = 3000
+    SED5_lambda_max = 12000
+
+      ! Range of ``log10`` flux density. -101 means set by the data in the
+      ! wavelength range.
+
+      ! ::
+
+    SED5_flux_min = -101
+    SED5_flux_max = -101
+
+      ! Height of the filter transmission curves as a fraction of the plot
+      ! height. Each curve is scaled so that its peak transmission reaches the
+      ! top of the plot. 0 hides the filter curves.
+
+      ! ::
+
+    SED5_filter_scale = 0.5
+
+      ! **File output**
+
+      ! ::
+
+    SED5_file_flag = .false.
+    SED5_file_dir = 'png'
+    SED5_file_prefix = 'SED5_'
+    SED5_file_interval = 5
+    SED5_file_width = -1
+    SED5_file_aspect_ratio = -1
+
+
+      ! SED6
+      ! ----
+
+      ! ::
+
+    SED6_win_flag = .false.
+
+      ! ::
+
+    SED6_win_width = 6
+    SED6_win_aspect_ratio = 0.75
+
+      ! ::
+
+    SED6_xleft = 0.15
+    SED6_xright = 0.85
+    SED6_ybot = 0.15
+    SED6_ytop = 0.85
+    SED6_txt_scale = 1.0
+    SED6_title = 'SED6'
+
+      ! Wavelength range of the plot in Angstrom. Set ``SED6_lambda_min`` or
+      ! ``SED6_lambda_max`` to -101 to use the edge of the SED.
+
+      ! ::
+
+    SED6_lambda_min = 3000
+    SED6_lambda_max = 12000
+
+      ! Range of ``log10`` flux density. -101 means set by the data in the
+      ! wavelength range.
+
+      ! ::
+
+    SED6_flux_min = -101
+    SED6_flux_max = -101
+
+      ! Height of the filter transmission curves as a fraction of the plot
+      ! height. Each curve is scaled so that its peak transmission reaches the
+      ! top of the plot. 0 hides the filter curves.
+
+      ! ::
+
+    SED6_filter_scale = 0.5
+
+      ! **File output**
+
+      ! ::
+
+    SED6_file_flag = .false.
+    SED6_file_dir = 'png'
+    SED6_file_prefix = 'SED6_'
+    SED6_file_interval = 5
+    SED6_file_width = -1
+    SED6_file_aspect_ratio = -1
+
+
+      ! SED7
+      ! ----
+
+      ! ::
+
+    SED7_win_flag = .false.
+
+      ! ::
+
+    SED7_win_width = 6
+    SED7_win_aspect_ratio = 0.75
+
+      ! ::
+
+    SED7_xleft = 0.15
+    SED7_xright = 0.85
+    SED7_ybot = 0.15
+    SED7_ytop = 0.85
+    SED7_txt_scale = 1.0
+    SED7_title = 'SED7'
+
+      ! Wavelength range of the plot in Angstrom. Set ``SED7_lambda_min`` or
+      ! ``SED7_lambda_max`` to -101 to use the edge of the SED.
+
+      ! ::
+
+    SED7_lambda_min = 3000
+    SED7_lambda_max = 12000
+
+      ! Range of ``log10`` flux density. -101 means set by the data in the
+      ! wavelength range.
+
+      ! ::
+
+    SED7_flux_min = -101
+    SED7_flux_max = -101
+
+      ! Height of the filter transmission curves as a fraction of the plot
+      ! height. Each curve is scaled so that its peak transmission reaches the
+      ! top of the plot. 0 hides the filter curves.
+
+      ! ::
+
+    SED7_filter_scale = 0.5
+
+      ! **File output**
+
+      ! ::
+
+    SED7_file_flag = .false.
+    SED7_file_dir = 'png'
+    SED7_file_prefix = 'SED7_'
+    SED7_file_interval = 5
+    SED7_file_width = -1
+    SED7_file_aspect_ratio = -1
+
+
+      ! SED8
+      ! ----
+
+      ! ::
+
+    SED8_win_flag = .false.
+
+      ! ::
+
+    SED8_win_width = 6
+    SED8_win_aspect_ratio = 0.75
+
+      ! ::
+
+    SED8_xleft = 0.15
+    SED8_xright = 0.85
+    SED8_ybot = 0.15
+    SED8_ytop = 0.85
+    SED8_txt_scale = 1.0
+    SED8_title = 'SED8'
+
+      ! Wavelength range of the plot in Angstrom. Set ``SED8_lambda_min`` or
+      ! ``SED8_lambda_max`` to -101 to use the edge of the SED.
+
+      ! ::
+
+    SED8_lambda_min = 3000
+    SED8_lambda_max = 12000
+
+      ! Range of ``log10`` flux density. -101 means set by the data in the
+      ! wavelength range.
+
+      ! ::
+
+    SED8_flux_min = -101
+    SED8_flux_max = -101
+
+      ! Height of the filter transmission curves as a fraction of the plot
+      ! height. Each curve is scaled so that its peak transmission reaches the
+      ! top of the plot. 0 hides the filter curves.
+
+      ! ::
+
+    SED8_filter_scale = 0.5
+
+      ! **File output**
+
+      ! ::
+
+    SED8_file_flag = .false.
+    SED8_file_dir = 'png'
+    SED8_file_prefix = 'SED8_'
+    SED8_file_interval = 5
+    SED8_file_width = -1
+    SED8_file_aspect_ratio = -1
+
+
+      ! SED9
+      ! ----
+
+      ! ::
+
+    SED9_win_flag = .false.
+
+      ! ::
+
+    SED9_win_width = 6
+    SED9_win_aspect_ratio = 0.75
+
+      ! ::
+
+    SED9_xleft = 0.15
+    SED9_xright = 0.85
+    SED9_ybot = 0.15
+    SED9_ytop = 0.85
+    SED9_txt_scale = 1.0
+    SED9_title = 'SED9'
+
+      ! Wavelength range of the plot in Angstrom. Set ``SED9_lambda_min`` or
+      ! ``SED9_lambda_max`` to -101 to use the edge of the SED.
+
+      ! ::
+
+    SED9_lambda_min = 3000
+    SED9_lambda_max = 12000
+
+      ! Range of ``log10`` flux density. -101 means set by the data in the
+      ! wavelength range.
+
+      ! ::
+
+    SED9_flux_min = -101
+    SED9_flux_max = -101
+
+      ! Height of the filter transmission curves as a fraction of the plot
+      ! height. Each curve is scaled so that its peak transmission reaches the
+      ! top of the plot. 0 hides the filter curves.
+
+      ! ::
+
+    SED9_filter_scale = 0.5
+
+      ! **File output**
+
+      ! ::
+
+    SED9_file_flag = .false.
+    SED9_file_dir = 'png'
+    SED9_file_prefix = 'SED9_'
+    SED9_file_interval = 5
+    SED9_file_width = -1
+    SED9_file_aspect_ratio = -1
 
 
 ! Text Summary

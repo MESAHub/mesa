@@ -167,7 +167,17 @@ module star_pgstar
    integer, parameter :: i_Col_Mag8 = i_Col_Mag7 + 1
    integer, parameter :: i_Col_Mag9 = i_Col_Mag8 + 1
 
-   integer, parameter :: i_Grid1 = i_Col_Mag9 + 1
+   integer, parameter :: i_SED1 = i_Col_Mag9 + 1
+   integer, parameter :: i_SED2 = i_SED1 + 1
+   integer, parameter :: i_SED3 = i_SED2 + 1
+   integer, parameter :: i_SED4 = i_SED3 + 1
+   integer, parameter :: i_SED5 = i_SED4 + 1
+   integer, parameter :: i_SED6 = i_SED5 + 1
+   integer, parameter :: i_SED7 = i_SED6 + 1
+   integer, parameter :: i_SED8 = i_SED7 + 1
+   integer, parameter :: i_SED9 = i_SED8 + 1
+
+   integer, parameter :: i_Grid1 = i_SED9 + 1
    integer, parameter :: i_Grid2 = i_Grid1 + 1
    integer, parameter :: i_Grid3 = i_Grid2 + 1
    integer, parameter :: i_Grid4 = i_Grid3 + 1

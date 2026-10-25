@@ -37,6 +37,8 @@ White dwarf phase separation now includes an option to use three-component phase
 
 MESA no longer stops when reactions for which special rates are set are not in the nuclear network, only a warning is printed. This is intended to make it easier to test various network sizes without having to also change the list of special reactions.
 
+pgstar has new ``SED1`` to ``SED9`` plots, which show the spectral energy distribution computed by the ``colors`` module for the current model with the filter transmission curves drawn over it. They can be shown in their own window or in a grid, see :ref:`reference/pgstar:SED Panels`. The ``Color_Magnitude`` plots now also accept the difference of two history columns written in a single axis name, e.g. ``Color_Magnitude1_xaxis1_name = 'B - V'``.
+
 GYRE has been upgraded to 9.1.1, the most recent stable release. Changes since the previous release (8.1) included in MESA can be seen `here <https://github.com/rhdtownsend/gyre/releases>`__.
 
 The `MESA SDK <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__ recommended for compiling MESA has been updated to 26.6.1. Although this newer SDK is not required to successfully build MESA, it brings the benefit of restoring the cross-platform bit-for-bit compatibility that MESA once enjoyed (meaning that runs on Linux/Intel, MacOS/Intel and MacOS/ARM give identical results).

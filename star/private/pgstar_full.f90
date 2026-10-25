@@ -161,6 +161,9 @@ contains
          Color_Magnitude1_plot, Color_Magnitude2_plot, Color_Magnitude3_plot, &
          Color_Magnitude4_plot, Color_Magnitude5_plot, Color_Magnitude6_plot, &
          Color_Magnitude7_plot, Color_Magnitude8_plot, Color_Magnitude9_plot
+      use pgstar_sed, only : &
+         SED1_plot, SED2_plot, SED3_plot, SED4_plot, SED5_plot, &
+         SED6_plot, SED7_plot, SED8_plot, SED9_plot
       type (star_info), pointer :: s
       integer, intent(out) :: ierr
 
@@ -1134,6 +1137,132 @@ contains
       p% file_interval = s% pg% Color_Magnitude9_file_interval
       p% file_width = s% pg% Color_Magnitude9_file_width
       p% file_aspect_ratio = s% pg% Color_Magnitude9_file_aspect_ratio
+
+      p => s% pg% pgstar_win_file_ptr(i_SED1)
+      p% plot => SED1_plot
+      p% id = i_SED1
+      p% name = 'SED1'
+      p% win_flag = s% pg% SED1_win_flag
+      p% win_width = s% pg% SED1_win_width
+      p% win_aspect_ratio = s% pg% SED1_win_aspect_ratio
+      p% file_flag = s% pg% SED1_file_flag
+      p% file_dir = s% pg% SED1_file_dir
+      p% file_prefix = s% pg% SED1_file_prefix
+      p% file_interval = s% pg% SED1_file_interval
+      p% file_width = s% pg% SED1_file_width
+      p% file_aspect_ratio = s% pg% SED1_file_aspect_ratio
+
+      p => s% pg% pgstar_win_file_ptr(i_SED2)
+      p% plot => SED2_plot
+      p% id = i_SED2
+      p% name = 'SED2'
+      p% win_flag = s% pg% SED2_win_flag
+      p% win_width = s% pg% SED2_win_width
+      p% win_aspect_ratio = s% pg% SED2_win_aspect_ratio
+      p% file_flag = s% pg% SED2_file_flag
+      p% file_dir = s% pg% SED2_file_dir
+      p% file_prefix = s% pg% SED2_file_prefix
+      p% file_interval = s% pg% SED2_file_interval
+      p% file_width = s% pg% SED2_file_width
+      p% file_aspect_ratio = s% pg% SED2_file_aspect_ratio
+
+      p => s% pg% pgstar_win_file_ptr(i_SED3)
+      p% plot => SED3_plot
+      p% id = i_SED3
+      p% name = 'SED3'
+      p% win_flag = s% pg% SED3_win_flag
+      p% win_width = s% pg% SED3_win_width
+      p% win_aspect_ratio = s% pg% SED3_win_aspect_ratio
+      p% file_flag = s% pg% SED3_file_flag
+      p% file_dir = s% pg% SED3_file_dir
+      p% file_prefix = s% pg% SED3_file_prefix
+      p% file_interval = s% pg% SED3_file_interval
+      p% file_width = s% pg% SED3_file_width
+      p% file_aspect_ratio = s% pg% SED3_file_aspect_ratio
+
+      p => s% pg% pgstar_win_file_ptr(i_SED4)
+      p% plot => SED4_plot
+      p% id = i_SED4
+      p% name = 'SED4'
+      p% win_flag = s% pg% SED4_win_flag
+      p% win_width = s% pg% SED4_win_width
+      p% win_aspect_ratio = s% pg% SED4_win_aspect_ratio
+      p% file_flag = s% pg% SED4_file_flag
+      p% file_dir = s% pg% SED4_file_dir
+      p% file_prefix = s% pg% SED4_file_prefix
+      p% file_interval = s% pg% SED4_file_interval
+      p% file_width = s% pg% SED4_file_width
+      p% file_aspect_ratio = s% pg% SED4_file_aspect_ratio
+
+      p => s% pg% pgstar_win_file_ptr(i_SED5)
+      p% plot => SED5_plot
+      p% id = i_SED5
+      p% name = 'SED5'
+      p% win_flag = s% pg% SED5_win_flag
+      p% win_width = s% pg% SED5_win_width
+      p% win_aspect_ratio = s% pg% SED5_win_aspect_ratio
+      p% file_flag = s% pg% SED5_file_flag
+      p% file_dir = s% pg% SED5_file_dir
+      p% file_prefix = s% pg% SED5_file_prefix
+      p% file_interval = s% pg% SED5_file_interval
+      p% file_width = s% pg% SED5_file_width
+      p% file_aspect_ratio = s% pg% SED5_file_aspect_ratio
+
+      p => s% pg% pgstar_win_file_ptr(i_SED6)
+      p% plot => SED6_plot
+      p% id = i_SED6
+      p% name = 'SED6'
+      p% win_flag = s% pg% SED6_win_flag
+      p% win_width = s% pg% SED6_win_width
+      p% win_aspect_ratio = s% pg% SED6_win_aspect_ratio
+      p% file_flag = s% pg% SED6_file_flag
+      p% file_dir = s% pg% SED6_file_dir
+      p% file_prefix = s% pg% SED6_file_prefix
+      p% file_interval = s% pg% SED6_file_interval
+      p% file_width = s% pg% SED6_file_width
+      p% file_aspect_ratio = s% pg% SED6_file_aspect_ratio
+
+      p => s% pg% pgstar_win_file_ptr(i_SED7)
+      p% plot => SED7_plot
+      p% id = i_SED7
+      p% name = 'SED7'
+      p% win_flag = s% pg% SED7_win_flag
+      p% win_width = s% pg% SED7_win_width
+      p% win_aspect_ratio = s% pg% SED7_win_aspect_ratio
+      p% file_flag = s% pg% SED7_file_flag
+      p% file_dir = s% pg% SED7_file_dir
+      p% file_prefix = s% pg% SED7_file_prefix
+      p% file_interval = s% pg% SED7_file_interval
+      p% file_width = s% pg% SED7_file_width
+      p% file_aspect_ratio = s% pg% SED7_file_aspect_ratio
+
+      p => s% pg% pgstar_win_file_ptr(i_SED8)
+      p% plot => SED8_plot
+      p% id = i_SED8
+      p% name = 'SED8'
+      p% win_flag = s% pg% SED8_win_flag
+      p% win_width = s% pg% SED8_win_width
+      p% win_aspect_ratio = s% pg% SED8_win_aspect_ratio
+      p% file_flag = s% pg% SED8_file_flag
+      p% file_dir = s% pg% SED8_file_dir
+      p% file_prefix = s% pg% SED8_file_prefix
+      p% file_interval = s% pg% SED8_file_interval
+      p% file_width = s% pg% SED8_file_width
+      p% file_aspect_ratio = s% pg% SED8_file_aspect_ratio
+
+      p => s% pg% pgstar_win_file_ptr(i_SED9)
+      p% plot => SED9_plot
+      p% id = i_SED9
+      p% name = 'SED9'
+      p% win_flag = s% pg% SED9_win_flag
+      p% win_width = s% pg% SED9_win_width
+      p% win_aspect_ratio = s% pg% SED9_win_aspect_ratio
+      p% file_flag = s% pg% SED9_file_flag
+      p% file_dir = s% pg% SED9_file_dir
+      p% file_prefix = s% pg% SED9_file_prefix
+      p% file_interval = s% pg% SED9_file_interval
+      p% file_width = s% pg% SED9_file_width
+      p% file_aspect_ratio = s% pg% SED9_file_aspect_ratio
 
       p => s% pg% pgstar_win_file_ptr(i_Grid1)
       p% plot => grid1_plot

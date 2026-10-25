@@ -122,12 +122,12 @@
 
 
 &pgstar
-  ! Live pgstar dashboard for the synthetic photometry / colors-module run.
-  ! Designed for the uploaded blue-loop inlist_run using GAIA colors:
-  !   G, Gbp, Grp, LOGS/SED, HR, Kipp, and History_Track panels.
+  ! Live pgstar dashboard for the colors module: the synthetic SED with the
+  ! Johnson filter curves, a CMD, a colour-colour plot and a V light curve,
+  ! next to the HR diagram and Kippenhahn diagram for context.
 
   file_white_on_black_flag = .false.
-  pgstar_interval = 1
+  pgstar_interval = 10
 
   ! Keep the standard component windows off; render HR/Kipp inside Grid8.
   HR_win_flag = .false.
@@ -193,7 +193,8 @@
   Grid8_win_width = 18
   Grid8_win_aspect_ratio = 0.62
 
-  Grid8_file_flag = .true.
+  ! set to .true. to also save the dashboard as png files in plots/
+  Grid8_file_flag = .false.
   Grid8_file_dir = 'plots'
   Grid8_file_prefix = 'colors_dashboard_'
   Grid8_file_interval = 5
@@ -270,7 +271,7 @@
   Grid8_plot_col(6) = 3
   Grid8_plot_rowspan(6) = 1
   Grid8_plot_colspan(6) = 1
-  Grid8_plot_pad_left(6) = 0.06
+  Grid8_plot_pad_left(6) = 0.09
   Grid8_plot_pad_right(6) = 0.03
   Grid8_plot_pad_top(6) = 0.05
   Grid8_plot_pad_bot(6) = 0.08

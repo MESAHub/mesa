@@ -50,4 +50,11 @@
 
       num_iters ! same as num_newton_iterations
 
-      log_dt ! log10 time_step in years
+!----------------------------------------------------------------------------------------------
+
+!# for the pgstar Kipp panel
+
+      he_core_mass
+      mixing_regions 20
+      burning_regions 20
+

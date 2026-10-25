@@ -148,19 +148,12 @@ contains
          call mesa_error(__FILE__, __LINE__, 'colors: data_for_colors_history_columns array size mismatch')
       end if
 
-
+      ! hand the SED over to the handle for the pgstar SED plots
       if (allocated(wavelengths) .and. allocated(fluxes)) then
-         if (allocated(cs%current_sed_wavelengths)) deallocate(cs%current_sed_wavelengths)
-         if (allocated(cs%current_sed_fluxes)) deallocate(cs%current_sed_fluxes)
-         
-         allocate(cs%current_sed_wavelengths(size(wavelengths)))
-         allocate(cs%current_sed_fluxes(size(fluxes)))
-         
-         cs%current_sed_wavelengths = wavelengths
-         cs%current_sed_fluxes = fluxes
+         call move_alloc(wavelengths, cs%current_sed_wavelengths)
+         call move_alloc(fluxes, cs%current_sed_fluxes)
          cs%pgstar_sed_valid = .true.
       end if
-
 
       ! clean up
       if (allocated(wavelengths)) deallocate (wavelengths)

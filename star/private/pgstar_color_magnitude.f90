@@ -51,7 +51,7 @@ contains
          s% pg% Color_Magnitude1_xaxis1_name, s% pg% Color_Magnitude1_xaxis2_name, &
          s% pg% Color_Magnitude1_xmin, s% pg% Color_Magnitude1_xmax, s% pg% Color_Magnitude1_dxmin, &
          s% pg% Color_Magnitude1_xmargin, s% pg% Color_Magnitude1_max_width, s% pg% Color_Magnitude1_num_panels, &
-         s% pg% Color_Magnitude1_other_ymin, s% pg% Color_Magnitude1_other_ymax, s% pg% Color_Magnitude1_yaxis_reversed, &
+         s% pg% Color_Magnitude1_other_ymin, s% pg% Color_Magnitude1_other_ymax, s% pg% Color_Magnitude1_other_yaxis_reversed, &
          s% pg% Color_Magnitude1_other_yaxis_log, s% pg% Color_Magnitude1_other_dymin, s% pg% Color_Magnitude1_other_ymargin, &
          s% pg% Color_Magnitude1_other_yaxis1_name, s% pg% Color_Magnitude1_other_yaxis2_name, &
          s% pg% Color_Magnitude1_ymin, s% pg% Color_Magnitude1_ymax, s% pg% Color_Magnitude1_xaxis_reversed, &
@@ -93,7 +93,7 @@ contains
          s% pg% Color_Magnitude2_xaxis1_name, s% pg% Color_Magnitude2_xaxis2_name, &
          s% pg% Color_Magnitude2_xmin, s% pg% Color_Magnitude2_xmax, s% pg% Color_Magnitude2_dxmin, &
          s% pg% Color_Magnitude2_xmargin, s% pg% Color_Magnitude2_max_width, s% pg% Color_Magnitude2_num_panels, &
-         s% pg% Color_Magnitude2_other_ymin, s% pg% Color_Magnitude2_other_ymax, s% pg% Color_Magnitude2_yaxis_reversed, &
+         s% pg% Color_Magnitude2_other_ymin, s% pg% Color_Magnitude2_other_ymax, s% pg% Color_Magnitude2_other_yaxis_reversed, &
          s% pg% Color_Magnitude2_other_yaxis_log, s% pg% Color_Magnitude2_other_dymin, s% pg% Color_Magnitude2_other_ymargin, &
          s% pg% Color_Magnitude2_other_yaxis1_name, s% pg% Color_Magnitude2_other_yaxis2_name, &
          s% pg% Color_Magnitude2_ymin, s% pg% Color_Magnitude2_ymax, s% pg% Color_Magnitude2_xaxis_reversed, &
@@ -135,7 +135,7 @@ contains
          s% pg% Color_Magnitude3_xaxis1_name, s% pg% Color_Magnitude3_xaxis2_name, &
          s% pg% Color_Magnitude3_xmin, s% pg% Color_Magnitude3_xmax, s% pg% Color_Magnitude3_dxmin, &
          s% pg% Color_Magnitude3_xmargin, s% pg% Color_Magnitude3_max_width, s% pg% Color_Magnitude3_num_panels, &
-         s% pg% Color_Magnitude3_other_ymin, s% pg% Color_Magnitude3_other_ymax, s% pg% Color_Magnitude3_yaxis_reversed, &
+         s% pg% Color_Magnitude3_other_ymin, s% pg% Color_Magnitude3_other_ymax, s% pg% Color_Magnitude3_other_yaxis_reversed, &
          s% pg% Color_Magnitude3_other_yaxis_log, s% pg% Color_Magnitude3_other_dymin, s% pg% Color_Magnitude3_other_ymargin, &
          s% pg% Color_Magnitude3_other_yaxis1_name, s% pg% Color_Magnitude3_other_yaxis2_name, &
          s% pg% Color_Magnitude3_ymin, s% pg% Color_Magnitude3_ymax, s% pg% Color_Magnitude3_xaxis_reversed, &
@@ -177,7 +177,7 @@ contains
          s% pg% Color_Magnitude4_xaxis1_name, s% pg% Color_Magnitude4_xaxis2_name, &
          s% pg% Color_Magnitude4_xmin, s% pg% Color_Magnitude4_xmax, s% pg% Color_Magnitude4_dxmin, &
          s% pg% Color_Magnitude4_xmargin, s% pg% Color_Magnitude4_max_width, s% pg% Color_Magnitude4_num_panels, &
-         s% pg% Color_Magnitude4_other_ymin, s% pg% Color_Magnitude4_other_ymax, s% pg% Color_Magnitude4_yaxis_reversed, &
+         s% pg% Color_Magnitude4_other_ymin, s% pg% Color_Magnitude4_other_ymax, s% pg% Color_Magnitude4_other_yaxis_reversed, &
          s% pg% Color_Magnitude4_other_yaxis_log, s% pg% Color_Magnitude4_other_dymin, s% pg% Color_Magnitude4_other_ymargin, &
          s% pg% Color_Magnitude4_other_yaxis1_name, s% pg% Color_Magnitude4_other_yaxis2_name, &
          s% pg% Color_Magnitude4_ymin, s% pg% Color_Magnitude4_ymax, s% pg% Color_Magnitude4_xaxis_reversed, &
@@ -219,7 +219,7 @@ contains
          s% pg% Color_Magnitude5_xaxis1_name, s% pg% Color_Magnitude5_xaxis2_name, &
          s% pg% Color_Magnitude5_xmin, s% pg% Color_Magnitude5_xmax, s% pg% Color_Magnitude5_dxmin, &
          s% pg% Color_Magnitude5_xmargin, s% pg% Color_Magnitude5_max_width, s% pg% Color_Magnitude5_num_panels, &
-         s% pg% Color_Magnitude5_other_ymin, s% pg% Color_Magnitude5_other_ymax, s% pg% Color_Magnitude5_yaxis_reversed, &
+         s% pg% Color_Magnitude5_other_ymin, s% pg% Color_Magnitude5_other_ymax, s% pg% Color_Magnitude5_other_yaxis_reversed, &
          s% pg% Color_Magnitude5_other_yaxis_log, s% pg% Color_Magnitude5_other_dymin, s% pg% Color_Magnitude5_other_ymargin, &
          s% pg% Color_Magnitude5_other_yaxis1_name, s% pg% Color_Magnitude5_other_yaxis2_name, &
          s% pg% Color_Magnitude5_ymin, s% pg% Color_Magnitude5_ymax, s% pg% Color_Magnitude5_xaxis_reversed, &
@@ -261,7 +261,7 @@ contains
          s% pg% Color_Magnitude6_xaxis1_name, s% pg% Color_Magnitude6_xaxis2_name, &
          s% pg% Color_Magnitude6_xmin, s% pg% Color_Magnitude6_xmax, s% pg% Color_Magnitude6_dxmin, &
          s% pg% Color_Magnitude6_xmargin, s% pg% Color_Magnitude6_max_width, s% pg% Color_Magnitude6_num_panels, &
-         s% pg% Color_Magnitude6_other_ymin, s% pg% Color_Magnitude6_other_ymax, s% pg% Color_Magnitude6_yaxis_reversed, &
+         s% pg% Color_Magnitude6_other_ymin, s% pg% Color_Magnitude6_other_ymax, s% pg% Color_Magnitude6_other_yaxis_reversed, &
          s% pg% Color_Magnitude6_other_yaxis_log, s% pg% Color_Magnitude6_other_dymin, s% pg% Color_Magnitude6_other_ymargin, &
          s% pg% Color_Magnitude6_other_yaxis1_name, s% pg% Color_Magnitude6_other_yaxis2_name, &
          s% pg% Color_Magnitude6_ymin, s% pg% Color_Magnitude6_ymax, s% pg% Color_Magnitude6_xaxis_reversed, &
@@ -303,7 +303,7 @@ contains
          s% pg% Color_Magnitude7_xaxis1_name, s% pg% Color_Magnitude7_xaxis2_name, &
          s% pg% Color_Magnitude7_xmin, s% pg% Color_Magnitude7_xmax, s% pg% Color_Magnitude7_dxmin, &
          s% pg% Color_Magnitude7_xmargin, s% pg% Color_Magnitude7_max_width, s% pg% Color_Magnitude7_num_panels, &
-         s% pg% Color_Magnitude7_other_ymin, s% pg% Color_Magnitude7_other_ymax, s% pg% Color_Magnitude7_yaxis_reversed, &
+         s% pg% Color_Magnitude7_other_ymin, s% pg% Color_Magnitude7_other_ymax, s% pg% Color_Magnitude7_other_yaxis_reversed, &
          s% pg% Color_Magnitude7_other_yaxis_log, s% pg% Color_Magnitude7_other_dymin, s% pg% Color_Magnitude7_other_ymargin, &
          s% pg% Color_Magnitude7_other_yaxis1_name, s% pg% Color_Magnitude7_other_yaxis2_name, &
          s% pg% Color_Magnitude7_ymin, s% pg% Color_Magnitude7_ymax, s% pg% Color_Magnitude7_xaxis_reversed, &
@@ -345,7 +345,7 @@ contains
          s% pg% Color_Magnitude8_xaxis1_name, s% pg% Color_Magnitude8_xaxis2_name, &
          s% pg% Color_Magnitude8_xmin, s% pg% Color_Magnitude8_xmax, s% pg% Color_Magnitude8_dxmin, &
          s% pg% Color_Magnitude8_xmargin, s% pg% Color_Magnitude8_max_width, s% pg% Color_Magnitude8_num_panels, &
-         s% pg% Color_Magnitude8_other_ymin, s% pg% Color_Magnitude8_other_ymax, s% pg% Color_Magnitude8_yaxis_reversed, &
+         s% pg% Color_Magnitude8_other_ymin, s% pg% Color_Magnitude8_other_ymax, s% pg% Color_Magnitude8_other_yaxis_reversed, &
          s% pg% Color_Magnitude8_other_yaxis_log, s% pg% Color_Magnitude8_other_dymin, s% pg% Color_Magnitude8_other_ymargin, &
          s% pg% Color_Magnitude8_other_yaxis1_name, s% pg% Color_Magnitude8_other_yaxis2_name, &
          s% pg% Color_Magnitude8_ymin, s% pg% Color_Magnitude8_ymax, s% pg% Color_Magnitude8_xaxis_reversed, &
@@ -387,7 +387,7 @@ contains
          s% pg% Color_Magnitude9_xaxis1_name, s% pg% Color_Magnitude9_xaxis2_name, &
          s% pg% Color_Magnitude9_xmin, s% pg% Color_Magnitude9_xmax, s% pg% Color_Magnitude9_dxmin, &
          s% pg% Color_Magnitude9_xmargin, s% pg% Color_Magnitude9_max_width, s% pg% Color_Magnitude9_num_panels, &
-         s% pg% Color_Magnitude9_other_ymin, s% pg% Color_Magnitude9_other_ymax, s% pg% Color_Magnitude9_yaxis_reversed, &
+         s% pg% Color_Magnitude9_other_ymin, s% pg% Color_Magnitude9_other_ymax, s% pg% Color_Magnitude9_other_yaxis_reversed, &
          s% pg% Color_Magnitude9_other_yaxis_log, s% pg% Color_Magnitude9_other_dymin, s% pg% Color_Magnitude9_other_ymargin, &
          s% pg% Color_Magnitude9_other_yaxis1_name, s% pg% Color_Magnitude9_other_yaxis2_name, &
          s% pg% Color_Magnitude9_ymin, s% pg% Color_Magnitude9_ymax, s% pg% Color_Magnitude9_xaxis_reversed, &
@@ -443,9 +443,9 @@ contains
       integer, intent(out) :: ierr
       procedure(pgstar_decorator_interface), pointer :: color_pgstar_decorator
 
-      real, allocatable, dimension(:) :: xvec, yvec, other_yvec
-      integer :: i, n, j, step_min, step_max, y_color, other_y_color
-      real :: color_xmin, xleft, xright, ymargin, panel_dy, panel_ytop, panel_ybot, ybot, ytop, other_ybot, other_ytop
+      real, allocatable, dimension(:) :: xvec, yvec, other_yvec, tmp_vec
+      integer :: n, j, step_min, step_max, y_color, other_y_color
+      real :: color_xmin, xleft, xright, panel_dy, panel_ytop, panel_ybot, ybot, ytop, other_ybot, other_ytop
       logical :: have_yaxis, have_other_yaxis
 
       include 'formats'
@@ -454,17 +454,18 @@ contains
       step_max = s% model_number
       n = count_hist_points(s, step_min, step_max)
 
-      allocate(xvec(n), yvec(n), other_yvec(n), stat=ierr)
+      allocate(xvec(n), yvec(n), other_yvec(n), tmp_vec(n), stat=ierr)
       if (ierr /= 0) then
-         write(*,*) 'allocate failed for PGSTAR vectors'
+         write(*,*) 'allocate failed for PGSTAR'
          return
       end if
 
-      ! DYNAMIC PARSING: Evaluate X-axis string expression (e.g. "Johnson_B - Johnson_V")
-      call evaluate_axis_expression(s, n, step_min, step_max, color_xaxis1_name, xvec, ierr)
-      if (ierr /= 0) then
-         write(*,*) 'PGSTAR Error: Failed to evaluate X-axis expression: ', trim(color_xaxis1_name)
-         deallocate(xvec, yvec, other_yvec)
+      if (.not. get_axis_vec(color_xaxis1_name, color_xaxis2_name, xvec)) then
+         write(*,'(A)')
+         write(*,*) 'ERROR: failed to find ' // trim(axis_label(color_xaxis1_name, color_xaxis2_name)) // &
+            ' in history data'
+         write(*,'(A)')
+         call dealloc
          return
       end if
 
@@ -474,41 +475,27 @@ contains
 
       call pgsave
       call pgsch(txt_scale)
-      ymargin = 0.05
       y_color = clr_Goldenrod
       other_y_color = clr_LightSkyBlue
       panel_dy = (vp_ytop - vp_ybot)/real(color_num_panels)
 
       do j = 1, color_num_panels
+
          have_yaxis = .false.
+         if (len_trim(color_yaxis1_name(j)) > 0) &
+            have_yaxis = get_axis_vec(color_yaxis1_name(j), color_yaxis2_name(j), yvec)
+
          have_other_yaxis = .false.
-
-         ! Evaluate Left Y-Axis Expression
-         if (len_trim(color_yaxis1_name(j)) > 0) then
-            call evaluate_axis_expression(s, n, step_min, step_max, color_yaxis1_name(j), yvec, ierr)
-            if (ierr == 0) have_yaxis = .true.
-         end if
-
-         ! Evaluate Right Other Y-Axis Expression
-         if (len_trim(color_other_yaxis1_name(j)) > 0) then
-            call evaluate_axis_expression(s, n, step_min, step_max, color_other_yaxis1_name(j), other_yvec, ierr)
-            if (ierr == 0) have_other_yaxis = .true.
-         end if
+         if (len_trim(color_other_yaxis1_name(j)) > 0) &
+            have_other_yaxis = get_axis_vec(color_other_yaxis1_name(j), color_other_yaxis2_name(j), other_yvec)
 
          if ((.not. have_yaxis) .and. (.not. have_other_yaxis)) cycle
 
-         ! Post-process limits cleanly for plotting safety
-         if (have_yaxis) then
-            where (yvec > 100.0) yvec = 100.0
-            where (yvec < -100.0) yvec = -100.0
-         end if
+         ! make sure limits are sensible for plotting
+         if (have_yaxis) yvec = max(-100.0, min(100.0, yvec))
+         if (have_other_yaxis) other_yvec = max(-100.0, min(100.0, other_yvec))
 
-         if (have_other_yaxis) then
-            where (other_yvec > 100.0) other_yvec = 100.0
-            where (other_yvec < -100.0) other_yvec = -100.0
-         end if
-
-         panel_ytop = vp_ytop - real(j-1)*panel_dy
+         panel_ytop = vp_ytop - real(j - 1)*panel_dy
          panel_ybot = panel_ytop - panel_dy
          call pgsvp(vp_xleft, vp_xright, panel_ybot, panel_ytop)
 
@@ -527,10 +514,10 @@ contains
             call pgswin(xleft, xright, other_ybot, other_ytop)
             call pgscf(1)
             call pgsci(clr_Foreground)
-            call show_box_pgstar(s, '', 'V')
+            call show_box_pgstar(s, '', 'CMSTV')
             call pgsci(other_y_color)
-            call show_right_yaxis_label_pgstar(s, trim(color_other_yaxis1_name(j)))
-            
+            call show_right_yaxis_label_pgstar(s, &
+               trim(axis_label(color_other_yaxis1_name(j), color_other_yaxis2_name(j))))
             call pgslw(s% pg% pgstar_lw)
             call pgline(n, xvec, other_yvec)
             call pgslw(1)
@@ -543,10 +530,22 @@ contains
             call pgswin(xleft, xright, ybot, ytop)
             call pgscf(1)
             call pgsci(clr_Foreground)
-            call show_box_pgstar(s, 'V', 'U')
+            if (j < color_num_panels) then
+               if (.not. have_other_yaxis) then
+                  call show_box_pgstar(s, 'BCST1', 'BCMNSTV1')
+               else
+                  call show_box_pgstar(s, 'BCST', 'BNSTV')
+               end if
+            else
+               if (.not. have_other_yaxis) then
+                  call show_box_pgstar(s, 'BCNST1', 'BCMNSTV1')
+               else
+                  call show_box_pgstar(s, 'BCNST', 'BNSTV')
+               end if
+            end if
             call pgsci(y_color)
-            call show_left_yaxis_label_pgstar(s, trim(color_yaxis1_name(j)))
-            
+            call show_left_yaxis_label_pgstar(s, &
+               trim(axis_label(color_yaxis1_name(j), color_yaxis2_name(j))))
             call pgslw(s% pg% pgstar_lw)
             call pgline(n, xvec, yvec)
             call pgslw(1)
@@ -556,66 +555,69 @@ contains
          call show_pgstar_decorator(s% id, color_use_decorator, color_pgstar_decorator, j, ierr)
       end do
 
-      call show_xaxis_label_pgstar(s, trim(color_xaxis1_name))
+      call show_xaxis_label_pgstar(s, trim(axis_label(color_xaxis1_name, color_xaxis2_name)))
       call pgunsa
-      deallocate(xvec, yvec, other_yvec)
+      call dealloc
 
    contains
 
-      ! SUBROUTINE: Parse strings dynamically and handle string subtraction math
-      subroutine evaluate_axis_expression(s_ptr, n_pts, s_min, s_max, expr, out_vec, err_flag)
-         type(star_info), pointer :: s_ptr
-         integer, intent(in) :: n_pts, s_min, s_max
+      subroutine dealloc
+         deallocate(xvec, yvec, other_yvec, tmp_vec)
+      end subroutine dealloc
+
+      ! name1 - name2, or name1 if name2 is blank.
+      ! each name is a history column or the difference of two columns written as 'B - V'.
+      logical function get_axis_vec(name1, name2, vec) result(ok)
+         character(len=*), intent(in) :: name1, name2
+         real, intent(out) :: vec(:)
+         ok = get_expr_vec(name1, vec)
+         if (.not. ok .or. len_trim(name2) == 0) return
+         ok = get_expr_vec(name2, tmp_vec)
+         if (ok) vec = vec - tmp_vec
+      end function get_axis_vec
+
+      logical function get_expr_vec(expr, vec) result(ok)
          character(len=*), intent(in) :: expr
-         real, dimension(:), intent(out) :: out_vec
-         integer, intent(out) :: err_flag
-         
-         character(len=strlen) :: left_token, right_token
-         real, allocatable :: tmp_vec(:)
-         integer :: dash_idx, idx_lookup
+         real, intent(out) :: vec(:)
+         real, allocatable :: vec2(:)
+         integer :: i
+         ! a column name may itself contain '-', so try the whole name first
+         ok = get_column_vec(expr, vec)
+         if (ok) return
+         allocate(vec2(size(vec)))
+         do i = 2, len_trim(expr) - 1
+            if (expr(i:i) /= '-') cycle
+            if (.not. get_column_vec(expr(1:i - 1), vec)) cycle
+            if (.not. get_column_vec(expr(i + 1:), vec2)) cycle
+            vec = vec - vec2
+            ok = .true.
+            exit
+         end do
+         deallocate(vec2)
+      end function get_expr_vec
 
-         err_flag = 0
-         out_vec = 0.0
-         dash_idx = index(expr, '-')
+      logical function get_column_vec(name, vec) result(ok)
+         character(len=*), intent(in) :: name
+         real, intent(out) :: vec(:)
+         integer :: ix, ierr
+         ok = .false.
+         if (len_trim(name) == 0) return
+         call integer_dict_lookup(s% history_names_dict, trim(adjustl(name)), ix, ierr)
+         if (ierr /= 0 .or. ix <= 0) return
+         ierr = 0
+         call get_hist_points(s, step_min, step_max, n, ix, vec, ierr)
+         ok = (ierr == 0)
+      end function get_column_vec
 
-         if (dash_idx == 0) then
-            ! Case A: Simple Single Column Lookup
-            left_token = adjustl(trim(expr))
-            call integer_dict_lookup(s_ptr% history_names_dict, trim(left_token), idx_lookup, err_flag)
-            if (err_flag == 0 .and. idx_lookup > 0) then
-               call get_hist_points(s_ptr, s_min, s_max, n_pts, idx_lookup, out_vec, err_flag)
-            else
-               err_flag = -1
-            end if
+      function axis_label(name1, name2) result(label)
+         character(len=*), intent(in) :: name1, name2
+         character(len=strlen) :: label
+         if (len_trim(name2) > 0) then
+            label = trim(adjustl(name1)) // ' - ' // trim(adjustl(name2))
          else
-            ! Case B: Subtract Expression Detected ("Filter1 - Filter2")
-            left_token = adjustl(trim(expr(1:dash_idx-1)))
-            right_token = adjustl(trim(expr(dash_idx+1:)))
-            
-            allocate(tmp_vec(n_pts))
-            
-            ! Retrieve Component 1
-            call integer_dict_lookup(s_ptr% history_names_dict, trim(left_token), idx_lookup, err_flag)
-            if (err_flag == 0 .and. idx_lookup > 0) then
-               call get_hist_points(s_ptr, s_min, s_max, n_pts, idx_lookup, out_vec, err_flag)
-            else
-               err_flag = -1
-               deallocate(tmp_vec)
-               return
-            end if
-            
-            ! Retrieve Component 2
-            call integer_dict_lookup(s_ptr% history_names_dict, trim(right_token), idx_lookup, err_flag)
-            if (err_flag == 0 .and. idx_lookup > 0) then
-               call get_hist_points(s_ptr, s_min, s_max, n_pts, idx_lookup, tmp_vec, err_flag)
-               out_vec = out_vec - tmp_vec ! Arithmetic execution
-            else
-               err_flag = -1
-            end if
-            
-            deallocate(tmp_vec)
+            label = adjustl(name1)
          end if
-      end subroutine evaluate_axis_expression
+      end function axis_label
 
    end subroutine do_Color_Magnitude_plot
 

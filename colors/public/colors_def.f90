@@ -118,11 +118,12 @@ module colors_def
       integer, allocatable :: sed_mcache_keys(:)          ! (sed_mem_cache_cap)
       real(dp), allocatable :: sed_mcache_data(:, :)       ! (n_lambda, sed_mem_cache_cap)
 
+      ! SED from the most recent call to data_for_colors_history_columns,
+      ! kept for the pgstar SED plots
       logical :: pgstar_sed_valid = .false.
-      real(dp), allocatable :: current_sed_wavelengths(:)
-      real(dp), allocatable :: current_sed_fluxes(:)
+      real(dp), allocatable :: current_sed_wavelengths(:)  ! (n_lambda)
+      real(dp), allocatable :: current_sed_fluxes(:)       ! (n_lambda)
    end type Colors_General_Info
-
 
    ! Global filter name list (shared across handles)
    integer :: num_color_filters
@@ -294,6 +295,12 @@ contains
       if (allocated(colors_handles(handle)%fallback_wavelengths)) &
          deallocate (colors_handles(handle)%fallback_wavelengths)
       colors_handles(handle)%fallback_wavelengths_set = .false.
+
+      if (allocated(colors_handles(handle)%current_sed_wavelengths)) &
+         deallocate (colors_handles(handle)%current_sed_wavelengths)
+      if (allocated(colors_handles(handle)%current_sed_fluxes)) &
+         deallocate (colors_handles(handle)%current_sed_fluxes)
+      colors_handles(handle)%pgstar_sed_valid = .false.
 
    end subroutine free_colors_cache
 

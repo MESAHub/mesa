@@ -1688,6 +1688,88 @@
          Color_Magnitude9_dymin, Color_Magnitude9_other_dymin
 
 
+      logical :: SED1_win_flag, SED1_file_flag
+      integer :: SED1_file_interval
+      character (len=strlen) :: SED1_file_dir, SED1_file_prefix, SED1_title
+      real :: &
+         SED1_win_width, SED1_win_aspect_ratio, &
+         SED1_xleft, SED1_xright, SED1_ybot, SED1_ytop, SED1_txt_scale, &
+         SED1_lambda_min, SED1_lambda_max, SED1_flux_min, SED1_flux_max, &
+         SED1_filter_scale, SED1_file_width, SED1_file_aspect_ratio
+
+      logical :: SED2_win_flag, SED2_file_flag
+      integer :: SED2_file_interval
+      character (len=strlen) :: SED2_file_dir, SED2_file_prefix, SED2_title
+      real :: &
+         SED2_win_width, SED2_win_aspect_ratio, &
+         SED2_xleft, SED2_xright, SED2_ybot, SED2_ytop, SED2_txt_scale, &
+         SED2_lambda_min, SED2_lambda_max, SED2_flux_min, SED2_flux_max, &
+         SED2_filter_scale, SED2_file_width, SED2_file_aspect_ratio
+
+      logical :: SED3_win_flag, SED3_file_flag
+      integer :: SED3_file_interval
+      character (len=strlen) :: SED3_file_dir, SED3_file_prefix, SED3_title
+      real :: &
+         SED3_win_width, SED3_win_aspect_ratio, &
+         SED3_xleft, SED3_xright, SED3_ybot, SED3_ytop, SED3_txt_scale, &
+         SED3_lambda_min, SED3_lambda_max, SED3_flux_min, SED3_flux_max, &
+         SED3_filter_scale, SED3_file_width, SED3_file_aspect_ratio
+
+      logical :: SED4_win_flag, SED4_file_flag
+      integer :: SED4_file_interval
+      character (len=strlen) :: SED4_file_dir, SED4_file_prefix, SED4_title
+      real :: &
+         SED4_win_width, SED4_win_aspect_ratio, &
+         SED4_xleft, SED4_xright, SED4_ybot, SED4_ytop, SED4_txt_scale, &
+         SED4_lambda_min, SED4_lambda_max, SED4_flux_min, SED4_flux_max, &
+         SED4_filter_scale, SED4_file_width, SED4_file_aspect_ratio
+
+      logical :: SED5_win_flag, SED5_file_flag
+      integer :: SED5_file_interval
+      character (len=strlen) :: SED5_file_dir, SED5_file_prefix, SED5_title
+      real :: &
+         SED5_win_width, SED5_win_aspect_ratio, &
+         SED5_xleft, SED5_xright, SED5_ybot, SED5_ytop, SED5_txt_scale, &
+         SED5_lambda_min, SED5_lambda_max, SED5_flux_min, SED5_flux_max, &
+         SED5_filter_scale, SED5_file_width, SED5_file_aspect_ratio
+
+      logical :: SED6_win_flag, SED6_file_flag
+      integer :: SED6_file_interval
+      character (len=strlen) :: SED6_file_dir, SED6_file_prefix, SED6_title
+      real :: &
+         SED6_win_width, SED6_win_aspect_ratio, &
+         SED6_xleft, SED6_xright, SED6_ybot, SED6_ytop, SED6_txt_scale, &
+         SED6_lambda_min, SED6_lambda_max, SED6_flux_min, SED6_flux_max, &
+         SED6_filter_scale, SED6_file_width, SED6_file_aspect_ratio
+
+      logical :: SED7_win_flag, SED7_file_flag
+      integer :: SED7_file_interval
+      character (len=strlen) :: SED7_file_dir, SED7_file_prefix, SED7_title
+      real :: &
+         SED7_win_width, SED7_win_aspect_ratio, &
+         SED7_xleft, SED7_xright, SED7_ybot, SED7_ytop, SED7_txt_scale, &
+         SED7_lambda_min, SED7_lambda_max, SED7_flux_min, SED7_flux_max, &
+         SED7_filter_scale, SED7_file_width, SED7_file_aspect_ratio
+
+      logical :: SED8_win_flag, SED8_file_flag
+      integer :: SED8_file_interval
+      character (len=strlen) :: SED8_file_dir, SED8_file_prefix, SED8_title
+      real :: &
+         SED8_win_width, SED8_win_aspect_ratio, &
+         SED8_xleft, SED8_xright, SED8_ybot, SED8_ytop, SED8_txt_scale, &
+         SED8_lambda_min, SED8_lambda_max, SED8_flux_min, SED8_flux_max, &
+         SED8_filter_scale, SED8_file_width, SED8_file_aspect_ratio
+
+      logical :: SED9_win_flag, SED9_file_flag
+      integer :: SED9_file_interval
+      character (len=strlen) :: SED9_file_dir, SED9_file_prefix, SED9_title
+      real :: &
+         SED9_win_width, SED9_win_aspect_ratio, &
+         SED9_xleft, SED9_xright, SED9_ybot, SED9_ytop, SED9_txt_scale, &
+         SED9_lambda_min, SED9_lambda_max, SED9_flux_min, SED9_flux_max, &
+         SED9_filter_scale, SED9_file_width, SED9_file_aspect_ratio
+
+
       logical :: Mode_Prop_win_flag, Mode_Prop_file_flag
       logical :: do_Mode_Prop_win, do_Mode_Prop_file, Mode_Prop_xaxis_reversed
       integer :: id_Mode_Prop_win, id_Mode_Prop_file, Mode_Prop_file_interval
@@ -2133,41 +2215,3 @@
             trho_use_decorator, &
             tmaxrho_use_decorator, &
             trho_profile_use_decorator
-
-      logical :: SED1_win_flag, SED2_win_flag, SED3_win_flag, &
-         SED4_win_flag, SED5_win_flag, SED6_win_flag, &
-         SED7_win_flag, SED8_win_flag, SED9_win_flag
-
-      logical :: SED1_file_flag, SED2_file_flag, SED3_file_flag, &
-         SED4_file_flag, SED5_file_flag, SED6_file_flag, &
-         SED7_file_flag, SED8_file_flag, SED9_file_flag
-
-      character (len=strlen) :: SED1_title, SED2_title, SED3_title, &
-         SED4_title, SED5_title, SED6_title, &
-         SED7_title, SED8_title, SED9_title
-
-      real :: SED1_txt_scale, SED2_txt_scale, SED3_txt_scale, &
-         SED4_txt_scale, SED5_txt_scale, SED6_txt_scale, &
-         SED7_txt_scale, SED8_txt_scale, SED9_txt_scale
-
-      real :: SED1_lambda_min, SED2_lambda_min, SED3_lambda_min, &
-         SED4_lambda_min, SED5_lambda_min, SED6_lambda_min, &
-         SED7_lambda_min, SED8_lambda_min, SED9_lambda_min
-
-      real :: SED1_lambda_max, SED2_lambda_max, SED3_lambda_max, &
-         SED4_lambda_max, SED5_lambda_max, SED6_lambda_max, &
-         SED7_lambda_max, SED8_lambda_max, SED9_lambda_max
-
-      real :: SED1_flux_min, SED2_flux_min, SED3_flux_min, &
-         SED4_flux_min, SED5_flux_min, SED6_flux_min, &
-         SED7_flux_min, SED8_flux_min, SED9_flux_min
-
-      real :: SED1_flux_max, SED2_flux_max, SED3_flux_max, &
-         SED4_flux_max, SED5_flux_max, SED6_flux_max, &
-         SED7_flux_max, SED8_flux_max, SED9_flux_max
-
-      real :: SED1_filter_scale, SED2_filter_scale, & 
-              SED3_filter_scale, SED6_filter_scale, &
-              SED4_filter_scale, SED5_filter_scale, & 
-              SED7_filter_scale, SED8_filter_scale, &
-              SED9_filter_scale         
