@@ -164,7 +164,7 @@ module run_star_extras
             return
          end if
 
-         if (AMIX2 > 0d0 .and. npts(2) /= nz-1) then
+         if (AMIX2 > 0d0 .and. npts(3) /= nz-1) then
             write(*,3) 'AMIX2 > 0d0 .and. npts(3) /= nz-1', npts(3)
             write(*,*) 'cannot use 2nd overtone for setting starting velocities'
             write(*,*) 'need to add code to interpolate from gyre grid to model'

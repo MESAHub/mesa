@@ -2401,8 +2401,11 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Calculate scale height by averaging P/rho onto faces together instead
-      ! of of wrapping P and rho separately by default. Both forms assume HSE.
+      ! of wrapping P and rho separately by default. Both forms assume HSE.
       ! Not compatible with alt_scale_height_flag.
+      ! This control has no effect when
+      ! ``use_face_reconstruction = .true.``; in that case MESA
+      ! uses P and rho from the same reconstructed face state.
 
       ! ::
 
@@ -2681,8 +2684,8 @@
    ! overshooting
    ! ____________
 
-      ! There are two schemes implemented in MESA to treat overshooting:
-      ! a step overshoot scheme and an exponential scheme.
+      ! There are three schemes implemented in MESA to treat overshooting:
+      ! a step overshoot scheme, an exponential scheme, and a step+exponential scheme.
 
       ! Parameters for exponential diffusive overshoot are described in the paper by Falk Herwig,
       ! "The evolution of AGB stars with convective overshoot", A&A, 360, 952-968 (2000).
@@ -2699,7 +2702,7 @@
 
       ! ::
 
-    overshoot_scheme(:) = '' ! ``exponential``, ``step``, ``other``
+    overshoot_scheme(:) = '' ! ``exponential``, ``step``, ``step+exponential``, ``other``
     overshoot_zone_type(:) = '' !  ``burn_H``, ``burn_He``, ``burn_Z``, ``nonburn``, ``any``
     overshoot_zone_loc(:) = '' ! ``core``, ``shell``, ``any``
     overshoot_bdy_loc(:) = '' ! ``bottom``, ``top``, ``any``
@@ -2711,11 +2714,12 @@
       ! ::
 
     overshoot_f(:) = 0d0
+    overshoot_f2(:) = 0d0
     overshoot_f0(:) = 0d0
 
       ! The switch from convective mixing to overshooting happens at a distance f0*Hp into the convection zone
       ! from the estimated location where ``grad_ad = grad_rad``, where Hp is the pressure scale height at that location.
-      ! A value <= 0 for f0 is a mistake -- you are required to set f0 as well as f.
+      ! A value <= 0 for f0 is a mistake -- you are required to set f0 as well as f (and f2 if using step+exponential).
       ! take a look at the following from an email concerning this:
       ! Overshooting works by taking the diffusion mixing coefficient at the edge
       ! of the convection zone and extending it beyond the zone. But -- and here's the issue --
@@ -2735,6 +2739,25 @@
       ! where D_ob is the convective diffusivity at the bottom (top) of the step overshoot region for outward (inward) overshooting.
       ! These are arrays of size ``NUM_OVERSHOOT_PARAM_SETS`` which is defined in
       ! ``star_data/public/star_data_def.inc`` (currently 16)
+
+      ! If you use the 'step+exponential' scheme, the step is placed first and the
+      ! exponential component follows it. In this scheme, ``overshoot_f`` sets
+      ! the width of the step part and ``overshoot_f2`` sets the length scale of
+      ! the additional exponential tail. The parameterizations for both parts are
+      ! still evaluated at the convective boundary (as described above); the
+      ! exponential part is displaced by the extent of the step part.
+      ! This approach is motivated by:
+      ! Michielsen et al. 2021 (`A&A 650, A175 <https://doi.org/10.1051/0004-6361/202039926>`_)
+      ! Anders et al. 2022a (`ApJ 926, 169 <https://doi.org/10.3847/1538-4357/ac408d>`_)
+      ! Anders et al. 2022b (`ApJL 928, L10 <https://doi.org/10.3847/2041-8213/ac5cb5>`_)
+      ! Johnston et al. 2024 (`ApJ 964, 170 <https://doi.org/10.3847/1538-4357/ad2343>`_)
+
+      ! The step overshoot part models convective entrainment, where a convective
+      ! zone "eats up" a Ledoux-stable region (typically above a convective core).
+      ! The exponential overshoot part then models actual overshooting where inertia
+      ! carries material beyond the Schwarzschild boundary.
+      ! Note however that no temperature gradients are modified, MESA's implementation of overshoot
+      ! only extends mixing regions (through the diffusion coefficients, ``D_mix``)
 
       ! ::
 
@@ -6504,37 +6527,60 @@
       ! ~~~~~~~~~~~~
       ! TDC_hydro_nz_outer
       ! ~~~~~~~~~~~~~~~~~~
+      ! TDC_hydro_nz_inner
+      ! ~~~~~~~~~~~~~~~~~~
+      ! TDC_hydro_nz_T_gradient
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! TDC_hydro_T_anchor
       ! ~~~~~~~~~~~~~~~~~~
       ! TDC_hydro_dq_1_factor
       ! ~~~~~~~~~~~~~~~~~~~~~
       ! TDC_hydro_use_mass_interp_face_values
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! remesh_for_TDC_pulsations_when_load
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remesh_for_TDC_pulsations_log_core_zoning
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! If calling the public ``remesh_for_TDC_pulsations`` function, the model will be rezoned below ``TDC_hydro_T_anchor`` with logarithmic
-      ! spacing in mass. If .false., remeshing scheme will do a bisection root find such
-      ! that each zone increases in mass inward following a power law, similar to RSP's static model builder.
+      ! If ``remesh_for_TDC_pulsations_log_core_zoning`` is true, the model is rezoned below
+      ! ``TDC_hydro_T_anchor`` with logarithmic spacing in mass. If false, each cell increases
+      ! in mass inward following a power law, similar to the RSP static model builder.
 
       ! The total number of zones is set by ``TDC_hydro_nz``, with constant spacing in mass between the surface and
-      ! ``TDC_hydro_T_anchor``, and increasing spacing in mass between the anchor and the inner boundary condition.
+      ! ``TDC_hydro_T_anchor``. The selected core zoning is used between the anchor and the inner boundary condition.
       ! The number of zones in between the anchor and the surface is set by ``TDC_hydro_nz_outer``, and the number of
       ! zones in the interior is set by ``TDC_hydro_nz`` - ``TDC_hydro_nz_outer``.
       ! The ``TDC_hydro_dq_1_factor`` sets the dq of the surface cell to this multiple of the cell beneath it, k = 2.
 
+      ! For power-law core zoning, ``TDC_hydro_nz_inner`` reserves this many zones next to the inner boundary.
+      ! Their cell masses decrease geometrically inward to ``max_center_cell_dq``. Set this to zero to use a
+      ! single inward-increasing power law. Increase ``TDC_hydro_nz`` by the same amount to add inner zones
+      ! without removing zones from the middle of an existing mesh. This control has no effect with logarithmic
+      ! core zoning.
+
+      ! ``TDC_hydro_nz_T_gradient`` adds this many zones below ``TDC_hydro_T_anchor`` according to the variation
+      ! in ``logT``. These zones enhance the selected mass-based core zoning rather than replacing it. Increase
+      ! ``TDC_hydro_nz`` by the same amount to retain all zones in the underlying mass grid. Set this to zero to
+      ! leave the mass grid unchanged.
+
       ! ``TDC_hydro_use_mass_interp_face_values`` determines whether quantities are averaged to faces using simple average or
       ! mass weighted averaging.
 
-      ! This remeshing scheme works well for most Cepheid envelopes, but it is not designed for AGB stars with deep convective envelopes.
+      ! Use ``TDC_hydro_nz_inner`` and ``TDC_hydro_nz_T_gradient`` to resolve the inner boundary
+      ! and steep temperature gradients in AGB envelopes with deep convective regions.
+
+      ! If ``remesh_for_TDC_pulsations_when_load`` is true, a model loaded from a ``.mod`` file
+      ! is remeshed before the first step. This is not applied to photo restarts.
 
       ! ::
 
+    remesh_for_TDC_pulsations_when_load = .false.
     remesh_for_TDC_pulsations_log_core_zoning = .false.
     TDC_hydro_use_mass_interp_face_values = .false.
 
     TDC_hydro_nz = 150
     TDC_hydro_nz_outer = 40
+    TDC_hydro_nz_inner = 0
+    TDC_hydro_nz_T_gradient = 0
     TDC_hydro_T_anchor = 11d3
     TDC_hydro_dq_1_factor = 2d0
 
@@ -7527,6 +7573,9 @@
       !   phase diagram of `Blouin & Daligault (2021a) <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B>`_.
       ! + ``'ONe'`` : oxygen-neon phase separation using the two-component
       !   phase diagram of `Blouin & Daligault (2021b) <https://ui.adsabs.harvard.edu/abs/2021ApJ...919...87B>`_.
+      ! + ``'3c'`` : three-component phase separation option dynamically selects dominant three components out
+      !   of C/O/Ne/Na/Mg and applies three-component PS procedure based on
+      !   `Castro-Tapia & Cumming (2025) <https://ui.adsabs.harvard.edu/abs/2025ApJ...991...64C>`_.
 
       ! ::
 
@@ -7542,6 +7591,20 @@
       ! ::
 
     do_phase_separation_heating = .true.
+
+      ! smooth_phase_separation_heating
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! if true, redistribute all heating associated with phase
+      ! separation evenly throughout the inner half of the white dwarf.
+      ! This is a somewhat arbitrary choice to broadly distribute the
+      ! correct amount of net heating through the WD interior where
+      ! heat conduction is efficent anyway, preventing unphysical localized
+      ! heating spikes near the crystallization boundary at small time steps.
+
+      ! ::
+
+    smooth_phase_separation_heating = .true.
 
       ! phase_separation_mixing_use_brunt
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

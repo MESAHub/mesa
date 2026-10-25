@@ -4,6 +4,8 @@
 twin_studies
 ************
 
+.. tags:: star, twin-studies, overshooting, massive-star, main-sequence
+
 This test case exercise the capability to simultaneously evolve two model stars.
 The test vehicle is a pair of 15 |Msun|, Z=0.02 metallicity, models one with overshooting and one without overshooting.
 

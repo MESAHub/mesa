@@ -21,8 +21,9 @@ module star_data_def
 
    use rates_def, only: rates_reaction_id_max, other_screening_interface, other_rate_get_interface
    use utils_def, only: integer_dict
+   use utils_namelist, only: max_extra_inlists
    use chem_def, only: num_categories, iso_name_length
-   use const_def, only: sp, dp, qp, i8, strlen, max_extra_inlists
+   use const_def, only: sp, dp, qp, i8, strlen
    use rates_def, only: maxlen_reaction_Name
    use eos_def, only: EoS_General_Info
    use kap_def, only: Kap_General_Info

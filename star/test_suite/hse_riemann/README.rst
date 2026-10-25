@@ -4,6 +4,8 @@
 hse_riemann
 ***********
 
+.. tags:: star, hydrodynamics, riemann-solver, hllc, hydrostatic-equilibrium, stellar-envelope, null-test
+
 This test case checks Riemann HLLC solver can hold an envelope model in hydrostatic equilibrium.
 
 This test case has 1 parts. Click to see a larger version of a plot.

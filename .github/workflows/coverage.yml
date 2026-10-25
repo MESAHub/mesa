@@ -19,12 +19,12 @@ jobs:
   run-code-coverage:
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }} 
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name : Install lcov
         run: |
@@ -32,12 +32,10 @@ jobs:
           sudo apt-get -y install lcov
         shell: bash
 
-      - name: Install MESA on ${{ runner.os }} with SDK 26.3.2 and coverage enabled
+      - name: Install MESA on ${{ runner.os }} with the default SDK and coverage enabled
         uses: ./.github/actions/install-mesa
         env:
           WITH_COVERAGE: yes
-        with:
-          sdk: "26.3.2"
 
       - name: Run gcov
         run: |
@@ -68,10 +66,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Save the html folder as an artifact
-        uses: actions/upload-pages-artifact@v3
-        with: 
+        uses: actions/upload-pages-artifact@v5
+        with:
           path: './.htmlcov/'
-      
+
       - name: Deploy to Github Pages
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
         id: deployment

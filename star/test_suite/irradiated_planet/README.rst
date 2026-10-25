@@ -4,6 +4,8 @@
 irradiated_planet
 *****************
 
+.. tags:: star, irradiated-planet, irradiation, planetary-cooling
+
 This test case checks the evolution of an ~1 Mjup model after the surface has been irradiated.
 
 This test case has 2 parts. Click to see a larger version of a plot.

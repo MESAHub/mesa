@@ -4,6 +4,8 @@
 diffusion_smoothness
 ********************
 
+.. tags:: star, element-diffusion, brunt-profile, low-mass
+
 This test suite case checks that element diffusion produces a sufficiently smooth Brunt profile.
 
 This test case has 2 part2. Click to see a larger view of a plot.

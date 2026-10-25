@@ -44,14 +44,14 @@ CHECK_RESULTS_GOLDEN := test/test_output
 # Install
 
 MODULES := kap_def.mod kap_lib.mod
-EXTRACT_DATA_COMMANDS += install-kap
+EXTRACT_DATA_COMMANDS += ../data/kap_data/.extract-completed
 
 include $(MAKE_DIR)/Makefile
 
-install-kap:
-	if [ ! -r ../data/kap_data ]; then \
-                mkdir -p ../data/kap_data; \
-		tar -xJf kap_data.tar.xz -C ../data; \
-		tar -xJf kapcn_data.txz -C ../data; \
-		cp AESOPUS_AGSS09.h5 ../data/kap_data; \
-	fi
+../data/kap_data/.extract-completed: kap_data.tar.xz kapcn_data.txz AESOPUS_AGSS09.h5
+	rm -rf ../data/kap_data
+	mkdir -p ../data/kap_data
+	tar -xJf kap_data.tar.xz -C ../data
+	tar -xJf kapcn_data.txz -C ../data
+	cp AESOPUS_AGSS09.h5 ../data/kap_data
+	touch $@

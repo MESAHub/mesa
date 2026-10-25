@@ -4,6 +4,8 @@
 rsp_check_2nd_crossing
 **********************
 
+.. tags:: star, rsp, radial-pulsation, linear-analysis, cepheid, instability-strip, second-crossing, colors
+
 This test case exercises the RSP model building and linear nonadiabatic stability analysis
 to find the instability strip edges, and effective temperatures offset from the blue edge of the instability strip.
 

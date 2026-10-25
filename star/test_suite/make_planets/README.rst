@@ -4,6 +4,8 @@
 make_planets
 ************
 
+.. tags:: star, irradiated-planet, core-envelope-planet, irradiation, planetary-cooling
+
 This test case shows an example of a 1 Mjup model with a 10 Mearth core that is irradiated and evolved for 10Gyr.
 
 This test case has 3 part. Click to see a larger version of a plot.

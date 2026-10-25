@@ -4,6 +4,8 @@
 jdot_gr_check
 *************
 
+.. tags:: binary, angular-momentum, orbital-angular-momentum, gravitational-waves, analytic-check, roche-lobe-overflow, point-mass, low-mass
+
 This test case verifies that the orbital evolution due to GW emission follows the
 analytical result of `Peters (1964) <https://ui.adsabs.harvard.edu/abs/1964PhRv..136.1224P>`_.
 
@@ -203,4 +205,3 @@ pgstar commands used for the plot above:
  / ! end of pgstar namelist
 
 Last-Updated: 12Jul2021 (MESA 094ff71) by fxt.
-

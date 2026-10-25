@@ -4,6 +4,8 @@
 conductive_flame
 ****************
 
+.. tags:: star, carbon-burning, conductive-flame, deflagration, carbon-oxygen-mixture, flame-speed
+
 This test suite case models a conductively-propagated deflagration
 wave ("flame") in a high-density, degenerate carbon-oxygen mixture.
 It is similar to a calculation presented by |Timmes1992|.

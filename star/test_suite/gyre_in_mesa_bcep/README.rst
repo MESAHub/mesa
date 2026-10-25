@@ -4,6 +4,8 @@
 gyre_in_mesa_bcep
 *****************
 
+.. tags:: star, gyre, asteroseismology, p-mode, beta-cephei, massive-star, main-sequence
+
 This test case checks the implementation of GYRE in MESA for a 12 |Msun|, Z=0.02 metallicity, model evolving from the zero-age main sequence to core hydrogen depletion;
 a beta Cephei stellar model.
 

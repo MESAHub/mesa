@@ -4,6 +4,8 @@
 TZO
 ***
 
+.. tags:: star, thorne-zytkow-object, compact-remnant, neutron-star, accretion, eddington, convective-core
+
 This test case builds and evolves a Thorne-Zytkow object (TZO) (Farmer et al 2023)
 
 The model starts by building a 20 |Msun| star mid way through the main sequence (inlist_initial). The precise physics do not matter here,

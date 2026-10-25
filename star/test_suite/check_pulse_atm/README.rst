@@ -4,6 +4,8 @@
 check_pulse_atm
 ***************
 
+.. tags:: star, atm, kap, atmosphere, t-tau-relation, opacity, pulsation-output, fgong
+
 .. |Ttau| replace:: :math:`T(\tau)`
 .. |tau| replace:: :math:`\tau`
 

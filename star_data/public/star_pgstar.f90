@@ -19,7 +19,8 @@
 
 module star_pgstar
 
-   use const_def, only: dp, strlen, max_extra_inlists
+   use const_def, only: dp, strlen
+   use utils_namelist, only: max_extra_inlists
    use chem_def, only: iso_name_length
 
    implicit none

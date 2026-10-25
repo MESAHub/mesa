@@ -4,6 +4,8 @@
 jdot_ls_check
 *************
 
+.. tags:: binary, angular-momentum, orbital-angular-momentum, tides, tidal-synchronization, conservation, point-mass, low-mass
+
 This test case verifies that models with tidal evolution conserve angular momentum.
 
 This test case has 1 part. Click to see a larger version of a plot.
@@ -194,4 +196,3 @@ pgstar commands used for the plot above:
 
 
 Last-Updated: 15Jul2021 (MESA 094ff71) by fxt.
-

@@ -4,6 +4,8 @@
 make_o_ne_wd
 ************
 
+.. tags:: star, white-dwarf, oxygen-neon-white-dwarf, agb, carbon-burning, carbon-flame, mass-loss, element-diffusion
+
 This test case produces a 1.05 |Msun| oxygen-neon-magnesium white dwarf using stellar engineering.
 
 This test case has 5 parts. Click to see a larger version of a plot.

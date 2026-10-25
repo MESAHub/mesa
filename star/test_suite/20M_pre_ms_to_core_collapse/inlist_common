@@ -12,8 +12,7 @@
       !change_net_net = .true.
       !new_net_name = 'mesa_206.net'
       !dump_missing_metals_into_heaviest = .false.
-    
-       
+
       ! if using rotation
       change_D_omega_flag = .true.
       new_D_omega_flag = .true.
@@ -41,7 +40,8 @@
       show_timestep_limit_counts_when_terminate = .true.
 
       ! pgstar is recommended for diagnosing issues and understanding the evolution
-      pgstar_flag = .false.
+      pgstar_flag = .true.
+      disable_pgstar_during_relax_flag = .false.
       save_pgstar_files_when_terminate = .true.
 
 / ! end of star_job namelist
@@ -144,15 +144,16 @@
 
 
   ! we use step overshooting in H core
-      overshoot_scheme(1) = 'step'
+      overshoot_scheme(1) = 'step+exponential'
       overshoot_zone_type(1) = 'burn_H'
       overshoot_zone_loc(1) = 'core'
       overshoot_bdy_loc(1) = 'top'
-      overshoot_f(1) = 0.345 ! for M>10
-      !overshoot_f(1) = 0.21 ! For M<10 
+      overshoot_f(1) = 0.335 ! for M>10 ! step part, slightly less than brott,
+      overshoot_f2(1) = 0.01 ! for M>10  ! exponential part, replace outer part of brott with this
+      !overshoot_f(1) = 0.21 ! For M<10
       overshoot_f0(1) = 0.01
 
-  ! exponential in the H core
+  ! exponential in the He core
       overshoot_scheme(2) = 'exponential'
       overshoot_zone_type(2) = 'burn_He'
       overshoot_zone_loc(2) = 'core'

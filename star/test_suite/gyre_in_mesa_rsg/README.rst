@@ -4,6 +4,8 @@
 gyre_in_mesa_rsg
 ****************
 
+.. tags:: star, gyre, asteroseismology, p-mode, massive-star, red-supergiant
+
 This test case checks the implementation of GYRE in MESA for a 21 |Msun|, Z=0.02 metallicity, model in the red supergiant regime.
 
 This test case has 4 parts.

@@ -4,6 +4,8 @@
 20M_pre_ms_to_core_collapse
 ***************************
 
+.. tags:: star, massive-star, pre-main-sequence, full-evolution, core-collapse, carbon-burning, silicon-burning
+
 This test suite evolves a solar metalicity 20 |MSun| model from the pre-ms to core collapse.
 For bit for bit convergence, we recommendedd to run by using the ./run_all script instead of restarting from models,
 see https://github.com/MESAHub/mesa/issues/610.

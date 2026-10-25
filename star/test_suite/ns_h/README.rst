@@ -4,6 +4,8 @@
 ns_h
 ****
 
+.. tags:: star, compact-remnant, neutron-star, neutron-star-envelope, accretion, hydrogen-burning, stable-hydrogen-burning
+
 This test case shows an example of steady hydrogen burning within a neutron star envelope.
 
 This test case has 2 parts. Click to see a larger version of a plot.

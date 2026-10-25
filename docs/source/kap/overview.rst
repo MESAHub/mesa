@@ -109,13 +109,19 @@ Tables based on the work of |Fergusson| include the effects of
 molecules and grains and cover the range
 :math:`2.7 \le \log T \le 4.5` and :math:`-8 \le \log R \le 1`.
 
-Tables based on the work of |Freedman| include the effects of
-molecules and cover the range :math:`1.88 \le \log T \le 4.5` and
-:math:`-8 \le \log R \le 9`.  The table set was privately communicated
-by R. S. Freedman in 2011.  Unlike other opacity sources, this is a 1D
-sequence of tables in :math:`Z` as opposed to a 2D grid of
-:math:`(X,Z)` values.  (The assumed H/He abundances scale with
-:math:`Z`.)
+Tables based on the work of |Freedman08| and |Freedman14| include the
+effects of molecules.  The MESA ``lowT_Freedman11`` tables cover the
+range :math:`1.88 \le \log T \le 4.5` and
+:math:`-8 \le \log R \le 9` after preprocessing.  The raw opacity data
+used to build these tables stop near :math:`T = 4000\,\rm K`,
+corresponding to :math:`\log T \simeq 3.60`; the higher temperature
+part of the MESA table is generated during preprocessing so the table
+can be used on the same grid as the other low temperature opacity
+tables.  The table set was privately communicated by R. S. Freedman in
+2011 and corresponds to the expanded opacity data later described by
+|Freedman14|.  Unlike other opacity sources, this is a 1D sequence of
+tables in :math:`Z` as opposed to a 2D grid of :math:`(X,Z)` values.
+(The assumed H/He abundances scale with :math:`Z`.)
 
 
 Tables from ÆSOPUS (|AESOPUS|) include variation factors for the CNO
@@ -182,7 +188,9 @@ degeneracy, the additional correction formulae of |B20| are applied.
 
 .. |Fergusson| replace:: `Ferguson et al. (2005) <https://ui.adsabs.harvard.edu/abs/2005ApJ...623..585F/abstract>`__
 
-.. |Freedman| replace:: `Freedman et al. (2008) <https://ui.adsabs.harvard.edu/abs/2008ApJS..174..504F/abstract>`__
+.. |Freedman08| replace:: `Freedman et al. (2008) <https://ui.adsabs.harvard.edu/abs/2008ApJS..174..504F/abstract>`__
+
+.. |Freedman14| replace:: `Freedman et al. (2014) <https://ui.adsabs.harvard.edu/abs/2014ApJS..214...25F/abstract>`__
 
 .. |AESOPUS| replace:: `Marigo & Aringer 2009 <https://ui.adsabs.harvard.edu/abs/2009A%26A...508.1539M/abstract>`__
 
@@ -193,4 +201,3 @@ degeneracy, the additional correction formulae of |B20| are applied.
 .. |OPLIB| replace:: `Colgan 2016 <https://ui.adsabs.harvard.edu/abs/2016ApJ...817..116C/abstract>`__
 
 .. |Cassisi| replace:: `Cassisi et al. (2007) <https://ui.adsabs.harvard.edu/abs/2007ApJ...661.1094C/abstract>`__
-

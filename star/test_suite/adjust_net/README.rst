@@ -4,6 +4,8 @@
 adjust_net
 **********
 
+.. tags:: star, net, adaptive-network, nuclear-network, massive-star, main-sequence
+
 This test suite example checks the functionality of the adaptive nuclear reaction network.
 
 Physical checks

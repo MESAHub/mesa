@@ -579,7 +579,7 @@ contains
        select case (i)
        case (6:9)
          num_kap_Xs(i) = 30
-         kap_Xs(1:num_kap_Xs(i), i) = [0.0d0, 0.000001d0, 0.00001d0, 0.000d0, 0.001d0, 0.01d0, &
+         kap_Xs(1:num_kap_Xs(i), i) = [0.0d0, 0.000001d0, 0.00001d0, 0.0001d0, 0.001d0, 0.01d0, &
              0.05d0, 0.1d0, 0.15d0, 0.2d0, 0.25d0, 0.3d0, 0.35d0, 0.4d0, 0.45d0, 0.5d0, 0.55d0, &
              0.6d0, 0.65d0, 0.7d0, 0.75d0, 0.8d0, 0.85d0, 0.9d0, 0.91d0, 0.92d0, 0.93d0, 0.94d0, &
              0.95d0,1.0d0]
@@ -618,7 +618,8 @@ contains
           kap_lowT_Xs(1:num_kap_lowT_Xs(i), i) = [ 0.00d0 ]
           num_kap_lowT_Zs(i) = 7
           kap_lowT_Zs(1:num_kap_lowT_Zs(i), i) = &
-             [ 0.01d0, 0.02d0, 0.04d0, 0.100d0, 0.200d0, 0.63d0, 1.00d0 ]
+             [ 0.007452d0, 0.014760d0, 0.029024d0, 0.069840d0, &
+               0.130292d0, 0.321456d0, 0.428844d0 ]
           num_kap_lowT_Xs_for_this_Z(1:num_kap_lowT_Zs(i), i) = num_kap_lowT_Xs(i)
        case DEFAULT
           num_kap_lowT_Xs(i) = 10

@@ -231,7 +231,7 @@
 
          if (s% rotation_flag) then
             call adjust_omega(s, nz, nz_old, comes_from, &
-               xq_old, xq, dq_old, dq, xh, j_rot_old, &
+               xq_old, xq, dq_old, dq, xh, j_rot_old, omega_old, &
                xout_old, xout_new, dqbar_old, dqbar, ierr)
             if (failed('adjust_omega')) return
             if (s% D_omega_flag) then
@@ -1925,14 +1925,14 @@
 
 
       subroutine adjust_omega(s, nz, nz_old, comes_from, &
-            old_xq, new_xq, old_dq, new_dq, xh, old_j_rot, &
+            old_xq, new_xq, old_dq, new_dq, xh, old_j_rot, old_omega, &
             xout_old, xout_new, old_dqbar, new_dqbar, ierr)
          use alloc
          type (star_info), pointer :: s
          integer, intent(in) :: nz, nz_old
          integer, dimension(:) :: comes_from
          real(dp), dimension(:) :: &
-            old_xq, new_xq, old_dq, new_dq, old_j_rot, &
+            old_xq, new_xq, old_dq, new_dq, old_j_rot, old_omega, &
             xout_old, xout_new, old_dqbar, new_dqbar
          real(dp), intent(in) :: xh(:,:)
          integer, intent(out) :: ierr
@@ -1944,7 +1944,8 @@
          do k = 1, nz
             op_err = 0
             call adjust1_omega(s, k, nz, nz_old, comes_from, &
-               xout_old, xout_new, old_dqbar, new_dqbar, old_j_rot, xh, op_err)
+               xout_old, xout_new, old_dqbar, new_dqbar, &
+               old_j_rot, old_omega, xh, op_err)
             if (op_err /= 0) ierr = op_err
          end do
 !$OMP END PARALLEL DO
@@ -1953,18 +1954,20 @@
 
 
       subroutine adjust1_omega(s, k, nz, nz_old, comes_from, &
-            xout_old, xout_new, old_dqbar, new_dqbar, old_j_rot, xh, ierr)
+            xout_old, xout_new, old_dqbar, new_dqbar, &
+            old_j_rot, old_omega, xh, ierr)
          use hydro_rotation, only: w_div_w_roche_jrot, update1_i_rot_from_xh
          ! set new value for s% omega(k)
          type (star_info), pointer :: s
          integer, intent(in) :: k, nz, nz_old
          integer, dimension(:) :: comes_from
          real(dp), dimension(:), intent(in) :: &
-            xout_old, xout_new, old_dqbar, new_dqbar, old_j_rot
+            xout_old, xout_new, old_dqbar, new_dqbar, old_j_rot, old_omega
          real(dp), intent(in) :: xh(:,:)
          integer, intent(out) :: ierr
 
-         real(dp) :: xq_outer, xq_inner, j_tot, xq0, xq1, new_point_dqbar, dq_sum, dq, r00
+         real(dp) :: xq_outer, xq_inner, j_tot, omega_tot, &
+            xq0, xq1, new_point_dqbar, dq_sum, dq, r00
          integer :: kk, k_outer
 
          integer, parameter :: k_dbg = -1
@@ -1987,7 +1990,8 @@
          end if
 
          dq_sum = 0d0
-         j_tot = 0
+         j_tot = 0d0
+         omega_tot = 0d0
          if (xq_outer >= xout_old(nz_old)) then
             ! new contained entirely in old center zone
             k_outer = nz_old
@@ -2016,6 +2020,7 @@
                   dq = new_point_dqbar - dq_sum
                   dq_sum = new_point_dqbar
                   j_tot = j_tot + old_j_rot(kk-1)*dq
+                  omega_tot = omega_tot + old_omega(kk-1)*dq
                   end if
                exit
             end if
@@ -2037,12 +2042,14 @@
                end if
 
                j_tot = j_tot + old_j_rot(kk)*dq
+               omega_tot = omega_tot + old_omega(kk)*dq
 
             else if (xq0 <= xq_outer .and. xq1 >= xq_inner) then  ! entire new k is in old kk
 
                dq = new_dqbar(k)
                dq_sum = dq_sum + dq
                j_tot = j_tot + old_j_rot(kk)*dq
+               omega_tot = omega_tot + old_omega(kk)*dq
 
             else  ! only use the part of old kk that is in new k
 
@@ -2075,6 +2082,7 @@
                end if
 
                j_tot = j_tot + old_j_rot(kk)*dq
+               omega_tot = omega_tot + old_omega(kk)*dq
 
                if (dq <= 0) then
                   ierr = -1
@@ -2095,6 +2103,8 @@
          end do
 
          s% j_rot(k) = j_tot/dq_sum
+         ! set an omega seed before evaluating a rotation-dependent moment of inertia
+         s% omega(k) = omega_tot/dq_sum
          r00 = get_r_from_xh(s,k)
          s% w_div_w_crit_roche(k) = &
             w_div_w_roche_jrot(r00,s% m(k),s% j_rot(k),s% cgrav(k), &

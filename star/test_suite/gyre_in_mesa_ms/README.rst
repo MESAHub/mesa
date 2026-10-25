@@ -4,6 +4,8 @@
 gyre_in_mesa_ms
 ***************
 
+.. tags:: star, gyre, asteroseismology, p-mode, low-mass, main-sequence
+
 This test case checks the implementation of GYRE in MESA for a 1 |Msun|, Z=0.02 metallicity, model evolving from the zero-age main sequence to core hydrogen depletion.
 
 This test case has 2 parts.

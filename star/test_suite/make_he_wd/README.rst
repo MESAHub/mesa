@@ -4,6 +4,8 @@
 make_he_wd
 **********
 
+.. tags:: star, white-dwarf, helium-white-dwarf, low-mass, mass-loss, envelope-stripping, white-dwarf-cooling
+
 This test case checks the creation and evolution of a 0.15 |Msun| helium white dwarf.
 
 This test case has 3 parts. Click to see a larger version of a plot.

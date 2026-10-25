@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.head.ref }}
 
@@ -31,7 +31,7 @@ jobs:
           sdk: "24.7.1"
 
       - name: Checkout mesa_test
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: MESAHub/mesa_test
           path: mesa_test  # Store in $GITHUB_WORKSPACE/mesa_test

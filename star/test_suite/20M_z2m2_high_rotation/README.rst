@@ -4,6 +4,8 @@
 20M_z2m2_high_rotation
 **********************
 
+.. tags:: star, rotation, critical-rotation, massive-star, core-helium-burning
+
 This test case checks the evolution of a strongly rotating, Omega/Omega_crit = 0.75, 20 |Msun|, Z=0.02 metallicity model from the pre-main sequence to the end of core helium burning.
 
 This test case has one part. Click to see a larger view of a plot.

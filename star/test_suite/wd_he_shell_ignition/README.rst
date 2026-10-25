@@ -4,6 +4,8 @@
 wd_he_shell_ignition
 ********************
 
+.. tags:: star, white-dwarf, carbon-oxygen-white-dwarf, accretion, helium-burning, helium-shell-ignition, shell-burning
+
 This test case checks the ignition of a helium layer in an accreting in a 0.96 |Msun| carbon-oxygen white dwarf model.
 
 This test case has 1 part. Click to see a larger version of a plot.

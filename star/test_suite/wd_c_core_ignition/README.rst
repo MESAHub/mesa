@@ -4,6 +4,8 @@
 wd_c_core_ignition
 ******************
 
+.. tags:: star, white-dwarf, carbon-oxygen-white-dwarf, accretion, carbon-ignition, thermonuclear-runaway, chandrashekhar-mass, type-ia-progenitor
+
 This test case the checks the onset of a thermonuclear runaway in an accreting Chandrasekhar mass carbon-oxygen white dwarf.
 
 This test case has 2 parts. Click to see a larger version of a plot.

@@ -4,6 +4,8 @@
 make_pre_ccsn_13bvn
 *******************
 
+.. tags:: star, massive-star, pre-main-sequence, full-evolution, core-collapse, stripped-envelope, envelope-stripping, pre-supernova
+
 This test suite evolves a solar metalicity 12 |MSun| model from the pre-ms to helium depletion, strips the hydrogen envelope, and then evolves to core collapse.
 This test suite is made to be similar (almost identical) to the 13BVN model from MESA IV. (This is a sensitive test_suite)
 
@@ -12,8 +14,7 @@ Physical checks
 
 Tests the functionality of velocity drag for v_flag for damping large surfaces velocities from He shell (N-alpha) flashes during advanced burning.
 Tests energy conservation for regions where v_drag is applied.
-Tests the use of OP_split_burn as split burn <4d9 leads to large temperature swings and single zone burning in the core, and split burn >4.5d9 needs smaller timesteps.
-This case illustrates strong coupling between burning and hydro: OP_split_burn lower and higher thresholds can only be exceeded with very tight timesteps.
+Tests MESA's solver by evolving to core-collapse with fully implicit coupling between burning and hydrodynamics.
 
 Inlists
 =======
@@ -28,9 +29,9 @@ This test case has five parts.
 
 * Part 4 (``inlist_after_remove``) replaces the remaining hydrogen in the envelope with helium.
 
-* Part 5 (``inlist_to_post_si_burn``) evolves the model until log_center_T = 9.60d0, after Si-core burning. op_split_burn_min_T = 4.2d9
+* Part 5 (``inlist_to_post_si_burn``) evolves the model until log_center_T = 9.60d0, after Si-core burning.
 
-* Part 6 (``inlist_to_cc``) evolves the model until core collapse (300 km/s infall).  reduced to op_split_burn_min_T = 1d9 for speed
+* Part 6 (``inlist_to_cc``) evolves the model until core collapse (300 km/s infall).
 
 
-Last-Updated: 24Dec2023 by EbF
+Last-Updated: 01June2026 by EbF

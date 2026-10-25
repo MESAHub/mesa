@@ -10,15 +10,13 @@
       change_initial_net = .true.
       new_net_name = 'approx21_cr60_plus_co56.net'
 
-
+      set_initial_dt = .true.
+      years_for_initial_dt = 1d-5
 
 / ! end of star_job namelist
 
 
 &controls
-
-! reduce op_split_burn_min_T to help with test_suite speed.
-     !op_split_burn_min_T = 1d9 ! results in photo check sum issues if toggled now.
 
 ! 300 km/s core infall stopping condition
      fe_core_infall_limit = 3d7
@@ -28,23 +26,12 @@
       when_to_stop_atol = 1d-3
 
 
-! adjust overshoot, to prevent He shell convection from propagating inward in test case.
+! adjust overshoot, to prevent He shell convection from mergers.
      overshoot_scheme(1) = 'none'
-     overshoot_zone_type(1) = 'burn_He'
-     overshoot_zone_loc(1) = 'shell'
-     overshoot_bdy_loc(1) = 'bottom'
-
-
-     overshoot_scheme(2) = 'exponential'
-     overshoot_zone_type(2) = 'any'
-     overshoot_zone_loc(2) = 'any'
-     overshoot_bdy_loc(2) = 'any'
-     overshoot_f(2) = 0.01
-     overshoot_f0(2) = 0.004
-
-     min_overshoot_q = 0d0
+     overshoot_scheme(2) = 'none'
 
 ! prevent development of radial pulses during advanced burning
+      use_drag_energy = .false.
       drag_coefficient = 1d0
       min_q_for_drag = 0.8d0
 
@@ -79,7 +66,7 @@
       photo_interval = 50
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 10
+      terminal_interval = 1
 
       x_integer_ctrl(1) = 6 ! inlist_part
 

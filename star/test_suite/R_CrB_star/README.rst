@@ -4,6 +4,8 @@
 R_CrB_star
 **********
 
+.. tags:: star, kap, r-crb-star, hydrogen-deficient, carbon-rich, opacity, aesopus
+
 This test case creates and evolves a simple model of an R Corona
 Borealis star.  The model is constructed from an 0.875 |Msun|
 homogeneous He star and evolved until it first reaches a low effective
@@ -58,4 +60,3 @@ Click to see a larger plot:
 
 
 Last-Updated: 2020-11-16 (mesa r14909) by Josiah Schwab, 30may2021 (MESA 15140) by fxt.
-

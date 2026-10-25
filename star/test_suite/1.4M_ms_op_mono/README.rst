@@ -4,6 +4,8 @@
 1.4M_ms_op_mono
 ***************
 
+.. tags:: star, kap, opacity, op-mono, low-mass, main-sequence
+
 The test checks the functionality of OP mono opacities. The test vehicle is a
 1.4 |Msun| solar metallicity model.
 
