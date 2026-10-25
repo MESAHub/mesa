@@ -102,17 +102,17 @@ Set with ``extinction_law``, ``A_V`` and ``R_V`` in ``&colors``:
    R_V = 3.1
 
 +----------------+--------------------------------------+---------------+--------------------------------------+
-| Name           | Reference                            | R_V           | Used by                              |
+| Name           | Reference                            | R_V range     | Used by                              |
 +================+======================================+===============+======================================+
-| ``CCM89``      | Cardelli, Clayton & Mathis (1989)    | ``R_V``       | MIST v1 (Choi et al. 2016)           |
+| ``CCM89``      | Cardelli, Clayton & Mathis (1989)    | 2 to 6        | MIST v1 (Choi et al. 2016)           |
 +----------------+--------------------------------------+---------------+--------------------------------------+
-| ``O94``        | O'Donnell (1994)                     | ``R_V``       | PARSEC/CMD, YBC (Chen et al. 2019)   |
+| ``O94``        | O'Donnell (1994)                     | 2 to 6        | PARSEC/CMD, YBC (Chen et al. 2019)   |
 +----------------+--------------------------------------+---------------+--------------------------------------+
-| ``F99``        | Fitzpatrick (1999)                   | ``R_V``       |                                      |
+| ``F99``        | Fitzpatrick (1999)                   | 2 to 6        |                                      |
 +----------------+--------------------------------------+---------------+--------------------------------------+
 | ``FM07``       | Fitzpatrick & Massa (2007)           | fixed 3.1     | cited by MIST v2.5 (Dotter+ 2026)    |
 +----------------+--------------------------------------+---------------+--------------------------------------+
-| ``G23``        | Gordon et al. (2023)                 | ``R_V``       |                                      |
+| ``G23``        | Gordon et al. (2023)                 | 2.3 to 5.6    |                                      |
 +----------------+--------------------------------------+---------------+--------------------------------------+
 | ``G03_SMCBar`` | Gordon et al. (2003), SMC bar        | fixed 2.74    |                                      |
 +----------------+--------------------------------------+---------------+--------------------------------------+
@@ -126,15 +126,23 @@ were used to verify the Fortran to machine precision. Outside a law's fitted
 wavelength range, its functional form is continued to long wavelengths (where it
 falls to zero) and held at its blue-limit value at short wavelengths.
 
-``A_V`` is the extinction at the law's reference V wavelength (about 5500 Å), so
-the extinction through a broad V filter differs from it by about a percent and
+``R_V`` is checked against each law's calibrated range, and a value outside it is
+rejected, since the fits can turn negative there. The fixed-shape laws ignore
+``R_V``.
+
+``A_V`` scales the law, A(λ) = A_V × A(λ)/A(V), and each law sets its own V
+normalisation: CCM89, O94, G23 and the G03 averages give A(λ)/A(V) = 1 within
+0.2% at 5500 Å, while F99 and FM07 define A(V) through the broad V band and give
+0.978 and 1.008 there at R_V = 3.1. The extinction through a V filter also
 depends on the SED.
 
 **Adding a law.** Each law in ``private/extinction.f90`` is a pure subroutine
 ``law(x, R_V, k)`` that fills ``k = A(λ)/A(V)`` at wavenumbers ``x = 1/λ`` [µm⁻¹].
 Write one (the building blocks ``cardelli_form``, ``f99_form``, ``fm90``,
 ``drude`` and ``natural_spline`` cover most published forms), give it a ``case``
-in ``extinction_curve``, and add it to the list in ``colors.defaults``.
+in ``extinction_curve``, add its name (and the R_V range it was calibrated over,
+if it uses R_V) to ``check_extinction_controls``, which also holds the list of
+names shown in error messages, and add it to the list in ``colors.defaults``.
 
 Source files
 ============

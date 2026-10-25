@@ -35,8 +35,10 @@
 !   vary Teff:   log g = 4.0, [M/H] = 0.0,  Teff = 3500, 6000, 10000, 20000
 !
 ! group 4 - interstellar extinction:
-!   A(lambda)/A(V) for every law at fixed wavelengths, and the extinction in
-!   each band for the solar case reddened by A_V = 1 (CCM89, R_V = 3.1)
+!   A(lambda)/A(V) for every law at fixed wavelengths (the R_V-dependent laws
+!   also at R_V = 2.5 and 5.0), the setup check on bad extinction controls, and
+!   the extinction in each band for the solar case reddened by A_V = 1 (CCM89,
+!   R_V = 3.1)
 
 program test_colors
 
@@ -51,7 +53,7 @@ program test_colors
    use const_def,  only: dp, rsun, boltz_sigma
    use utils_lib,  only: mesa_error
    use colors_utils, only: resolve_path
-   use extinction, only: extinction_curve
+   use extinction, only: extinction_curve, check_extinction_controls
 
    implicit none
 
@@ -105,6 +107,18 @@ program test_colors
    ! far-UV, 2175 A bump, U, B, V, J, K [Angstrom]
    real(dp), parameter :: ext_waves(n_ext_waves) = &
       [1500d0, 2175d0, 3650d0, 4400d0, 5500d0, 12500d0, 22000d0]
+
+   ! the R_V-dependent laws are also printed away from R_V = 3.1, where G23's R_V term vanishes
+   integer, parameter :: n_rv_laws = 4
+   character(len=12), parameter :: rv_laws(n_rv_laws) = [character(len=12) :: 'CCM89', 'O94', 'F99', 'G23']
+   real(dp), parameter :: ext_rvs(2) = [2.5d0, 5.0d0]
+
+   ! extinction controls the setup check must reject (ierr /= 0) or accept (ierr = 0)
+   integer, parameter :: n_ctrl = 6
+   character(len=12), parameter :: ctrl_law(n_ctrl) = [character(len=12) :: &
+      'Cardelli', 'F99', 'G23', 'CCM89', 'FM07', 'g03_smcbar']
+   real(dp), parameter :: ctrl_av(n_ctrl) = [1d0, -0.5d0, 1d0, 1d0, 1d0, 1d0]
+   real(dp), parameter :: ctrl_rv(n_ctrl) = [3.1d0, 3.1d0, 2.0d0, 7.0d0, 7.0d0, 3.1d0]
 
    ! -----------------------------------------------------------------------
    ! shared
@@ -310,11 +324,25 @@ program test_colors
    write(*,'(a, 7f9.0)') '# A(lambda)/A(V) at R_V=3.1  lambda_AA=', ext_waves
    do j = 1, n_ext_laws
       call extinction_curve(ext_laws(j), 3.1d0, ext_waves, ext_k, ierr)
-      if (ierr /= 0) then
-         write(*,*) 'extinction_curve failed for ', trim(ext_laws(j))
-         stop 1
-      end if
+      if (ierr /= 0) call mesa_error(__FILE__, __LINE__)
       write(*,'(a12, 7f9.5)') trim(ext_laws(j)), ext_k
+   end do
+
+   write(*,'(a)') ''
+   write(*,'(a)') '# A(lambda)/A(V) of the R_V-dependent laws at R_V=2.5 and 5.0'
+   do j = 1, n_rv_laws
+      do i = 1, size(ext_rvs)
+         call extinction_curve(rv_laws(j), ext_rvs(i), ext_waves, ext_k, ierr)
+         if (ierr /= 0) call mesa_error(__FILE__, __LINE__)
+         write(*,'(a8, f4.1, 7f9.5)') trim(rv_laws(j)), ext_rvs(i), ext_k
+      end do
+   end do
+
+   write(*,'(a)') ''
+   write(*,'(a)') '# control checks  law  A_V  R_V  ierr (0 = accepted)'
+   do j = 1, n_ctrl
+      call check_extinction_controls(ctrl_law(j), ctrl_av(j), ctrl_rv(j), ierr)
+      write(*,'(a12, f6.2, f6.2, i4)') trim(ctrl_law(j)), ctrl_av(j), ctrl_rv(j), ierr
    end do
 
    ! the solar case through the full pipeline, with and without dust;
@@ -332,10 +360,7 @@ program test_colors
       handle, n_cols, col_names, red_vals, ierr)
    cs%extinction_law = 'none'
    cs%A_V = 0d0
-   if (ierr /= 0) then
-      write(*,*) 'data_for_colors_history_columns failed, group4, ierr =', ierr
-      stop 1
-   end if
+   if (ierr /= 0) call mesa_error(__FILE__, __LINE__)
 
    write(*,'(a)') ''
    write(*,'(a)') '# case: solar  law=CCM89  A_V=1  R_V=3.1  value = m(A_V=1) - m(A_V=0)'

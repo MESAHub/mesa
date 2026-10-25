@@ -141,7 +141,7 @@ contains
       call get_colors_ptr(handle, rq, ierr)
       if (ierr /= 0) return
 
-      call check_extinction_controls(rq%extinction_law, rq%A_V, rq%R_V, ierr)
+      call check_extinction_controls(rq%extinction_law, rq%A_V, rq%R_V, ierr, report=.true.)
       if (ierr /= 0) return
 
       call read_strings_from_file(rq, color_filter_names, num_color_filters, ierr)

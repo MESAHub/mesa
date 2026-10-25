@@ -102,7 +102,7 @@ contains
 
       ! Mag_bol and Flux_bol stay intrinsic; only the filter magnitudes see the dust
       call apply_extinction(cs%extinction_law, cs%A_V, cs%R_V, wavelengths, fluxes, ierr)
-      if (ierr /= 0) return
+      if (ierr /= 0) call mesa_error(__FILE__, __LINE__, 'colors: invalid extinction controls')
 
       names(1) = "Mag_bol"
       vals(1) = bolometric_magnitude

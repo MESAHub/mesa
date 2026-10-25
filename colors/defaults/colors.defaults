@@ -135,16 +135,20 @@
 
    ! ``A_V``
    ! ~~~~~~~
-   ! Extinction in magnitudes at the reference V wavelength of the law (about
-   ! 5500 A); must be >= 0. Because it is defined at one wavelength, the extinction
-   ! in a broad V filter differs from A_V by about a percent and depends on the SED.
+   ! V-band extinction in magnitudes, which scales the law: A(lambda) = A_V A(lambda)/A(V).
+   ! Must be >= 0. Each law sets its own V normalisation: CCM89, O94, G23 and the
+   ! G03 averages give A(lambda)/A(V) = 1 within 0.2% at 5500 A, while F99 and FM07
+   ! define A(V) through the broad V band and give 0.978 and 1.008 at 5500 A
+   ! (R_V = 3.1). The extinction through a V filter also depends on the SED.
 
    ! ``R_V``
    ! ~~~~~~~
    ! Ratio of total to selective extinction, R_V = A(V)/E(B-V), which sets the
    ! shape of the CCM89, O94, F99 and G23 laws. 3.1 is the diffuse Milky Way
    ! average. CCM89, O94 and F99 are calibrated for 2 <= R_V <= 6, and G23 for
-   ! 2.3 <= R_V <= 5.6.
+   ! 2.3 <= R_V <= 5.6; a value outside that range is rejected, because the fits
+   ! can turn negative there. FM07 and the G03 averages have a fixed shape and
+   ! ignore R_V.
 
    ! ::
 

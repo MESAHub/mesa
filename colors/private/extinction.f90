@@ -26,7 +26,8 @@
 !
 ! each law is a pure subroutine  law(x, R_V, k)  that fills k(:) at the wavenumbers
 ! x(:) = 1/lambda [micron^-1], the variable the published fits are written in.
-! to add a law, write one below and give it a case in extinction_curve.
+! to add a law, write one below, give it a case in extinction_curve, and add its name
+! (with the R_V range it was calibrated over, if it uses R_V) to check_extinction_controls.
 !
 ! outside a law's fitted range: longward, the law's own functional form is continued
 ! (each falls to zero as lambda -> infinity); shortward, k is held at its value at the
@@ -56,15 +57,19 @@ contains
       real(dp), intent(inout) :: fluxes(:)
       integer, intent(out) :: ierr
 
-      real(dp) :: k(size(wavelengths))
+      real(dp), allocatable :: k(:)
 
-      ierr = 0
+      ! checked on every call, since the controls can change after setup
+      call check_extinction_controls(law, A_V, R_V, ierr)
+      if (ierr /= 0) return
       if (StrUpCase(law) == 'NONE' .or. A_V == 0.0_dp) return
 
+      allocate (k(size(wavelengths)))
       call extinction_curve(law, R_V, wavelengths, k, ierr)
       if (ierr /= 0) return
 
-      fluxes = fluxes*exp10(-0.4_dp*A_V*k)
+      k = exp10(-0.4_dp*A_V*k)
+      fluxes = fluxes*k
    end subroutine apply_extinction
 
    ! k = A(lambda)/A(V) for the named law; wavelengths in Angstrom
@@ -75,9 +80,10 @@ contains
       real(dp), intent(out) :: k(:)
       integer, intent(out) :: ierr
 
-      real(dp) :: x(size(wavelengths))
+      real(dp), allocatable :: x(:)
 
       ierr = 0
+      allocate (x(size(wavelengths)))
 
       ! a non-positive wavelength (never present in a valid SED) is sent to the far-UV,
       ! where every law is held constant
@@ -102,36 +108,79 @@ contains
       case ('G03_LMCAVG')
          call g03_lmcavg(x, k)
       case default
-         write (*, '(a)') 'colors error: unknown extinction_law '//trim(law)// &
-            '; options are none, CCM89, O94, F99, FM07, G23, G03_SMCBar, G03_LMCAvg'
+         write (*, '(a)') 'colors error: unknown extinction_law '//trim(law)
          k = 0.0_dp
          ierr = -1
       end select
    end subroutine extinction_curve
 
-   ! checks the extinction controls once, at setup
-   subroutine check_extinction_controls(law, A_V, R_V, ierr)
+   ! checks the extinction controls: a known law, A_V >= 0, and R_V inside the range the
+   ! law was calibrated over (outside it the fits can go negative and brighten the star).
+   ! with report, also says when a control has no effect
+   subroutine check_extinction_controls(law, A_V, R_V, ierr, report)
       character(len=*), intent(in) :: law
       real(dp), intent(in) :: A_V, R_V
       integer, intent(out) :: ierr
+      logical, intent(in), optional :: report
 
-      real(dp) :: k(1)
+      real(dp) :: rv_lo, rv_hi
+      logical :: uses_rv
 
       ierr = 0
+      rv_lo = 0.0_dp
+      rv_hi = 0.0_dp
+
+      ! every law, with the R_V range it was calibrated over; fixed-shape laws ignore R_V
+      uses_rv = .true.
+      select case (StrUpCase(law))
+      case ('NONE', 'FM07', 'G03_SMCBAR', 'G03_LMCAVG')
+         uses_rv = .false.
+      case ('CCM89', 'O94', 'F99')
+         rv_lo = 2.0_dp
+         rv_hi = 6.0_dp
+      case ('G23')
+         rv_lo = 2.3_dp
+         rv_hi = 5.6_dp
+      case default
+         write (*, '(a)') 'colors error: unknown extinction_law '//trim(law)// &
+            '; options are none, CCM89, O94, F99, FM07, G23, G03_SMCBar, G03_LMCAvg'
+         ierr = -1
+         return
+      end select
+
       if (A_V < 0.0_dp) then
-         write (*, '(a, 1pe12.4)') 'colors error: A_V must be >= 0, got ', A_V
+         write (*, '(a)') 'colors error: A_V must be >= 0, got '//num_str(A_V)
          ierr = -1
          return
       end if
-      if (R_V <= 0.0_dp) then
-         write (*, '(a, 1pe12.4)') 'colors error: R_V must be > 0, got ', R_V
+      if (uses_rv .and. (R_V < rv_lo .or. R_V > rv_hi)) then
+         write (*, '(a)') 'colors error: '//trim(law)//' is calibrated for '//num_str(rv_lo)// &
+            ' <= R_V <= '//num_str(rv_hi)//', got R_V = '//num_str(R_V)
          ierr = -1
          return
       end if
 
-      ! rejects an unknown law name
-      call extinction_curve(law, R_V, [5.5d3], k, ierr)
+      if (.not. present(report)) return
+      if (.not. report) return
+      if (StrUpCase(law) == 'NONE') then
+         if (A_V /= 0.0_dp) write (*, '(a)') 'colors: A_V has no effect because extinction_law = ''none'''
+      else if (A_V == 0.0_dp) then
+         write (*, '(a)') 'colors: extinction_law = '//trim(law)//' has no effect with A_V = 0'
+      else if (.not. uses_rv .and. R_V /= 3.1_dp) then
+         write (*, '(a)') 'colors: '//trim(law)//' has a fixed shape, so the R_V control is ignored'
+      end if
    end subroutine check_extinction_controls
+
+   ! v as short text for messages, e.g. -0.500
+   function num_str(v) result(s)
+      real(dp), intent(in) :: v
+      character(len=:), allocatable :: s
+
+      character(len=32) :: buf
+
+      write (buf, '(f12.3)') v
+      s = trim(adjustl(buf))
+   end function num_str
 
    ! ----------------------------------------------------------------------
    ! extinction laws
