@@ -1,0 +1,1 @@
+../../../star/test_suite/colors_post/README.rst

@@ -35,6 +35,7 @@ do_one adjust_net "finished with expected number of species" "final.mod" auto
 do_one carbon_kh "stop because log_center_density >= log_center_density_upper_limit" "final.mod" auto
 do_one check_pulse_atm "all values are within tolerance" "final.mod" auto
 do_one check_redo "stop because have dropped below central lower limit for h1" "final.mod" auto
+do_one colors_post "colors_post: successfully post-processed all" skip skip
 do_one conductive_flame "all values are within tolerance" "final.mod" auto
 do_one conserve_angular_momentum "stop because he_core_mass >= he_core_mass_limit" "final.mod" auto
 do_one conv_core_cpm "Test passed: mass_conv_core within specified range" "final.mod" auto

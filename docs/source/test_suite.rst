@@ -243,6 +243,12 @@ This developer test checks that a run with a forced redo gives the
 same answer when restarted from an earlier photo.
 
 
+:ref:`colors_post`
+^^^^^^^^^^^^^^^^^^
+
+This test suite case computes synthetic photometry for an existing MESA history file, without rerunning the stellar evolution.
+
+
 :ref:`conductive_flame`
 ^^^^^^^^^^^^^^^^^^^^^^^
 
