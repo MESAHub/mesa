@@ -19,8 +19,8 @@ from pathlib import Path
 import re
 import sys
 
-HISTORY_HEADER_LINES = 6   # 5 MESA header lines + 1 column-name line
-COLORS_SKIP_COLS     = 4   # star_age, Teff, log_g, feh (already in history)
+HISTORY_HEADER_LINES = 6  # 5 MESA header lines + 1 column-name line
+COLORS_SKIP_COLS = 4  # star_age, Teff, log_g, feh (already in history)
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 
@@ -55,10 +55,12 @@ def stitch(root_dir: Path = None):
         sys.exit(f"error: inlist not found: {inlist_path}")
 
     m_hist = re.search(r"history_file\s*=\s*'([^']+)'", text)
-    m_out  = re.search(r"output_file\s*=\s*'([^']+)'", text)
+    m_out = re.search(r"output_file\s*=\s*'([^']+)'", text)
 
     history_file = resolve_from_root(m_hist.group(1) if m_hist else "LOGS/history.data")
-    colors_file  = resolve_from_root(m_out.group(1)  if m_out  else "post_proc_output.data")
+    colors_file = resolve_from_root(
+        m_out.group(1) if m_out else "LOGS/post_proc_output.data"
+    )
 
     # --- read original history file ---
     try:
@@ -67,8 +69,8 @@ def stitch(root_dir: Path = None):
         sys.exit(f"error: history file not found: {history_file}")
 
     hist_header = hist_lines[:HISTORY_HEADER_LINES]
-    hist_data   = [l for l in hist_lines[HISTORY_HEADER_LINES:] if l.strip()]
-    hist_cols   = hist_header[HISTORY_HEADER_LINES - 1].split()
+    hist_data = [l for l in hist_lines[HISTORY_HEADER_LINES:] if l.strip()]
+    hist_cols = hist_header[HISTORY_HEADER_LINES - 1].split()
 
     # --- read colors output file ---
     try:
@@ -80,8 +82,8 @@ def stitch(root_dir: Path = None):
         sys.exit(f"error: colors output file is empty: {colors_file}")
 
     col_header = col_lines[0]
-    col_data   = [l for l in col_lines[1:] if l.strip()]
-    col_names  = col_header.split()[COLORS_SKIP_COLS:]
+    col_data = [l for l in col_lines[1:] if l.strip()]
+    col_names = col_header.split()[COLORS_SKIP_COLS:]
 
     # --- check row counts match ---
     if len(hist_data) != len(col_data):
@@ -94,9 +96,11 @@ def stitch(root_dir: Path = None):
     # --- build stitched header ---
     stitched_col_header = (
         hist_header[HISTORY_HEADER_LINES - 1].rstrip()
-        + "   " + "   ".join(col_names) + "\n"
+        + "   "
+        + "   ".join(col_names)
+        + "\n"
     )
-    stitched_header = hist_header[:HISTORY_HEADER_LINES - 1] + [stitched_col_header]
+    stitched_header = hist_header[: HISTORY_HEADER_LINES - 1] + [stitched_col_header]
 
     # --- stitch rows ---
     stitched_rows = []

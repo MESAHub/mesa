@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-compare_mag_systems.py
+plot_zero_points.py
 
 Runs MESA colors post-processor 3 times with different magnitude zero-point
 systems (Vega, AB, ST) and overlays the resulting CMDs for comparison.
@@ -8,8 +8,8 @@ systems (Vega, AB, ST) and overlays the resulting CMDs for comparison.
 After each post-processing run, stitches the colors output onto the MESA
 history file via stitch_history.stitch() before saving results.
 
-Usage: python compare_mag_systems.py
-       (Run from the custom_colors test suite directory)
+Usage: python plot_zero_points.py
+       (run from colors_post/python_helpers)
 
 Requires an existing MESA LOGS directory (or LOGS_original backup) containing
 history.data from a completed stellar evolution run.
