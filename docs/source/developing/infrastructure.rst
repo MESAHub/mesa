@@ -76,7 +76,7 @@ ReadTheDocs
 -----------
 
 The Sphinx documentation is hosted by `ReadTheDocs <https://readthedocs.org/>`__.
-Rich controls the account (and Earl, Joey, Meridith, and Eb have access to it). This is
+Rich controls the account (and Evan, Earl, and Ebraheem have access to it). This is
 currently free for open source software.
 
 
