@@ -28,9 +28,12 @@ CHECK_RESULTS_GOLDEN := test/test_output
 
 MODULES := colors_def.mod colors_lib.mod
 INSTALL_INCLUDES :=
-EXTRACT_DATA_COMMANDS += install-colors-data
+EXTRACT_DATA_COMMANDS += ../data/colors_data/.extract-completed
 
 include $(MAKE_DIR)/Makefile
 
-install-colors-data:
-	./build_data_and_export
+../data/colors_data/.extract-completed: colors_data.txz
+	rm -rf ../data/colors_data
+	mkdir -p ../data/colors_data
+	tar -xf colors_data.txz -C ../data/colors_data
+	touch $@
