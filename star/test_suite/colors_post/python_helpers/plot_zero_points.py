@@ -5,14 +5,10 @@ plot_zero_points.py
 Runs MESA colors post-processor 3 times with different magnitude zero-point
 systems (Vega, AB, ST) and overlays the resulting CMDs for comparison.
 
-After each post-processing run, stitches the colors output onto the MESA
-history file via stitch_history.stitch() before saving results.
-
 Usage: python plot_zero_points.py
        (run from colors_post/python_helpers)
 
-Requires an existing MESA LOGS directory (or LOGS_original backup) containing
-history.data from a completed stellar evolution run.
+Each run's output (LOGS/history.data) is saved to LOGS_<system>.
 
 Niall Miller (2025)
 """
@@ -21,24 +17,16 @@ import os
 import re
 import shutil
 import subprocess
-import sys
-from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-
-# stitch_history.py lives alongside this script
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from stitch_history import stitch
 
 # Configuration
 MAG_SYSTEMS = ["Vega", "AB", "ST"]
 COLORS = {"Vega": "blue", "AB": "red", "ST": "green"}
 INLIST_COLORS = "inlist"
-LOGS_ORIGINAL = "LOGS_original"  # backup of original MESA run — preserved across runs
 
 os.chdir("../")
-ROOT_DIR = Path(os.getcwd()).resolve()
 
 
 def read_inlist(filename):
@@ -56,39 +44,14 @@ def modify_mag_system(content, mag_system):
     return re.sub(pattern, rf"\g<1>{mag_system}\g<2>", content)
 
 
-def ensure_logs_backup():
-    if os.path.exists(LOGS_ORIGINAL):
-        return True
-    if os.path.exists("LOGS"):
-        print(f"Backing up LOGS -> {LOGS_ORIGINAL}")
-        shutil.copytree("LOGS", LOGS_ORIGINAL)
-        return True
-    print(
-        f"Error: Neither LOGS nor {LOGS_ORIGINAL} found.\n"
-        "Run a full MESA stellar evolution first, then re-run this script."
-    )
-    return False
-
-
-def restore_logs():
-    if os.path.exists("LOGS"):
-        shutil.rmtree("LOGS")
-    shutil.copytree(LOGS_ORIGINAL, "LOGS")
-
-
 def run_postproc(mag_system, run_dir):
-    """Run the colors post-processor, stitch colors onto history, save LOGS."""
+    """Run the colors post-processor and save its LOGS."""
     print(f"\n{'=' * 60}")
     print(f"Running colors post-processor with mag_system = {mag_system}")
     print(f"{'=' * 60}")
 
-    restore_logs()
-
     original_content = read_inlist(INLIST_COLORS)
     modified_content = modify_mag_system(original_content, mag_system)
-    modified_content = re.sub(
-        r"pgstar_flag\s*=\s*\.true\.", "pgstar_flag = .false.", modified_content
-    )
     write_inlist(INLIST_COLORS, modified_content)
 
     try:
@@ -113,11 +76,7 @@ def run_postproc(mag_system, run_dir):
     finally:
         write_inlist(INLIST_COLORS, original_content)
 
-    # Stitch colors output onto LOGS/history.data
-    print(f"Stitching colors into history.data for {mag_system}...")
-    stitch(root_dir=ROOT_DIR)
-
-    # Save LOGS — history.data now contains the color columns
+    # Save LOGS — history.data contains the color columns
     if os.path.exists("LOGS"):
         if os.path.exists(run_dir):
             shutil.rmtree(run_dir)
@@ -234,14 +193,7 @@ def plot_cmd_comparison(results):
 
 def main():
     if not os.path.exists(INLIST_COLORS):
-        print(f"Error: {INLIST_COLORS} not found. Run from custom_colors directory.")
-        return
-
-    if not os.path.exists("./rn"):
-        print("Error: ./rn not found. Run from custom_colors directory.")
-        return
-
-    if not ensure_logs_backup():
+        print(f"Error: {INLIST_COLORS} not found. Run from colors_post/python_helpers.")
         return
 
     results = {}

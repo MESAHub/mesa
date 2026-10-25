@@ -1,0 +1,27 @@
+! colors_post: synthetic photometry for an existing MESA history file.
+
+! &colors takes the same controls as a run with inline colors
+! (see colors/defaults/colors.defaults). To reuse the settings of the run
+! that wrote the history file, point at the file that holds its &colors:
+!
+!    read_extra_colors_inlist(1) = .true.
+!    extra_colors_inlist_name(1) = '/path/to/that/run/inlist_colors'
+
+&colors
+   instrument = 'data/colors_data/filters/Generic/Johnson'
+   stellar_atm = 'data/colors_data/stellar_models/Kurucz2003all/'
+   vega_sed = 'data/colors_data/stellar_models/vega_flam.csv'
+   mag_system = 'Vega'
+   distance = 3.0857d19 ! 10 pc in cm -> absolute magnitudes
+/ ! end of colors namelist
+
+
+! &post_proc names the history file to read (required) and the file to
+! write, which is a copy of the history file with the colors columns added.
+! If the history file has no surface_h1 and surface_he4 columns, set
+! fallback_m_div_h to the [M/H] to use for every row.
+
+&post_proc
+   history_file = 'input/history.data'
+   output_file = 'LOGS/history.data'
+/ ! end of post_proc namelist

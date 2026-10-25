@@ -1,12 +1,5 @@
 #!/usr/bin/env bash
 
-# unless LOGS/history.data is already there (e.g. from grab_post_inputs.sh),
-# post-process the history file shipped with this test case
-if [ ! -e LOGS/history.data ]; then
-    mkdir -p LOGS
-    cp input/history.data LOGS/history.data
-fi
-
 # record the inlist for TestHub, as do_one in test_suite_helpers does
 echo "    - inlist: inlist" >> testhub.yml
 

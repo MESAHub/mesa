@@ -24,9 +24,8 @@ Running the test
    make
    ./rn
 
-``./rn`` copies ``input/history.data`` to ``LOGS/history.data`` (unless that
-file already exists), then runs the program. The program writes
-``LOGS/post_proc_output.data`` and finishes with::
+``./rn`` reads ``input/history.data`` and writes ``LOGS/history.data``, a
+copy of it with the colors columns added. It finishes with::
 
    colors_post: successfully post-processed all N models
 
@@ -42,70 +41,68 @@ Both namelists are read from ``inlist``.
 ``&colors``
    The same controls as for a run with inline colors; see
    ``colors/defaults/colors.defaults``. ``use_colors`` is turned on even if
-   the inlist sets it to ``.false.``, as a run made without inline colors
-   usually does. To reuse the settings of the run that wrote the history file, point at
-   that run's inlist instead of copying them::
-
-      read_extra_colors_inlist(1) = .true.
-      extra_colors_inlist_name(1) = '/path/to/that/run/inlist_colors'
+   the inlist leaves it ``.false.``, as a run made without inline colors
+   usually does.
 
 ``&post_proc``
    ``history_file``
-      The history file to read. Default ``'LOGS/history.data'``.
+      The history file to read. Required.
    ``output_file``
-      The file to write. Default ``'LOGS/post_proc_output.data'``.
+      The file to write. Default ``'LOGS/history.data'``.
+   ``fallback_m_div_h``
+      The [M/H] to use for every row when the history file has no
+      ``surface_h1`` and ``surface_he4`` columns. Ignored when it has them.
+      Not set by default, in which case such a history file is an error.
 
-The history file must contain these columns:
-
-* ``star_age``
-* ``log_Teff`` or ``Teff``
-* ``log_g``
-* ``log_R`` or ``radius``
-* ``surface_h1`` and ``surface_he4``
-
-The default ``history_columns.list`` does not include ``surface h1`` and
-``surface he4``. Add them to the run's history columns before running it.
+The history file must contain ``log_Teff`` (or ``Teff``), ``log_g`` and
+``log_R`` (or ``radius``). It should also contain ``surface_h1`` and
+``surface_he4``, which the default ``history_columns.list`` does not include;
+add ``surface h1`` and ``surface he4`` to the run's history columns, or set
+``fallback_m_div_h``. If ``model_number`` is present it is passed on to the
+colors module, which uses it to name per-model SED files.
 
 The surface composition sets the atmosphere metallicity. The program maps
 :math:`Z/X` onto the atmosphere-table metallicity axis as
 :math:`\log_{10}((Z/X)/z\_over\_x\_ref)`, with :math:`Z = 1 - X - Y`, and
 clamps the result to the range of the table. This is the same mapping, and
 the same ``z_over_x_ref`` control, that ``star`` uses for the inline colors
-history columns.
+history columns. ``fallback_m_div_h`` is clamped the same way.
 
 Output
 ======
 
-``output_file`` has one header line of column names, then one row per history
-row. The first four columns are ``star_age``, ``Teff``, ``log_g`` and
-``m_div_h`` (the metallicity passed to the atmosphere interpolation). Then
-come the colors history columns: ``Mag_bol``, ``Flux_bol``, ``Interp_rad``
-and one magnitude per filter.
+``output_file`` is a MESA history file: the header and every column of
+``history_file``, plus the colors history columns ``Mag_bol``, ``Flux_bol``,
+``Interp_rad`` and one magnitude per filter. A colors column that already
+exists in ``history_file``, for example from a run with inline colors, is
+replaced rather than duplicated, so running again on the output gives the
+same file.
+
+The output is written to a temporary file that replaces ``output_file`` only
+once every row is done. A failed run leaves any earlier output untouched, and
+``output_file`` may be the same file as ``history_file``.
 
 Post-processing your own run
 ============================
 
-#. Add ``surface h1`` and ``surface he4`` to the run's history columns and
-   run it.
-#. Either set ``history_file`` in ``&post_proc`` to that run's
-   ``LOGS/history.data``, or copy it in with::
+#. Copy this directory and run ``make`` there.
+#. In ``inlist``, set ``history_file`` to the run's ``LOGS/history.data``.
+#. Set the ``&colors`` controls, or reuse the run's::
 
-      ./grab_post_inputs.sh /path/to/that/run
+      read_extra_colors_inlist(1) = .true.
+      extra_colors_inlist_name(1) = '/path/to/that/run/inlist_colors'
 
-   which copies the run's ``inlist*`` files here and its history file to
-   ``LOGS/history.data``, after backing up any files it replaces. The run's
-   ``inlist`` then supplies ``&colors``, and since it has no ``&post_proc``
-   the defaults apply.
+   Extra inlist names are resolved relative to the current directory, so
+   name the file that contains the run's ``&colors`` namelist itself, not a
+   top-level ``inlist`` that refers to it by a relative name.
 #. ``./rn``
 
 Plotting
 ========
 
-``python_helpers/stitch_history.py`` appends the colors columns to the
-history file named in ``&post_proc``. It renames the original file with an
-``_old`` suffix. After stitching, the plotting scripts in
-``star/test_suite/custom_colors/python_helpers`` work on the result. Run them
-from ``colors_post/python_helpers``, since they read ``../LOGS/history.data``.
+The plotting scripts in ``star/test_suite/custom_colors/python_helpers`` read
+``../LOGS/history.data``, so they work on the output when run from
+``colors_post/python_helpers``.
 
 ``python_helpers/plot_zero_points.py`` runs the post-processing once each for
 the Vega, AB and ST magnitude systems and overlays the resulting CMDs. It
