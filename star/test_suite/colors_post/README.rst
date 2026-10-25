@@ -108,7 +108,9 @@ history file named in ``&post_proc``. It renames the original file with an
 from ``colors_post/python_helpers``, since they read ``../LOGS/history.data``.
 
 ``python_helpers/plot_zero_points.py`` runs the post-processing once each for
-the Vega, AB and ST magnitude systems and overlays the resulting CMDs.
+the Vega, AB and ST magnitude systems and overlays the resulting CMDs. It
+changes ``mag_system`` in ``./inlist`` only, so ``mag_system`` must be set
+there rather than in an extra inlist.
 
 Differences from inline colors
 ==============================

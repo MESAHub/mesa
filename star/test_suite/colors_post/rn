@@ -7,4 +7,7 @@ if [ ! -e LOGS/history.data ]; then
     cp input/history.data LOGS/history.data
 fi
 
+# record the inlist for TestHub, as do_one in test_suite_helpers does
+echo "    - inlist: inlist" >> testhub.yml
+
 make run
