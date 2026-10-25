@@ -33,6 +33,10 @@
 !   vary [M/H]:  Teff = 5778, log g = 4.44, [M/H] = -2.0, -1.0, 0.0, 0.5
 !   vary log g:  Teff = 5778, [M/H] = 0.0,  log g = 1.0, 2.5, 4.0, 5.0
 !   vary Teff:   log g = 4.0, [M/H] = 0.0,  Teff = 3500, 6000, 10000, 20000
+!
+! group 4 - interstellar extinction:
+!   A(lambda)/A(V) for every law at fixed wavelengths, and the extinction in
+!   each band for the solar case reddened by A_V = 1 (CCM89, R_V = 3.1)
 
 program test_colors
 
@@ -47,6 +51,7 @@ program test_colors
    use const_def,  only: dp, rsun, boltz_sigma
    use utils_lib,  only: mesa_error
    use colors_utils, only: resolve_path
+   use extinction, only: extinction_curve
 
    implicit none
 
@@ -89,6 +94,19 @@ program test_colors
    real(dp), parameter :: sweep_teff(n_teff) = [3500d0, 6000d0, 10000d0, 20000d0]
 
    ! -----------------------------------------------------------------------
+   ! group 4: interstellar extinction
+   ! -----------------------------------------------------------------------
+
+   integer, parameter :: n_ext_laws = 7, n_ext_waves = 7
+
+   character(len=12), parameter :: ext_laws(n_ext_laws) = [character(len=12) :: &
+      'CCM89', 'O94', 'F99', 'FM07', 'G23', 'G03_SMCBar', 'G03_LMCAvg']
+
+   ! far-UV, 2175 A bump, U, B, V, J, K [Angstrom]
+   real(dp), parameter :: ext_waves(n_ext_waves) = &
+      [1500d0, 2175d0, 3650d0, 4400d0, 5500d0, 12500d0, 22000d0]
+
+   ! -----------------------------------------------------------------------
    ! shared
    ! -----------------------------------------------------------------------
 
@@ -113,6 +131,8 @@ program test_colors
    real(dp) :: bol_mag, bol_flux, interp_rad
    character(len=256) :: sed_filepath
    integer :: n_wav, stride
+   real(dp) :: ext_k(n_ext_waves)
+   real(dp), allocatable :: red_vals(:)
 
    ! -----------------------------------------------------------------------
    ! module initialization
@@ -283,10 +303,51 @@ program test_colors
    end do
 
    ! -----------------------------------------------------------------------
+   ! group 4: interstellar extinction
+   ! -----------------------------------------------------------------------
+
+   call write_section_header('# Group4  extinction')
+   write(*,'(a, 7f9.0)') '# A(lambda)/A(V) at R_V=3.1  lambda_AA=', ext_waves
+   do j = 1, n_ext_laws
+      call extinction_curve(ext_laws(j), 3.1d0, ext_waves, ext_k, ierr)
+      if (ierr /= 0) then
+         write(*,*) 'extinction_curve failed for ', trim(ext_laws(j))
+         stop 1
+      end if
+      write(*,'(a12, 7f9.5)') trim(ext_laws(j)), ext_k
+   end do
+
+   ! the solar case through the full pipeline, with and without dust;
+   ! Mag_bol, Flux_bol and Interp_rad must not change
+   allocate(red_vals(n_cols))
+   model_num = model_num + 1
+   call data_for_colors_history_columns( &
+      test_teff(1), test_logg(1), test_R(1), test_meta(1), model_num, &
+      handle, n_cols, col_names, col_vals, ierr)
+   cs%extinction_law = 'CCM89'
+   cs%A_V = 1d0
+   cs%R_V = 3.1d0
+   if (ierr == 0) call data_for_colors_history_columns( &
+      test_teff(1), test_logg(1), test_R(1), test_meta(1), model_num, &
+      handle, n_cols, col_names, red_vals, ierr)
+   cs%extinction_law = 'none'
+   cs%A_V = 0d0
+   if (ierr /= 0) then
+      write(*,*) 'data_for_colors_history_columns failed, group4, ierr =', ierr
+      stop 1
+   end if
+
+   write(*,'(a)') ''
+   write(*,'(a)') '# case: solar  law=CCM89  A_V=1  R_V=3.1  value = m(A_V=1) - m(A_V=0)'
+   do k = 1, n_cols
+      write(*,'(a40, f12.6)') trim(col_names(k)), red_vals(k) - col_vals(k)
+   end do
+
+   ! -----------------------------------------------------------------------
    ! cleanup
    ! -----------------------------------------------------------------------
 
-   deallocate(col_names, col_vals)
+   deallocate(col_names, col_vals, red_vals)
    if (allocated(wavelengths)) deallocate(wavelengths)
    if (allocated(fluxes))      deallocate(fluxes)
 

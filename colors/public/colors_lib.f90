@@ -97,6 +97,7 @@ contains
       ! skip colors table setup and hooks if use_colors = .false.
       if (.not. rq%use_colors) return
       call colors_setup_tables(handle, ierr)
+      if (ierr /= 0) return
       call colors_setup_hooks(handle, ierr)
    end function alloc_colors_handle_using_inlist
 
@@ -127,6 +128,7 @@ contains
    subroutine colors_setup_tables(handle, ierr)
       use colors_def, only: Colors_General_Info, get_colors_ptr, color_filter_names, num_color_filters
       use synthetic, only: compute_vega_zero_point, compute_ab_zero_point, compute_st_zero_point
+      use extinction, only: check_extinction_controls
       integer, intent(in) :: handle
       integer, intent(out):: ierr
 
@@ -137,6 +139,9 @@ contains
 
       ierr = 0
       call get_colors_ptr(handle, rq, ierr)
+      if (ierr /= 0) return
+
+      call check_extinction_controls(rq%extinction_law, rq%A_V, rq%R_V, ierr)
       if (ierr /= 0) return
 
       call read_strings_from_file(rq, color_filter_names, num_color_filters, ierr)

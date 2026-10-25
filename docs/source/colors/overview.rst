@@ -20,6 +20,7 @@ The colors module is controlled via the ``&colors`` namelist with key options:
 - ``distance``: Distance to the star in cm
 - ``make_csv``: Output detailed spectral energy distributions
 - ``colors_results_directory``: Directory for output files
+- ``extinction_law``, ``A_V``, ``R_V``: Interstellar extinction applied to the SED before the filter integrals (default ``'none'``)
 
 Filter-specific magnitude columns are automatically added to history output based on the selected instrument.
 

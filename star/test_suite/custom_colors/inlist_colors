@@ -77,6 +77,12 @@
       !zero point. Select between: Vega, AB, ST
       mag_system = 'Vega'
 
+      ! Interstellar extinction applied to the SED before the filter integrals
+      ! (laws: none, CCM89, O94, F99, FM07, G23, G03_SMCBar, G03_LMCAvg)
+      !extinction_law = 'CCM89'
+      !A_V = 1.0d0
+      !R_V = 3.1d0
+
       ! Vega spectrum for zero-point calibration
       ! This file should contain wavelength (Å) and flux (erg/s/cm²/Å) columns
       ! Used to define the zero-point of the magnitude system (Vega = 0.0 mag)

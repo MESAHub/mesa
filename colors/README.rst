@@ -62,9 +62,19 @@ where R is the stellar radius and d is ``distance`` (default 10 pc, giving absol
 
 The bolometric flux is obtained by integrating the diluted SED over all wavelengths using adaptive Simpson's rule (falling back to the trapezoid rule for even-length arrays). The bolometric magnitude follows from the standard relation using the solar bolometric absolute magnitude.
 
-**Step 4 — Synthetic photometry**
+**Step 4 — Interstellar extinction (optional)**
 
-For each filter, the in-band flux is computed by integrating the product of the diluted SED and the filter transmission curve:
+If ``extinction_law`` is not ``'none'``, the diluted SED is reddened before any filter integration:
+
+.. code-block:: text
+
+   F_observed(λ) → F_observed(λ) × 10^(-0.4 × A_V × A(λ)/A(V))
+
+where ``A_V`` sets the amount of dust and the law (with ``R_V`` for the R_V-dependent laws) sets the shape A(λ)/A(V). Because the dust acts on the SED, the extinction in each band follows from the star's own spectrum and the filter shape, rather than from a fixed coefficient per band. The bolometric quantities of Step 3 stay intrinsic, and the zero-points are not reddened. See `Extinction laws`_.
+
+**Step 5 — Synthetic photometry**
+
+For each filter, the in-band flux is computed by integrating the product of the diluted (and reddened) SED and the filter transmission curve:
 
 .. code-block:: text
 
@@ -79,6 +89,52 @@ The synthetic magnitude is then:
 where F_zp is the precomputed zero-point for the selected magnitude system (Vega, AB, or ST).
 
 If the star's parameters fall outside the atmosphere grid, the module clamps to the nearest grid boundary. The ``Interp_rad`` column records the Euclidean distance (in normalised parameter space) between the stellar parameters and the nearest grid point.
+
+Extinction laws
+===============
+
+Set with ``extinction_law``, ``A_V`` and ``R_V`` in ``&colors``:
+
+.. code-block:: fortran
+
+   extinction_law = 'CCM89'
+   A_V = 1.0
+   R_V = 3.1
+
++----------------+--------------------------------------+---------------+--------------------------------------+
+| Name           | Reference                            | R_V           | Used by                              |
++================+======================================+===============+======================================+
+| ``CCM89``      | Cardelli, Clayton & Mathis (1989)    | ``R_V``       | MIST v1 (Choi et al. 2016)           |
++----------------+--------------------------------------+---------------+--------------------------------------+
+| ``O94``        | O'Donnell (1994)                     | ``R_V``       | PARSEC/CMD, YBC (Chen et al. 2019)   |
++----------------+--------------------------------------+---------------+--------------------------------------+
+| ``F99``        | Fitzpatrick (1999)                   | ``R_V``       |                                      |
++----------------+--------------------------------------+---------------+--------------------------------------+
+| ``FM07``       | Fitzpatrick & Massa (2007)           | fixed 3.1     | MIST v2.5 (Dotter et al. 2026)       |
++----------------+--------------------------------------+---------------+--------------------------------------+
+| ``G23``        | Gordon et al. (2023)                 | ``R_V``       |                                      |
++----------------+--------------------------------------+---------------+--------------------------------------+
+| ``G03_SMCBar`` | Gordon et al. (2003), SMC bar        | fixed 2.74    |                                      |
++----------------+--------------------------------------+---------------+--------------------------------------+
+| ``G03_LMCAvg`` | Gordon et al. (2003), LMC average    | fixed 3.41    |                                      |
++----------------+--------------------------------------+---------------+--------------------------------------+
+
+All laws are analytic (no data files). Their coefficients follow the
+`dust_extinction <https://github.com/karllark/dust_extinction>`_ package and, for
+``FM07``, the `extinction <https://github.com/kbarbary/extinction>`_ package; both
+were used to verify the Fortran to machine precision. Outside a law's fitted
+wavelength range, its functional form is continued to long wavelengths (where it
+falls to zero) and held at its blue-limit value at short wavelengths.
+
+``A_V`` is the extinction at the law's reference V wavelength (about 5500 Å), so
+the extinction through a broad V filter differs from it by about a percent and
+depends on the SED.
+
+**Adding a law.** Each law in ``private/extinction.f90`` is a pure subroutine
+``law(x, R_V, k)`` that fills ``k = A(λ)/A(V)`` at wavenumbers ``x = 1/λ`` [µm⁻¹].
+Write one (the building blocks ``cardelli_form``, ``f99_form``, ``fm90``,
+``drude`` and ``natural_spline`` cover most published forms), give it a ``case``
+in ``extinction_curve``, and add it to the list in ``colors.defaults``.
 
 Source files
 ============
@@ -96,6 +152,7 @@ Source files
    │   ├── bolometric.f90       — bolometric magnitude and flux calculation
    │   ├── synthetic.f90        — per-filter convolution and magnitude calculation,
    │   │                          SED CSV output (make_csv / sed_per_model)
+   │   ├── extinction.f90       — interstellar extinction laws applied to the SED
    │   ├── hermite_interp.f90   — hermite tensor interpolation (cube path)
    │   ├── linear_interp.f90    — trilinear interpolation (cube path fallback)
    │   ├── knn_interp.f90       — k-nearest-neighbour interpolation

@@ -9,6 +9,7 @@ SRCS := public/colors_def.f90 \
         private/colors_ctrls_io.f90 \
         private/colors_history.f90 \
         private/colors_utils.f90 \
+        private/extinction.f90 \
         private/hermite_interp.f90 \
         private/knn_interp.f90 \
         private/linear_interp.f90 \

@@ -106,6 +106,52 @@
       z_over_x_ref = 2.30057173972d-2
 
 
+! Interstellar Extinction
+! -----------------------
+
+   ! ``extinction_law``
+   ! ~~~~~~~~~~~~~~~~~~
+   ! Dust extinction law applied to the SED before it is integrated through the
+   ! filters, F_obs(lambda) = F(lambda) 10^(-0.4 A_V A(lambda)/A(V)). Options:
+   !   'none'       : no extinction.
+   !   'CCM89'      : Cardelli, Clayton & Mathis (1989), Milky Way, uses R_V.
+   !                  The law used by MIST v1 (Choi et al. 2016).
+   !   'O94'        : O'Donnell (1994), CCM89 with a revised optical section,
+   !                  uses R_V. The law used by PARSEC/CMD and YBC (Chen et al. 2019).
+   !   'F99'        : Fitzpatrick (1999), Milky Way, uses R_V.
+   !   'FM07'       : Fitzpatrick & Massa (2007) Milky Way average, fixed at
+   !                  R_V = 3.1. The law used by MIST v2.5 (Dotter et al. 2026).
+   !   'G23'        : Gordon et al. (2023), Milky Way, uses R_V; covers
+   !                  0.0912-32 micron, including the 10 and 20 micron silicate features.
+   !   'G03_SMCBar' : Gordon et al. (2003) SMC bar average, fixed at R_V = 2.74.
+   !   'G03_LMCAvg' : Gordon et al. (2003) LMC average, fixed at R_V = 3.41.
+   ! The filter magnitudes are reddened. Mag_bol and Flux_bol stay intrinsic, and the
+   ! zero-points (including the Vega SED) are not reddened. With make_csv, the SED
+   ! written out is the reddened one.
+   ! Outside a law's fitted wavelength range, its functional form is continued to
+   ! long wavelengths (where it falls to zero), and held at its blue-limit value at
+   ! short wavelengths.
+
+   ! ``A_V``
+   ! ~~~~~~~
+   ! Extinction in magnitudes at the reference V wavelength of the law (about
+   ! 5500 A); must be >= 0. Because it is defined at one wavelength, the extinction
+   ! in a broad V filter differs from A_V by about a percent and depends on the SED.
+
+   ! ``R_V``
+   ! ~~~~~~~
+   ! Ratio of total to selective extinction, R_V = A(V)/E(B-V), which sets the
+   ! shape of the CCM89, O94, F99 and G23 laws. 3.1 is the diffuse Milky Way
+   ! average. CCM89, O94 and F99 are calibrated for 2 <= R_V <= 6, and G23 for
+   ! 2.3 <= R_V <= 5.6.
+
+   ! ::
+
+      extinction_law = 'none'
+      A_V = 0d0
+      R_V = 3.1d0
+
+
 ! Extra inlist controls
 ! ---------------------
 

@@ -25,6 +25,7 @@ module colors_history
    use colors_utils, only: remove_dat, resolve_path
    use bolometric, only: calculate_bolometric
    use synthetic, only: calculate_synthetic
+   use extinction, only: apply_extinction
 
    implicit none
 
@@ -98,6 +99,10 @@ contains
       call calculate_bolometric(cs, t_eff, log_g, metallicity, R, d, &
                                 bolometric_magnitude, bolometric_flux, wavelengths, fluxes, &
                                 sed_filepath, interpolation_radius)
+
+      ! Mag_bol and Flux_bol stay intrinsic; only the filter magnitudes see the dust
+      call apply_extinction(cs%extinction_law, cs%A_V, cs%R_V, wavelengths, fluxes, ierr)
+      if (ierr /= 0) return
 
       names(1) = "Mag_bol"
       vals(1) = bolometric_magnitude

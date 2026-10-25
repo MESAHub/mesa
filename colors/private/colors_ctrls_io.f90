@@ -37,9 +37,11 @@ module colors_ctrls_io
    character(len=256) :: stellar_atm
    character(len=256) :: colors_results_directory
    character(len=256) :: mag_system
+   character(len=256) :: extinction_law
 
    real(dp) :: distance
    real(dp) :: z_over_x_ref
+   real(dp) :: A_V, R_V
    logical :: make_csv
    logical :: sed_per_model
    logical :: use_colors
@@ -53,6 +55,9 @@ module colors_ctrls_io
       make_csv, &
       sed_per_model, &
       mag_system, &
+      extinction_law, &
+      A_V, &
+      R_V, &
       colors_results_directory, &
       use_colors, &
       read_extra_colors_inlist, &
@@ -123,6 +128,9 @@ contains
       rq%colors_results_directory = colors_results_directory
       rq%use_colors = use_colors
       rq%mag_system = mag_system
+      rq%extinction_law = extinction_law
+      rq%A_V = A_V
+      rq%R_V = R_V
 
    end subroutine store_controls
 
@@ -161,6 +169,9 @@ contains
       colors_results_directory = rq%colors_results_directory
       use_colors = rq%use_colors
       mag_system = rq%mag_system
+      extinction_law = rq%extinction_law
+      A_V = rq%A_V
+      R_V = rq%R_V
 
    end subroutine set_controls_for_writing
 

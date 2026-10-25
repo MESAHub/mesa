@@ -47,9 +47,11 @@ module colors_def
       character(len=256) :: stellar_atm
       character(len=256) :: colors_results_directory
       character(len=256) :: mag_system
+      character(len=256) :: extinction_law
       real(dp) :: metallicity
       real(dp) :: distance
       real(dp) :: z_over_x_ref
+      real(dp) :: A_V, R_V
       logical :: make_csv
       logical :: sed_per_model
       logical :: use_colors
