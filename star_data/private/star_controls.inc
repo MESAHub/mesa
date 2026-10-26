@@ -428,6 +428,7 @@
 
          logical :: use_compression_outer_BC
          logical :: use_momentum_outer_BC
+         logical :: floor_momentum_outer_BC_at_Prad
          logical :: use_zero_Pgas_outer_BC
          logical :: use_fixed_vsurf_outer_BC
          real(dp) :: fixed_vsurf
@@ -851,6 +852,7 @@
             use_dPrad_dm_form_of_T_gradient_eqn, &
             use_flux_limiting_with_dPrad_dm_form, &
             use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn, &
+            constant_L, &
             no_dedt_form_during_relax, &
             include_P_in_velocity_time_centering, &
             include_L_in_velocity_time_centering, &
@@ -1360,6 +1362,7 @@
          character (len=strlen) :: zams_filename
          logical :: set_rho_to_dm_div_dV
 
+         real(dp) :: min_logRho_for_eos
          logical :: fix_d_eos_dxa_partials
 
          logical :: use_other_surface_PT
