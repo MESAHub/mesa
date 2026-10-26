@@ -33,12 +33,46 @@ MESA's documentation now includes a generated :ref:`Test Suite Gallery <tagoverv
 Diffusive overshooting (overmixing) prescriptions now support a
 ``step+exponential`` option, see :ref:`reference/controls:overshoot_scheme`.
 
+White dwarf phase separation now includes an option to use three-component phase diagrams, automatically selected according to the dominant three elements in the crystallizing layer, based on the work of `Castro-Tapia & Cumming (2025) <https://ui.adsabs.harvard.edu/abs/2025ApJ...991...64C>`_. See documentation at :ref:`reference/controls:phase_separation_option` and new test case exercising this capability in an ultramassive white dwarf :doc:`test_suite/wd_o_ne_3_phase`.
+
 MESA no longer stops when reactions for which special rates are set are not in the nuclear network, only a warning is printed. This is intended to make it easier to test various network sizes without having to also change the list of special reactions.
+
+GYRE has been upgraded to 9.1.1, the most recent stable release. Changes since the previous release (8.1) included in MESA can be seen `here <https://github.com/rhdtownsend/gyre/releases>`__.
+
+The `MESA SDK <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__ recommended for compiling MESA has been updated to 26.6.1. Although this newer SDK is not required to successfully build MESA, it brings the benefit of restoring the cross-platform bit-for-bit compatibility that MESA once enjoyed (meaning that runs on Linux/Intel, MacOS/Intel and MacOS/ARM give identical results).
+
+Additional controls are available for TDC envelope remeshing:
+
+- ``remesh_for_TDC_pulsations_when_load`` remeshes a model after loading it from a ``.mod`` file.
+- ``TDC_hydro_nz_inner`` adds geometrically spaced zones near the inner boundary.
+- ``TDC_hydro_nz_T_gradient`` adds zones according to the variation in ``logT`` below ``TDC_hydro_T_anchor`` while retaining the mass-based mesh.
+
+Additional ``pgstar`` plots to visualize residuals of equations:
+- Kippenhahn-style diagram (with mass on the y-axis and model number on the x-axis) colored by ``safe_log10(maxval(abs(s%equ(1:neq, k))))``, which is the logarithm of the absolute value of the biggest residual at cell ``k`` for the *accepted* iteration of MESA's Newton-Raphson solver. The y-axis can be mass, logR, or tau.
+- Time evolution of the maximum residual across mesh points for each structure equation (ignores chemical composition equations). See ``Kipp_residuals_*`` and ``Max_eq_resid_*`` in ``pgstar.defaults``
 
 .. _Bug Fixes main:
 
 Bug Fixes
 ---------
+
+Removed duplicate treatment of ``n14(a,g)f18(e+nu)o18`` in networks that
+include both the explicit hot CNO reactions and the corresponding approximate
+reaction. See :ref:`the known bugs entry <duplicate_n14ag_rate_bug>` and
+`gh-1056 <https://github.com/MESAHub/mesa/issues/1056>`_.
+
+Fixed the hydrodynamic drag energy term so that it is only included when
+``v_flag = .true.``. Previously, using ``u_flag`` with a nonzero
+``drag_coefficient`` could inject spurious energy. See :ref:`the known bugs
+entry <drag_energy_u_flag_bug>`.
+
+Important bug fix for ``r26.4.1`` identified by Emily Sandford and Louis Siebenaler: the ``lowT_Freedman11`` opacity option used ``[M/H]`` labels as the metal mass fraction when interpolating in ``Z``, resulting in incorrect opacities. We recommend users who use these low-temperature opacities, such as in planet models, update to the latest MESA version or employ the fixes in :ref:`the known bugs entry <freedman_lowt_z_bug>` and `gh-993 <https://github.com/MESAHub/mesa/pull/993>`_.
+
+The plasmon neutrino cooling rate used a hardcoded prefactor calculated with a Weinberg angle of 0.2319, while all other neutrino cooling processes used calculated prefactors taking the Weinberg angle as input, with default value 0.22290. Thus, modifying the value of the Weinberg angle resulted in changes to neutrino cooling processes except for the plasmon neutrinos. This affects all previous MESA versions, and was found and fixed by user Garv Chauhan, see :ref:`the known bugs entry <plasmon_weinberg_angle_bug>` and `gh-998 <https://github.com/MESAHub/mesa/pull/998>`_. Plasmon neutrinos now use the same Weinberg angle as all other processes and changing its value will affect the corresponding cooling rate. Changes to the plasmon neutrino prefactor for MESA's default Weinberg angle result in small numerical differences for stars where plasmon neutrino cooling is significant.
+
+Fixed a bug where RSP photo restarts did not immediately reconstruct ``s% L``,
+which could leave ``s% L(1)`` with an uninitialized near-zero value and crash
+MESA when the KH timescale was recalculated on restart.
 
 Fixed a small bug where diffusive overshooting (overmixing) routines did not
 respect changes to the mixing length set by ``other_alpha_mlt``, and used the
@@ -48,8 +82,17 @@ The parameter ``report_max_infall_inside_fe_core`` was ignored in versions r25.1
 
 ``fe_core_infall_limit`` now obeys ``when_to_stop_rtol`` and ``when_to_stop_atol`` again (broken since r11532).
 
+Fixed the OPAL/SCVH blend in metallicity, which could cause discontinuities
+in the EOS at ``Z = 0.04`` with the default blend limits. See
+:ref:`the known bugs entry <opal_scvh_high_z_blend_bug>`.
 
 .. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ``changelog_template.rst``).
+
+Other Changes
+-------------
+
+`mesa/binary` now no longer copies the binary history columns into the star history by default. Set `append_to_star_history = .true.` to reenable this feature. All binary history data is still saved to `history_name` defined in section `&binary_controls`.
+
 
 Changes in r26.4.1
 ===================

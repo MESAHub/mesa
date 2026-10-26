@@ -268,9 +268,12 @@
       subroutine save_start_values(s, ierr)
          use hydro_rsp2, only: set_etrb_start_vars
          use star_utils, only: eval_total_energy_integrals, set_luminosity_by_category, get_Peos_face_val
+         use reconstructed_face_support, only: get_reconstructed_face_eos_kap_ad
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          integer :: k, j
+         type(auto_diff_real_star_order1) :: &
+            T_face_ad, rho_face_ad, P_face_ad, Cp_face_ad, ChiRho_face_ad, ChiT_face_ad, grada_face_ad, opacity_face_ad
          include 'formats'
          ierr = 0
 
@@ -298,6 +301,18 @@
             s% lnPeos_start(k) = s% lnPeos(k)
             s% Peos_start(k) = s% Peos(k)
             s% Peos_face_start(k) = get_Peos_face_val(s,k)
+            if (s% use_face_reconstruction) then
+               if (s% reconstructed_face_state_valid(k)) then
+                  s% reconstructed_P_face_start(k) = s% reconstructed_P_face_ad(k)%val
+               else
+                  call get_reconstructed_face_eos_kap_ad( &
+                     s, k, T_face_ad, rho_face_ad, P_face_ad, Cp_face_ad, ChiRho_face_ad, ChiT_face_ad, grada_face_ad, opacity_face_ad, ierr)
+                  if (ierr /= 0) return
+                  s% reconstructed_P_face_start(k) = P_face_ad%val
+               end if
+            else
+               s% reconstructed_P_face_start(k) = s% Peos_face_start(k)
+            end if
             s% lnPgas_start(k) = s% lnPgas(k)
             s% energy_start(k) = s% energy(k)
             s% lnR_start(k) = s% lnR(k)
@@ -1210,5 +1225,3 @@
 
 
       end module struct_burn_mix
-
-

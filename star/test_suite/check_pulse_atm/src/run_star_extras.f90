@@ -65,6 +65,29 @@
          if (ierr /= 0) return
          call test_suite_startup(s, restart, ierr)
 
+         if (restart) then
+            ! Restore controls cycled by extras_check_model after the saved step.
+            select case (MOD(s% model_number/5, 4))
+            case (0)
+               s% atm_T_tau_relation = 'Trampedach_solar'
+            case (1)
+               s% atm_T_tau_relation = 'Eddington'
+            case (2)
+               s% atm_T_tau_relation = 'solar_Hopf'
+            case (3)
+               s% atm_T_tau_relation = 'Krishna_Swamy'
+            end select
+
+            select case (MOD(s% model_number/20, 3))
+            case (0)
+               s% atm_T_tau_opacity = 'varying'
+            case (1)
+               s% atm_T_tau_opacity = 'fixed'
+            case (2)
+               s% atm_T_tau_opacity = 'iterated'
+            end select
+         end if
+
          failed = .false.
 
       end subroutine extras_startup
@@ -323,4 +346,3 @@
       end function q
 
       end module run_star_extras
-

@@ -98,6 +98,7 @@ SRCS := \
    private/init_model.f90 \
    private/ionization_potentials.f90 \
    private/kap_support.f90 \
+   private/reconstructed_face_support.f90 \
    private/magnetic_diffusion.f90 \
    private/mass_utils.f90 \
    private/mesh_adjust.f90 \
@@ -239,7 +240,7 @@ MODULES += pgstar_abundance.mod \
            pgstar_decorator.mod \
            pgstar_dpg_dnu.mod \
            pgstar_dynamo.mod \
-		   pgstar_equation_residuals.mod \
+           pgstar_equation_residuals.mod \
            pgstar_grid.mod \
            pgstar_history_panels.mod \
            pgstar_hist_track.mod \

@@ -79,7 +79,7 @@
 
       integer function alloc_kap_handle_using_inlist(inlist,ierr) result(handle)
          use kap_def, only:do_alloc_kap,kap_is_initialized
-         use kap_ctrls_io, only:read_namelist
+         use kap_ctrls_io, only:read_kap_namelist
          character (len=*), intent(in) :: inlist  ! empty means just use defaults.
          integer, intent(out) :: ierr  ! 0 means AOK.
          ierr = 0
@@ -89,7 +89,7 @@
          end if
          handle = do_alloc_kap(ierr)
          if (ierr /= 0) return
-         call read_namelist(handle, inlist, ierr)
+         call read_kap_namelist(handle, inlist, ierr)
          if (ierr /= 0) return
          call kap_setup_tables(handle, ierr)
          call kap_setup_hooks(handle, ierr)

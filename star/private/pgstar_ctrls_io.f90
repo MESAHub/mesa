@@ -3028,6 +3028,7 @@
             Max_eq_resid_win_aspect_ratio, &
             Max_eq_resid_file_flag, &
             Max_eq_resid_file_width, &
+            Max_eq_resid_file_interval, &
             Max_eq_resid_file_aspect_ratio, &
             Max_eq_resid_file_dir, &
             Max_eq_resid_file_prefix, &
@@ -3043,6 +3044,7 @@
             Kipp_residuals_win_width, &
             Kipp_residuals_win_aspect_ratio, &
             Kipp_residuals_file_flag, &
+            Kipp_residuals_file_interval, &
             Kipp_residuals_file_width, &
             Kipp_residuals_file_aspect_ratio, &
             Kipp_residuals_file_dir, &
@@ -3055,6 +3057,9 @@
             Kipp_residuals_title, &
             Kipp_residuals_max_width, &
             Kipp_residuals_yaxis_name, &
+            Kipp_residuals_max_residual, &
+            Kipp_residuals_min_residual, &
+
 
             annotation1_ci, &
             annotation1_ch, &
@@ -3092,87 +3097,48 @@
       contains
 
       subroutine read_pgstar(s, filename, ierr)
-         use star_private_def
-         use utils_lib
+         use utils_namelist, only: read_namelist, missing_namelist_warning
+         use star_private_def, only: star_info
          type (star_info), pointer :: s
          character(*), intent(in) :: filename
          integer, intent(out) :: ierr
-         character (len=strlen) :: pgstar_namelist_name
-         pgstar_namelist_name = ''
-         ierr = 0
+
          call set_default_pgstar_controls
-         call read_pgstar_file(s, filename, 1, ierr)
+         call read_namelist(filename, read_pgstar_file, "pgstar", ierr, missing_namelist_warning)
+         if (ierr /= 0) return
+         call store_pgstar_controls(s)
       end subroutine read_pgstar
 
+      subroutine read_pgstar_file(unit, iostat, iomsg, extra_inlists, extra_inlists_mask)
+         use const_def, only: strlen
+         use utils_namelist, only: max_extra_inlists
 
-      recursive subroutine read_pgstar_file(s, filename, level, ierr)
-         use star_private_def
-         use utils_lib
-         character(*), intent(in) :: filename
-         type (star_info), pointer :: s
-         integer, intent(in) :: level
-         integer, intent(out) :: ierr
-         logical, dimension(max_extra_inlists) :: read_extra
-         character (len=strlen), dimension(max_extra_inlists) :: extra
-         integer :: unit, i
+         integer, intent(in) :: unit
+         integer, intent(out) :: iostat
+         character(len=strlen), intent(out) :: iomsg
+         character(len=strlen), dimension(max_extra_inlists), intent(out) :: extra_inlists
+         logical, dimension(max_extra_inlists), intent(out) :: extra_inlists_mask
 
-         ierr = 0
+         integer :: i
 
-         if (level >= 10) then
-            write(*,*) 'ERROR: too many levels of nested extra pgstar inlist files'
-            ierr = -1
+         read_extra_pgstar_inlist(:) = .false.
+
+         read(unit, nml=pgstar, iostat=iostat, iomsg=iomsg)
+
+         if (iostat /= 0) then
             return
          end if
 
-         if (len_trim(filename) > 0) then
-            open(newunit=unit, file=trim(filename), action='read', delim='quote', status='old', iostat=ierr)
-            if (ierr /= 0) then
-               write(*, *) 'Failed to open pgstar namelist file ', trim(filename)
-               return
-            end if
-            read(unit, nml=pgstar, iostat=ierr)
-            close(unit)
-            if (ierr /= 0) then
-               write(*, *)
-               write(*, *)
-               write(*, *)
-               write(*, *)
-               write(*, '(a)') &
-                  'Failed while trying to read pgstar namelist file: ' // trim(filename)
-               write(*, '(a)') &
-                  'Perhaps the following runtime error message will help you find the problem.'
-               write(*, *)
-               open(newunit=unit, file=trim(filename), action='read', delim='quote', status='old', iostat=ierr)
-               read(unit, nml=pgstar)
-               close(unit)
-               return
-            end if
-         end if
-
-         call store_pgstar_controls(s, ierr)
-
-         ! recursive calls to read other inlists
          do i=1, max_extra_inlists
-            read_extra(i) = read_extra_pgstar_inlist(i)
-            read_extra_pgstar_inlist(i) = .false.
-            extra(i) = extra_pgstar_inlist_name(i)
-            extra_pgstar_inlist_name(i) = 'undefined'
-
-            if (read_extra(i)) then
-               call read_pgstar_file(s, extra(i), level+1, ierr)
-               if (ierr /= 0) return
-            end if
+            extra_inlists(i) = extra_pgstar_inlist_name(i)
+            extra_inlists_mask(i) = read_extra_pgstar_inlist(i)
          end do
 
       end subroutine read_pgstar_file
 
-
-      subroutine store_pgstar_controls(s, ierr)
-         use star_private_def
+      subroutine store_pgstar_controls(s)
+         use star_private_def, only: star_info
          type (star_info), pointer :: s
-         integer, intent(out) :: ierr
-
-         ierr = 0
 
          s% pg% file_device = file_device
          s% pg% file_digits = file_digits
@@ -6240,6 +6206,7 @@
          s% pg% Max_eq_resid_win_aspect_ratio = Max_eq_resid_win_aspect_ratio
          s% pg% Max_eq_resid_file_flag = Max_eq_resid_file_flag
          s% pg% Max_eq_resid_file_width = Max_eq_resid_file_width
+         s% pg% Max_eq_resid_file_interval = Max_eq_resid_file_interval
          s% pg% Max_eq_resid_file_aspect_ratio = Max_eq_resid_file_aspect_ratio
          s% pg% Max_eq_resid_file_dir = Max_eq_resid_file_dir
          s% pg% Max_eq_resid_file_prefix = Max_eq_resid_file_prefix
@@ -6256,6 +6223,7 @@
          s% pg% Kipp_residuals_win_aspect_ratio = Kipp_residuals_win_aspect_ratio
          s% pg% Kipp_residuals_file_flag = Kipp_residuals_file_flag
          s% pg% Kipp_residuals_file_width = Kipp_residuals_file_width
+         s% pg% Kipp_residuals_file_interval = Kipp_residuals_file_interval
          s% pg% Kipp_residuals_file_aspect_ratio = Kipp_residuals_file_aspect_ratio
          s% pg% Kipp_residuals_file_dir = Kipp_residuals_file_dir
          s% pg% Kipp_residuals_file_prefix = Kipp_residuals_file_prefix
@@ -6267,7 +6235,8 @@
          s% pg% Kipp_residuals_title = Kipp_residuals_title
          s% pg% Kipp_residuals_max_width = Kipp_residuals_max_width
          s% pg% Kipp_residuals_yaxis_name = Kipp_residuals_yaxis_name
-
+         s% pg% Kipp_residuals_max_residual = Kipp_residuals_max_residual
+         s% pg% Kipp_residuals_min_residual = Kipp_residuals_min_residual
 
          s% pg% annotation1_ci = annotation1_ci
          s% pg% annotation1_ch = annotation1_ch

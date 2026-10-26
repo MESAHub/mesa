@@ -38,8 +38,7 @@
       set_initial_model_number = .true.
       initial_model_number = 0
 
-      pgstar_flag = .false.
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -219,6 +218,7 @@
       warn_rates_for_high_temp = .true.
       max_safe_logT_for_rates = 10.5d0
       
+      use_superad_reduction = .true. 
 
       Pextra_factor = 2 ! for atm
 

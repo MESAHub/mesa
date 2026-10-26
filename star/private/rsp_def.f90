@@ -398,7 +398,7 @@
          type (star_info), pointer :: s
          integer, intent(in) :: iounit
          integer, intent(out) :: ierr
-         integer :: n
+         integer :: n, k
          include 'formats'
          call init_def(s)
          ierr = 0
@@ -430,6 +430,13 @@
             PPP0(1:n), PPQ0(1:n), PPT0(1:n), PPC0(1:n), VV0(1:n), &
             WORK(1:n), WORKQ(1:n), WORKT(1:n), WORKC(1:n)
          if (ierr /= 0) call mesa_error(__FILE__,__LINE__,'read failed in rsp_photo_in')
+         do k = 1, NZN
+            s% L(k) = 4d0*pi*pow2(photo_r(k))*s% Fr(k) + s% Lc(k) + s% Lt(k)
+            if (is_bad(s% L(k))) then
+               write(*,2) 'bad RSP photo L', k, s% L(k), s% Fr(k), s% Lc(k), s% Lt(k)
+               call mesa_error(__FILE__,__LINE__,'rsp_photo_in')
+            end if
+         end do
          if (writing_map) then
             write(*,*) 'sorry, cannot use photo to resume writing map data file'
             writing_map = .false.

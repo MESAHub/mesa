@@ -2047,7 +2047,6 @@
       integer, dimension(max_num_pgstar_grid_plots) :: &
          Grid9_plot_row, Grid9_plot_rowspan, &
          Grid9_plot_col, Grid9_plot_colspan
-      
       logical :: Max_eq_resid_win_flag, Max_eq_resid_file_flag
       logical :: do_Max_eq_resid_win, do_Max_eq_resid_file
       integer :: Max_eq_resid_file_interval
@@ -2063,7 +2062,6 @@
          Max_eq_resid_txt_scale
       character (len=strlen) :: Max_eq_resid_title
       integer :: Max_eq_resid_max_width
-      
       logical :: Kipp_residuals_win_flag, Kipp_residuals_file_flag
       logical :: do_Kipp_residuals_win, do_Kipp_residuals_file
       integer :: Kipp_residuals_file_interval
@@ -2075,7 +2073,8 @@
          Kipp_residuals_ybot, Kipp_residuals_ytop, &
          prev_Kipp_residuals_win_width, prev_Kipp_residuals_win_ratio, &
          Kipp_residuals_file_width, Kipp_residuals_file_aspect_ratio, &
-         prev_Kipp_residuals_file_width, prev_Kipp_residuals_file_ratio
+         prev_Kipp_residuals_file_width, prev_Kipp_residuals_file_ratio, &
+         Kipp_residuals_max_residual, Kipp_residuals_min_residual
       character (len=strlen) :: Kipp_residuals_title, Kipp_residuals_yaxis_name
       real :: Kipp_residuals_txt_scale
       integer :: Kipp_residuals_max_width
@@ -2165,12 +2164,3 @@
             trho_use_decorator, &
             tmaxrho_use_decorator, &
             trho_profile_use_decorator
-
-
-      ! for Kippenhahn-like visualization of max residual across all equations
-      logical :: Kipp_residuals_win_flag, Kipp_residuals_file_flag
-      real :: Kipp_residuals_win_width, Kipp_residuals_win_aspect_ratio, &
-           Kipp_residuals_file_width, Kipp_residuals_file_aspect_ratio, &
-           Kipp_residuals_min, Kipp_residuals_max
-      character (len=strlen) :: Kipp_residuals_file_dir, Kipp_residuals_file_prefix
-      integer :: Kipp_residuals_file_interval
