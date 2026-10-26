@@ -191,3 +191,5 @@ extlinks = {
     "wiki": ("https://en.wikipedia.org/wiki/%s", None),
     "git": ("https://github.com/%s", None),
 }
+
+html_extra_path = ['assets']
