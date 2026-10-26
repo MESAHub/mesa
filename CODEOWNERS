@@ -63,7 +63,7 @@ star/test_suite/cburn_inward
 star/test_suite/ccsn_IIp @fxt44 @aurimontem
 star/test_suite/check_redo @fxt44
 star/test_suite/check_pulse_atm @warrickball
-star/test_suite/colors_post
+star/test_suite/colors_post @nialljmiller
 star/test_suite/conductive_flame @fxt44
 star/test_suite/conserve_angular_momentum @matthiasfabry
 star/test_suite/conv_core_cpm
