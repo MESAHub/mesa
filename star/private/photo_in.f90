@@ -87,9 +87,13 @@
             s% cumulative_energy_error, s% cumulative_extra_heating, &
             s% have_initial_energy_integrals, s% total_energy_initial, &
             s% force_tau_factor, s% force_opacity_factor, &
-            s% crystal_core_boundary_mass
+            s% crystal_core_boundary_mass, s% num_superad_reduction_history
 
          if (failed('initial_y')) return
+         if (s% num_superad_reduction_history < 0) then
+            ierr = -1
+            if (failed('num_superad_reduction_history')) return
+         end if
          s% nz_old = s% nz  ! needed by alloc
 
          if (s% force_tau_factor > 0 .and. s% tau_factor /= s% force_tau_factor .and. &
@@ -141,6 +145,13 @@
          s% superad_reduction_factor_old(1:nz) = s% superad_reduction_factor(1:nz)
          s% have_superad_reduction_factor = .true.
          s% okay_to_set_superad_reduction_factor = .false.
+         s% superad_reduction_history_pending = .false.
+
+         if (s% num_superad_reduction_history > 0) then
+            read(iounit, iostat=ierr) &
+               s% superad_reduction_history_du(:,1:nz), s% superad_reduction_history_eta_du(:,1:nz)
+            if (failed('superad_reduction_history')) return
+         end if
 
          call read_part_number(iounit)
          if (failed('rsp_num_periods')) return

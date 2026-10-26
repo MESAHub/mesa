@@ -106,6 +106,7 @@
       public :: set_scale_height
       public :: set_abs_du_div_cs
       public :: set_conv_time_scales
+      public :: superad_history_integral, get_superad_history
       public :: set_rv_info
       public :: smooth
       public :: safe_div_val
@@ -3750,10 +3751,11 @@
                tau_conv = conv_time_scale(s,k)
                s% tau_conv_start(k) = tau_conv
             end if
+            ! These limits select the diagnostic extrema only.
             if (s% X(k) > s% max_X_for_conv_timescale) cycle
             if (s% X(k) < s% min_X_for_conv_timescale) cycle
             if (s% q(k) > s% max_q_for_conv_timescale) cycle
-            if (s% q(k) < s% min_q_for_conv_timescale) exit
+            if (s% q(k) < s% min_q_for_conv_timescale) cycle
             if (.not. set_tau_conv) tau_conv = conv_time_scale(s,k)
             if (tau_conv < s% min_conv_time_scale) &
                s% min_conv_time_scale = tau_conv
@@ -3763,6 +3765,80 @@
          if (s% max_conv_time_scale == 0d0) s% max_conv_time_scale = 1d99
          if (s% min_conv_time_scale == 1d99) s% min_conv_time_scale = 0d0
       end subroutine set_conv_time_scales
+
+
+      real(dp) function superad_history_integral(du, eta_du, span) result(integral)
+         real(dp), intent(in) :: du(:), eta_du(:)
+         real(dp), intent(in) :: span
+         real(dp) :: remaining, eta
+         integer :: j
+
+         remaining = span
+         integral = 0d0
+         if (remaining <= 0d0) return
+         eta = 0d0
+         do j=1,size(du)
+            if (du(j) <= 0d0) cycle
+            eta = eta_du(j)/du(j)
+            if (du(j) >= remaining) then
+               integral = integral + remaining*eta
+               return
+            end if
+            integral = integral + eta_du(j)
+            remaining = remaining - du(j)
+         end do
+         if (remaining > 100d0*epsilon(1d0)*max(1,size(du))) &
+            call mesa_error(__FILE__, __LINE__, 'incomplete superad reduction history')
+         ! Close a roundoff-sized remainder with the oldest target.
+         integral = integral + remaining*eta
+      end function superad_history_integral
+
+
+      subroutine get_superad_history(s, du, eta_du, ierr)
+         type(star_info), pointer :: s
+         real(dp), pointer :: du(:,:), eta_du(:,:)
+         integer, intent(out) :: ierr
+         real(dp) :: remaining, width, target
+         integer :: j, k, n, nh, nz_alloc
+
+         nullify(du, eta_du)
+         ierr = -1
+         nh = s% num_superad_reduction_history
+         if (nh <= 0) return
+         n = 1
+         do k=1,s% nz
+            width = s% superad_reduction_du(k)
+            target = s% superad_reduction_target(k)
+            if (is_bad_num(width) .or. is_bad_num(target)) return
+            if (width < 0d0 .or. target <= 0d0 .or. target > 1d0) return
+            remaining = 1d0 - min(width, 1d0)
+            j = 0
+            do while (remaining > 0d0 .and. j < nh)
+               j = j + 1
+               remaining = remaining - s% superad_reduction_history_du(j,k)
+            end do
+            if (remaining > 100d0*epsilon(1d0)*max(1,nh)) return
+            n = max(n, j+1)
+         end do
+
+         nz_alloc = size(s% superad_reduction_history_du, dim=2)
+         allocate(du(n,nz_alloc), eta_du(n,nz_alloc), stat=ierr)
+         if (ierr /= 0) then
+            if (associated(du)) deallocate(du)
+            if (associated(eta_du)) deallocate(eta_du)
+            return
+         end if
+         ! Every active entry is assigned below; only padding needs clearing.
+         du(:,s% nz+1:nz_alloc) = 0d0
+         eta_du(:,s% nz+1:nz_alloc) = 0d0
+         ! Rows are common accepted physical timesteps, newest first.
+         du(1,1:s% nz) = s% superad_reduction_du(1:s% nz)
+         eta_du(1,1:s% nz) = s% superad_reduction_du(1:s% nz)*s% superad_reduction_target(1:s% nz)
+         if (n > 1) then
+            du(2:n,1:s% nz) = s% superad_reduction_history_du(1:n-1,1:s% nz)
+            eta_du(2:n,1:s% nz) = s% superad_reduction_history_eta_du(1:n-1,1:s% nz)
+         end if
+      end subroutine get_superad_history
 
 
       real(dp) function QHSE_time_scale(s,k) result(tau_qhse)

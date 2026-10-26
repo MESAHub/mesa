@@ -465,7 +465,8 @@
          integer, intent(in) :: action_in
          integer, intent(out) :: ierr
 
-         integer :: nz, species, num_reactions, nvar, nvar_hydro, nvar_chem, sz_new, action
+         integer :: nz, species, num_reactions, nvar, nvar_hydro, nvar_chem, sz_new, action, nh_prev
+         logical :: use_turnover_limit
          type (star_info), pointer :: c
          character (len=128) :: null_str
 
@@ -480,6 +481,12 @@
          nvar = s% nvar_total
          nvar_hydro = s% nvar_hydro
          nvar_chem = s% nvar_chem
+         use_turnover_limit = s% use_superad_reduction .and. &
+            s% superad_reduction_use_turnover_limit .and. .not. s% RSP_flag
+         nh_prev = 0
+         ! Fresh allocation has no rollback history. Capture the source size before pointer swaps.
+         if (action_in /= do_allocate .and. associated(s% prev_mesh_superad_reduction_history_du)) &
+            nh_prev = size(s% prev_mesh_superad_reduction_history_du, dim=1)
 
          c => s
          action = action_in
@@ -526,6 +533,18 @@
                if (failed('mlt_vc')) exit
                call do1(s% conv_vel, c% conv_vel)
                if (failed('conv_vel')) exit
+               call do2(s% superad_reduction_history_du, c% superad_reduction_history_du, &
+                  s% num_superad_reduction_history, 'superad_reduction_history_du')
+               if (failed('superad_reduction_history_du')) exit
+               call do2(s% superad_reduction_history_eta_du, c% superad_reduction_history_eta_du, &
+                  s% num_superad_reduction_history, 'superad_reduction_history_eta_du')
+               if (failed('superad_reduction_history_eta_du')) exit
+               call do2(s% prev_mesh_superad_reduction_history_du, c% prev_mesh_superad_reduction_history_du, &
+                  nh_prev, 'prev_mesh_superad_reduction_history_du')
+               if (failed('prev_mesh_superad_reduction_history_du')) exit
+               call do2(s% prev_mesh_superad_reduction_history_eta_du, c% prev_mesh_superad_reduction_history_eta_du, &
+                  nh_prev, 'prev_mesh_superad_reduction_history_eta_du')
+               if (failed('prev_mesh_superad_reduction_history_eta_du')) exit
 
                ! These are persistent inputs needed for ST time smoothing.
                call do1(s% D_ST_start, c% D_ST_start)
@@ -782,9 +801,20 @@
             if (failed('adjust_mlt_gradT_fraction')) exit
             call do1(s% gradT_excess_effect, c% gradT_excess_effect)
             if (failed('gradT_excess_effect')) exit
-            call do1(s% superad_reduction_factor, c% superad_reduction_factor)
-            if (failed('superad_reduction_factor')) exit
+            ! Preserve the accepted factor until it has been copied to the old model.
+            if (action /= do_fill_arrays_with_NaNs .or. .not. use_turnover_limit) then
+               call do1(s% superad_reduction_factor, c% superad_reduction_factor)
+               if (failed('superad_reduction_factor')) exit
+            end if
             if (action == do_allocate) s% superad_reduction_factor = 1d0
+            call do1(s% superad_reduction_du, c% superad_reduction_du)
+            if (failed('superad_reduction_du')) exit
+            call do1(s% superad_reduction_target, c% superad_reduction_target)
+            if (failed('superad_reduction_target')) exit
+            if (action == do_allocate) then
+               s% superad_reduction_du = 0d0
+               s% superad_reduction_target = 1d0
+            end if
 
             call do1(s% domega_dlnR, c% domega_dlnR)
             if (failed('domega_dlnR')) exit
