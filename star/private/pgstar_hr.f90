@@ -173,7 +173,7 @@
          call pgsch(0.7*char_height/2.8)
 
          ! log10(L/Lsun) = 4*log10(Teff) + 2*log10(R/Rsun) + solar_intercept.
-         solar_intercept = real(log10(4.0_dp*pi*boltz_sigma*Rsun**2/Lsun))
+         solar_intercept = real(log10(4.0_dp*pi*boltz_sigma*pow2(Rsun)/Lsun))  ! cast to real b/c pgstar uses single precision
 
          ! figure out which radii (powers of 10) are visible
          ! smallest visible line is at highest Teff and lowest L (xhi, ylo)
@@ -201,10 +201,13 @@
             label_x = 0.5*(label_lo + label_hi)
 
             if (i >= 0 .and. i <= 3) then
-               write(radius, '(i0)') 10**i
+               write(radius, '(i0)') 10**i                    ! 1, 10, 100, 1000
+               label = trim(radius) // ' R\d\(2281)\u'
+            else if (i < 0 .and. i >= -3) then
+               radius = '0.' // repeat('0', -i-1) // '1'      ! 0.1, 0.01, 0.001
                label = trim(radius) // ' R\d\(2281)\u'
             else
-               write(radius, '(i0)') i
+               write(radius, '(i0)') i                        ! i0 includes the minus sign
                label = '10\u' // trim(radius) // '\d R\d\(2281)\u'
             end if
 
