@@ -21,9 +21,11 @@ CHECK_RESULTS_GOLDEN := test/test_output
 
 MODULES := chem_def.mod chem_lib.mod
 INSTALL_INCLUDES :=
-EXTRACT_DATA_COMMANDS += install-chem-data
+EXTRACT_DATA_COMMANDS += ../data/chem_data/.extract-completed
 
 include $(MAKE_DIR)/Makefile
 
-install-chem-data:
-	mkdir -p ../data/chem_data && cp data/* ../data/chem_data
+../data/chem_data/.extract-completed: data $(wildcard data/*)
+	rm -rf ../data/chem_data
+	cp -r data ../data/chem_data
+	touch $@

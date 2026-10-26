@@ -57,7 +57,7 @@
          integer, intent(in) :: lrd, lid
          integer, intent(inout), pointer :: ipar_decsol(:) ! (lid)
          real(dp), intent(inout), pointer :: rpar_decsol(:) ! (lrd)
-         integer, intent(in) :: which_decsol ! values given in num_def
+         integer, intent(in) :: which_decsol ! values given in $MESA_DIR/mtx/public/mtx_def.f90
             ! e.g., lapack or bcyclic_dble or ....
 
          real(dp), pointer, dimension(:) :: xscale1 ! =(nvar,nz)
