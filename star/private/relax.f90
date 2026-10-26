@@ -56,9 +56,9 @@
       real(dp), parameter :: min_dlnz = -12
       real(dp), parameter :: min_z = 1d-12
 
-      ! some relax routines depend on things such as other_energy and other_torque
-      ! to which interpolation parameters cannot be passed directly. So for simplicity
-      ! use these two global variables instead.
+      ! some relax routines depend on energy and torque hooks to which interpolation
+      ! parameters cannot be passed directly. So for simplicity use these two global
+      ! variables instead.
       integer :: relax_num_pts
       real(dp), pointer :: relax_work_array(:)
 
@@ -702,16 +702,19 @@
          integer, intent(out) :: ierr
 
          integer, parameter ::  lipar=2
-         integer :: lrpar, max_model_number
+         integer :: lrpar, max_model_number, retry_hold
          real(dp), pointer :: rpar(:)
-         real(dp) :: starting_dt_next, mix_factor, dxdt_nuc_factor, max_years_for_timestep, time
-         logical :: do_element_diffusion, use_other_energy
+         real(dp) :: starting_dt_next, mix_factor, dxdt_nuc_factor, max_years_for_timestep, &
+            scale_max_correction, time
+         logical :: do_element_diffusion, use_other_energy, use_other_energy_implicit
          type (star_info), pointer :: s
          real(dp), pointer :: x(:), f1(:), f(:,:)
          integer, target :: ipar_ary(lipar)
          integer, pointer :: ipar(:)
          procedure (other_energy_interface), pointer :: &
             other_energy => null()
+         procedure (other_energy_implicit_interface), pointer :: &
+            other_energy_implicit => null()
 
          ipar => ipar_ary
 
@@ -755,9 +758,24 @@
          s% max_years_for_timestep = s% job% max_dt_for_relax_entropy
          s% dt_next = min(s% dt_next, s% job% max_dt_for_relax_entropy * secyer)
          use_other_energy = s% use_other_energy
-         s% use_other_energy = .true.
          other_energy => s% other_energy
-         s% other_energy => entropy_relax_other_energy
+         use_other_energy_implicit = s% use_other_energy_implicit
+         other_energy_implicit => s% other_energy_implicit
+         if (s% job% relax_entropy_use_implicit_source) then
+            s% use_other_energy = .false.
+            s% use_other_energy_implicit = .true.
+            s% other_energy_implicit => entropy_relax_other_energy
+         else
+            s% use_other_energy = .true.
+            s% other_energy => entropy_relax_other_energy
+            s% use_other_energy_implicit = .false.
+         end if
+         scale_max_correction = s% scale_max_correction
+         if (s% job% relax_entropy_scale_max_correction > 0d0) &
+            s% scale_max_correction = s% job% relax_entropy_scale_max_correction
+         retry_hold = s% retry_hold
+         if (s% job% relax_entropy_retry_hold >= 0) &
+            s% retry_hold = s% job% relax_entropy_retry_hold
          time = s% time
          s% time = 0d0
 
@@ -774,6 +792,10 @@
          s% max_years_for_timestep = max_years_for_timestep
          s% use_other_energy = use_other_energy
          s% other_energy => other_energy
+         s% use_other_energy_implicit = use_other_energy_implicit
+         s% other_energy_implicit => other_energy_implicit
+         s% scale_max_correction = scale_max_correction
+         s% retry_hold = retry_hold
          s% time = time
 
          call error_check('relax entropy',ierr)
@@ -922,25 +944,43 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          integer :: k, nz, num_pts
-         real(dp), pointer :: vals(:), xq(:), x(:), f(:)
+         real(dp), allocatable :: vals(:), xq(:)
+         real(dp), pointer :: x(:), f(:)
          ierr = 0
          call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
 
          nz = s% nz
          num_pts = relax_num_pts
          allocate(vals(nz), xq(nz), stat=ierr)
+         if (ierr /= 0) return
          f(1:4*num_pts) => relax_work_array(num_pts+1:5*num_pts)
          x(1:num_pts) => relax_work_array(1:num_pts)
          xq(1) = s% dq(1)/2  ! xq for cell center
          do k = 2, nz
             xq(k) = xq(k-1) + (s% dq(k) + s% dq(k-1))/2
          end do
-         call interp_values(x, num_pts, f, nz, xq, vals(:), ierr)
-         if (ierr /= 0) return
+         call interp_values(x, num_pts, f, nz, xq, vals, ierr)
+         if (ierr /= 0) then
+            deallocate(vals, xq)
+            return
+         end if
          do k = 1, s% nz
-            s% extra_heat(k) = ( 1d0 - exp(s%lnS(k))/vals(k) ) * exp(s%lnE(k))
-            s% extra_heat(k) = s% extra_heat(k) / (s% job% timescale_for_relax_entropy * secyer)
+            if (s% job% relax_entropy_use_normalized_source) then
+               if (s% job% relax_entropy_use_implicit_source) then
+                  s% extra_heat(k) = wrap_T_00(s,k)*(vals(k) - wrap_s_00(s,k))
+               else
+                  s% extra_heat(k) = s% T(k)*(vals(k) - exp(s% lnS(k)))
+               end if
+            else if (s% job% relax_entropy_use_implicit_source) then
+               s% extra_heat(k) = (1d0 - wrap_s_00(s,k)/vals(k))*wrap_e_00(s,k)
+            else
+               s% extra_heat(k) = (1d0 - exp(s% lnS(k))/vals(k))*exp(s% lnE(k))
+            end if
+            s% extra_heat(k) = s% extra_heat(k) / &
+               (s% job% timescale_for_relax_entropy * secyer)
          end do
+         deallocate(vals, xq)
       end subroutine entropy_relax_other_energy
 
       subroutine do_relax_angular_momentum(  &

@@ -469,13 +469,14 @@
 
       end subroutine leak
 
-      subroutine calculate_eps_mdot(s, dt, ierr)
+      subroutine calculate_eps_mdot(s, dt, velocity_remap_kinetic_energy, ierr)
          use adjust_mass, only: compute_prev_mesh_dm
 
          ! Inputs
          type (star_info), pointer :: s
-         real(dp) :: dt
-         integer :: ierr
+         real(dp), intent(in) :: dt
+         real(dp), intent(in) :: velocity_remap_kinetic_energy(:)
+         integer, intent(out) :: ierr
 
          ! Intermediates
          logical, parameter :: dbg = .false.
@@ -491,6 +492,7 @@
          integer, dimension(:,:), allocatable :: ranges
          real(qp), dimension(:), allocatable :: mesh_intersects
 
+         ierr = 0
          if (s% mstar_dot == 0d0 .or. dt <= 0d0) then
             s% eps_mdot(1:s%nz) = 0d0
             s% mdot_adiabatic_surface = 0d0
@@ -634,6 +636,10 @@
 
             change_sum = change_sum + sum%value() / (dt)
 
+            ! Velocity averaging converts unresolved kinetic energy into heat.
+            ! Keep that local source out of the thermal leakage calculation.
+            sum = sum - real(velocity_remap_kinetic_energy(j),qp)
+
             ! Multiplicative factors
             eps_mdot_per_total_mass(j) = sum % value() / (s%dm(j) * dt) / total_mass_through_cell(j)
 
@@ -642,6 +648,7 @@
          err = 0d0
          do j=1,nz
             err = err + eps_mdot_per_total_mass(j) * s%dm(j) * dt * total_mass_through_cell(j)
+            err = err + velocity_remap_kinetic_energy(j)
          end do
          err = err - s%mdot_acoustic_surface
          err = err - te_bar(1) * delta_m
@@ -657,7 +664,8 @@
                            total_mass_through_cell, eps_mdot_per_total_mass,&
                            accumulated, mdot_adiabatic_surface, leak_frac)
          do j=1,nz
-            s%eps_mdot(j) = accumulated(j)
+            s%eps_mdot(j) = accumulated(j) + &
+               velocity_remap_kinetic_energy(j)/(s%dm(j)*dt)
          end do
          s% mdot_adiabatic_surface = -mdot_adiabatic_surface
 

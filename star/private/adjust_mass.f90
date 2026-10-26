@@ -166,7 +166,7 @@
 
       end subroutine update_radius
 
-      subroutine do_adjust_mass(s, species, ierr)
+      subroutine do_adjust_mass(s, species, velocity_remap_kinetic_energy, ierr)
          use adjust_xyz, only: get_xa_for_accretion
          use star_utils, only: report_xa_bad_nums, &
             start_time, update_time
@@ -175,6 +175,7 @@
 
          type (star_info), pointer :: s
          integer, intent(in) :: species
+         real(dp), intent(out) :: velocity_remap_kinetic_energy(:)
          integer, intent(out) :: ierr
 
          real(dp) :: &
@@ -186,7 +187,7 @@
          real(dp), dimension(:), allocatable :: &
             rxm_old, rxm_new, old_cell_mass, new_cell_mass, &
             oldloc, newloc, oldval, newval, xm_old, xm_new, &
-            xq_center_old, xq_center_new
+            xq_center_old, xq_center_new, velocity_old
          real(dp), dimension(:,:), allocatable :: xa_old
          real(dp), pointer :: work(:)
 
@@ -201,6 +202,7 @@
 
          if (dbg) write(*,*) 'do_adjust_mass'
 
+         velocity_remap_kinetic_energy(:) = 0d0
          call save_for_eps_mdot(s)
 
          ierr = 0
@@ -281,6 +283,11 @@
 
          do k=1,nz
             old_cell_mass(k) = old_xmstar*s% dq(k)
+            if (s% u_flag) then
+               velocity_old(k) = s% xh(s% i_u,k)
+            else if (s% v_flag) then
+               velocity_old(k) = s% xh(s% i_v,k)
+            end if
          end do
          xm_old(1) = 0
          xq_center_old(1) = 0.5d0*s% dq(1)
@@ -418,6 +425,12 @@
             end if
          end do
 
+         if ((s% u_flag .or. s% v_flag) .and. delta_m < 0d0) then
+            call remap_velocity_for_mass_loss( &
+               s, nz, k_const_mass, velocity_old, old_cell_mass, new_cell_mass, &
+               velocity_remap_kinetic_energy)
+         end if
+
          call set_xa(s, nz, k_const_mass, species, xa_old, xaccrete, &
             rxm_old, rxm_new, mmax, old_cell_mass, new_cell_mass, ierr)
          if (ierr /= 0) then
@@ -524,6 +537,72 @@
          contains
 
 
+         subroutine remap_velocity_for_mass_loss( &
+               s, nz, k_const_mass, velocity_old, old_cell_mass, new_cell_mass, &
+               remap_kinetic_energy)
+            use mass_utils, only: integrate_conserved
+            type (star_info), pointer :: s
+            integer, intent(in) :: nz, k_const_mass
+            real(dp), intent(in) :: velocity_old(:), old_cell_mass(:), new_cell_mass(:)
+            real(dp), intent(out) :: remap_kinetic_energy(:)
+
+            integer :: k
+            real(dp) :: vals_outside(2), delta_specific_kinetic_energy
+            real(dp), allocatable :: vals_old(:,:), vals_new(:,:)
+            real(qp), allocatable :: dm_old(:), dm_new(:)
+
+            allocate(vals_old(nz,2), vals_new(nz,2), dm_old(nz), dm_new(nz))
+
+            do k=1,nz
+               if (s% u_flag) then
+                  dm_old(k) = old_cell_mass(k)
+                  dm_new(k) = new_cell_mass(k)
+               else if (k == 1) then
+                  ! v(1) has only the outer half of cell 1 in its dual cell.
+                  dm_old(k) = 0.5d0*old_cell_mass(k)
+                  dm_new(k) = 0.5d0*new_cell_mass(k)
+               else
+                  ! Other v points have half of each adjacent cell.
+                  dm_old(k) = 0.5d0*(old_cell_mass(k-1) + old_cell_mass(k))
+                  dm_new(k) = 0.5d0*(new_cell_mass(k-1) + new_cell_mass(k))
+               end if
+               vals_old(k,1) = velocity_old(k)
+               vals_old(k,2) = 0.5d0*pow2(velocity_old(k))
+            end do
+            vals_outside(:) = 0d0
+
+            ! Remap specific momentum and kinetic energy on the same mass overlaps.
+            call integrate_conserved( &
+               vals_new, vals_old, vals_outside, dm_new, dm_old, nz, 2)
+
+            remap_kinetic_energy(:) = 0d0
+            do k=1,nz
+               if (k > k_const_mass) then
+                  vals_new(k,1) = velocity_old(k)
+                  delta_specific_kinetic_energy = 0d0
+               else
+                  ! Momentum projection removes only unresolved velocity variance.
+                  delta_specific_kinetic_energy = max(0d0, &
+                     vals_new(k,2) - 0.5d0*pow2(vals_new(k,1)))
+               end if
+               if (s% u_flag) then
+                  s% u(k) = vals_new(k,1)
+                  s% xh(s% i_u,k) = s% u(k)
+                  remap_kinetic_energy(k) = &
+                     new_cell_mass(k)*delta_specific_kinetic_energy
+               else
+                  s% v(k) = vals_new(k,1)
+                  s% xh(s% i_v,k) = s% v(k)
+                  remap_kinetic_energy(k) = remap_kinetic_energy(k) + &
+                     0.5d0*new_cell_mass(k)*delta_specific_kinetic_energy
+                  if (k > 1) remap_kinetic_energy(k-1) = remap_kinetic_energy(k-1) + &
+                     0.5d0*new_cell_mass(k-1)*delta_specific_kinetic_energy
+               end if
+            end do
+
+         end subroutine remap_velocity_for_mass_loss
+
+
          real(dp) function angular_momentum_removed(ierr) result(J)
             ! when call this, s% j_rot is still for old mass
             integer, intent(out) :: ierr
@@ -580,7 +659,7 @@
             integer, intent(out) :: ierr
             allocate(rxm_old(nz), rxm_new(nz), old_cell_mass(nz), new_cell_mass(nz), &
                xa_old(species,nz), oldloc(nz), newloc(nz), oldval(nz), newval(nz), &
-               xm_old(nz), xm_new(nz), xq_center_old(nz), xq_center_new(nz))
+               xm_old(nz), xm_new(nz), xq_center_old(nz), xq_center_new(nz), velocity_old(nz))
             call do_work_arrays(.true.,ierr)
          end subroutine do_alloc
 

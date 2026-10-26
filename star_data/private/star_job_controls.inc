@@ -259,6 +259,10 @@
       real(dp) :: timescale_for_relax_entropy
       real(dp) :: max_dt_for_relax_entropy
       real(dp) :: num_timescales_for_relax_entropy
+      logical :: relax_entropy_use_implicit_source
+      logical :: relax_entropy_use_normalized_source
+      real(dp) :: relax_entropy_scale_max_correction
+      integer :: relax_entropy_retry_hold
       character (len=strlen) :: relax_entropy_filename
       character (len=strlen) :: get_entropy_for_relax_from_eos
 
