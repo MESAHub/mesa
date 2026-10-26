@@ -15,25 +15,31 @@
 
 &eos
 
-mass_fraction_limit_for_Skye = 1d-16
+mass_fraction_limit_for_Skye = 1d-5
 
 / ! end of eos namelist
 
 &star_job
 
-   timescale_for_relax_composition = 1d5
+   ! Relax composition by model count rather than the initial timestep.
+   num_steps_to_relax_composition = 100
+   timescale_for_relax_composition = -1d0
 
    !change_initial_net = .true.
    !although not used, run_star_extras reads new_net_name during pulses
-   new_net_name = "approx21_plus_co56.net"
-   adv_net = "approx21_plus_co56.net"
+   new_net_name = "approx21_cr60_plus_co56.net"
+   adv_net = "approx21_cr60_plus_co56.net"
 
    initial_zfracs = 6
 
    ! this are options for the relaxation of the model in-between pulses
-   timescale_for_relax_entropy = 1d-15
-   max_dt_for_relax_entropy = 5d-17
+   timescale_for_relax_entropy = 1d-20
+   max_dt_for_relax_entropy = 5d-22
    num_timescales_for_relax_entropy = 30
+   relax_entropy_use_implicit_source = .true.
+   relax_entropy_use_normalized_source = .true.
+   relax_entropy_scale_max_correction = 0.1d0
+   relax_entropy_retry_hold = 5
    max_steps_to_relax_entropy = 10000
    relax_omega_max_yrs_dt = 1d-5
 
@@ -41,24 +47,24 @@ mass_fraction_limit_for_Skye = 1d-16
    new_cumulative_energy_error = 0d0
 
    change_rotation_flag = .true.
-   new_rotation_flag = .true.
+   new_rotation_flag = .false.
    change_w_div_wc_flag = .true.
-   new_w_div_wc_flag = .true.
+   new_w_div_wc_flag = .false.
 
    read_extra_star_job_inlist(1) = .true.
    extra_star_job_inlist_name(1) = 'inlist_extra'
 
-   !pgstar_flag = .true.
+   pgstar_flag = .true.
    save_pgstar_files_when_terminate = .true.
 
-   num_special_rate_factors = 2
+   num_special_rate_factors = 1
    reaction_for_special_factor(1) = 'r_c12_ag_o16'
    special_rate_factor(1) = 1
    filename_of_special_rate(1) = 'c12ag_deboer_sigma_0p0_2000_Tgrid.dat'
 
-   reaction_for_special_factor(2) = 'r_he4_he4_he4_to_c12'
-   special_rate_factor(2) = 1
-   filename_of_special_rate(2) = 'r_he4_he4_he4_to_c12_cf88.txt'
+   ! reaction_for_special_factor(2) = 'r_he4_he4_he4_to_c12'
+   ! special_rate_factor(2) = 1
+   ! filename_of_special_rate(2) = 'r_he4_he4_he4_to_c12_cf88.txt'
 
 / !end of star_job namelist
 
@@ -66,7 +72,10 @@ mass_fraction_limit_for_Skye = 1d-16
 &controls
 
    fill_arrays_with_nans = .false.
-   report_solver_progress = .false.
+   min_logRho_for_eos = -30d0
+   report_solver_progress = .true.
+   report_ierr = .true.
+   trace_evolve = .true.
    max_resid_jump_limit = 1d99
 
    okay_to_remove_mixing_singleton = .false.
@@ -78,27 +87,27 @@ mass_fraction_limit_for_Skye = 1d-16
    energy_eqn_option = 'dedt'
 
    ! adjustments to the newton solver
-   solver_max_tries_before_reject = 30
+   solver_max_tries_before_reject = 40 ! 30
+   gold_solver_iters_timestep_limit = 30 ! 20
+
    max_tries_for_retry = 30
    max_tries_after_5_retries = 40
    max_tries_after_10_retries = 40
    max_tries_after_20_retries = 40
-   corr_coeff_limit = 1d-2
-   relax_use_gold_tolerances = .false.
+   relax_use_gold_tolerances = .false. ! don't use gold tol. during relax
    use_gold_tolerances = .true.
    use_gold2_tolerances = .false.
-   !maxT_for_gold_tolerances = 5d9 ! this is to ease core-collapse (~logT=9.7)
-   !gold_iter_for_resid_tol2 = 5
-   !gold_iter_for_resid_tol3 = 5
-   gold_tol_residual_norm3 = 1d-6
+   maxT_for_gold_tolerances = 6d9
+   gold_tol_residual_norm3 = 1d-5
    gold_tol_max_residual3 = 1d-3
-   gold_solver_iters_timestep_limit = 20
-   solver_iters_timestep_limit = 50
    ignore_too_large_correction = .true.
    !scale_max_correction = 0.1d0
    corr_coeff_limit = 0.2d0
    ignore_min_corr_coeff_for_scale_max_correction = .true.
-   ignore_species_in_max_correction = .true.
+   ignore_species_in_max_correction = .false.
+
+   limit_for_rel_error_in_energy_conservation = 1d10 !1d-2
+   hard_limit_for_rel_error_in_energy_conservation = 1d10
 
    ! during pulses very small cells near the surface can sometimes exceed
    ! the speed of light. This has no impact in the behaviour of the bulk
@@ -106,10 +115,10 @@ mass_fraction_limit_for_Skye = 1d-16
    retry_for_v_above_clight = .false.
 
    ! limit max_model_number as part of test_suite
-   max_model_number = 10000 ! RECOMMENDED -1
+   max_model_number = 15000 ! RECOMMENDED -1
 
    relax_max_number_retries = 1000
-   max_number_retries = 500 ! RECOMMENDED 5000
+   max_number_retries = 5000 ! RECOMMENDED 5000
 
    ! in principle this is the only thing that needs changing
    ! it is set in inlist_extra
@@ -123,31 +132,48 @@ mass_fraction_limit_for_Skye = 1d-16
    ! when using hydro, we reduce the rotational corrections near the surface
    use_other_eval_fp_ft = .false.
 
-   ! During hydro we use es scaterring opacity on the very outermost cell
+   ! Correct the ideal-EOS contribution to lnfree_e, floor opacity below
+   ! logT=2.7001 with blending to 2.8001, and use electron-scattering opacity
+   ! for an escaping Riemann-hydro surface cell.
    use_other_kap = .true.
 
    ! convection controls
    use_ledoux_criterion = .true.
    mixing_length_alpha = 2d0
+   MLT_option = "TDC"
+   include_mlt_corr_to_TDC = .false.
+   TDC_alpha_M = 0d0
+   TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .true.
+   TDC_include_eturb_in_energy_equation = .true.
+   harmonic_dissipation_length_beta = 1d0
    alpha_semiconvection = 1d0
    thermohaline_coeff = 0d0
    num_cells_for_smooth_gradL_composition_term = 0
-   max_conv_vel_div_csound = 1d0
-   max_conv_vel_div_csound_maxq = 1d0
+   !max_conv_vel_div_csound = 1d0
+   !max_conv_vel_div_csound_maxq = 1d0
 
    ! The control below is useful when running with burning + convection during pulses.
    make_gradr_sticky_in_solver_iters = .true.
+   convergence_ignore_equL_residuals = .true.
 
    max_abs_du_div_cs_for_convection = 0.03d0
-   max_v_div_cs_for_convection = 1d1
-   max_v_for_convection = 1d4
+   max_v_div_cs_for_convection = 10d0
+   max_v_for_convection = 1d5 ! v should never hit this anyway, see x_ctrl(17) below.
+
+   use_superad_reduction = .true.
+   superad_reduction_max_logT = 7d0
+   superad_reduction_diff_grads_limit = 1d-4
+   superad_reduction_use_turnover_limit = .true.
+   superad_reduction_Gamma_limit = 0.5d0
+   superad_reduction_Gamma_limit_scale = 5d0
+   superad_reduction_Gamma_inv_scale = 5d0
 
    ! overshoot controls
    ! we only include a bit of exponential overshooting to smooth things out
 
    overshoot_scheme(1) = 'exponential'
-   overshoot_zone_type(1) = 'any'
-   overshoot_zone_loc(1) = 'any'
+   overshoot_zone_type(1) = 'burn_He'
+   overshoot_zone_loc(1) = 'core'
    overshoot_bdy_loc(1) = 'any'
    overshoot_f(1) = 0.01
    overshoot_f0(1) = 0.005
@@ -185,7 +211,19 @@ mass_fraction_limit_for_Skye = 1d-16
    delta_lg_star_mass_limit = 2d-3 ! RECOMMENDED 2d-3
    delta_lgRho_cntr_limit = 0.005d0 ! RECOMMENDED 0.0025d0
    delta_lgRho_cntr_hard_limit = 0.01d0 ! RECOMMENDED 0.005d0
-   dt_div_min_dr_div_cs_limit = 5d0 ! this value is adjusted in run_star_extras ! RECOMMENDED 3d0
+
+
+
+   ! cfl timestep limiter
+   !dt_div_min_dr_div_cs_limit = 1000d0! set less than 1d0 in high L/M stars.
+   !dt_div_min_dr_div_cs_hard_limit = 1d4! i don't like hard limits ~ EbF
+   !min_abs_u_div_cs_for_dt_div_min_dr_div_cs_limit = 0d0
+   !min_q_for_dt_div_min_dr_div_cs_limit = 0d0
+   !max_q_for_dt_div_min_dr_div_cs_limit = 0.99d0
+   !min_k_for_dt_div_min_dr_div_cs_limit = 1
+   !min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 0d0 !0.001d0
+
+
    min_timestep_limit = 1d-20 ! (seconds)
    relax_hard_limits_after_retry = .false.
 
@@ -195,14 +233,15 @@ mass_fraction_limit_for_Skye = 1d-16
    mesh_delta_coeff = 0.8d0 ! RECOMMENDED 0.8d0
 
    ! Relax mesh on the surface for pre-hydro evolution
-   min_surface_cell_dq = 1d-8
-   max_num_merge_surface_cells = 5
-   max_surface_cell_dq = 1d0
+   !min_surface_cell_dq = 1d-8
+   !max_num_merge_surface_cells = 5
+   !max_surface_cell_dq = 1d0
 
    !! this one is turned on in run_star_extras
-   !use_split_merge_amr = .true.
-   split_merge_amr_log_zoning = .false.
-   split_merge_amr_logtau_zoning = .true.
+   split_merge_amr_use_metric_zoning_for_u_flag = .true.
+   split_merge_amr_reconstruct_pressure_for_u_flag = .true.
+   split_merge_amr_metric_logR_weight = 1d0
+   split_merge_amr_metric_logtau_weight = 0.5d0
    split_merge_amr_nz_baseline = 2000 ! RECOMMENDED 6000 for logR zoning
    split_merge_amr_MaxLong = 1.25d0
    split_merge_amr_MaxShort = 2.5d0
@@ -269,7 +308,7 @@ mass_fraction_limit_for_Skye = 1d-16
    ! in order for Riemann hydro to be turned on, the following two conditions need to be met
    x_ctrl(1) = 0.01d0 ! the integrated gamma1 must be smaller than this (min_gamma_sub_43_for_hydro)
 
-   ! parameters controlling switch between hydrostatic and Riemann hydro
+   ! parameters controlling the switch between v_flag and Riemann hydro
    ! after the pulse starts, we estimate the dynamical timescale of the star
    ! (excluding some of the outer layers), and model the dynamical evolution
    ! for at least a fixed number of these timescales before turning off hydro
@@ -297,8 +336,8 @@ mass_fraction_limit_for_Skye = 1d-16
                     ! The additional conditions are as follows
    x_ctrl(6) = 20d0 ! absolute velocities must be below this in km/s (max_v_for_relax)
    x_ctrl(7) = 0.5d0 ! the ratio of the (absolute) velocity to the sound speed must be below this (max_machn_for_relax)
-   x_ctrl(8) = 11d0 ! do not relax if log10 Lneu/Lsun is bigger than this (max_Lneu_for_relax)
-   x_ctrl(9) = 10d0 ! do not relax if log10 Lnuc/Lsun is bigger than this (max_Lnuc_for_relax)
+   x_ctrl(8) = 9d0 !11d0 ! do not relax if log10 Lneu/Lsun is bigger than this (max_Lneu_for_relax)
+   x_ctrl(9) = 9d0 !10d0 ! do not relax if log10 Lnuc/Lsun is bigger than this (max_Lnuc_for_relax)
 
    x_integer_ctrl(1) = 100 ! conditions for relax must be satisfied for this number of consecutive steps
                            ! before the outer layers are removed
@@ -316,30 +355,55 @@ mass_fraction_limit_for_Skye = 1d-16
                        ! (delta_lgLnuc_limit)
                        ! RECOMMENDED 0.025d0
 
-   x_ctrl(13) = 10d0 ! Ignore the L_nuc limit of x_ctrl(18) if L_photo exceeds this value, otherwise step to step
+   x_ctrl(13) = 10d0 ! Ignore the L_nuc limit of x_ctrl(12) if L_photo exceeds this value, otherwise step to step
                      ! variations can lead to tiny timesteps
                      ! When we reach this value we switch the timestep limit for lgLnuc to lgLphot instead
                      ! (max_Lphoto_for_lgLnuc_limit)
 
-   x_ctrl(14) = 25d0 ! If L_photo is above this limit, then the timestep limit given by x_ctrl(18) is not used for L_photo either
+   x_ctrl(14) = 25d0 ! If L_photo is above this limit, then the timestep limit given by x_ctrl(12) is not used for L_photo either
 
-   x_ctrl(15) = 9d0 ! After first pulse, turn on v_flag if riemann hydro is off and logT_center falls below this.
+   x_ctrl(15) = 5d0 ! After first pulse, turn on v_flag if Riemann hydro is off and logT_center exceeds this.
                       ! (logT_for_v_flag)
    x_ctrl(16) = 9d0 ! After first pulse, turn on v_flag if riemann hydro is off and log10(Lneu/Lsun) exceeds this.
                       ! (logLneu_for_v_flag)
 
-   x_ctrl(17) = 2d4 ! km/s : if surface exceeds 20,000 km/s, cap vsurf with fixed velocity BC. 
+   x_ctrl(17) = 5d4 ! km/s: cap the emergency fixed surface velocity.
 
-   x_logical_ctrl(1) = .true.! If true, terminate after evolving 100d after first relax
-                              ! meant for use in the test_suite
+   x_integer_ctrl(2) = 1 ! Surface ejecta removal: 0 disabled, 1 direct.
+                         ! (surface_ejecta_removal_mode)
+   x_ctrl(18) = 1d4 ! Minimum radius in Rsun for removal.
+                    ! (surface_ejecta_radius_limit)
+   x_ctrl(19) = 4d0 ! Minimum outward velocity divided by escape velocity.
+                    ! (surface_ejecta_v_div_vesc_limit)
+   x_ctrl(21) = 0d0 ! Maximum local escape velocity in km/s for removal.
+                    ! A positive value replaces the radius criterion.
+                    ! (surface_ejecta_escape_velocity_limit)
+
+   x_ctrl(22) = 1d4 ! Maximum timestep in seconds during an active pulse.
+                    ! A nonpositive value disables this limit.
+                    ! (max_dt_during_pulse)
+
+   TDC_adjust_mass_fallback_to_mlt = .true.
+
+   x_logical_ctrl(1) = .true. ! If true, terminate 100 days after the first pulse relaxation.
                               ! (stop_100d_after_pulse)
                               ! RECOMMENDED .false.
 
+   x_logical_ctrl(3) = .false. ! Enable RTI during Riemann-hydro phases.
+                              ! (use_RTI_during_hydro)
 
-      photo_interval = 50
-      profile_interval = 100
-      history_interval = 1
-      terminal_interval = 10
+   ! Dampen velocities in the outer 2% by mass while v_flag is on.
+   min_q_for_drag = 0.98d0
+   drag_coefficient = 1d0
+
+   use_Pvsc_art_visc = .true.
+   Pvsc_cq = 4.0d0
+   Pvsc_zsh = 0.1d0
+
+   photo_interval = 50
+   profile_interval = 200
+   history_interval = 1
+   terminal_interval = 10
 
 / ! end of controls namelist
 

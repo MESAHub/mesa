@@ -10,18 +10,34 @@
    !use_ODE_var_eqn_pairing = .true.
    use_dPrad_dm_form_of_T_gradient_eqn = .true.
    use_momentum_outer_BC = .true.
+   floor_momentum_outer_BC_at_Prad = .true.
 
    use_split_merge_amr = .true.
 
+   mesh_min_dlnR = 1d-9
+   merge_if_dlnR_too_small = .true.
+
+   ! applies to u and v flag
+   min_surface_cell_dq = 1d-14
    split_merge_amr_dq_min = 1d-16
 
    max_mdot_redo_cnt = 0
 
-   restore_mesh_on_retry = .true.
+   restore_mesh_on_retry = .false.
    num_steps_to_hold_mesh_after_retry = 5
 
-   MLT_option = "none"
-   
+   ! RTI parameters are inactive when x_logical_ctrl(3) is false.
+   RTI_A = 1d-3
+   RTI_B = 2.5d0
+   RTI_C = 0.2d0
+   RTI_D = 3d0
+   RTI_max_alpha = 0.5d0
+   alpha_RTI_src_min_v_div_cs = 1d0
+   RTI_log_max_boost = 0d0
+
+   ! Limit chemical diffusion at strong Riemann shocks without disabling TDC.
+   Riemann_shock_D_mix_reduction_on = 0.01d0
+   Riemann_shock_D_mix_reduction_full_on = 0.05d0
 
 / ! end of controls namelist
 

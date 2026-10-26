@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-rm -f restart_photo
-
-make run

@@ -455,13 +455,13 @@
    !lum_conv_div_L
    !lum_rad_div_L
    !lum_rad_div_L_Edd_sub_fourPrad_div_PchiT ! density increases outward if this is > 0
-      ! see Joss, Salpeter, and Ostriker, "Critical Luminosity", ApJ 181:429-438, 1973. 
+      ! see Joss, Salpeter, and Ostriker, "Critical Luminosity", ApJ 181:429-438, 1973.
    Frad_div_cUrad
    flux_limit_lambda
    flux_limit_R
-   
+
    gradT ! mlt value for required temperature gradient dlnT/dlnP
-   
+
    gradr ! dlnT/dlnP required for purely radiative transport
    !grad_temperature ! smoothed dlnT/dlnP at cell boundary
    !grad_density ! smoothed dlnRho/dlnP at cell boundary
@@ -516,6 +516,10 @@
 !# Mixing
    mixing_type ! mixing types are defined in mesa/const/public/const_def   
    log_D_mix ! log10 diffusion coefficient for mixing in units of cm^2/second (Eulerian)
+   Riemann_shock_compression
+   Riemann_shock_pressure_jump
+   Riemann_shock_strength
+   Riemann_shock_D_mix_factor
    !log_D_mix_non_rotation
    !log_D_mix_rotation
 
@@ -525,7 +529,7 @@
    log_D_ovr ! D_mix for regions where mix_type = overshoot_mixing
    log_D_thrm ! D_mix for regions where mix_type = thermohaline_mixing
    !log_D_minimum ! D_mix for regions where mix_type = minimum_mixing
-   !log_D_rayleigh_taylor ! D_mix for regions where mix_type = rayleigh_taylor_mixing
+   log_D_rayleigh_taylor ! D_mix for regions where mix_type = rayleigh_taylor_mixing
    !log_D_anon ! D_mix for regions where mix_type = anonymous_mixing
    !log_D_omega
 
@@ -739,24 +743,24 @@
 
 !# RTI
 
-   !RTI_du_diffusion_kick
-   !alpha_RTI
+   RTI_du_diffusion_kick
+   alpha_RTI
    !boost_for_eta_RTI
-   !dedt_RTI
-   !dudt_RTI
-   !eta_RTI
-   !log_alpha_RTI
+   dedt_RTI
+   dudt_RTI
+   eta_RTI
+   log_alpha_RTI
    !log_boost_for_eta_RTI
-   !log_eta_RTI
+   log_eta_RTI
    !log_etamid_RTI
    !log_lambda_RTI_div_Hrho
-   !log_sig_RTI
+   log_sig_RTI
    !log_sigmid_RTI
    !log_source_RTI
    !log_source_minus_alpha_RTI
    !log_source_plus_alpha_RTI
-   !source_minus_alpha_RTI
-   !source_plus_alpha_RTI
+   source_minus_alpha_RTI
+   source_plus_alpha_RTI
    !lambda_RTI
 
 !# Hydrodynamics
@@ -851,7 +855,7 @@
    
    !zFe ! mass fraction of "Fe" = Fe+Co+Ni
    !log_zFe
-   !dPdr_dRhodr_info
+   dPdr_dRhodr_info
    !log_sig_raw_mix
 
    !d_u_div_rmid
@@ -866,8 +870,8 @@
    !dlnY_dr
    !dlogR
    !dPdr_div_grav
-   !dPdr_info
-   !dRhodr_info
+   dPdr_info
+   dRhodr_info
    !dRstar_div_dr
    !dr_ratio
    !dm_eps_grav

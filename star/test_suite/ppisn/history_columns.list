@@ -714,12 +714,12 @@
       ! returns values at location of max velocity
       !shock_mass ! baryonic (Msun)
       !shock_mass_gm ! baryonic (grams)
-      !shock_q
-      !shock_radius ! (Rsun)
+      shock_q
+      shock_radius ! (Rsun)
       !shock_radius_cm ! (cm)
       !shock_velocity
       !shock_csound
-      !shock_v_div_cs
+      shock_v_div_cs
       !shock_lgT
       !shock_lgRho
       !shock_lgP

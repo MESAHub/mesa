@@ -1,0 +1,103 @@
+&binary_job
+
+inlist_names(1) = 'inlist1'
+inlist_names(2) = 'inlist2'
+
+evolve_both_stars = .true.
+pgbinary_flag = .true.
+
+
+/ ! end of binary_job namelist
+
+&binary_controls
+
+      m1 = 100.0
+      m2 = 50.0
+      initial_period_in_days = 10d0 !3.5
+
+limit_retention_by_mdot_edd = .false. ! this is for BH secondaries
+use_radiation_corrected_transfer_rate = .false.
+mass_transfer_alpha = 0.0d0
+mass_transfer_beta = 0.0d0
+mass_transfer_delta = 0.0d0
+mass_transfer_gamma = 0.0d0
+
+mdot_scheme = "Kolb" ! !"Ritter" !
+! max_tries_to_achieve = 200 ! commented bc POSYDON
+! min_change_factor = 1.02d0 ! commented bc POSYDON
+! max_change_factor = 1.2d0  ! commented bc POSYDON
+initial_change_factor = 1.2d0
+change_factor_fraction = 0.8d0
+! implicit_lambda = 0.4d0 ! commented bc POSYDON
+min_mdot_for_implicit = 1d-10
+! implicit_scheme_tolerance = 2.5d-4 ! commented bc POSYDON
+implicit_scheme_tiny_factor = 1d-6
+! report_rlo_solver_progress = .true.
+
+write_header_frequency = 1
+history_interval = 1
+
+do_tidal_sync = .false.
+do_j_accretion = .false. ! if .true. use A.3.3 of de Mink et al. 2013, ApJ, 764, 166
+! be 100% sure MB is always off
+do_jdot_mb = .false.
+do_jdot_missing_wind = .true.
+
+! ! timestep controls
+! fr = 0.01d0 !commented bc POSYDON
+! fr_limit = 2.5d-2 !commented bc POSYDON
+! fm = 0.01d0 !commented bc POSYDON
+fm_limit = 1d4 ! changed from 1d-1 due to issue much after mass transfer
+
+! commented for quick testing -EbF
+!varcontrol_case_a = 1d-4
+!varcontrol_case_b = 2.5d-4
+!varcontrol_ms = 1d-3
+!varcontrol_post_ms = 5d-3
+
+!dt_softening_factor = 0.1d0 !commented bc POSYDON
+
+!changed by Neev
+fr = 1d0 !1d-2
+fr_limit = 0.5! 0.025d0
+fr_dt_limit = 100 !10d0
+fa = 0.01d0
+fa_hard = 0.02d0
+fm = 1d4 ! changed from 0.01d0 due to issue much after mass transfer
+fj = 0.001d0
+fj_hard = 1d-2
+dt_softening_factor = 0.1d0
+
+implicit_scheme_tolerance = 2.5d-4
+max_tries_to_achieve = 200
+min_change_factor = 1.02d0
+max_change_factor = 1.2d0
+initial_change_factor = 1.2d0
+change_factor_fraction = 0.8d0
+implicit_lambda = 0.4d0
+
+min_mdot_for_implicit = 1d-10
+
+sync_mode_1 = "Uniform"
+sync_type_1 = "Hut_rad"
+Ftid_1 = 1
+sync_mode_2 = "Uniform"
+sync_type_2 = "Hut_rad"
+Ftid_2 = 1
+do_initial_orbit_sync_1 = .false.
+do_initial_orbit_sync_2 = .false.
+
+accretor_overflow_terminate = 2d0
+
+photo_interval = 50
+append_to_star_history = .false.
+
+
+/ ! end of binary_controls namelist
+
+&pgbinary
+
+read_extra_pgbinary_inlist(1) = .true.
+extra_pgbinary_inlist_name(1) = 'inlist_pgbinary'
+
+/ ! end of pgbinary namelist
