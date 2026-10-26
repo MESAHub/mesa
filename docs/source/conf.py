@@ -192,4 +192,4 @@ extlinks = {
     "git": ("https://github.com/%s", None),
 }
 
-html_extra_path = ['assets']
+html_extra_path = ["assets"]
