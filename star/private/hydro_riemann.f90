@@ -43,7 +43,8 @@
 
       private
       public :: do_surf_Riemann_dudt_eqn, do1_Riemann_momentum_eqn, &
-         do_uface_and_Pface, get_RTI_momentum_diffusion
+         do_uface_and_Pface, get_Riemann_shock_diagnostics, &
+         get_RTI_momentum_diffusion
          ! Riemann energy eqn is now part of the standard energy equation
          ! Riemann dlnR_dt rqn is now part of the standard radius equation
 
@@ -335,6 +336,91 @@
          if (s% rotation_flag .and. s% use_gravity_rotation_correction) &
             G = G*s% fp_rot(k)
       end subroutine get_G
+
+
+      subroutine get_Riemann_shock_diagnostics( &
+            s, k, compression, pressure_jump, shock_strength, D_mix_factor, ierr)
+         use math_lib, only: pow3
+         use star_utils, only: calc_Ptot_ad_tw
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp), intent(out) :: &
+            compression, pressure_jump, shock_strength, D_mix_factor
+         integer, intent(out) :: ierr
+
+         type(auto_diff_real_star_order1) :: &
+            r_ad, area_ad, PL_ad, PR_ad, G_ad, dPdm_grav_ad, &
+            csL_ad, csR_ad
+         real(dp), dimension(s% species) :: d_Ptot_dxa
+         real(dp) :: cs_face, P_face, P_min, onset, full_on, reduction, x
+         real(dp) :: delta_m, uL, uR, rhoL, rhoR, Sl, Sr, Ss
+         real(dp) :: numerator, denominator, P_face_L, P_face_R
+         logical, parameter :: skip_Peos = .false., skip_mlt_Pturb = .false.
+
+         ierr = 0
+         compression = 0d0
+         pressure_jump = 0d0
+         shock_strength = 0d0
+         D_mix_factor = 1d0
+         if (.not. s% u_flag .or. k <= 1 .or. k > s% nz) return
+
+         call calc_Ptot_ad_tw(s, k, skip_Peos, skip_mlt_Pturb, &
+            PL_ad, d_Ptot_dxa, ierr)
+         if (ierr /= 0) return
+         call calc_Ptot_ad_tw(s, k-1, skip_Peos, skip_mlt_Pturb, &
+            PR_ad, d_Ptot_dxa, ierr)
+         if (ierr /= 0) return
+         PR_ad = shift_m1(PR_ad)
+
+         if (PL_ad%val <= 0d0 .or. PR_ad%val <= 0d0) return
+         csL_ad = sqrt(wrap_gamma1_00(s,k)*PL_ad/wrap_d_00(s,k))
+         csR_ad = sqrt(wrap_gamma1_m1(s,k)*PR_ad/wrap_d_m1(s,k))
+         cs_face = 0.5d0*(csL_ad%val + csR_ad%val)
+         if (cs_face <= 0d0 .or. is_bad(cs_face)) return
+         uL = s% u(k)
+         uR = s% u(k-1)
+         rhoL = s% rho(k)
+         rhoR = s% rho(k-1)
+         Sl = min(uL - csL_ad%val, uR - csR_ad%val)
+         Sr = max(uR + csR_ad%val, uL + csL_ad%val)
+
+         r_ad = wrap_r_00(s,k)
+         area_ad = 4d0*pi*pow2(r_ad)
+         call get_G(s, k, G_ad)
+         dPdm_grav_ad = -G_ad*s% m_grav(k)/(pow2(r_ad)*area_ad)
+
+         delta_m = 0.5d0*s% dm(k)
+         PL_ad = PL_ad + delta_m*dPdm_grav_ad
+         delta_m = -0.5d0*s% dm(k-1)
+         PR_ad = PR_ad + delta_m*dPdm_grav_ad
+
+         if (PL_ad%val <= 0d0 .or. PR_ad%val <= 0d0) return
+
+         numerator = uR*rhoR*(Sr-uR) + uL*rhoL*(uL-Sl) + &
+            (PL_ad%val - PR_ad%val)
+         denominator = rhoR*(Sr-uR) + rhoL*(uL-Sl)
+         if (denominator == 0d0 .or. is_bad(denominator)) return
+         Ss = numerator/denominator
+
+         P_face_L = rhoL*(uL-Sl)*(uL-Ss) + PL_ad%val
+         P_face_R = rhoR*(uR-Sr)*(uR-Ss) + PR_ad%val
+         P_face = 0.5d0*(P_face_L + P_face_R)
+         if (P_face <= 0d0 .or. is_bad(P_face)) return
+
+         compression = max(0d0, (uL-uR)/cs_face)
+         P_min = min(PL_ad%val, PR_ad%val)
+         pressure_jump = max(0d0, P_face/P_min - 1d0)
+         shock_strength = min(compression, pressure_jump)
+
+         onset = s% Riemann_shock_D_mix_reduction_on
+         full_on = s% Riemann_shock_D_mix_reduction_full_on
+         if (full_on <= onset .or. shock_strength <= onset) return
+
+         x = min(1d0, (shock_strength-onset)/(full_on-onset))
+         reduction = pow3(x)*(10d0 + x*(-15d0 + 6d0*x))
+         D_mix_factor = 1d0 - reduction
+
+      end subroutine get_Riemann_shock_diagnostics
 
 
       subroutine do1_uface_and_Pface(s, k, ierr)

@@ -374,6 +374,9 @@
             end if
          end do
 
+         call reduce_D_mix_at_Riemann_shocks(s, ierr)
+         if (failed('reduce_D_mix_at_Riemann_shocks')) return
+
          ! set these just for plotting.  not used.
          s% mixing_type(1) = s% mixing_type(2)
          s% D_mix(1) = s% D_mix(2)
@@ -427,6 +430,35 @@
          end subroutine check
 
       end subroutine set_mixing_info
+
+
+      subroutine reduce_D_mix_at_Riemann_shocks(s, ierr)
+         use hydro_riemann, only: get_Riemann_shock_diagnostics
+         type (star_info), pointer :: s
+         integer, intent(out) :: ierr
+
+         integer :: k
+         real(dp) :: compression, D_mix_factor, pressure_jump, shock_strength
+
+         ierr = 0
+         if (.not. s% u_flag .or. &
+               s% Riemann_shock_D_mix_reduction_full_on <= 0d0) return
+
+         do k = 2, s% nz
+            call get_Riemann_shock_diagnostics( &
+               s, k, compression, pressure_jump, shock_strength, D_mix_factor, ierr)
+            if (ierr /= 0) return
+
+            ! Retain the TDC state while limiting symmetric chemical transport.
+            s% D_mix(k) = D_mix_factor*s% D_mix(k)
+            s% D_mix_non_rotation(k) = &
+               D_mix_factor*s% D_mix_non_rotation(k)
+            if (s% rotation_flag) &
+               s% D_mix_rotation(k) = D_mix_factor*s% D_mix_rotation(k)
+            s% cdc(k) = D_mix_factor*s% cdc(k)
+         end do
+
+      end subroutine reduce_D_mix_at_Riemann_shocks
 
 
       subroutine set_cz_boundary_info(s, ierr)

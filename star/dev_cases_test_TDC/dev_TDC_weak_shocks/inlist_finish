@@ -1,0 +1,183 @@
+
+&star_job
+   show_log_description_at_start = .false.
+
+   load_saved_model = .true.
+   load_model_filename = 'mods/ready_to_finish_1d46_v0.mod'
+
+   save_model_when_terminate = .true.
+   save_model_filename = 'mods/final.mod'
+
+   set_to_this_tau_factor = 1d-3
+   set_tau_factor = .true.
+
+   set_initial_age = .true.
+   initial_age = 0
+
+   set_initial_model_number = .true.
+   initial_model_number = 0
+
+   set_initial_cumulative_energy_error = .true.
+   new_cumulative_energy_error = 0
+
+   pgstar_flag = .true.
+
+/ ! end of star_job namelist
+
+&kap
+      use_Type2_opacities = .true.
+      Zbase = 0.02d0
+
+/ ! end of kap namelist
+
+&controls
+
+      initial_mass = 0.8
+      initial_z = 0.02
+
+      velocity_logT_lower_bound = 0
+      calculate_Brunt_N2 = .false.
+
+
+      x_logical_ctrl(1) = .true. ! .true. switch BCs when have mass ejection
+      x_logical_ctrl(2) = .true. ! set this to true to use a fixed vsurf BC
+
+      ! controls for removing surface layer
+      ! see run_star_extras for details
+      x_ctrl(17) = 0.5d0 ! remove down to this fraction of v escape
+      x_ctrl(18) = 0.999999d0 ! only remove if remaining q(k) < this
+      x_ctrl(19) = 0.99d0 ! only check v/v_esc for q(k) >= this
+      x_integer_ctrl(20) = 10 ! remove at least this many cells
+
+     ! Just for history column files that measure pulse energy and width
+      x_ctrl(21) = 0.1 !tolerance to define pulse width up to (tol*v_peak)
+
+
+! Stopping controls
+      x_ctrl(22) = 7.82d8 ! in cm - r_terminate -- terminate when r_peak > x_ctrl(22)
+      max_model_number = 30000 ! Do not let it run forever
+      max_age_in_seconds = 2d0
+
+
+! equation controls
+      energy_eqn_option = 'dedt'
+      use_dPrad_dm_form_of_T_gradient_eqn = .true.
+
+      use_compression_outer_BC = .false. !.true.
+      !use_momentum_outer_BC = .false.   !.true.
+
+      use_fixed_vsurf_outer_BC = .true. !added because of v_surf problems at high resolution
+      fixed_vsurf = 0d0 ! enforce v at surface to be zero
+
+      mix_factor = 0d0
+      dxdt_nuc_factor = 0d0
+      non_nuc_neu_factor = 0d0
+      eps_nuc_factor = 0d0
+
+
+! mixing controls
+      mixing_length_alpha = 1.9
+      MLT_option = 'TDC'
+      include_mlt_corr_to_TDC = .false.
+      thermohaline_coeff = 0
+      make_gradr_sticky_in_solver_iters = .true.
+      convergence_ignore_equL_residuals = .true.
+      use_TDC_enthalpy_flux_limiter = .true.
+
+
+     max_abs_du_div_cs_for_convection = 1d99 !0.03d0
+     max_v_div_cs_for_convection = 1d99
+
+   TDC_alpha_M = 0d0 !2d0
+!   TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation = .true.
+   TDC_include_eturb_in_energy_equation = .true.
+
+
+! mesh controls
+      !okay_to_remesh = .false.
+      okay_to_remesh = .true.
+      use_split_merge_amr = .true.
+      split_merge_amr_log_zoning = .false.
+      split_merge_amr_nz_baseline = 8000    ! 2000
+      split_merge_amr_MaxLong = 1.1d0
+      split_merge_amr_MaxShort = 2.5d0
+      split_merge_amr_max_iters = 50
+     ! merge_amr_inhibit_at_jumps = .true.
+      !trace_split_merge_amr = .true.
+
+
+! timestep controls
+      varcontrol_target = 1d-3
+
+      delta_lgL_limit = 0.05d0
+      delta_lgTeff_limit = 0.05d0
+
+      limit_for_rel_error_in_energy_conservation = 1d-2 !3d-10
+      hard_limit_for_rel_error_in_energy_conservation = 1d0 !3d-7
+
+      dt_div_min_dr_div_cs_limit = 0.45
+      min_q_for_dt_div_min_dr_div_cs_limit = 0.005d0
+      max_q_for_dt_div_min_dr_div_cs_limit = 1d0
+      min_abs_du_div_cs_for_dt_div_min_dr_div_cs_limit = 0.01d0
+
+      min_timestep_limit = 1d-12
+      max_timestep = 2d-4      ! 1d-2
+
+! solver controls
+
+      solver_iters_timestep_limit = 20 ! 10
+      solver_max_tries_before_reject = 30!11
+      !iter_for_resid_tol2 = 10
+
+      tol_residual_norm1 = 1d-9
+      tol_max_residual1 = 1d-6
+
+      tiny_corr_coeff_limit = 999999
+      solver_itermin_until_reduce_min_corr_coeff = 999999
+      max_resid_jump_limit = 1d99
+
+! output controls
+      max_num_profile_models = 1000
+      terminal_show_age_units = 'seconds'
+
+      num_trace_history_values = 2
+      trace_history_value_name(1) = 'rel_E_err'
+      trace_history_value_name(2) = 'log_rel_run_E_err'
+
+
+      photo_interval = 50
+      profile_interval = 50
+      history_interval = 1
+      terminal_interval = 10
+      write_header_frequency = 10
+
+      !photo_interval = 5
+      !profile_interval = 5
+      !history_interval = 1
+      !terminal_interval = 1
+
+
+
+report_solver_progress = .true.
+
+/ ! end of controls namelist
+
+&pgstar
+      read_extra_pgstar_inlist(1) = .true.
+      extra_pgstar_inlist_name(1) = 'inlist_pgstar'
+
+
+      Grid2_win_flag = .true.
+
+         Profile_Panels1_xmax = -101d0
+
+         !Grid2_title = '0.8 M\d\(2281)\u  Z=0.02  RGB'
+
+      Grid2_file_flag = .true.
+         file_digits = 7
+         Grid2_file_dir = 'png'
+         Grid2_file_prefix = 'grid'
+         Grid2_file_interval = 25 ! output when mod(model_number,Grid2_file_interval)==0
+
+
+/ ! end of pgstar namelist

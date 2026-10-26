@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+export MESA_DIR=../../..
+
+rm -f restart_photo
+
+make run

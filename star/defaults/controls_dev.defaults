@@ -225,6 +225,35 @@
     use_TDC_enthalpy_flux_limiter = .false.
 
 
+      ! Riemann_shock_D_mix_reduction_on
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! When the Riemann shock mixing reduction is enabled, leave chemical
+      ! diffusion unchanged at shock strengths less than or equal to this
+      ! value. The strength is the minimum of the signed compression Mach
+      ! number and the HLLC pressure jump.
+
+      ! ::
+
+    Riemann_shock_D_mix_reduction_on = 0d0
+
+
+      ! Riemann_shock_D_mix_reduction_full_on
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! For positive values with ``u_flag``, smoothly reduce the final chemical
+      ! diffusion coefficient at compressive Riemann shock faces. The reduction
+      ! changes from zero at ``Riemann_shock_D_mix_reduction_on`` to complete at
+      ! this value using a quintic smootherstep. Nonpositive values disable the
+      ! reduction. When positive, this value must be greater than the onset.
+      ! This does not change the MLT/TDC velocity, convective luminosity, or
+      ! eddy viscosity.
+
+      ! ::
+
+    Riemann_shock_D_mix_reduction_full_on = -1d0
+
+
       ! use_face_reconstruction
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

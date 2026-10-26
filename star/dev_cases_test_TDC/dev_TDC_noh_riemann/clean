@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+export MESA_DIR=../../..
+
+make clean
