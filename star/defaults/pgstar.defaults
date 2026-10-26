@@ -5282,6 +5282,7 @@
     Color_magnitude1_title = 'Color_magnitude1'
 
       ! Plots xaxis1-xaxis2 leave xaxis2 blank if you only want to plot xaxis1.
+      ! The x-axis can also be a time column, ``star_age`` or ``model_number``, to draw a light curve.
 
       ! ::
 

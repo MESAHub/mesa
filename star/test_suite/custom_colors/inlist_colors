@@ -179,12 +179,14 @@
   Kipp_max_width = -1
 
   ! Colors module output as a time series.
-  History_Track1_title = 'Johnson V magnitude'
-  History_Track1_xname = 'star_age'
-  History_Track1_yname = 'V'
-  History_Track1_xaxis_label = 'Age (yr)'
-  History_Track1_yaxis_label = 'M_V'
-  History_Track1_reverse_xaxis = .false.
+  Color_Magnitude3_num_panels = 1
+  Color_Magnitude3_xaxis1_name = 'star_age'
+  !Color_Magnitude3_xaxis1_name = 'model_number'
+  Color_Magnitude3_yaxis1_name = 'V'
+  Color_Magnitude3_xaxis_reversed = .false.
+  Color_Magnitude3_yaxis_reversed = .true.
+  Color_Magnitude3_title = 'Johnson V magnitude'
+  Color_Magnitude3_txt_scale = 0.75
 
   ! ---------------------------------------------------------------------------
   ! Grid8 dashboard layout: 3 columns x 2 rows
@@ -266,7 +268,7 @@
   Grid8_txt_scale_factor(5) = 0.75
 
   ! Bottom right: one-band synthetic magnitude through time.
-  Grid8_plot_name(6) = 'History_Track1'
+  Grid8_plot_name(6) = 'Color_Magnitude3'
   Grid8_plot_row(6) = 2
   Grid8_plot_col(6) = 3
   Grid8_plot_rowspan(6) = 1

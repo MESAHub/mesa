@@ -447,6 +447,7 @@ contains
       integer :: n, j, step_min, step_max, y_color, other_y_color
       real :: color_xmin, xleft, xright, panel_dy, panel_ytop, panel_ybot, ybot, ytop, other_ybot, other_ytop
       logical :: have_yaxis, have_other_yaxis
+      character(len=6) :: bottom_xopt
 
       include 'formats'
       ierr = 0
@@ -472,6 +473,13 @@ contains
       color_xmin = color_xmin_in
       call set_xleft_xright(n, xvec, color_xmin, color_xmax, color_xmargin, &
                             color_xaxis_reversed, dxmin, xleft, xright)
+
+      ! force decimal x labels only for model numbers; let pgplot format the rest (e.g. star_age)
+      if (adjustl(color_xaxis1_name) == 'model_number' .and. len_trim(color_xaxis2_name) == 0) then
+         bottom_xopt = 'BCNST1'
+      else
+         bottom_xopt = 'BCNST'
+      end if
 
       call pgsave
       call pgsch(txt_scale)
@@ -538,9 +546,9 @@ contains
                end if
             else
                if (.not. have_other_yaxis) then
-                  call show_box_pgstar(s, 'BCNST1', 'BCMNSTV1')
+                  call show_box_pgstar(s, trim(bottom_xopt), 'BCMNSTV1')
                else
-                  call show_box_pgstar(s, 'BCNST', 'BNSTV')
+                  call show_box_pgstar(s, trim(bottom_xopt), 'BNSTV')
                end if
             end if
             call pgsci(y_color)
