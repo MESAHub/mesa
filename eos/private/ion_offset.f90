@@ -52,20 +52,13 @@ module ion_offset
                                                    23221.0,25820.0,28582.0,31514.0,34619.0,37899.0,41356.0]
 
          integer :: k, Z(species)
-         real(dp) :: A(species), ya(species), norm
+         real(dp) :: A(species), ya(species)
 
          ! Get basic species info
-         norm = 0d0
          do k=1,species
             A(k) = chem_isos% Z_plus_N(chem_id(k))  ! baryon number
             Z(k) = chem_isos% Z(chem_id(k))  ! charge
-            ya(k) = xa(k) / A(k)            ! number fraction (not normalized)
-            norm = norm + ya(k)             ! accumulate number fraction normalization
-         end do
-
-         ! Normalize number fraction
-         do k=1,species
-            ya(k) = ya(k) / norm
+            ya(k) = xa(k) / A(k)            ! number per baryon
          end do
 
          ! Compute offset in eV/baryon

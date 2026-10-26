@@ -13,6 +13,39 @@ issue, but it may not be complete.
 r26.4.1
 =======
 
+.. _skye_ion_offset_normalization_bug:
+
+EOS: Skye ionization energy offset normalization
+------------------------------------------------
+
+With ``Skye_use_ion_offsets = .true.`` (the default), the ionization energy
+offset added to Skye's specific free energy was too large by the mean mass
+number ``abar``. The offset aligns the fully ionized energy with the neutral
+ground state used by FreeEOS.
+
+The correct specific offset is
+
+.. math::
+
+   e_{\rm off} = \frac{\mathrm{ev2erg}}{m_u}
+      \sum_i \frac{X_i}{A_i} I_{Z_i},
+
+where :math:`I_{Z_i}` is the total ionization energy in eV for element
+:math:`Z_i`. MESA uses baryon fractions :math:`X_i`, so :math:`X_i/A_i` gives
+ions per baryon. The routine incorrectly normalized these abundances to
+fractions per ion, introducing an extra factor
+:math:`\bar A = 1/\sum_i X_i/A_i` for normalized compositions.
+
+At fixed composition in pure Skye, the offset changes internal energy but
+leaves pressure, entropy, and heat capacities unchanged. It can affect energy
+evolution when composition or EOS blend weights change.
+
+This affects released versions using the Skye ionization offset, including
+``r26.4.1``, and is fixed in the main branch after ``r26.4.1``. To apply the fix
+to an existing release, remove the normalization of ``ya`` in
+``eos/private/ion_offset.f90``. Retain ``ya = xa/A`` and the final conversion
+by ``ev2erg/amu``. See `gh-1086 <https://github.com/MESAHub/mesa/issues/1086>`_.
+
 .. _duplicate_n14ag_rate_bug:
 
 Net: duplicate ``n14(a,g)f18(e+nu)o18`` reaction

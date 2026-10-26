@@ -52,6 +52,11 @@ Additional controls are available for TDC envelope remeshing:
 Bug Fixes
 ---------
 
+Corrected the Skye ionization energy offset, which was too large by the mean
+mass number ``abar`` when ``Skye_use_ion_offsets = .true.``. See
+:ref:`the known bugs entry <skye_ion_offset_normalization_bug>` and
+`gh-1086 <https://github.com/MESAHub/mesa/issues/1086>`_.
+
 Fixed a typo in the OPLIB hydrogen grid that could cause incorrect opacities or interpolation failures at low hydrogen abundance; see `gh-1078 <https://github.com/MESAHub/mesa/pull/1078>`_.
 
 Removed duplicate treatment of ``n14(a,g)f18(e+nu)o18`` in networks that

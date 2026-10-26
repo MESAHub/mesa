@@ -12,6 +12,59 @@ module test_eos_support
 
 contains
 
+   subroutine test_ion_offset
+      use ion_offset, only: compute_ion_offset
+      integer, target :: test_chem_ids(7)
+      integer, pointer :: test_ids(:)
+      integer :: i
+      real(dp) :: test_xa(7), expected
+      real(dp), parameter :: ion_energy(5) = &
+         [13.598434599702d0, 13.598434599702d0, 79.0051545d0, 1030.1085d0, 2043.8428d0]
+      real(dp), parameter :: baryon_number(5) = [1d0, 2d0, 4d0, 12d0, 16d0]
+
+      test_chem_ids = [ih1, ih2, ihe4, ic12, io16, ineut, izn64]
+      test_ids => test_chem_ids
+
+      do i=1,5
+         test_xa = 0d0
+         test_xa(i) = 1d0
+         call check_offset('pure ion', test_xa, ion_energy(i)/baryon_number(i))
+      end do
+
+      test_xa = [0d0, 0d0, 0d0, 0.5d0, 0.5d0, 0d0, 0d0]
+      expected = 0.5d0*ion_energy(4)/12d0 + 0.5d0*ion_energy(5)/16d0
+      call check_offset('C/O mixture', test_xa, expected)
+
+      test_xa = [0.7d0, 0d0, 0.28d0, 0.01d0, 0.01d0, 0d0, 0d0]
+      expected = 0.7d0*ion_energy(1) + 0.28d0*ion_energy(3)/4d0 + &
+         0.01d0*ion_energy(4)/12d0 + 0.01d0*ion_energy(5)/16d0
+      call check_offset('H/He/C/O mixture', test_xa, expected)
+      call check_offset('mass scaling', 0.5d0*test_xa, 0.5d0*expected)
+      call check_offset('zero mass fractions', 0d0*test_xa, 0d0)
+
+      test_xa = [0.5d0, 0d0, 0d0, 0d0, 0d0, 0.25d0, 0.25d0]
+      call check_offset('neutron and unsupported ion', test_xa, 0.5d0*ion_energy(1))
+      test_xa = [0d0, 0d0, 0d0, 0d0, 0d0, 0.5d0, 0.5d0]
+      call check_offset('no supported ions', test_xa, 0d0)
+
+   contains
+
+      subroutine check_offset(label, mass_fractions, expected_ev)
+         character(len=*), intent(in) :: label
+         real(dp), intent(in) :: mass_fractions(7), expected_ev
+         real(dp) :: actual, expected_offset
+
+         actual = compute_ion_offset(7, mass_fractions, test_ids)
+         expected_offset = expected_ev*ev2erg/amu
+         ! The ionization table constants have default real precision.
+         if (.not. (abs(actual - expected_offset) <= 1d-7*max(1d0, abs(expected_offset)))) then
+            write (*, '(a,1p,2e26.16)') 'ion offset '//trim(label)//': ', actual, expected_offset
+            call mesa_error(__FILE__, __LINE__, 'test_ion_offset')
+         end if
+      end subroutine check_offset
+
+   end subroutine test_ion_offset
+
    subroutine test1_eosPT_for_ck(quietly)
       logical, intent(in) :: quietly
       real(dp) :: Z, X, logPgas, logT, logRho, logP
