@@ -43,7 +43,7 @@
 
       private
       public :: do_surf_Riemann_dudt_eqn, do1_Riemann_momentum_eqn, &
-         do_uface_and_Pface
+         do_uface_and_Pface, get_RTI_momentum_diffusion
          ! Riemann energy eqn is now part of the standard energy equation
          ! Riemann dlnR_dt rqn is now part of the standard radius equation
 
@@ -88,7 +88,7 @@
             Uq_cell
          type(accurate_auto_diff_real_star_order1) :: sum_ad
          real(dp) :: dt, dm, ie_plus_ke, scal, residual
-         logical :: dbg, do_diffusion, test_partials
+         logical :: dbg, test_partials
          real(dp) :: v_drag, drag_factor, drag_fraction
 
          include 'formats'
@@ -257,37 +257,56 @@
          end subroutine setup_gravity_source
 
          subroutine setup_diffusion_source
-            type(auto_diff_real_star_order1) :: u_m1, u_00, u_p1
-            real(dp) :: sig00, sigp1
-            do_diffusion = s% RTI_flag .and. s% dudt_RTI_diffusion_factor > 0d0
-            if (do_diffusion) then  ! add diffusion source term to dudt
-               u_p1 = 0d0  ! sets val and d1Array to 0
-               if (k < nz) then
-                  sigp1 = s% dudt_RTI_diffusion_factor*s% sig_RTI(k+1)
-                  u_p1%val = s% u(k+1)
-                  u_p1%d1Array(i_v_p1) = 1d0
-               else
-                  sigp1 = 0
-               end if
-               u_m1 = 0d0  ! sets val and d1Array to 0
-               if (k > 1) then
-                  sig00 = s% dudt_RTI_diffusion_factor*s% sig_RTI(k)
-                  u_m1%val = s% u(k-1)
-                  u_m1%d1Array(i_v_m1) = 1d0
-               else
-                  sig00 = 0
-               end if
-               u_00 = 0d0  ! sets val and d1Array to 0
-               u_00%val = s% u(k)
-               u_00%d1Array(i_v_00) = 1d0
-               diffusion_source_ad = sig00*(u_m1 - u_00) - sigp1*(u_00 - u_p1)
-            else
-               diffusion_source_ad = 0d0
-            end if
+            type(auto_diff_real_star_order1) :: dissipation_ad
+            call get_RTI_momentum_diffusion(s, k, diffusion_source_ad, dissipation_ad)
             s% dudt_RTI(k) = diffusion_source_ad%val/dm
          end subroutine setup_diffusion_source
 
       end subroutine do1_dudt_eqn
+
+
+      subroutine get_RTI_momentum_diffusion(s, k, force_ad, dissipation_ad)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1), intent(out) :: force_ad, dissipation_ad
+
+         real(dp) :: sig00, sigp1
+         type(auto_diff_real_star_order1) :: &
+            u_m1, u_00, u_p1, ubar_m1, ubar_00, ubar_p1, &
+            du00, dup1, dubar00, dubarp1
+
+         force_ad = 0d0
+         dissipation_ad = 0d0
+         if (.not. s% RTI_flag .or. s% dudt_RTI_diffusion_factor <= 0d0) return
+
+         u_m1 = 0d0
+         u_p1 = 0d0
+         ubar_m1 = 0d0
+         ubar_p1 = 0d0
+         sig00 = 0d0
+         sigp1 = 0d0
+
+         u_00 = wrap_u_00(s,k)
+         ubar_00 = 0.5d0*(u_00 + s% u_start(k))
+         if (k > 1) then
+            u_m1 = wrap_u_m1(s,k)
+            ubar_m1 = 0.5d0*(u_m1 + s% u_start(k-1))
+            sig00 = s% dudt_RTI_diffusion_factor*s% sig_RTI(k)
+         end if
+         if (k < s% nz) then
+            u_p1 = wrap_u_p1(s,k)
+            ubar_p1 = 0.5d0*(u_p1 + s% u_start(k+1))
+            sigp1 = s% dudt_RTI_diffusion_factor*s% sig_RTI(k+1)
+         end if
+
+         du00 = u_m1 - u_00
+         dup1 = u_00 - u_p1
+         dubar00 = ubar_m1 - ubar_00
+         dubarp1 = ubar_00 - ubar_p1
+         force_ad = sig00*du00 - sigp1*dup1
+         ! Share the kinetic energy dissipated at each interface between its cells.
+         dissipation_ad = 0.5d0*(sig00*du00*dubar00 + sigp1*dup1*dubarp1)
+      end subroutine get_RTI_momentum_diffusion
 
 
       subroutine do_uface_and_Pface(s, ierr)

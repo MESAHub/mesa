@@ -2031,8 +2031,8 @@
                end if
             end if
 
-            if (shock_mass_start - s% m(k) < min_dm) &
-               C = C*(shock_mass_start - s% m(k))/min_dm
+            if (min_dm > 0d0 .and. shock_mass_start - s% m(k) < min_dm) &
+               C = C*max(0d0, (shock_mass_start - s% m(k))/min_dm)
 
             if (k > 1) then
                alpha_face = &
