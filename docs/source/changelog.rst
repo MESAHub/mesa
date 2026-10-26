@@ -23,6 +23,12 @@ For a more in-depth look at the new build system, see :doc:`developing/build-sys
 
 ``Tsurf_factor`` and the associated controls and history column have been removed as they affected nothing. These controls were effectively deprecated after the removal of the black body boundary condition in 21.12.1.
 
+``num_cells_for_smooth_gradL_composition_term`` now defaults to 0 instead of 3.
+The composition term used in Ledoux stability and rotational mixing is no longer
+smoothed by default. This can change convective boundaries and mixing. Set the
+control to 3 to recover the previous smoothing. The separate
+``num_cells_for_smooth_brunt_B`` default remains 2.
+
 .. _New Features main:
 
 New Features

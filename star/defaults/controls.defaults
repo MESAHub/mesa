@@ -2188,14 +2188,14 @@
       ! Number of cells on either side to use in weighted smoothing of ``gradL_composition_term``.
       ! ``gradL_composition_term`` is set to the "raw" unsmoothed ``brunt_B``
       ! and then optionally smoothed according ``num_cells_for_smooth_gradL_composition_term``.
-      ! In cases where the Ledoux criterion is used to evaluate the boundary for burning
-      ! convective cores, you may need to set ``num_cells_for_smooth_gradL_composition_term = 0``
-      ! to avoid smoothing the stabilizing composition jump into the convection zone and
-      ! unphysically causing it to shrink. See section 3.2 in Moore, K., & Garaud, P. 2016, APJ, 817, 54
+      ! Set to 0 to disable smoothing. When the Ledoux criterion is used to evaluate the
+      ! boundary for burning convective cores, smoothing can spread the stabilizing
+      ! composition jump into the convection zone and unphysically cause it to shrink.
+      ! See section 3.2 in Moore, K., & Garaud, P. 2016, APJ, 817, 54
 
       ! ::
 
-    num_cells_for_smooth_gradL_composition_term = 3
+    num_cells_for_smooth_gradL_composition_term = 0
 
 
       ! threshold_for_smooth_gradL_composition_term
@@ -7984,6 +7984,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! Number of cells on either side to use in weighted smoothing of ``brunt_B``.
+      ! Set to 0 to disable smoothing. Smoothing of ``gradL_composition_term`` is
+      ! controlled separately by ``num_cells_for_smooth_gradL_composition_term``.
 
       ! ::
 
