@@ -23,6 +23,10 @@ For a more in-depth look at the new build system, see :doc:`developing/build-sys
 
 ``Tsurf_factor`` and the associated controls and history column have been removed as they affected nothing. These controls were effectively deprecated after the removal of the black body boundary condition in 21.12.1.
 
+Photos now store the target history for the superadiabatic moving mean.
+Photos written before this change are incompatible.
+Saved ``.mod`` starting models are unaffected.
+
 .. _New Features main:
 
 New Features
@@ -47,14 +51,33 @@ Additional controls are available for TDC envelope remeshing:
 - ``TDC_hydro_nz_inner`` adds geometrically spaced zones near the inner boundary.
 - ``TDC_hydro_nz_T_gradient`` adds zones according to the variation in ``logT`` below ``TDC_hydro_T_anchor`` while retaining the mass-based mesh.
 
-Two new profile columns, ``superad_reduction_Lrad_div_Ledd`` and ``superad_reduction_trigger``, and one new history column, ``num_cells_with_superad_reduction``, expose what the ``use_superad_reduction`` throttle is doing per cell (which threshold fired and at what proximity to Eddington). The existing ``superad_reduction_factor`` profile column and ``max_superad_reduction_factor`` history column are unchanged. The new ``superad_reduction_trigger`` is an integer flag: 1 = Eddington proximity (``Lrad/Ledd > Gamma_limit``); 2 = density-inversion criterion (Joss et al. 1973, Paxton, Cantiello et al. 2013 eq. 17); 3 = both.
+The new control ``superad_reduction_use_turnover_limit`` limits changes in
+``eta = 1/Gamma_factor``, the factor applied to ``gradr-gradL``.
+``superad_reduction_turnover_limit_function`` selects ``'linear'``,
+``'exponential'``, or ``'moving_mean'``. The default is ``'linear'``.
+The moving mean averages the instantaneous target over one accumulated
+turnover. A sustained target replaces the full averaging interval after
+one turnover, including when the turnover time changes between steps.
+The history is preserved through remeshing, retries, and photo restarts.
+See :ref:`reference/controls:superad_reduction_turnover_limit_function`
+for the equations and treatment of target history.
 
-The new control ``superad_reduction_use_turnover_limit`` relaxes the applied superadiabatic reduction from its previous accepted value toward the instantaneous value. ``superad_reduction_turnover_limit_function`` selects either the exponential response ``1-exp(-dt/tau_conv)`` or the linear response ``min(dt/tau_conv,1)``. The limiter acts on the applied reduction ``1/Gamma_factor``. Zones with a lagged convective velocity use ``scale_height/max(mlt_vc,1d-10 cm/s)``; other zones use the Brunt frequency. The timescale is set at the start of the step and held fixed during solver iterations. With ``use_face_reconstruction``, this calculation uses the reconstructed face thermodynamic state. The scale height is the interpolated or reconstructed face value used by MLT and TDC. The previous reduction is preserved across retries, remeshing, and photo restarts. For ``k > 0``, ``superad_reduction_max_logT`` restricts the reduction to faces whose start-of-step temperature is below the selected ``logT``. Its default is ``7d0``, corresponding to :math:`10^7\,\mathrm{K}`. The ``k=0`` model-construction path is unchanged.
+Zones with a lagged convective velocity use
+``scale_height/max(mlt_vc,1d-10 cm/s)`` for ``tau_conv``; other zones use the
+Brunt frequency. The scale height and thermodynamic state are the interpolated
+or reconstructed face values used by MLT and TDC. For ``k > 0``,
+``superad_reduction_max_logT`` uses the cell temperature at the start of
+the step, not a face temperature. Its default is ``7d0``, corresponding to
+:math:`10^7\,\mathrm{K}`. Model construction with ``k=0`` is unchanged.
 
 .. _Bug Fixes main:
 
 Bug Fixes
 ---------
+
+Fixed ``switch_to_radiative`` zeroing saved ``mlt_vc`` during TDC photo
+restarts. This could also change the evolution after a retry with
+``restore_mesh_on_retry = .true.``.
 
 Removed duplicate treatment of ``n14(a,g)f18(e+nu)o18`` in networks that
 include both the explicit hot CNO reactions and the corresponding approximate

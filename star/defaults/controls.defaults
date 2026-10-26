@@ -2673,9 +2673,9 @@
       ! superad_reduction_max_logT
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! For k > 0, apply superadiabatic reduction only where the start-of-step
-      ! ``logT`` is less than this limit. The start-of-step value keeps the
-      ! selection fixed during solver iterations.
+      ! For k > 0, apply superadiabatic reduction only where the cell temperature
+      ! at the start of the step has ``logT`` less than this limit. This keeps
+      ! the selection fixed during solver iterations.
 
       ! ::
 
@@ -2718,8 +2718,8 @@
       ! superad_reduction_diff_grads_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! Smoothly turns off the reduction as ``gradT - gradL`` approaches
-      ! this value.
+      ! Sets the scale below which the reduction decreases smoothly to zero
+      ! as ``gradT - gradL`` vanishes.
 
       ! ::
 
@@ -2740,9 +2740,8 @@
       ! superad_reduction_use_turnover_limit
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! Relaxes the applied reduction from its previous accepted value toward
-      ! the instantaneous value over the local response time. The response
-      ! fraction is set by ``superad_reduction_turnover_limit_function``.
+      ! Limits changes in the applied reduction using the local response time.
+      ! The response is set by ``superad_reduction_turnover_limit_function``.
       ! In zones with a lagged convective velocity, ``tau_conv`` is
       ! ``scale_height/max(mlt_vc,1d-10 cm/s)``. Other zones use the Brunt
       ! frequency. The timescale is set at the start of the step and held fixed
@@ -2757,9 +2756,43 @@
       ! superad_reduction_turnover_limit_function
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! Sets the response fraction used by the turnover limiter. The
-      ! ``'exponential'`` option uses ``1-exp(-dt/tau_conv)`` and the
-      ! ``'linear'`` option uses ``min(dt/tau_conv,1)``.
+      ! Sets the response of ``eta = 1/Gamma_factor``. The ``'linear'`` and
+      ! ``'exponential'`` options use
+      ! ``eta = eta_old + f*(eta_inst-eta_old)``, where ``eta_old`` is the
+      ! previous accepted value and ``eta_inst`` is the instantaneous target.
+      ! ``'linear'`` uses ``f = min(dt/tau_conv,1)``; ``'exponential'`` uses
+      ! ``f = 1-exp(-dt/tau_conv)``. Repeated short steps approach a sustained
+      ! target without reaching it after one turnover.
+      !
+      ! ``'moving_mean'`` averages the instantaneous target over the preceding
+      ! accumulated turnover:
+      ! :math:`\eta(u)=\int_{u-1}^{u}\eta_{\rm inst}(v)\,dv`, where
+      ! :math:`u(t)=\int_0^t dt'/\tau_{\rm conv}(t')`.
+      ! Each accepted target is constant over ``du = dt/tau_conv``, with
+      ! ``tau_conv`` fixed during each attempt. The contribution of an older
+      ! step is its target times the part of ``du`` within the last turnover.
+      ! A sustained target reaches its full value after one accumulated
+      ! turnover, even when ``tau_conv`` changes between steps. The initial
+      ! history is the previous applied ``eta``. Only accepted steps advance
+      ! the history. For each retained step, two arrays store ``du`` and
+      ! ``eta_inst*du`` at every face. Remeshing interpolates both arrays
+      ! with the same positive linear weights in mass. The target on the
+      ! new mesh is the ratio of these interpolated quantities. The stored
+      ! ``du`` is not limited to one; only its contribution to the mean is.
+      ! This preserves the common accepted steps when neighboring faces
+      ! have different turnover times. Photo restarts preserve both arrays.
+      ! A stored step is removed only after newer steps cover one turnover
+      ! at every face. Storage therefore depends on the face that requires
+      ! the largest number of accepted steps to complete a turnover.
+      !
+      ! Subdividing the same target history leaves the mean unchanged.
+      ! Timestep convergence is still required to resolve changes in the
+      ! target and turnover time.
+      !
+      ! Disabling the limiter or selecting another response clears this
+      ! history. Enabling the limiter initializes it from the current value.
+      ! A nonpositive or nonfinite timescale uses the instantaneous target.
+      ! The temperature cutoff resets that face to no reduction.
 
       ! ::
 

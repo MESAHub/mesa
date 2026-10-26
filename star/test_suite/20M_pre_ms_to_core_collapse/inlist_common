@@ -123,12 +123,14 @@
 ! superadiabatic convection routines, it's a choice:
       
       ! superadiabatic reduction, implicit, new
-      use_superad_reduction = .false.
+      use_superad_reduction = .true.
       superad_reduction_Gamma_limit = 0.3d0 ! default is 0.5d0
       superad_reduction_Gamma_limit_scale = 5d0
       superad_reduction_Gamma_inv_scale = 5d0
-      superad_reduction_diff_grads_limit = 1d-2 ! default is 1d-3
+      superad_reduction_diff_grads_limit = 1d-4
       superad_reduction_limit = -1d0
+      superad_reduction_use_turnover_limit = .true.
+      superad_reduction_turnover_limit_function = 'moving_mean'
 
 
       ! MLT ++, explicit, well tested

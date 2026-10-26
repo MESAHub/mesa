@@ -40,6 +40,8 @@
 
          ierr = 0
          nz = s% nz
+         s% superad_reduction_du(1:nz) = 0d0
+         s% superad_reduction_target(1:nz) = 1d0
 
          if (.not. s% rsp_flag) then
 
@@ -159,6 +161,7 @@
 
          include 'formats'
 
+         s% superad_reduction_history_pending = .false.
          s% nz = s% nz_old
          s% mstar = s% mstar_old
          s% xmstar = s% xmstar_old

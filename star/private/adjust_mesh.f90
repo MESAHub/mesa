@@ -53,7 +53,7 @@
          type (star_info), pointer :: c, prv
          real(dp) :: delta_coeff, sum_L_other, sum_L_other_limit, A_max, &
             mesh_max_allowed_ratio, tmp, J_tot1, J_tot2, center_logT, alfa, beta, &
-            d_dlnR00, d_dlnRp1, d_dv00, d_dvp1
+            d_dlnR00, d_dlnRp1, d_dv00, d_dvp1, history_weight
          real(dp), pointer, dimension(:) :: &
             delta_gval_max, specific_PE, specific_KE, &
             xq_old, xq_new, dq_new
@@ -422,6 +422,36 @@
          end if
          if (dbg_remesh) write(*,*) 'back from do_mesh_adjust'
 
+         ! Use the same mass weights for interval widths and target integrals.
+         if (s% num_superad_reduction_history > 0) then
+            j = 1
+            do k=1,nz
+               do while (j < nz_old)
+                  if (xq_new(k) <= xq_old(j+1)) exit
+                  j = j + 1
+               end do
+               if (j < nz_old) then
+                  history_weight = max(0d0, min(1d0, &
+                     (xq_new(k)-xq_old(j))/(xq_old(j+1)-xq_old(j))))
+                  s% superad_reduction_history_du(:,k) = &
+                     (1d0-history_weight)*prv% superad_reduction_history_du(:,j) + &
+                     history_weight*prv% superad_reduction_history_du(:,j+1)
+                  s% superad_reduction_history_eta_du(:,k) = &
+                     (1d0-history_weight)*prv% superad_reduction_history_eta_du(:,j) + &
+                     history_weight*prv% superad_reduction_history_eta_du(:,j+1)
+               else
+                  history_weight = max(0d0, min(1d0, &
+                     (xq_new(k)-xq_old(j))/(1d0-xq_old(j))))
+                  s% superad_reduction_history_du(:,k) = prv% superad_reduction_history_du(:,j)
+                  s% superad_reduction_history_eta_du(:,k) = &
+                     (1d0-history_weight)*prv% superad_reduction_history_eta_du(:,j) + &
+                     history_weight*prv% superad_reduction_history_du(:,j)
+               end if
+               s% superad_reduction_factor(k) = 1d0/superad_history_integral( &
+                  s% superad_reduction_history_du(:,k), s% superad_reduction_history_eta_du(:,k), 1d0)
+            end do
+         end if
+
          ! restore prev_mesh info
          do k=1, s% prev_mesh_nz
             s% prev_mesh_xa(:,k) = prv% prev_mesh_xa(:,k)
@@ -432,6 +462,8 @@
             s% prev_mesh_mlt_vc(k) = prv% prev_mesh_mlt_vc(k)
             s% prev_mesh_superad_reduction_factor(k) = &
                prv% prev_mesh_superad_reduction_factor(k)
+            s% prev_mesh_superad_reduction_history_du(:,k) = prv% prev_mesh_superad_reduction_history_du(:,k)
+            s% prev_mesh_superad_reduction_history_eta_du(:,k) = prv% prev_mesh_superad_reduction_history_eta_du(:,k)
          end do
 
          ! restore ST info (for time smoothing)

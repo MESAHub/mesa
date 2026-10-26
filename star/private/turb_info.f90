@@ -57,10 +57,8 @@
          if (present(set_tau_conv)) set_tau = set_tau_conv
          set_tau = set_tau .and. s% superad_reduction_use_turnover_limit
          use_mlt_vc_tau_surface = .false.
-         if (set_tau .and. s% have_mlt_vc .and. nzlo == 1) then
-            if (associated(s% mlt_vc)) &
-               use_mlt_vc_tau_surface = s% mlt_vc(1) > 0d0
-         end if
+         if (set_tau .and. s% have_mlt_vc .and. nzlo == 1) &
+            use_mlt_vc_tau_surface = s% mlt_vc(1) > 0d0
          if (s% doing_timing) call start_time(s, time0, total)
 !$OMP PARALLEL DO PRIVATE(k,op_err,make_gradr_sticky_in_solver_iters) SCHEDULE(dynamic,2)
          do k = nzlo, nzhi
@@ -155,11 +153,9 @@
             if (s% use_face_reconstruction .and. k > 1) &
                tau_conv = conv_time_scale(s,k)
             if (s% have_mlt_vc) then
-               if (associated(s% mlt_vc)) then
-                  if (s% mlt_vc(k) > 0d0) &
-                     tau_conv = scale_height_ad% val/ &
-                        max(s% mlt_vc(k), min_mlt_vc_for_tau_conv)
-               end if
+               if (s% mlt_vc(k) > 0d0) &
+                  tau_conv = scale_height_ad% val/ &
+                     max(s% mlt_vc(k), min_mlt_vc_for_tau_conv)
             end if
             s% tau_conv_start(k) = tau_conv
          end if
@@ -332,7 +328,22 @@
 
          subroutine set_no_mixing(str)
             character (len=*) :: str
+            real(dp) :: fraction
             include 'formats'
+
+            ! No mixing contributes a neutral target to the moving mean.
+            if (s% use_superad_reduction .and. s% superad_reduction_use_turnover_limit .and. &
+                  .not. s% RSP_flag .and. trim(s% superad_reduction_turnover_limit_function) == 'moving_mean' .and. &
+                  .not. s% doing_finish_load_model) then
+               if (.not. s% have_superad_reduction_factor) s% superad_reduction_factor(k) = 1d0
+               if (s% okay_to_set_superad_reduction_factor .and. s% num_superad_reduction_history > 0) then
+                  s% superad_reduction_target(k) = 1d0
+                  fraction = min(s% superad_reduction_du(k), 1d0)
+                  s% superad_reduction_factor(k) = 1d0/( &
+                     superad_history_integral(s% superad_reduction_history_du(:,k), &
+                        s% superad_reduction_history_eta_du(:,k), 1d0-fraction) + fraction)
+               end if
+            end if
 
             s% mlt_mixing_type(k) = no_mixing
 
@@ -435,7 +446,7 @@
          s% mlt_mixing_length(k) = 0
          s% mlt_D(k) = 0
          s% mlt_cdc(k) = 0d0
-         s% mlt_vc(k) = 0
+         if (s% okay_to_set_mlt_vc) s% mlt_vc(k) = 0
          s% gradT_ad(k) = s% gradr_ad(k)
          s% gradT(k) = s% gradT_ad(k)%val
       end subroutine switch_to_radiative

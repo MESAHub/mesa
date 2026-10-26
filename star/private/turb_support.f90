@@ -231,7 +231,7 @@ contains
       real(dp) :: f_turnover, Gamma_factor_old_local, eta_old
       type(auto_diff_real_star_order1) :: eta_inst, Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
          diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled, Eq_div_w, check_Eq, mlt_Pturb, Ptot
-      logical :: test_partials, using_TDC, have_Y_face_guess, hold_superad_reduction_factor
+      logical :: test_partials, using_TDC, have_Y_face_guess, hold_superad_reduction_factor, use_moving_mean
       logical, parameter :: report = .false.
       include 'formats'
 
@@ -309,6 +309,18 @@ contains
              .not. s% okay_to_set_superad_reduction_factor)
       if (k /= 0 .and. .not. hold_superad_reduction_factor) &
          s% superad_reduction_factor(k) = 1d0
+      use_moving_mean = k > 0 .and. s% use_superad_reduction .and. s% superad_reduction_use_turnover_limit .and. &
+            .not. s% RSP_flag .and. trim(s% superad_reduction_turnover_limit_function) == 'moving_mean' .and. &
+            s% okay_to_set_superad_reduction_factor .and. .not. s% doing_finish_load_model .and. &
+            s% num_superad_reduction_history > 0
+      ! Paths that skip the reduction still contribute a neutral target.
+      if (use_moving_mean) then
+         s% superad_reduction_target(k) = 1d0
+         f_turnover = min(s% superad_reduction_du(k), 1d0)
+         eta_old = superad_history_integral(s% superad_reduction_history_du(:,k), &
+            s% superad_reduction_history_eta_du(:,k), 1d0-f_turnover)
+         s% superad_reduction_factor(k) = 1d0/(eta_old + f_turnover)
+      end if
 
       ! Bail if we asked for no mixing, or if parameters are bad.
       if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0 .or. &
@@ -538,25 +550,29 @@ contains
             end if
          end if
 
+         ! Rebuilding the starting state must not advance the response.
          if (hold_superad_reduction_factor) then
-            ! Start-of-step setup must not advance the stored response.
             Gamma_factor = max(s% superad_reduction_factor(k), 1d0)
-         else if (s% superad_reduction_use_turnover_limit .and. k > 0) then
+         else if (use_moving_mean) then
+            ! Only the current target contributes derivatives.
+            eta_inst = 1d0/Gamma_factor
+            s% superad_reduction_target(k) = eta_inst% val
+            Gamma_factor = 1d0/(eta_old + f_turnover*eta_inst)
+         else if (s% superad_reduction_use_turnover_limit .and. k > 0 .and. &
+               trim(s% superad_reduction_turnover_limit_function) /= 'moving_mean') then
             if (s% dt > 0d0 .and. s% tau_conv_start(k) > 0d0 .and. &
                   s% have_superad_reduction_factor) then
-               if (associated(s% superad_reduction_factor_old)) then
-                  Gamma_factor_old_local = max(s% superad_reduction_factor_old(k), 1d0)
-                  if (Gamma_factor > 1d0 .or. Gamma_factor_old_local > 1d0) then
-                     select case (trim(s% superad_reduction_turnover_limit_function))
-                     case ('linear')
-                        f_turnover = min(s% dt/s% tau_conv_start(k), 1d0)
-                     case ('exponential')
-                        f_turnover = -expm1(-s% dt/s% tau_conv_start(k))
-                     end select
-                     eta_old = 1d0/Gamma_factor_old_local
-                     eta_inst = 1d0/Gamma_factor
-                     Gamma_factor = 1d0/(eta_old + f_turnover*(eta_inst - eta_old))
-                  end if
+               Gamma_factor_old_local = max(s% superad_reduction_factor_old(k), 1d0)
+               if (Gamma_factor > 1d0 .or. Gamma_factor_old_local > 1d0) then
+                  select case (trim(s% superad_reduction_turnover_limit_function))
+                  case ('linear')
+                     f_turnover = min(s% dt/s% tau_conv_start(k), 1d0)
+                  case ('exponential')
+                     f_turnover = -expm1(-s% dt/s% tau_conv_start(k))
+                  end select
+                  eta_old = 1d0/Gamma_factor_old_local
+                  eta_inst = 1d0/Gamma_factor
+                  Gamma_factor = 1d0/(eta_old + f_turnover*(eta_inst - eta_old))
                end if
             end if
          end if

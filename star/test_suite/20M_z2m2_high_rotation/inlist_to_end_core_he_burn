@@ -218,7 +218,10 @@
       warn_rates_for_high_temp = .true.
       max_safe_logT_for_rates = 10.5d0
       
-      use_superad_reduction = .true. 
+      use_superad_reduction = .true.
+      superad_reduction_diff_grads_limit = 1d-4
+      superad_reduction_use_turnover_limit = .true.
+      superad_reduction_turnover_limit_function = 'moving_mean'
 
       Pextra_factor = 2 ! for atm
 

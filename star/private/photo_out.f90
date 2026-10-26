@@ -32,17 +32,28 @@
          use rates_def,only:num_rvs
          use rsp_def, only: rsp_photo_out
          use alloc
+         use star_utils, only: get_superad_history
          type (star_info), pointer :: s
          integer, intent(in) :: iounit
          integer, intent(out) :: ierr
 
          integer :: part_number, nz, len_history_col_spec
-         integer :: k
+         integer :: k, n
+         real(dp), pointer :: history_du(:,:), history_eta_du(:,:)
 
          include 'formats'
 
          ierr = 0
          nz = s% nz
+         n = s% num_superad_reduction_history
+         history_du => s% superad_reduction_history_du
+         history_eta_du => s% superad_reduction_history_eta_du
+         ! Extras can save a photo before finish_step commits the interval.
+         if (s% superad_reduction_history_pending) then
+            call get_superad_history(s, history_du, history_eta_du, ierr)
+            if (ierr /= 0) return
+            n = size(history_du,1)
+         end if
 
          part_number = 0  ! part_numbers are just a consistency check on the data file
 
@@ -69,7 +80,7 @@
             s% cumulative_energy_error, s% cumulative_extra_heating, &
             s% have_initial_energy_integrals, s% total_energy_initial, &
             s% force_tau_factor, s% force_opacity_factor, &
-            s% crystal_core_boundary_mass
+            s% crystal_core_boundary_mass, n
 
          write(iounit) s% net_name
 
@@ -80,6 +91,11 @@
             s% superad_reduction_factor(1:nz), &
             s% D_ST_start(1:nz), s% nu_ST_start(1:nz), &  ! needed for ST time smoothing
             s% have_ST_start_info, s% mstar_old
+
+         if (n > 0) write(iounit, iostat=ierr) history_du(:,1:nz), history_eta_du(:,1:nz)
+         ! Only a pending snapshot allocates temporary history.
+         if (s% superad_reduction_history_pending) deallocate(history_du, history_eta_du)
+         if (ierr /= 0) return
 
          call write_part_number(iounit)
          write(iounit) &

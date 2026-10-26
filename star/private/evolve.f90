@@ -20,7 +20,7 @@
       module evolve
 
       use star_private_def
-      use const_def, only: dp, i8, pi, pi4, msun, lsun, crad, clight, secyer, secday
+      use const_def, only: dp, i8, pi, pi4, ln10, msun, lsun, crad, clight, secyer, secday
       use utils_lib, only: is_bad
       use star_utils
       use auto_diff_support
@@ -289,6 +289,7 @@
          use mix_info, only: set_cz_bdy_mass
          use hydro_rotation, only: use_xh_to_update_i_rot, set_rotation_info
          use star_utils
+         use utils_lib, only: realloc_double2
          use report, only: do_report
          use rsp, only: rsp_total_energy_integrals
          logical, intent(in) :: first_try
@@ -299,6 +300,7 @@
          integer(i8) :: time0, clock_rate
          real(dp) :: total_radiation
 
+         logical :: moving_mean
          logical, parameter :: dbg = .false.
 
          include 'formats'
@@ -307,6 +309,8 @@
          ierr = 0
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
+         moving_mean = s% use_superad_reduction .and. s% superad_reduction_use_turnover_limit .and. &
+            s% superad_reduction_turnover_limit_function == 'moving_mean' .and. .not. s% RSP_flag
 
          s% termination_code = 0
          s% retry_message = ''
@@ -320,6 +324,37 @@
          s% okay_to_set_mixing_info = .true.  ! set false by element diffusion
          s% okay_to_set_mlt_vc = .false.  ! don't change mlt_vc until have set mlt_vc_old
          s% okay_to_set_superad_reduction_factor = .false.
+         s% superad_reduction_history_pending = .false.
+         ! Disabling the moving mean discards its history.
+         if (.not. moving_mean) then
+            if (s% num_superad_reduction_history > 0) then
+               call realloc_double2(s% superad_reduction_history_du, 0, size(s% superad_reduction_factor), ierr)
+               if (failed('realloc superad_reduction_history_du')) return
+               call realloc_double2(s% superad_reduction_history_eta_du, 0, size(s% superad_reduction_factor), ierr)
+               if (failed('realloc superad_reduction_history_eta_du')) return
+               s% num_superad_reduction_history = 0
+            end if
+            if (size(s% prev_mesh_superad_reduction_history_du, dim=1) > 0) then
+               call realloc_double2(s% prev_mesh_superad_reduction_history_du, &
+                  0, size(s% prev_mesh_superad_reduction_factor), ierr)
+               if (failed('realloc prev_mesh_superad_reduction_history_du')) return
+               call realloc_double2(s% prev_mesh_superad_reduction_history_eta_du, &
+                  0, size(s% prev_mesh_superad_reduction_factor), ierr)
+               if (failed('realloc prev_mesh_superad_reduction_history_eta_du')) return
+            end if
+         else if (s% num_superad_reduction_history == 0) then
+            call realloc_double2(s% superad_reduction_history_du, 1, size(s% superad_reduction_factor), ierr)
+            if (failed('realloc superad_reduction_history_du')) return
+            call realloc_double2(s% superad_reduction_history_eta_du, 1, size(s% superad_reduction_factor), ierr)
+            if (failed('realloc superad_reduction_history_eta_du')) return
+            ! Initialize prehistory before the first remesh with moving_mean.
+            s% num_superad_reduction_history = 1
+            s% superad_reduction_history_du = 1d0
+            s% superad_reduction_history_eta_du = 1d0
+            do k=1,s% nz
+               s% superad_reduction_history_eta_du(1,k) = 1d0/max(s% superad_reduction_factor(k), 1d0)
+            end do
+         end if
 
          if (s% timestep_hold > s% model_number + 10000) then
             write(*,3) 'ERROR: s% timestep_hold', s% timestep_hold, s% model_number
@@ -407,8 +442,39 @@
             return
          end if
 
+         ! Rebuild the starting state with the applied factor held fixed.
+         if (moving_mean) then
+            s% okay_to_set_superad_reduction_factor = .false.
+            s% need_to_setvars = .true.
+         end if
          call set_start_of_step_info(s, 'after prepare_for_new_try', ierr)  ! does set_vars_if_needed
          if (failed('set_start_of_step_info')) return
+
+         ! Freeze the interval before later variable rebuilds change tau_conv_start.
+         if (moving_mean) then
+            do k=1,s% nz
+               s% superad_reduction_du(k) = 1d0
+               if (s% dt <= 0d0) then
+                  s% superad_reduction_du(k) = 0d0
+               else if (s% lnT_start(k)/ln10 < s% superad_reduction_max_logT) then
+                  if (.not. is_bad_num(s% tau_conv_start(k))) then
+                     if (s% tau_conv_start(k) > 0d0) then
+                        ! Test for overflow before dividing by a small turnover time.
+                        if (s% tau_conv_start(k) < 1d0) then
+                           if (s% dt > huge(1d0)*s% tau_conv_start(k)) then
+                              ierr = -1
+                              if (failed('superad_reduction_du overflow')) return
+                           end if
+                        end if
+                        s% superad_reduction_du(k) = s% dt/s% tau_conv_start(k)
+                     end if
+                  end if
+               end if
+               s% superad_reduction_target(k) = 1d0
+            end do
+            s% okay_to_set_superad_reduction_factor = .true.
+            s% need_to_setvars = .true.
+         end if
 
          if (.not. s% have_new_cz_bdy_info) then
             call set_cz_bdy_mass(s, ierr)
@@ -728,6 +794,10 @@
          s% current_system_clock_time = time0
          s% total_elapsed_time = &
             dble(time0 - s% starting_system_clock_time)/dble(clock_rate)
+
+         s% superad_reduction_history_pending = s% use_superad_reduction .and. &
+            s% superad_reduction_use_turnover_limit .and. &
+            s% superad_reduction_turnover_limit_function == 'moving_mean' .and. .not. s% RSP_flag
 
 
          contains
@@ -1815,6 +1885,7 @@
          use chem_def
          use star_utils, only: use_xh_to_set_rho_to_dm_div_dV, set_phot_info
          use hydro_vars, only: set_vars_if_needed
+         use utils_lib, only: realloc_double2
 
          type (star_info), pointer :: s
 
@@ -1870,6 +1941,21 @@
                s% prev_mesh_species_or_nvar_hydro_changed = .false.
             end do
             s% prev_mesh_nz = s% nz
+            ! Save the accepted history on the mesh restored by a retry.
+            if (s% num_superad_reduction_history > 0) then
+               if (size(s% prev_mesh_superad_reduction_history_du, dim=1) /= s% num_superad_reduction_history .or. &
+                     size(s% prev_mesh_superad_reduction_history_du, dim=2) < size(s% prev_mesh_superad_reduction_factor)) then
+                  call realloc_double2(s% prev_mesh_superad_reduction_history_du, &
+                     s% num_superad_reduction_history, size(s% prev_mesh_superad_reduction_factor), ierr)
+                  if (failed('realloc prev_mesh_superad_reduction_history_du')) return
+                  call realloc_double2(s% prev_mesh_superad_reduction_history_eta_du, &
+                     s% num_superad_reduction_history, size(s% prev_mesh_superad_reduction_factor), ierr)
+                  if (failed('realloc prev_mesh_superad_reduction_history_eta_du')) return
+               end if
+               s% prev_mesh_superad_reduction_history_du(:,1:s% nz) = s% superad_reduction_history_du(:,1:s% nz)
+               s% prev_mesh_superad_reduction_history_eta_du(:,1:s% nz) = &
+                  s% superad_reduction_history_eta_du(:,1:s% nz)
+            end if
             ! also store ST information for time smoothing
             if (s% have_ST_start_info) then
                do k=1, s% nz
@@ -2179,6 +2265,7 @@
 
       integer function prepare_to_retry(id)
          use evolve_support, only: set_current_to_old
+         use utils_lib, only: realloc_double2
          integer, intent(in) :: id
          real(dp) :: retry_factor
          type (star_info), pointer :: s
@@ -2205,6 +2292,28 @@
                   s% superad_reduction_factor_old(k) = &
                      s% prev_mesh_superad_reduction_factor(k)
                end do
+               ! Restore history on the same mesh as the other step inputs.
+               if (size(s% superad_reduction_history_du, dim=1) /= &
+                     size(s% prev_mesh_superad_reduction_history_du, dim=1) .or. &
+                     size(s% superad_reduction_history_du, dim=2) < size(s% superad_reduction_factor)) then
+                  call realloc_double2(s% superad_reduction_history_du, &
+                     size(s% prev_mesh_superad_reduction_history_du, dim=1), size(s% superad_reduction_factor), ierr)
+                  if (ierr /= 0) then
+                     prepare_to_retry = terminate
+                     return
+                  end if
+                  call realloc_double2(s% superad_reduction_history_eta_du, &
+                     size(s% prev_mesh_superad_reduction_history_du, dim=1), size(s% superad_reduction_factor), ierr)
+                  if (ierr /= 0) then
+                     prepare_to_retry = terminate
+                     return
+                  end if
+               end if
+               s% num_superad_reduction_history = size(s% prev_mesh_superad_reduction_history_du, dim=1)
+               s% superad_reduction_history_du(:,1:s% prev_mesh_nz) = &
+                  s% prev_mesh_superad_reduction_history_du(:,1:s% prev_mesh_nz)
+               s% superad_reduction_history_eta_du(:,1:s% prev_mesh_nz) = &
+                  s% prev_mesh_superad_reduction_history_eta_du(:,1:s% prev_mesh_nz)
                call normalize_dqs(s, s% prev_mesh_nz, s% dq_old, ierr)
                if (ierr /= 0) then
                   prepare_to_retry = terminate
@@ -2304,7 +2413,8 @@
 
          type (star_info), pointer :: s
          integer, parameter :: nvals = 1, n_ivals = 0
-         integer :: nz, current_num_iounits_in_use, prev_num_iounits_in_use
+         integer :: nz, k, current_num_iounits_in_use, prev_num_iounits_in_use
+         real(dp), pointer :: history_du(:,:), history_eta_du(:,:)
          logical :: trace, will_do_photo
 
          include 'formats'
@@ -2317,6 +2427,21 @@
          nz = s% nz
          trace = s% trace_evolve
          prev_num_iounits_in_use = number_iounits_allocated()
+
+         ! Commit the converged target once, before native output.
+         if (s% superad_reduction_history_pending) then
+            call get_superad_history(s, history_du, history_eta_du, ierr)
+            if (ierr /= 0) return
+            deallocate(s% superad_reduction_history_du, s% superad_reduction_history_eta_du)
+            s% superad_reduction_history_du => history_du
+            s% superad_reduction_history_eta_du => history_eta_du
+            s% num_superad_reduction_history = size(history_du, dim=1)
+            do k=1,nz
+               s% superad_reduction_factor(k) = &
+                  1d0/superad_history_integral(history_du(:,k), history_eta_du(:,k), 1d0)
+            end do
+            s% superad_reduction_history_pending = .false.
+         end if
 
          finish_step = keep_going
          s% result_reason = result_reason_normal

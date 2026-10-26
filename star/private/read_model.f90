@@ -233,6 +233,13 @@
          include 'formats'
 
          ierr = 0
+         s% superad_reduction_history_pending = .false.
+         ! Saved models do not contain the response history.
+         if (s% use_superad_reduction .and. s% superad_reduction_use_turnover_limit .and. &
+               s% superad_reduction_turnover_limit_function == 'moving_mean' .and. .not. s% RSP_flag) then
+            s% have_superad_reduction_factor = .false.
+            s% okay_to_set_superad_reduction_factor = .false.
+         end if
          open(newunit=iounit, file=trim(filename), status='old', action='read', iostat=ierr)
          if (ierr /= 0) then
             write(*,*) 'open failed', ierr, iounit
@@ -388,6 +395,7 @@
 
          s% nz = nz
          call free_star_info_arrays(s)
+         s% num_superad_reduction_history = 0
          call allocate_star_info_arrays(s, ierr)
          if (ierr /= 0) then
             write(*,*) 'do_read_saved_model failed in allocate_star_info_arrays'

@@ -540,6 +540,12 @@
          s% have_mlt_vc = .false.
          s% okay_to_set_superad_reduction_factor = .false.
          s% have_superad_reduction_factor = .false.
+         s% superad_reduction_history_pending = .false.
+         if (associated(s% superad_reduction_history_du)) deallocate(s% superad_reduction_history_du)
+         if (associated(s% superad_reduction_history_eta_du)) deallocate(s% superad_reduction_history_eta_du)
+         if (associated(s% prev_mesh_superad_reduction_history_du)) deallocate(s% prev_mesh_superad_reduction_history_du)
+         if (associated(s% prev_mesh_superad_reduction_history_eta_du)) deallocate(s% prev_mesh_superad_reduction_history_eta_du)
+         s% num_superad_reduction_history = 0
 
          s% have_ST_start_info = .false.
          s% prev_mesh_have_ST_start_info = .false.
@@ -913,6 +919,13 @@
          end if
 
          num_trace_history_values = s% num_trace_history_values
+         ! A new starting model has no accepted target history.
+         if (associated(s% superad_reduction_history_du)) deallocate(s% superad_reduction_history_du)
+         if (associated(s% superad_reduction_history_eta_du)) deallocate(s% superad_reduction_history_eta_du)
+         if (associated(s% prev_mesh_superad_reduction_history_du)) deallocate(s% prev_mesh_superad_reduction_history_du)
+         if (associated(s% prev_mesh_superad_reduction_history_eta_du)) deallocate(s% prev_mesh_superad_reduction_history_eta_du)
+         s% num_superad_reduction_history = 0
+         s% superad_reduction_history_pending = .false.
          s% num_trace_history_values = 0
 
          warning_limit_for_max_residual = s% warning_limit_for_max_residual

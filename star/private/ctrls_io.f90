@@ -659,10 +659,11 @@
     end if
 
     if (.not. (trim(s% superad_reduction_turnover_limit_function) == 'linear' .or. &
-          trim(s% superad_reduction_turnover_limit_function) == 'exponential')) then
+          trim(s% superad_reduction_turnover_limit_function) == 'exponential' .or. &
+          trim(s% superad_reduction_turnover_limit_function) == 'moving_mean')) then
        write(*,'(A)')
        write(*,*) "Invalid choice for superad_reduction_turnover_limit_function"
-       write(*,*) "Available options are 'linear' or 'exponential'"
+       write(*,*) "Available options are 'linear', 'exponential', or 'moving_mean'"
        write(*,'(A)')
        ierr = -1
        return

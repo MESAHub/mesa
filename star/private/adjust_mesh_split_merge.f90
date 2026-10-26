@@ -24,6 +24,7 @@
       use chem_def, only: ih1, ihe3, ihe4
       use utils_lib
       use auto_diff_support
+      use star_utils, only: superad_history_integral
 
       implicit none
 
@@ -658,6 +659,8 @@
             s% D_mix(im) = s% D_mix(i0)
             s% mlt_vc(im) = s% mlt_vc(i0)
             s% superad_reduction_factor(im) = s% superad_reduction_factor(i0)
+            s% superad_reduction_history_du(:,im) = s% superad_reduction_history_du(:,i0)
+            s% superad_reduction_history_eta_du(:,im) = s% superad_reduction_history_eta_du(:,i0)
             s% csound(im) = s% csound(i0)
             s% tau(im) = s% tau(i0)
             s% opacity(im) = s% opacity(i0)
@@ -1044,6 +1047,8 @@
                s% D_mix(jp) = s% D_mix(j)
                s% mlt_vc(jp) = s% mlt_vc(j)
                s% superad_reduction_factor(jp) = s% superad_reduction_factor(j)
+               s% superad_reduction_history_du(:,jp) = s% superad_reduction_history_du(:,j)
+               s% superad_reduction_history_eta_du(:,jp) = s% superad_reduction_history_eta_du(:,j)
                s% csound(jp) = s% csound(j)
                s% tau(jp) = s% tau(j)
                s% opacity(jp) = s% opacity(j)
@@ -1184,8 +1189,28 @@
          ! These are face-based, so a split creates new interior face values here.
          ! Interpolate using the same left/right orientation as tau(ip).
          s% mlt_vc(ip) = mlt_vcR + (mlt_vcL - mlt_vcR)*dMR/dM
-         s% superad_reduction_factor(ip) = superad_reduction_factorR + &
-            (superad_reduction_factorL - superad_reduction_factorR)*dMR/dM
+         ! Derive the applied factor from the interpolated history.
+         if (s% num_superad_reduction_history > 0) then
+            f = dMR/dM
+            if (i < nz_old) then
+               ! The shift leaves the original inner face at ip+1.
+               s% superad_reduction_history_du(:,ip) = &
+                  (1d0-f)*s% superad_reduction_history_du(:,i) + f*s% superad_reduction_history_du(:,ip+1)
+               s% superad_reduction_history_eta_du(:,ip) = &
+                  (1d0-f)*s% superad_reduction_history_eta_du(:,i) + f*s% superad_reduction_history_eta_du(:,ip+1)
+            else
+               ! The inner boundary has no reduction.
+               s% superad_reduction_history_du(:,ip) = s% superad_reduction_history_du(:,i)
+               s% superad_reduction_history_eta_du(:,ip) = &
+                  (1d0-f)*s% superad_reduction_history_eta_du(:,i) + f*s% superad_reduction_history_du(:,i)
+            end if
+            s% superad_reduction_factor(ip) = &
+               1d0/superad_history_integral( &
+                  s% superad_reduction_history_du(:,ip), s% superad_reduction_history_eta_du(:,ip), 1d0)
+         else
+            s% superad_reduction_factor(ip) = superad_reduction_factorR + &
+               (superad_reduction_factorL - superad_reduction_factorR)*dMR/dM
+         end if
 
          s% tau(ip) = tauR + (tauL - tauR)*dMR/dM
          if (is_bad(s% tau(ip))) then

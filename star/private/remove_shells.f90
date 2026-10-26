@@ -1116,6 +1116,13 @@
          if (ierr /= 0) then
             return
          end if
+         s% superad_reduction_history_du(:,1:nz) = prv% superad_reduction_history_du(:,1+skip:nz_old)
+         s% superad_reduction_history_eta_du(:,1:nz) = prv% superad_reduction_history_eta_du(:,1+skip:nz_old)
+         ! Surface removal can precede history commitment.
+         if (s% superad_reduction_history_pending) then
+            s% superad_reduction_du(1:nz) = prv% superad_reduction_du(1+skip:nz_old)
+            s% superad_reduction_target(1:nz) = prv% superad_reduction_target(1+skip:nz_old)
+         end if
          if (dbg) write(*,2) 's% dq(1)', 1, s% dq(1)
          if (dbg) write(*,2) 's% dm(1)/Msun', 1, s% dm(1)/Msun
          if (dbg) write(*,2) 's% m(1)/msun', 1, s% m(1)/Msun
@@ -1237,6 +1244,7 @@
          s% have_mlt_vc = .false.
          s% have_superad_reduction_factor = .false.
          s% okay_to_set_superad_reduction_factor = .false.
+         s% superad_reduction_history_pending = .false.
 
          !save composition and entropy profiles
          xa(:,:) = s% xa(:,k_remove:s% nz)

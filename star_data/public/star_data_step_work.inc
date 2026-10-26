@@ -335,6 +335,9 @@
       real(dp), pointer, dimension(:) :: & ! (prev_mesh_nz)
          prev_mesh_j_rot, prev_mesh_omega, prev_mesh_dq, prev_mesh_mlt_vc, &
          prev_mesh_superad_reduction_factor
+      ! Accepted history before remeshing, restored on a retry.
+      real(dp), pointer :: prev_mesh_superad_reduction_history_du(:,:) => null()
+      real(dp), pointer :: prev_mesh_superad_reduction_history_eta_du(:,:) => null()
       logical :: prev_mesh_species_or_nvar_hydro_changed ! specifies if either species or number of hydro variables
                                                          ! have been altered since prev_mesh info was stored
       real(dp), pointer, dimension(:) :: prev_mesh_D_ST_start, prev_mesh_nu_ST_start
@@ -355,6 +358,8 @@
 
       real(dp), pointer :: superad_reduction_factor(:) ! only set when use_superad_reduction = .true.
          ! reports effect of superad_reduction.  value = 1d0 for no effect.
+      ! Frozen dt/tau_conv_start and latest 1/Gamma_inst for the current attempt.
+      real(dp), pointer :: superad_reduction_du(:), superad_reduction_target(:)
 
       ! mixing length alpha for MLT (can be set by user and can vary within model)
       real(dp), pointer :: alpha_mlt(:)
@@ -908,6 +913,8 @@
             okay_to_set_mlt_vc, have_mlt_vc, &
             okay_to_set_superad_reduction_factor, have_superad_reduction_factor
             ! current factor is frozen until it has been copied to the old state
+         ! Completed interval waiting for finish_step to commit its history.
+         logical :: superad_reduction_history_pending = .false.
 
          real(dp), pointer :: xa_removed(:) ! mass fractions for removed mass (1:species)
          real(dp) :: h1_czb_mass
