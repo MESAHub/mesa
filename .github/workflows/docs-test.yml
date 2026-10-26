@@ -31,7 +31,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r ./requirements-dev.txt
-          pip install Sphinx sphinx-copybutton sphinx_design sphinx-tags sphinxemoji
+          pip install Sphinx sphinx-copybutton sphinx_design sphinx-tags sphinxemoji sphinx-book-theme
 
       - name: Build docs
         run: |
