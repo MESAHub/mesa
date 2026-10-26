@@ -20,3 +20,5 @@ How this test passes
 The active test-suite entry expects the output string ``good match for
 period``.  The case has ``.ignore_checksum``, so checksum reporting is
 intentionally suppressed.
+
+Last-Updated: 16Oct2026 by EbF

@@ -52,6 +52,8 @@ Additional controls are available for TDC envelope remeshing:
 Bug Fixes
 ---------
 
+Fixed a typo in the OPLIB hydrogen grid that could cause incorrect opacities or interpolation failures at low hydrogen abundance; see `gh-1078 <https://github.com/MESAHub/mesa/pull/1078>`_.
+
 Removed duplicate treatment of ``n14(a,g)f18(e+nu)o18`` in networks that
 include both the explicit hot CNO reactions and the corresponding approximate
 reaction. See :ref:`the known bugs entry <duplicate_n14ag_rate_bug>` and
@@ -77,6 +79,10 @@ respect changes to the mixing length set by ``other_alpha_mlt``, and used the
 The parameter ``report_max_infall_inside_fe_core`` was ignored in versions r25.12.1 and r26.4.1 and always had it's default value. See `gh-981 https://github.com/MESAHub/mesa/pull/981`_.
 
 ``fe_core_infall_limit`` now obeys ``when_to_stop_rtol`` and ``when_to_stop_atol`` again (broken since r11532).
+
+Fixed the OPAL/SCVH blend in metallicity, which could cause discontinuities
+in the EOS at ``Z = 0.04`` with the default blend limits. See
+:ref:`the known bugs entry <opal_scvh_high_z_blend_bug>`.
 
 .. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ``changelog_template.rst``).
 
