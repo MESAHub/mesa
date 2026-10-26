@@ -58,9 +58,10 @@ contains
       use num_lib
       use utils_lib
       use auto_diff
-      type(auto_diff_real_star_order1), intent(in) :: chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, gradr, grada, gradL
+      type(auto_diff_real_star_order1), intent(in) :: &
+         mixing_length_alpha, chiT, chiRho, Cp, grav, Lambda, rho, P, T, opacity, gradr, grada, gradL
       character(len=*), intent(in) :: MLT_option
-      real(dp), intent(in) :: mixing_length_alpha, Henyey_MLT_nu_param, Henyey_MLT_y_param, max_conv_vel
+      real(dp), intent(in) :: Henyey_MLT_nu_param, Henyey_MLT_y_param, max_conv_vel
       type(auto_diff_real_star_order1), intent(out) :: Gamma, gradT, Y_face, conv_vel, D
       integer, intent(out) :: mixing_type, ierr
 
