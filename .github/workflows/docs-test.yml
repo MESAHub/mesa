@@ -1,0 +1,39 @@
+name: docs build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.job }}-${{ github.ref }}-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.14'
+          cache: "pip"
+          cache-dependency-path: |
+            requirements-dev.txt
+
+      - name: Install dependencies
+        run: |
+          pip install -r ./requirements-dev.txt
+
+      - name: Build docs
+        run: |
+          cd docs/
+          # add -W to fail on warnings too
+          make SPHINXOPTS='-v --keep-going -n' html
