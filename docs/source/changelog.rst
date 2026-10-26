@@ -47,7 +47,7 @@ Additional controls are available for TDC envelope remeshing:
 - ``TDC_hydro_nz_inner`` adds geometrically spaced zones near the inner boundary.
 - ``TDC_hydro_nz_T_gradient`` adds zones according to the variation in ``logT`` below ``TDC_hydro_T_anchor`` while retaining the mass-based mesh.
 
-The ``colors`` module can now apply interstellar extinction to the SED before the filter integrals, controlled by ``extinction_law``, ``A_V`` and ``R_V`` (see :ref:`colors/defaults:extinction_law`). The available laws are CCM89, O94, F99, FM07, G23 and the G03 SMC bar and LMC averages, which include the laws adopted by MIST (CCM89 in v1, FM07 in v2.5) and PARSEC (CCM89 + O94). Bolometric quantities are unaffected.
+The ``colors`` module can now apply interstellar extinction to the SED before the filter integrals, controlled by ``extinction_law``, ``A_V`` and ``R_V`` (see :ref:`colors/defaults:Interstellar Extinction`). The available laws are CCM89, O94, F99, FM07, G23 and the G03 SMC bar and LMC averages, which include the laws adopted by MIST (CCM89 in v1, FM07 in v2.5) and PARSEC (CCM89 + O94). Bolometric quantities are unaffected.
 
 .. _Bug Fixes main:
 
