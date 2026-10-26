@@ -52,6 +52,10 @@ Additional controls are available for TDC envelope remeshing:
 Bug Fixes
 ---------
 
+Fixed ``switch_to_radiative`` zeroing saved ``mlt_vc`` during TDC photo
+restarts. This could also change the evolution after a retry with
+``restore_mesh_on_retry = .true.``.
+
 Fixed a typo in the OPLIB hydrogen grid that could cause incorrect opacities or interpolation failures at low hydrogen abundance; see `gh-1078 <https://github.com/MESAHub/mesa/pull/1078>`_.
 
 Removed duplicate treatment of ``n14(a,g)f18(e+nu)o18`` in networks that
