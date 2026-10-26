@@ -444,8 +444,8 @@
    !mlt_Pturb
    !alpha_mlt
 
-   !conv_vel ! convection velocity (cm/sec)
-   !log_conv_vel ! log10 convection velocity (cm/sec)
+   !conv_vel ! effective mixing velocity from total D_mix (cm/sec); see mlt_vc for mlt/TDC convective velocity
+   !log_conv_vel ! log10 effective mixing velocity from total D_mix (cm/sec)
 
    !conv_L_div_L
    !log_conv_L_div_L
@@ -477,7 +477,7 @@
 
    !log_gradT_div_gradr ! log10 gradT/gradr at cell boundary 
    !log_mlt_Gamma ! convective efficiency
-   !conv_vel_div_csound ! convection velocity divided by sound speed
+   !conv_vel_div_csound ! conv_vel divided by sound speed
    !conv_vel_div_L_vel ! L_vel is velocity needed to carry L by convection; L = 4*pi*r^2*rho*vel**3
    !log_mlt_D_mix ! log10 diffusion coefficient for mixing from mlt (cm^2/sec)
 

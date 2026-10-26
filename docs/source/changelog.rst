@@ -52,6 +52,13 @@ Additional controls are available for TDC envelope remeshing:
 Bug Fixes
 ---------
 
+The dPrad/dm form of the temperature gradient equation now uses
+``mlt_mixing_type`` to identify convection, so rotational mixing labels no
+longer suppress the convective luminosity correction. Semiconvection and
+thermohaline mixing no longer set ``mlt_vc``; their diffusion coefficients
+still contribute to ``D_mix`` and the effective mixing velocity ``conv_vel``. See
+`gh-1066 <https://github.com/MESAHub/mesa/issues/1066>`_.
+
 Fixed a typo in the OPLIB hydrogen grid that could cause incorrect opacities or interpolation failures at low hydrogen abundance; see `gh-1078 <https://github.com/MESAHub/mesa/pull/1078>`_.
 
 Removed duplicate treatment of ``n14(a,g)f18(e+nu)o18`` in networks that

@@ -359,8 +359,8 @@
             end do
          end if
 
-         ! as last thing, update conv_vel from D_mix and mixing length.
-         ! this updates the effective conv vel for rotation and overshooting effects
+         ! as last thing, update conv_vel from total D_mix and mixing length.
+         ! this effective mixing velocity includes all contributions to D_mix.
          do k=2,nz
             if (s% alpha_mlt(k)*s% scale_height(k) > 0) then
                s% conv_vel(k) = &

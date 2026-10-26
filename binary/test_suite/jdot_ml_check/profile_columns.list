@@ -84,8 +84,8 @@
    eps_grav ! heat from gravitational contraction (negative for expansion)
    mlt_mixing_length ! mixing length for mlt (cm)
    log_D_mix ! log10 diffusion coefficient in units of cm^2/second (Eulerian)
-   log_conv_vel ! log10 convection velocity (cm/sec)
-   conv_vel_div_csound ! convection velocity divided by sound speed
+   log_conv_vel ! log10 effective mixing velocity from total D_mix (cm/sec)
+   conv_vel_div_csound ! conv_vel divided by sound speed
    log_mlt_D_mix ! log10 cdc from mlt (cm^2/sec)
    !use_gradr_for_gradT ! if = 1, then zone has been forced radiative in spite of mlt results.
    pressure_scale_height ! in Rsun units
