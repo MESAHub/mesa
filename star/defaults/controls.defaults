@@ -7989,7 +7989,7 @@
 
       ! ::
 
-    num_cells_for_smooth_brunt_B = 2
+    num_cells_for_smooth_brunt_B = 0
 
 
       ! threshold_for_smooth_brunt_B
