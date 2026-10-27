@@ -51,7 +51,10 @@
       max_years_for_timestep = 1d6
       max_age = 1d7
 
-      energy_eqn_option = 'dedt'
+      ! EOS blending pure Fe from Skye to FreeEOS (which assumes C/O table)
+      ! has some inconsistencies that cause EOS blend issues, but eps_grav
+      ! alleviates most of this.
+      energy_eqn_option = 'eps_grav'
 
       max_abar_for_burning = 55
 
