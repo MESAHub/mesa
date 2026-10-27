@@ -32,7 +32,7 @@
 module profiler
 
    use const_def, only: dp, i8
-   use utils_lib, only: mesa_error
+   use utils_lib, only: mesa_error, utils_OMP_IN_PARALLEL
 
    implicit none
 
@@ -86,17 +86,11 @@ contains
       prof_enabled = enabled
    end function prof_enabled
 
-   logical function in_parallel()
-!$    use omp_lib, only: omp_in_parallel
-      in_parallel = .false.
-!$    in_parallel = omp_in_parallel()
-   end function in_parallel
-
    subroutine prof_push(name)
       character(len=*), intent(in) :: name
       integer :: parent, id, i
 
-      if (in_parallel()) return
+      if (utils_OMP_IN_PARALLEL()) return
       if (.not. prof_enabled()) return
 
       ! If we are inside of a stack, grab our parent's id
@@ -151,7 +145,7 @@ contains
       integer(i8) :: t, elapsed
       integer :: id
 
-      if (in_parallel()) return
+      if (utils_OMP_IN_PARALLEL()) return
       if (.not. prof_enabled()) return
 
       if (depth == 0) &

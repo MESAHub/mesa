@@ -51,6 +51,12 @@ contains
   end subroutine utils_OMP_SET_NUM_THREADS
 
 
+  logical function utils_OMP_IN_PARALLEL()
+    use utils_openmp, only: eval_OMP_IN_PARALLEL
+    utils_OMP_IN_PARALLEL = eval_OMP_IN_PARALLEL()
+  end function utils_OMP_IN_PARALLEL
+
+
   subroutine get_compiler_version(compiler_name,compiler_version_name)
     character(len=*) :: compiler_name, compiler_version_name
     integer, save :: intel_compiler_build_date = 0, gcc_major = 0, gcc_minor = 0, gcc_patch = 0
