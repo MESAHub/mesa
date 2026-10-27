@@ -22,6 +22,7 @@
       use star_private_def
       use const_def, only: dp, i8, ln10, secyer, lsun
       use utils_lib, only: is_bad
+      use profiler, only: prof_push, prof_pop
 
       implicit none
 
@@ -103,7 +104,9 @@
                total = total - s% energy(k)*s% dm(k)
             end do
             if (s% trace_evolve) write(*,*) 'call do_burn'
+            call prof_push('op_split_burn')
             do_struct_burn_mix = do_burn(s, dt)
+            call prof_pop()
             if (do_struct_burn_mix /= keep_going) then
                write(*,2) 'failed in do_burn', s% model_number
                call mesa_error(__FILE__,__LINE__,'do_struct_burn_mix')
@@ -804,10 +807,12 @@
             s% doing_solver_iterations = .true.
             save_warn_rates_flag = warn_rates_for_high_temp
             warn_rates_for_high_temp = .false.
+            call prof_push('solver')
             call solver( &
                s, nvar, skip_global_corr_coeff_limit, &
                gold_tolerances_level, tol_max_correction, tol_correction_norm, &
                failure, ierr)
+            call prof_pop()
             s% doing_solver_iterations = .false.
             warn_rates_for_high_temp = save_warn_rates_flag
          end subroutine newt

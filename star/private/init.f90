@@ -862,6 +862,7 @@
          use relax, only: do_relax_to_limit, do_relax_mass, &
             do_relax_mass_scale, do_relax_num_steps, do_relax_to_radiative_core
          use auto_diff_support
+         use profiler, only: prof_push, prof_pop
          integer, intent(in) :: id, do_which
          character (len=*), intent(in) :: model_info, restart_filename
          logical, intent(in) :: restart
@@ -1073,12 +1074,14 @@
          end if
 
          if (do_which == do_create_pre_ms_model) then
+            call prof_push('pre_ms_relax')
             call setup_for_relax_after_create_pre_ms_model
             if (s% mstar > s% initial_mass*Msun) then  ! need to reduce mass
                write(*,1) 'reduce mass to', s% initial_mass
                call do_relax_mass(s% id, s% initial_mass, lg_max_abs_mdot, ierr)
                if (ierr /= 0) then
                   write(*,*) 'failed in do_relax_mass'
+                  call prof_pop()
                   return
                end if
             else if (s% mstar < s% initial_mass*Msun) then  ! need to increase mass
@@ -1087,6 +1090,7 @@
                   s% id, s% initial_mass, s% job% dlgm_per_step, s% job% change_mass_years_for_dt, ierr)
                if (ierr /= 0) then
                   write(*,*) 'failed in do_relax_mass'
+                  call prof_pop()
                   return
                end if
             end if
@@ -1094,6 +1098,7 @@
                s% id, s% pre_ms_relax_num_steps, s% dt_next, ierr)
             if (ierr /= 0) then
                write(*,*) 'failed in do_relax_num_steps'
+               call prof_pop()
                return
             end if
 
@@ -1101,10 +1106,12 @@
                call do_relax_to_radiative_core(s% id, ierr)
                if (ierr /= 0) then
                   write(*,*) 'failed in do_relax_to_radiative_core'
+                  call prof_pop()
                   return
                end if
             end if
             call done_relax_after_create_pre_ms_model
+            call prof_pop()
          else if (do_which == do_create_initial_model .and. &
                   s% initial_model_relax_num_steps > 0) then
             call do_relax_num_steps( &
