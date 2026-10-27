@@ -27,11 +27,11 @@ jobs:
           cache: "pip"
           cache-dependency-path: |
             requirements-dev.txt
+            docs/requirements.txt
 
       - name: Install dependencies
         run: |
-          pip install -r ./requirements-dev.txt
-          pip install Sphinx sphinx-copybutton sphinx_design sphinx-tags sphinxemoji sphinx-book-theme
+          pip install -r ./requirements-dev.txt -r docs/requirements.txt
 
       - name: Build docs
         run: |
