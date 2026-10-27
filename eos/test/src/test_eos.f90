@@ -12,8 +12,6 @@ program test_eos
 
    call Setup_eos
 
-   call test_ion_offset
-
    call Do_One(quietly)
 
    call test1_eosPT_for_ck(quietly)
