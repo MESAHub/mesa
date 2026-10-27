@@ -72,8 +72,8 @@ contains
       real(dp) :: &
          epsnuc_out(num_epsnuc_out), csound_surf, v_surf, envelope_fraction_left, m_div_h, &
          min_m_div_h, max_m_div_h
-      integer :: mixing_regions, mix_relr_regions, burning_regions, burn_relr_regions
-      integer, pointer :: mixing_type(:), mix_relr_type(:), burning_type(:), burn_relr_type(:)
+      integer :: mixing_regions, mix_relr_regions, burning_regions, burn_relr_regions, rti_regions
+      integer, pointer :: mixing_type(:), mix_relr_type(:), burning_type(:), burn_relr_type(:), rti_type(:)
       character (len = maxlen_history_column_name), pointer, dimension(:) :: &
          extra_col_names, binary_col_names, extra_binary_col_names, colors_col_names, extra_header_item_names
       real(dp), pointer, dimension(:) :: &
@@ -191,6 +191,7 @@ contains
       nullify(mix_relr_type)
       nullify(burning_type)
       nullify(burn_relr_type)
+      nullify(rti_type)
       nullify(extra_col_names)
       nullify(extra_col_vals)
       nullify(binary_col_names)
@@ -414,6 +415,7 @@ contains
       mixing_regions = 0
       mix_relr_regions = 0
       burn_relr_regions = 0
+      rti_regions = 0
 
       do i = i0, 3  ! add a row to the log
 
@@ -433,6 +435,16 @@ contains
             epsnuc_out(1:4) = s% burn_zone_mass(1:4, 1)
             epsnuc_out(5:8) = s% burn_zone_mass(1:4, 2)
             epsnuc_out(9:12) = s% burn_zone_mass(1:4, 3)
+
+            rti_regions = count_output_mix_regions(rti_offset)
+            if (rti_regions > 0) then
+               allocate(rti_type(nz), stat = ierr)
+               if (ierr /= 0) exit
+               rti_type = 0
+               if (s% RTI_flag) then
+                  where (s% alpha_RTI(1:nz) > 0d0) rti_type = 1
+               end if
+            end if
 
             mixing_regions = count_output_mix_regions(mixing_offset)
             if (mixing_regions > 0) then
@@ -507,6 +519,7 @@ contains
          if (associated(mix_relr_type)) deallocate(mix_relr_type)
          if (associated(burning_type)) deallocate(burning_type)
          if (associated(burn_relr_type)) deallocate(burn_relr_type)
+         if (associated(rti_type)) deallocate(rti_type)
          if (associated(extra_col_names)) deallocate(extra_col_names)
          if (associated(extra_col_vals)) deallocate(extra_col_vals)
          if (associated(binary_col_names)) deallocate(binary_col_names)
@@ -520,6 +533,7 @@ contains
          nullify(mix_relr_type)
          nullify(burning_type)
          nullify(burn_relr_type)
+         nullify(rti_type)
          nullify(extra_col_names)
          nullify(extra_col_vals)
          nullify(binary_col_names)
@@ -932,7 +946,16 @@ contains
          character (len = 10) :: str
          integer :: c, i, ii, ir
          c = s% history_column_spec(j)
-         if (c > burn_relr_offset) then
+         if (c > rti_offset) then
+            i = c - rti_offset
+            ii = (i + 1) / 2
+            write(str, '(i0)') ii
+            if (mod(i, 2)==1) then
+               col_name = 'rti_type_' // trim(str)
+            else
+               col_name = 'rti_qtop_' // trim(str)
+            end if
+         else if (c > burn_relr_offset) then
             i = c - burn_relr_offset
             ii = (i + 1) / 2
             if (ii > burn_relr_regions) burn_relr_regions = ii  ! count the regions in pass2
@@ -1078,7 +1101,25 @@ contains
          real(dp) :: val, frac
          int_val = 0; val = 0; is_int_val = .false.
 
-         if (c > burn_relr_offset) then
+         if (c > rti_offset) then
+            i = c - rti_offset
+            ii = (i + 1) / 2
+            k = region_top(rti_type, ii)
+            if (mod(i, 2)==1) then
+               is_int_val = .true.
+               if (k > 0) then
+                  int_val = rti_type(k)
+               else
+                  int_val = -1
+               end if
+            else
+               if (k > 0) then
+                  val = s% q(k)  ! outer face of the outermost cell in this RTI region
+               else
+                  val = 1d0
+               end if
+            end if
+         else if (c > burn_relr_offset) then
             i = c - burn_relr_offset
             ii = (i + 1) / 2
             k = region_top(burn_relr_type, ii)
@@ -2284,7 +2325,14 @@ contains
          case(h_log_min_tau_conv)
             val = safe_log10(s% min_conv_time_scale)
          case(h_tau_QHSE_yrs)
-            val = s% max_QHSE_time_scale / secyer
+            if (s% v_flag .or. s% u_flag) then
+               do k = 1, nz
+                  if (s% q(k) > s% max_q_for_QHSE_timescale) cycle
+                  if (s% q(k) < s% min_q_for_QHSE_timescale) exit
+                  val = max(val, QHSE_time_scale(s,k))
+               end do
+            end if
+            val = val / secyer
          case(h_eps_grav_integral)
             val = dot_product(s% dm(1:nz), s% eps_grav_ad(1:nz)% val) / Lsun
          case(h_extra_L)

@@ -644,6 +644,11 @@
          type (binary_info), pointer :: b
          binary_after_evolve = keep_going
 
+         if (b% extra_binary_terminal_iounit /= 0) then
+            close(b% extra_binary_terminal_iounit)
+            b% extra_binary_terminal_iounit = 0
+         end if
+
          !take care of deallocating binary arrays here
          if (associated(b% theta_co)) then
             deallocate(b% theta_co)

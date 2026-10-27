@@ -289,6 +289,11 @@
 
       subroutine free_binary(b)
          type (binary_info), pointer :: b
+
+         if (b% extra_binary_terminal_iounit /= 0) then
+            close(b% extra_binary_terminal_iounit)
+            b% extra_binary_terminal_iounit = 0
+         end if
          binary_handles(b% binary_id)% in_use = .false.
       end subroutine free_binary
 
