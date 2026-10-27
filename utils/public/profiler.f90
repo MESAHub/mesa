@@ -188,13 +188,14 @@ contains
       call system_clock(t, rate)
       total = max(real(t - t_first, dp)/real(rate, dp), tiny(1d0))
 
-      ! a non-empty stack means a push without a matching pop; the time of
-      ! regions that are still open has not been recorded
+      ! a non-empty stack means a push without a matching pop, so the
+      ! instrumentation is broken; list the open regions and fail
       if (depth > 0) then
-         write(*,'(a,i0,a)') 'WARNING: profiler stack not empty, ', depth, ' region(s) still open:'
+         write(*,'(a,i0,a)') 'profiler stack not empty, ', depth, ' region(s) still open:'
          do i = 1, depth
             write(*,'(a,a)') repeat('  ', i), trim(rname(sid(i)))
          end do
+         call mesa_error(__FILE__, __LINE__, 'profiler: unmatched prof_push (missing prof_pop?)')
       end if
 
       write(*,'(a)') 'time  %total  %remainder  calls  name'
