@@ -34,6 +34,8 @@
       log_L
       log_R
       log_g
+      effective_T
+      photosphere_r
       !Custom Av values are handled in the run_star_extras
 
 !----------------------------------------------------------------------------------------------

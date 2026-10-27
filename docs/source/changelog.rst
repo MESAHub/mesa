@@ -52,6 +52,18 @@ Additional controls are available for TDC envelope remeshing:
 Bug Fixes
 ---------
 
+The ``colors`` module now checks Hermite-interpolated spectra for unphysical
+fluxes, sets negligible negative undershoots to zero, and falls back to
+trilinear interpolation when necessary. Interpolation also handles atmosphere
+grid boundaries and axes with only one tabulated value more robustly.
+Filter transmission is now zero outside the tabulated passband, preventing
+spurious contributions to synthetic magnitudes and photometric zero-points.
+Bolometric magnitudes now include the bolometric flux zero point, correcting
+their absolute scale independently of the Vega, AB, or ST bandpass system.
+
+The ``colors`` module now read Teff, photosphere logg and photosphere radius :
+``call data_for_colors_history_columns(s% Teff, s% photosphere_logg, s% photosphere_r * Rsun, ...``
+
 Fixed a typo in the OPLIB hydrogen grid that could cause incorrect opacities or interpolation failures at low hydrogen abundance; see `gh-1078 <https://github.com/MESAHub/mesa/pull/1078>`_.
 
 Removed duplicate treatment of ``n14(a,g)f18(e+nu)o18`` in networks that
