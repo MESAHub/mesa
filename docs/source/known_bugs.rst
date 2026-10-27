@@ -43,8 +43,9 @@ evolution when composition or EOS blend weights change.
 This affects released versions using the Skye ionization offset, including
 ``r26.4.1``, and is fixed in the main branch after ``r26.4.1``. To apply the fix
 to an existing release, remove the normalization of ``ya`` in
-``eos/private/ion_offset.f90``. Retain ``ya = xa/A`` and the final conversion
-by ``ev2erg/amu``. See `gh-1086 <https://github.com/MESAHub/mesa/issues/1086>`_.
+``eos/private/ion_offset.f90``. Retain the per-baryon weighting ``xa/A`` and
+the final conversion by ``ev2erg/amu``. Use double-precision literals for the
+ionization energies. See `gh-1086 <https://github.com/MESAHub/mesa/issues/1086>`_.
 
 .. _duplicate_n14ag_rate_bug:
 

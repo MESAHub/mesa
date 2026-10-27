@@ -53,7 +53,8 @@ Bug Fixes
 ---------
 
 Corrected the Skye ionization energy offset, which was too large by the mean
-mass number ``abar`` when ``Skye_use_ion_offsets = .true.``. See
+mass number ``abar`` when ``Skye_use_ion_offsets = .true.``. The ionization
+energies now use double-precision literals. See
 :ref:`the known bugs entry <skye_ion_offset_normalization_bug>` and
 `gh-1086 <https://github.com/MESAHub/mesa/issues/1086>`_.
 

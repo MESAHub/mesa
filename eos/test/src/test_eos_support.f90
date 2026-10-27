@@ -56,8 +56,7 @@ contains
 
          actual = compute_ion_offset(7, mass_fractions, test_ids)
          expected_offset = expected_ev*ev2erg/amu
-         ! The ionization table constants have default real precision.
-         if (.not. (abs(actual - expected_offset) <= 1d-7*max(1d0, abs(expected_offset)))) then
+         if (.not. (abs(actual - expected_offset) <= 1d-12*max(1d0, abs(expected_offset)))) then
             write (*, '(a,1p,2e26.16)') 'ion offset '//trim(label)//': ', actual, expected_offset
             call mesa_error(__FILE__, __LINE__, 'test_ion_offset')
          end if
