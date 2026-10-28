@@ -339,9 +339,7 @@
                if (s% okay_to_set_superad_reduction_factor .and. s% num_superad_reduction_history > 0) then
                   s% superad_reduction_target(k) = 1d0
                   fraction = min(s% superad_reduction_du(k), 1d0)
-                  s% superad_reduction_factor(k) = 1d0/( &
-                     superad_history_integral(s% superad_reduction_history_du(:,k), &
-                        s% superad_reduction_history_eta_du(:,k), 1d0-fraction) + fraction)
+                  s% superad_reduction_factor(k) = 1d0/(s% superad_reduction_eta_past(k) + fraction)
                end if
             end if
 

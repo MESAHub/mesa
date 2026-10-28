@@ -92,7 +92,7 @@
             s% D_ST_start(1:nz), s% nu_ST_start(1:nz), &  ! needed for ST time smoothing
             s% have_ST_start_info, s% mstar_old
 
-         if (n > 0) write(iounit, iostat=ierr) history_du(:,1:nz), history_eta_du(:,1:nz)
+         if (n > 0) write(iounit, iostat=ierr) history_du(1:n,1:nz), history_eta_du(1:n,1:nz)
          ! Only a pending snapshot allocates temporary history.
          if (s% superad_reduction_history_pending) deallocate(history_du, history_eta_du)
          if (ierr /= 0) return

@@ -360,6 +360,8 @@
          ! reports effect of superad_reduction.  value = 1d0 for no effect.
       ! Frozen dt/tau_conv_start and latest 1/Gamma_inst for the current attempt.
       real(dp), pointer :: superad_reduction_du(:), superad_reduction_target(:)
+      ! Historical contribution to the moving mean for the current attempt.
+      real(dp), pointer :: superad_reduction_eta_past(:)
 
       ! mixing length alpha for MLT (can be set by user and can vary within model)
       real(dp), pointer :: alpha_mlt(:)

@@ -149,7 +149,8 @@
 
          if (s% num_superad_reduction_history > 0) then
             read(iounit, iostat=ierr) &
-               s% superad_reduction_history_du(:,1:nz), s% superad_reduction_history_eta_du(:,1:nz)
+               s% superad_reduction_history_du(1:s% num_superad_reduction_history,1:nz), &
+               s% superad_reduction_history_eta_du(1:s% num_superad_reduction_history,1:nz)
             if (failed('superad_reduction_history')) return
          end if
 

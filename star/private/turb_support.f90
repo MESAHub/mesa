@@ -228,7 +228,7 @@ contains
 
       ! these are used by use_superad_reduction
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
-      real(dp) :: f_turnover, Gamma_factor_old_local, eta_old
+      real(dp) :: f_turnover, Gamma_factor_old_local, eta_old, eta_past
       type(auto_diff_real_star_order1) :: eta_inst, Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
          diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled, Eq_div_w, check_Eq, mlt_Pturb, Ptot
       logical :: test_partials, using_TDC, have_Y_face_guess, hold_superad_reduction_factor, use_moving_mean
@@ -317,9 +317,8 @@ contains
       if (use_moving_mean) then
          s% superad_reduction_target(k) = 1d0
          f_turnover = min(s% superad_reduction_du(k), 1d0)
-         eta_old = superad_history_integral(s% superad_reduction_history_du(:,k), &
-            s% superad_reduction_history_eta_du(:,k), 1d0-f_turnover)
-         s% superad_reduction_factor(k) = 1d0/(eta_old + f_turnover)
+         eta_past = s% superad_reduction_eta_past(k)
+         s% superad_reduction_factor(k) = 1d0/(eta_past + f_turnover)
       end if
 
       ! Bail if we asked for no mixing, or if parameters are bad.
@@ -557,7 +556,7 @@ contains
             ! Only the current target contributes derivatives.
             eta_inst = 1d0/Gamma_factor
             s% superad_reduction_target(k) = eta_inst% val
-            Gamma_factor = 1d0/(eta_old + f_turnover*eta_inst)
+            Gamma_factor = 1d0/(eta_past + f_turnover*eta_inst)
          else if (s% superad_reduction_use_turnover_limit .and. k > 0 .and. &
                trim(s% superad_reduction_turnover_limit_function) /= 'moving_mean') then
             if (s% dt > 0d0 .and. s% tau_conv_start(k) > 0d0 .and. &

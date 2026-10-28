@@ -30,6 +30,7 @@
       contains
 
       subroutine new_generation(s, ierr)
+         use star_utils, only: superad_history_integral
          use utils_lib
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
@@ -42,6 +43,14 @@
          nz = s% nz
          s% superad_reduction_du(1:nz) = 0d0
          s% superad_reduction_target(1:nz) = 1d0
+         s% superad_reduction_eta_past(1:nz) = 0d0
+         if (s% num_superad_reduction_history > 0) then
+            do k=1,nz
+               s% superad_reduction_eta_past(k) = superad_history_integral( &
+                  s% superad_reduction_history_du(1:s% num_superad_reduction_history,k), &
+                  s% superad_reduction_history_eta_du(1:s% num_superad_reduction_history,k), 1d0)
+            end do
+         end if
 
          if (.not. s% rsp_flag) then
 
