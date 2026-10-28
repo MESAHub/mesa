@@ -47,14 +47,24 @@ Additional controls are available for TDC envelope remeshing:
 - ``TDC_hydro_nz_inner`` adds geometrically spaced zones near the inner boundary.
 - ``TDC_hydro_nz_T_gradient`` adds zones according to the variation in ``logT`` below ``TDC_hydro_T_anchor`` while retaining the mass-based mesh.
 
+Additional ``pgstar`` plots to visualize residuals of equations:
+- Kippenhahn-style diagram (with mass on the y-axis and model number on the x-axis) colored by ``safe_log10(maxval(abs(s%equ(1:neq, k))))``, which is the logarithm of the absolute value of the biggest residual at cell ``k`` for the *accepted* iteration of MESA's Newton-Raphson solver. The y-axis can be mass, logR, or tau.
+- Time evolution of the maximum residual across mesh points for each structure equation (ignores chemical composition equations). See ``Kipp_residuals_*`` and ``Max_eq_resid_*`` in ``pgstar.defaults``
+
 .. _Bug Fixes main:
 
 Bug Fixes
 ---------
 
 Fixed ``switch_to_radiative`` zeroing saved ``mlt_vc`` during TDC photo
-restarts. This could also change the evolution after a retry with
-``restore_mesh_on_retry = .true.``.
+restarts and preparation for a new step. Mixing cleanup now preserves
+the velocity until it has been copied to ``mlt_vc_old``.
+
+Corrected the Skye ionization energy offset, which was too large by the mean
+mass number ``abar`` when ``Skye_use_ion_offsets = .true.``. The ionization
+energies now use double-precision literals. See
+:ref:`the known bugs entry <skye_ion_offset_normalization_bug>` and
+`gh-1086 <https://github.com/MESAHub/mesa/issues/1086>`_.
 
 Fixed a typo in the OPLIB hydrogen grid that could cause incorrect opacities or interpolation failures at low hydrogen abundance; see `gh-1078 <https://github.com/MESAHub/mesa/pull/1078>`_.
 
