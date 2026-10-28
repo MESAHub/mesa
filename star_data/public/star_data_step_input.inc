@@ -44,6 +44,7 @@
       real(dp), pointer, dimension(:) :: conv_vel ! (nz)
       integer :: num_superad_reduction_history = 0
       ! Accepted dt/tau_conv_start and (dt/tau_conv_start)/Gamma_inst, newest first.
+      ! Only rows 1:num_superad_reduction_history are active.
       real(dp), pointer :: superad_reduction_history_du(:,:) => null() ! (history,nz)
       real(dp), pointer :: superad_reduction_history_eta_du(:,:) => null()
 

@@ -1003,7 +1003,7 @@
          type (star_info), pointer :: s, c, prv
          type (star_info), target :: copy_info
          real(dp) :: tau_surf_new, tau_factor_new, Lmid, Rmid, T, P
-         integer :: k, k_old, nz, nz_old, skip
+         integer :: k, k_old, nz, nz_old, skip, nh
 
          logical, parameter :: dbg = .false., restart = .false.
 
@@ -1116,8 +1116,9 @@
          if (ierr /= 0) then
             return
          end if
-         s% superad_reduction_history_du(:,1:nz) = prv% superad_reduction_history_du(:,1+skip:nz_old)
-         s% superad_reduction_history_eta_du(:,1:nz) = prv% superad_reduction_history_eta_du(:,1+skip:nz_old)
+         nh = s% num_superad_reduction_history
+         s% superad_reduction_history_du(1:nh,1:nz) = prv% superad_reduction_history_du(1:nh,1+skip:nz_old)
+         s% superad_reduction_history_eta_du(1:nh,1:nz) = prv% superad_reduction_history_eta_du(1:nh,1+skip:nz_old)
          ! Surface removal can precede history commitment.
          if (s% superad_reduction_history_pending) then
             s% superad_reduction_du(1:nz) = prv% superad_reduction_du(1+skip:nz_old)

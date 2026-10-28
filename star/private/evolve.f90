@@ -349,8 +349,7 @@
             if (failed('realloc superad_reduction_history_eta_du')) return
             ! Initialize prehistory before the first remesh with moving_mean.
             s% num_superad_reduction_history = 1
-            s% superad_reduction_history_du = 1d0
-            s% superad_reduction_history_eta_du = 1d0
+            s% superad_reduction_history_du(1,1:s% nz) = 1d0
             do k=1,s% nz
                s% superad_reduction_history_eta_du(1,k) = 1d0/max(s% superad_reduction_factor(k), 1d0)
             end do
@@ -470,6 +469,11 @@
                      end if
                   end if
                end if
+               ! The accepted history is fixed during the solve.
+               s% superad_reduction_eta_past(k) = superad_history_integral( &
+                  s% superad_reduction_history_du(1:s% num_superad_reduction_history,k), &
+                  s% superad_reduction_history_eta_du(1:s% num_superad_reduction_history,k), &
+                  1d0-min(s% superad_reduction_du(k), 1d0))
                s% superad_reduction_target(k) = 1d0
             end do
             s% okay_to_set_superad_reduction_factor = .true.
@@ -1952,9 +1956,10 @@
                      s% num_superad_reduction_history, size(s% prev_mesh_superad_reduction_factor), ierr)
                   if (failed('realloc prev_mesh_superad_reduction_history_eta_du')) return
                end if
-               s% prev_mesh_superad_reduction_history_du(:,1:s% nz) = s% superad_reduction_history_du(:,1:s% nz)
+               s% prev_mesh_superad_reduction_history_du(:,1:s% nz) = &
+                  s% superad_reduction_history_du(1:s% num_superad_reduction_history,1:s% nz)
                s% prev_mesh_superad_reduction_history_eta_du(:,1:s% nz) = &
-                  s% superad_reduction_history_eta_du(:,1:s% nz)
+                  s% superad_reduction_history_eta_du(1:s% num_superad_reduction_history,1:s% nz)
             end if
             ! also store ST information for time smoothing
             if (s% have_ST_start_info) then
@@ -2269,7 +2274,7 @@
          integer, intent(in) :: id
          real(dp) :: retry_factor
          type (star_info), pointer :: s
-         integer :: ierr, k
+         integer :: ierr, k, nh_alloc
          include 'formats'
 
          call get_star_ptr(id, s, ierr)
@@ -2293,27 +2298,38 @@
                      s% prev_mesh_superad_reduction_factor(k)
                end do
                ! Restore history on the same mesh as the other step inputs.
-               if (size(s% superad_reduction_history_du, dim=1) /= &
+               if (size(s% superad_reduction_history_du, dim=1) < &
                      size(s% prev_mesh_superad_reduction_history_du, dim=1) .or. &
                      size(s% superad_reduction_history_du, dim=2) < size(s% superad_reduction_factor)) then
+                  nh_alloc = max(size(s% superad_reduction_history_du, dim=1), &
+                     size(s% prev_mesh_superad_reduction_history_du, dim=1))
                   call realloc_double2(s% superad_reduction_history_du, &
-                     size(s% prev_mesh_superad_reduction_history_du, dim=1), size(s% superad_reduction_factor), ierr)
+                     nh_alloc, size(s% superad_reduction_factor), ierr)
                   if (ierr /= 0) then
                      prepare_to_retry = terminate
                      return
                   end if
                   call realloc_double2(s% superad_reduction_history_eta_du, &
-                     size(s% prev_mesh_superad_reduction_history_du, dim=1), size(s% superad_reduction_factor), ierr)
+                     nh_alloc, size(s% superad_reduction_factor), ierr)
                   if (ierr /= 0) then
                      prepare_to_retry = terminate
                      return
                   end if
                end if
                s% num_superad_reduction_history = size(s% prev_mesh_superad_reduction_history_du, dim=1)
-               s% superad_reduction_history_du(:,1:s% prev_mesh_nz) = &
+               s% superad_reduction_history_du(1:s% num_superad_reduction_history,1:s% prev_mesh_nz) = &
                   s% prev_mesh_superad_reduction_history_du(:,1:s% prev_mesh_nz)
-               s% superad_reduction_history_eta_du(:,1:s% prev_mesh_nz) = &
+               s% superad_reduction_history_eta_du(1:s% num_superad_reduction_history,1:s% prev_mesh_nz) = &
                   s% prev_mesh_superad_reduction_history_eta_du(:,1:s% prev_mesh_nz)
+               ! Keep the cache consistent before the rollback callback.
+               if (s% num_superad_reduction_history > 0) then
+                  do k=1,s% prev_mesh_nz
+                     s% superad_reduction_eta_past(k) = superad_history_integral( &
+                        s% superad_reduction_history_du(1:s% num_superad_reduction_history,k), &
+                        s% superad_reduction_history_eta_du(1:s% num_superad_reduction_history,k), &
+                        1d0-min(s% superad_reduction_du(k), 1d0))
+                  end do
+               end if
                call normalize_dqs(s, s% prev_mesh_nz, s% dq_old, ierr)
                if (ierr /= 0) then
                   prepare_to_retry = terminate
@@ -2430,15 +2446,12 @@
 
          ! Commit the converged target once, before native output.
          if (s% superad_reduction_history_pending) then
-            call get_superad_history(s, history_du, history_eta_du, ierr)
+            call get_superad_history(s, history_du, history_eta_du, ierr, commit=.true.)
             if (ierr /= 0) return
-            deallocate(s% superad_reduction_history_du, s% superad_reduction_history_eta_du)
-            s% superad_reduction_history_du => history_du
-            s% superad_reduction_history_eta_du => history_eta_du
-            s% num_superad_reduction_history = size(history_du, dim=1)
             do k=1,nz
                s% superad_reduction_factor(k) = &
-                  1d0/superad_history_integral(history_du(:,k), history_eta_du(:,k), 1d0)
+                  1d0/superad_history_integral(history_du(1:s% num_superad_reduction_history,k), &
+                     history_eta_du(1:s% num_superad_reduction_history,k), 1d0)
             end do
             s% superad_reduction_history_pending = .false.
          end if

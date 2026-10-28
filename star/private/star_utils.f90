@@ -3794,15 +3794,20 @@
       end function superad_history_integral
 
 
-      subroutine get_superad_history(s, du, eta_du, ierr)
+      subroutine get_superad_history(s, du, eta_du, ierr, commit)
          type(star_info), pointer :: s
          real(dp), pointer :: du(:,:), eta_du(:,:)
          integer, intent(out) :: ierr
+         logical, intent(in), optional :: commit
          real(dp) :: remaining, width, target
-         integer :: j, k, n, nh, nz_alloc
+         integer :: j, k, n, nh, nh_alloc, nz_alloc
+         integer, parameter :: extra = 32
+         logical :: do_commit, reuse
 
          nullify(du, eta_du)
          ierr = -1
+         do_commit = .false.
+         if (present(commit)) do_commit = commit
          nh = s% num_superad_reduction_history
          if (nh <= 0) return
          n = 1
@@ -3822,22 +3827,41 @@
          end do
 
          nz_alloc = size(s% superad_reduction_history_du, dim=2)
-         allocate(du(n,nz_alloc), eta_du(n,nz_alloc), stat=ierr)
-         if (ierr /= 0) then
-            if (associated(du)) deallocate(du)
-            if (associated(eta_du)) deallocate(eta_du)
-            return
+         reuse = do_commit .and. n <= size(s% superad_reduction_history_du, dim=1)
+         if (reuse) then
+            du => s% superad_reduction_history_du
+            eta_du => s% superad_reduction_history_eta_du
+         else
+            nh_alloc = n
+            if (do_commit) nh_alloc = n + extra
+            allocate(du(nh_alloc,nz_alloc), eta_du(nh_alloc,nz_alloc), stat=ierr)
+            if (ierr /= 0) then
+               if (associated(du)) deallocate(du)
+               if (associated(eta_du)) deallocate(eta_du)
+               return
+            end if
+            du(:,s% nz+1:nz_alloc) = 0d0
+            eta_du(:,s% nz+1:nz_alloc) = 0d0
          end if
-         ! Every active entry is assigned below; only padding needs clearing.
-         du(:,s% nz+1:nz_alloc) = 0d0
-         eta_du(:,s% nz+1:nz_alloc) = 0d0
          ! Rows are common accepted physical timesteps, newest first.
-         du(1,1:s% nz) = s% superad_reduction_du(1:s% nz)
-         eta_du(1,1:s% nz) = s% superad_reduction_du(1:s% nz)*s% superad_reduction_target(1:s% nz)
-         if (n > 1) then
-            du(2:n,1:s% nz) = s% superad_reduction_history_du(1:n-1,1:s% nz)
-            eta_du(2:n,1:s% nz) = s% superad_reduction_history_eta_du(1:n-1,1:s% nz)
+         do k=1,s% nz
+            ! Descending copies also work when reusing the accepted arrays.
+            do j=n,2,-1
+               du(j,k) = s% superad_reduction_history_du(j-1,k)
+               eta_du(j,k) = s% superad_reduction_history_eta_du(j-1,k)
+            end do
+            du(1,k) = s% superad_reduction_du(k)
+            eta_du(1,k) = s% superad_reduction_du(k)*s% superad_reduction_target(k)
+         end do
+         if (do_commit) then
+            if (.not. reuse) then
+               deallocate(s% superad_reduction_history_du, s% superad_reduction_history_eta_du)
+               s% superad_reduction_history_du => du
+               s% superad_reduction_history_eta_du => eta_du
+            end if
+            s% num_superad_reduction_history = n
          end if
+         ierr = 0
       end subroutine get_superad_history
 
 

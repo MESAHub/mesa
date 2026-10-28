@@ -465,7 +465,7 @@
          integer, intent(in) :: action_in
          integer, intent(out) :: ierr
 
-         integer :: nz, species, num_reactions, nvar, nvar_hydro, nvar_chem, sz_new, action, nh_prev
+         integer :: nz, species, num_reactions, nvar, nvar_hydro, nvar_chem, sz_new, action, nh_alloc, nh_prev
          logical :: use_turnover_limit
          type (star_info), pointer :: c
          character (len=128) :: null_str
@@ -483,6 +483,9 @@
          nvar_chem = s% nvar_chem
          use_turnover_limit = s% use_superad_reduction .and. &
             s% superad_reduction_use_turnover_limit .and. .not. s% RSP_flag
+         nh_alloc = s% num_superad_reduction_history
+         if (action_in /= do_allocate .and. associated(s% superad_reduction_history_du)) &
+            nh_alloc = max(nh_alloc, size(s% superad_reduction_history_du, dim=1))
          nh_prev = 0
          ! Fresh allocation has no rollback history. Capture the source size before pointer swaps.
          if (action_in /= do_allocate .and. associated(s% prev_mesh_superad_reduction_history_du)) &
@@ -504,6 +507,10 @@
             else  ! nothing to copy, so switch to allocate
                action = do_allocate
             end if
+         end if
+         if (action == do_copy_pointers_and_resize) then
+            if (associated(c% superad_reduction_history_du)) &
+               nh_alloc = max(nh_alloc, size(c% superad_reduction_history_du, dim=1))
          end if
 
          do  ! just so can exit on failure
@@ -534,10 +541,10 @@
                call do1(s% conv_vel, c% conv_vel)
                if (failed('conv_vel')) exit
                call do2(s% superad_reduction_history_du, c% superad_reduction_history_du, &
-                  s% num_superad_reduction_history, 'superad_reduction_history_du')
+                  nh_alloc, 'superad_reduction_history_du')
                if (failed('superad_reduction_history_du')) exit
                call do2(s% superad_reduction_history_eta_du, c% superad_reduction_history_eta_du, &
-                  s% num_superad_reduction_history, 'superad_reduction_history_eta_du')
+                  nh_alloc, 'superad_reduction_history_eta_du')
                if (failed('superad_reduction_history_eta_du')) exit
                call do2(s% prev_mesh_superad_reduction_history_du, c% prev_mesh_superad_reduction_history_du, &
                   nh_prev, 'prev_mesh_superad_reduction_history_du')
@@ -811,9 +818,12 @@
             if (failed('superad_reduction_du')) exit
             call do1(s% superad_reduction_target, c% superad_reduction_target)
             if (failed('superad_reduction_target')) exit
+            call do1(s% superad_reduction_eta_past, c% superad_reduction_eta_past)
+            if (failed('superad_reduction_eta_past')) exit
             if (action == do_allocate) then
                s% superad_reduction_du = 0d0
                s% superad_reduction_target = 1d0
+               s% superad_reduction_eta_past = 1d0
             end if
 
             call do1(s% domega_dlnR, c% domega_dlnR)

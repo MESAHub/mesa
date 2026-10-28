@@ -48,7 +48,7 @@
          type (star_info), pointer :: s
 
          integer :: alloc_level, i, k, ierr, species, nvar, nz, nz_new, nz_old, &
-            num_gvals, j, cid, cid_max, unchanged, split, merged, revised
+            num_gvals, j, cid, cid_max, unchanged, split, merged, revised, nh
          type (star_info), target :: copy_info
          type (star_info), pointer :: c, prv
          real(dp) :: delta_coeff, sum_L_other, sum_L_other_limit, A_max, &
@@ -423,7 +423,8 @@
          if (dbg_remesh) write(*,*) 'back from do_mesh_adjust'
 
          ! Use the same mass weights for interval widths and target integrals.
-         if (s% num_superad_reduction_history > 0) then
+         nh = s% num_superad_reduction_history
+         if (nh > 0) then
             j = 1
             do k=1,nz
                do while (j < nz_old)
@@ -433,22 +434,22 @@
                if (j < nz_old) then
                   history_weight = max(0d0, min(1d0, &
                      (xq_new(k)-xq_old(j))/(xq_old(j+1)-xq_old(j))))
-                  s% superad_reduction_history_du(:,k) = &
-                     (1d0-history_weight)*prv% superad_reduction_history_du(:,j) + &
-                     history_weight*prv% superad_reduction_history_du(:,j+1)
-                  s% superad_reduction_history_eta_du(:,k) = &
-                     (1d0-history_weight)*prv% superad_reduction_history_eta_du(:,j) + &
-                     history_weight*prv% superad_reduction_history_eta_du(:,j+1)
+                  s% superad_reduction_history_du(1:nh,k) = &
+                     (1d0-history_weight)*prv% superad_reduction_history_du(1:nh,j) + &
+                     history_weight*prv% superad_reduction_history_du(1:nh,j+1)
+                  s% superad_reduction_history_eta_du(1:nh,k) = &
+                     (1d0-history_weight)*prv% superad_reduction_history_eta_du(1:nh,j) + &
+                     history_weight*prv% superad_reduction_history_eta_du(1:nh,j+1)
                else
                   history_weight = max(0d0, min(1d0, &
                      (xq_new(k)-xq_old(j))/(1d0-xq_old(j))))
-                  s% superad_reduction_history_du(:,k) = prv% superad_reduction_history_du(:,j)
-                  s% superad_reduction_history_eta_du(:,k) = &
-                     (1d0-history_weight)*prv% superad_reduction_history_eta_du(:,j) + &
-                     history_weight*prv% superad_reduction_history_du(:,j)
+                  s% superad_reduction_history_du(1:nh,k) = prv% superad_reduction_history_du(1:nh,j)
+                  s% superad_reduction_history_eta_du(1:nh,k) = &
+                     (1d0-history_weight)*prv% superad_reduction_history_eta_du(1:nh,j) + &
+                     history_weight*prv% superad_reduction_history_du(1:nh,j)
                end if
                s% superad_reduction_factor(k) = 1d0/superad_history_integral( &
-                  s% superad_reduction_history_du(:,k), s% superad_reduction_history_eta_du(:,k), 1d0)
+                  s% superad_reduction_history_du(1:nh,k), s% superad_reduction_history_eta_du(1:nh,k), 1d0)
             end do
          end if
 
