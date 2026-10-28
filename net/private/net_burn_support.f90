@@ -143,8 +143,7 @@
        end if
 
 ! this is the normal exit point
-       if ( (nstp == max_steps) .or. &
-            (x-stopp)*(stopp-start)>= 0.0d0) then
+       if ((x-stopp)*(stopp-start)>= 0.0d0) then
         call burner_finish_substep(nstp, x, y, ierr)
         return
        end if
@@ -178,6 +177,8 @@
 
 ! back for another iteration or death
       end do
+
+! if we made it here, we took too many steps
       ierr = -1
       return
       call mesa_error(__FILE__,__LINE__,'more than max_steps steps required in netint')
@@ -638,4 +639,3 @@
 
 
       end module net_burn_support
-
