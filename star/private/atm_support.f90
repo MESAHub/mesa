@@ -533,6 +533,10 @@ contains
        return
     end if
     s% tau_base = tau_base
+    if (beta == 0._dp) then
+       write(*,*) "outside range for atm_table,"
+       write(*,*) "setting T_tau value for tau_base =", tau_base
+    end if
 
     ! Evaluate temperature and pressure from the table
 
