@@ -4328,7 +4328,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~
 
       ! If have selected ``'table'`` for ``atm_option``, fallback to using
-      ! this if the args are off the table. Possible choices are ``'T_tau'``
+      ! this if the args are off the table. The fallback uses the attachment
+      ! optical depth of the selected table. Possible choices are ``'T_tau'``
       ! or blank (in which case the code will halt when it encounters an off-table
       ! arg)
 
