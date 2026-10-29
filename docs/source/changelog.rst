@@ -56,6 +56,10 @@ Additional ``pgstar`` plots to visualize residuals of equations:
 Bug Fixes
 ---------
 
+Fixed ``switch_to_radiative`` zeroing saved ``mlt_vc`` during TDC photo
+restarts and preparation for a new step. Mixing cleanup now preserves
+the velocity until it has been copied to ``mlt_vc_old``.
+
 Corrected the Skye ionization energy offset, which was too large by the mean
 mass number ``abar`` when ``Skye_use_ion_offsets = .true.``. The ionization
 energies now use double-precision literals. See

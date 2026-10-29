@@ -437,7 +437,6 @@ contains
     use atm_lib, only: &
          atm_eval_table, &
          atm_get_table_alfa_beta, &
-         atm_get_T_tau_base, &
          atm_get_table_base
 
     type (star_info), pointer :: s
@@ -458,7 +457,6 @@ contains
 
     real(dp) :: Z
     real(dp) :: tau_base
-    integer  :: T_tau_id
     integer  :: table_id
     real(dp) :: alfa
     real(dp) :: beta
@@ -526,44 +524,18 @@ contains
        return
     end if
 
-    ! If completely off the table, may need to reset tau_base to the
-    ! T_Tau value to get the expected off-table behavior.
-    if(beta == 0._dp) then
-       call get_T_tau_id(s% atm_T_tau_relation, T_tau_id, ierr)
-       if (ierr /= 0) then
-          if (s% report_ierr) then
-             write(*,*) 'Call to get_T_tau_id failed in get_table'
-          end if
-          return
+    ! Use the same attachment depth for the table and backup atmosphere.
+    call atm_get_table_base(table_id, tau_base, ierr)
+    if (ierr /= 0) then
+       if (s% report_ierr) then
+          write(*,*) 'Call to atm_get_table_base failed in get_table'
        end if
-
-       call atm_get_T_tau_base(T_tau_id, tau_base, ierr)
-       if (ierr /= 0) then
-          if (s% report_ierr) then
-             write(*,*) 'Call to atm_get_T_tau_base failed in get_table'
-          end if
-          return
-       end if
-
-       if(s% tau_base /= tau_base) then
-          write(*,*) "outside range for atm_table,"
-          write(*,*) "setting T_tau value for tau_base =", tau_base
-          s% tau_base = tau_base
-       end if
-    else  ! check to see if need to switch back to table value for tau_base
-       call atm_get_table_base(table_id, tau_base, ierr)
-       if (ierr /= 0) then
-          if (s% report_ierr) then
-             write(*,*) 'Call to atm_get_table_base failed in get_table'
-          end if
-          return
-       end if
-
-       if(s% tau_base /= tau_base) then
-          write(*,*) "back on atm_table,"
-          write(*,*) "resetting to atm_table tau_base =", tau_base
-          s% tau_base = tau_base
-       end if
+       return
+    end if
+    s% tau_base = tau_base
+    if (beta == 0._dp) then
+       write(*,*) "outside range for atm_table,"
+       write(*,*) "setting T_tau value for tau_base =", tau_base
     end if
 
     ! Evaluate temperature and pressure from the table
