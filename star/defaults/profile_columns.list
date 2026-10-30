@@ -447,7 +447,15 @@
    !mlt_Pturb
    !alpha_mlt
 
+   !effective_mixing_speed ! 3*D_mix/(alpha_mlt*scale_height), in cm/sec
+      ! includes all contributions to D_mix, e.g. convection, semiconvection, thermohaline mixing,
+      ! overshooting, rotation, and user-supplied mixing. Zero at the surface or for non-positive mixing length.
+   !eff_mix_speed ! same as effective_mixing_speed
+   !log_effective_mixing_speed ! log10(effective_mixing_speed)
+   !log_eff_mix_speed ! same as log_effective_mixing_speed
    !conv_vel ! convection velocity (cm/sec)
+      ! Includes predictive mixing, but not added overshoot diffusion.
+      ! mlt_vc is the local mlt/TDC result.
    !log_conv_vel ! log10 convection velocity (cm/sec)
 
    !conv_L_div_L
@@ -483,6 +491,8 @@
 
    !log_gradT_div_gradr ! log10 gradT/gradr at cell boundary 
    !log_mlt_Gamma ! convective efficiency
+   !effective_mixing_speed_div_csound ! effective mixing speed divided by sound speed
+   !eff_mix_speed_div_csound ! same as effective_mixing_speed_div_csound
    !conv_vel_div_csound ! convection velocity divided by sound speed
    !conv_vel_div_L_vel ! L_vel is velocity needed to carry L by convection; L = 4*pi*r^2*rho*vel**3
    !log_mlt_D_mix ! log10 diffusion coefficient for mixing from mlt (cm^2/sec)
@@ -511,7 +521,9 @@
    !dvc_dt_TDC_div_g ! dimensionless ratio of convective velocity to g
 
    !superad_reduction_factor ! gamma_factor from superad_reduction
-   !conv_vel_div_mlt_vc ! conv_vel from any convection model (including RSP) / mlt_vc, for comparison 
+   !conv_vel_div_mlt_vc ! conv_vel / mlt_vc, for comparison
+   !effective_mixing_speed_div_mlt_vc ! effective mixing speed divided by mlt_vc
+   !eff_mix_speed_div_mlt_vc ! same as effective_mixing_speed_div_mlt_vc
 
    !log_Lconv
    !log_Lconv_div_L
@@ -889,9 +901,13 @@
    !dt_cs_div_dr
    !dt_div_tau_conv
    !dt_times_conv_vel_div_mixing_length
+   !dt_times_effective_mixing_speed_div_mixing_length ! dt*effective_mixing_speed/mlt_mixing_length
+   !dt_times_eff_mix_speed_div_mixing_length ! same as dt_times_effective_mixing_speed_div_mixing_length
    !log_dt_cs_div_dr
    !log_dt_div_tau_conv
    !log_dt_times_conv_vel_div_mixing_length
+   !log_dt_times_effective_mixing_speed_div_mixing_length ! log10(dt*effective_mixing_speed/mlt_mixing_length)
+   !log_dt_times_eff_mix_speed_div_mixing_length ! same as log_dt_times_effective_mixing_speed_div_mixing_length
    !log_du_kick_div_du
    !du
    !dvdt_dPdm

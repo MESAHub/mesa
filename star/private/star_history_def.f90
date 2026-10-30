@@ -663,7 +663,10 @@
       integer, parameter :: h_TDC_num_cells = h_C_cntr + 1
       integer, parameter :: h_retries = h_TDC_num_cells + 1
 
-      integer, parameter :: h_col_id_max = h_retries
+      integer, parameter :: h_max_eff_mix_speed_div_csound = h_retries + 1
+      integer, parameter :: h_max_effective_mixing_speed_div_csound = h_max_eff_mix_speed_div_csound + 1
+
+      integer, parameter :: h_col_id_max = h_max_effective_mixing_speed_div_csound
 
       character (len=maxlen_history_column_name) :: history_column_name(h_col_id_max)
       type (integer_dict), pointer :: history_column_names_dict
@@ -1097,6 +1100,8 @@
          history_column_name(h_surface_cell_entropy) = 'surface_cell_entropy'
 
          history_column_name(h_max_conv_vel_div_csound) = 'max_conv_vel_div_csound'
+         history_column_name(h_max_eff_mix_speed_div_csound) = 'max_eff_mix_speed_div_csound'
+         history_column_name(h_max_effective_mixing_speed_div_csound) = 'max_effective_mixing_speed_div_csound'
          history_column_name(h_max_gradT_div_grada) = 'max_gradT_div_grada'
          history_column_name(h_max_gradT_sub_grada) = 'max_gradT_sub_grada'
          history_column_name(h_min_log_mlt_Gamma) = 'min_log_mlt_Gamma'
