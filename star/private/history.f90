@@ -2721,7 +2721,7 @@ contains
             end do
             val = safe_log10(val)
 
-         case(h_max_conv_vel_div_csound)
+         case(h_max_conv_vel_div_csound, h_max_eff_mix_speed_div_csound, h_max_effective_mixing_speed_div_csound)
             val = 0
             do k = 2, nz
                if (s% q(k) > s% max_conv_vel_div_csound_maxq) cycle
@@ -2731,16 +2731,25 @@ contains
                else
                   csound_face = s% csound_face(k)
                end if
-               if (csound_face > 0d0) val = max(val, s% conv_vel(k)/csound_face)
+               if (csound_face > 0d0) then
+                  if (c == h_max_conv_vel_div_csound) then
+                     if (.not. s% RSP_flag) val = max(val, s% mlt_vc(k)/csound_face)
+                  else
+                     val = max(val, get_effective_mixing_speed(s,k)/csound_face)
+                  end if
+               end if
             end do
 
          case(h_min_t_eddy)
-            val = 1d99
-            do k = 2, nz
-               if (s% conv_vel(k) <= 0) cycle
-               if (s% scale_height(k) / s% conv_vel(k) < val) &
-                  val = s% scale_height(k) / s% conv_vel(k)
-            end do
+            val = 0d0
+            if (.not. s% RSP_flag) then
+               val = 1d99
+               do k = 2, nz
+                  if (s% conv_vel(k) <= 0) cycle
+                  if (s% scale_height(k) / s% conv_vel(k) < val) &
+                     val = s% scale_height(k) / s% conv_vel(k)
+               end do
+            end if
 
          case(h_elapsed_time)
             val = s% total_elapsed_time

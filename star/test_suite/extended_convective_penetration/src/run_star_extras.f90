@@ -430,7 +430,7 @@
 
         conductivity = 16.0_dp * boltz_sigma * pow3(s% T(k)) / ( 3.0_dp * s% opacity(k) * pow2(s% rho(k)) * s% cp(k) )
         call evaluate_Hp (s, k, s%r(k), Hp, ierr)
-        Peclet_nr = s% conv_vel(k) * Hp * s% mixing_length_alpha / conductivity
+        Peclet_nr = star_get_effective_mixing_speed(s,k) * Hp * s% mixing_length_alpha / conductivity
     end subroutine calc_Peclet_number
 
     ! Evaluate the pressure scale height at a given location in the star

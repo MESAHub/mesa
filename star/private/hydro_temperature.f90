@@ -20,7 +20,7 @@
       module hydro_temperature
 
       use star_private_def
-      use const_def, only: dp, ln10, pi4, crad, clight, convective_mixing
+      use const_def, only: dp, ln10, pi4, crad, clight, convective_mixing, semiconvective_mixing
       use reconstructed_face_support, only: get_reconstructed_face_eos_kap_ad
       use utils_lib, only: mesa_error, is_bad
       use auto_diff
@@ -83,7 +83,9 @@
          area = pi4*pow2(r_00); area2 = pow2(area)
 
          if (s% lnT(k)/ln10 <= s% max_logT_for_mlt &
-               .and. s% mlt_mixing_type(k) == convective_mixing .and. s% gradr(k) > 0d0 &
+               .and. (s% mlt_mixing_type(k) == convective_mixing &
+                  .or. s% mlt_mixing_type(k) == semiconvective_mixing) &
+               .and. s% gradr(k) > 0d0 &
                .and. abs(s% gradr(k) - s% gradT(k)) > abs(s% gradr(k))*1d-5) then
             Lrad_ad = L_ad*s% gradT_ad(k)/s% gradr_ad(k)  ! C&G 14.109
          else
