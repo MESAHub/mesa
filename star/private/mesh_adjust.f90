@@ -1938,12 +1938,15 @@
       subroutine adjust_omega(s, nz, nz_old, nzlo, nzhi, old_j_rot, &
             old_dq, new_dq, old_dqbar, new_dqbar, ierr)
          use hydro_rotation, only: w_div_w_roche_jrot, update1_i_rot_from_xh
+         use const_def, only: qp
+         use accurate_sum, only: accurate_real, assignment(=), operator(+), operator(-)
          type (star_info), pointer :: s
          integer, intent(in) :: nz, nz_old, nzlo, nzhi
          real(dp), dimension(:), intent(in) :: &
             old_j_rot, old_dq, new_dq, old_dqbar, new_dqbar
          integer, intent(out) :: ierr
-         real(dp) :: old_j_tot, new_j_tot, correction_norm, domega, r00
+         type(accurate_real) :: j_error
+         real(dp) :: correction_norm, domega, r00
          integer :: k
 
          ierr = 0
@@ -1959,8 +1962,14 @@
          end do
 !$OMP END PARALLEL DO
 
-         old_j_tot = dot_product(old_dqbar(1:nz_old), old_j_rot(1:nz_old))
-         new_j_tot = dot_product(new_dqbar(1:nz), s% j_rot(1:nz))
+         ! Accumulate old minus new in one sum to avoid subtracting rounded totals.
+         j_error = 0.0_qp
+         do k = 1, nz_old
+            j_error = j_error + real(old_dqbar(k),qp)*real(old_j_rot(k),qp)
+         end do
+         do k = 1, nz
+            j_error = j_error - real(new_dqbar(k),qp)*real(s% j_rot(k),qp)
+         end do
          correction_norm = 0d0
          do k = nzlo, nzhi
             correction_norm = correction_norm + &
@@ -1969,8 +1978,10 @@
 
          ! RSP uses half of the innermost cell in its dm_bar definition.
          if (s% rsp_flag .or. s% RSP2_flag) then
-            old_j_tot = old_j_tot - 0.5d0*old_dq(nz_old)*old_j_rot(nz_old)
-            new_j_tot = new_j_tot - 0.5d0*new_dq(nz)*s% j_rot(nz)
+            j_error = j_error - &
+               0.5_qp*real(old_dq(nz_old),qp)*real(old_j_rot(nz_old),qp)
+            j_error = j_error + &
+               0.5_qp*real(new_dq(nz),qp)*real(s% j_rot(nz),qp)
             if (nzhi == nz) correction_norm = correction_norm - &
                0.5d0*new_dq(nz)*s% i_rot(nz)% val
          end if
@@ -1979,7 +1990,7 @@
             ierr = -1
             return
          end if
-         domega = (old_j_tot - new_j_tot)/correction_norm
+         domega = real(j_error%value()/real(correction_norm,qp),dp)
          if (is_bad(domega)) then
             ierr = -1
             return
