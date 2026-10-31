@@ -300,7 +300,10 @@ contains
       call binary_private_def_init
       call binary_history_column_names_init(ierr)
       call set_binary_history_columns(b, b% job% binary_history_columns_file, .true., ierr)
-
+      if (.not. doing_restart) then
+         call do_get_data_for_binary_history_columns(b, ierr)
+         if (failed('do_get_data_for_binary_history_columns', ierr)) return
+      end if
       ! setup pgbinary
       if (.not. doing_restart) then
          call start_new_run_for_pgbinary(b, ierr)
