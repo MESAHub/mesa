@@ -1,9 +1,10 @@
 &binary_job
 
+read_extra_binary_job_inlist(1) = .true.
+extra_binary_job_inlist_name = "inlist_binary"
+
 inlist_names(1) = 'inlist1_ref'
 inlist_names(2) = 'inlist2_ref'
-
-evolve_both_stars = .true.
 
 !   pgbinary_flag = .true.
 
@@ -11,25 +12,18 @@ evolve_both_stars = .true.
 
 &binary_controls
 
-m1 = 1.0d0  ! donor mass in Msun
-m2 = 0.8d0 ! companion mass in Msun
-initial_period_in_days = 0.5d0
+read_extra_binary_controls_inlist(1) = .true.
+extra_binary_controls_inlist_name = "inlist_binary"
 
-fr = 0.01
-fr_limit = 1d-3
-
-limit_retention_by_mdot_edd = .false.
-
-
-photo_interval = 1
 log_directory = 'LOGS_ref'
 photo_digits = 3 ! 3 for ref, 5 for restart
 
 / ! end of binary_controls namelist
 
+
 &pgbinary
 
 read_extra_pgbinary_inlist(1) = .true.
-extra_pgbinary_inlist_name(1) = 'inlist_pgbinary'
+extra_pgbinary_inlist_name(1) = 'inlist_binary'
 
 / ! end of pgbinary namelist
