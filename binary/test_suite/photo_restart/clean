@@ -1,0 +1,1 @@
+rm LOGS* photos/* *.txt build *.mod -rf
