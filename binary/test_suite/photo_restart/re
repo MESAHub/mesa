@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+shopt -u expand_aliases
+
+# restart from photo
+photo_directory=photos
+
+# read restart inlist pointing to new output and more digits for photos
+new_inlist=inlist_main_restart
+
+
+if [ ! -f "$new_inlist" ]; then
+    echo "missing $new_inlist"
+    exit 1
+fi
+
+if [ $# -eq 0 ]; then
+    bp=$(ls -tp "$photo_directory"/b_* 2>/dev/null | tail -1)
+    photo=${bp#"$photo_directory/"b_}
+else
+    photo=$1
+fi
+
+if [ -z "$photo" ] || [ ! -f "$photo_directory/b_$photo" ] || [ ! -f "$photo_directory/1_$photo" ] || [ ! -f "$photo_directory/2_$photo" ]; then
+    echo "Not all specified photos exist: $photo"
+    exit 1
+fi
+
+cp "$new_inlist" inlist
+echo "restart from $photo using $new_inlist"
+echo "$photo" > .restart
+make run | tee restart_output.txt

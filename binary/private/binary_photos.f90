@@ -115,18 +115,18 @@ contains
          b% model_twins_flag, b% model_twins_flag_old, &
          b% dt_why_reason, b% dt_why_reason_old, &
          b% have_star_1, b% have_star_2, &
-         b% CE_flag, b% CE_flag_old, &
-         b% CE_init, b% CE_init_old, &
-         b% CE_nz, b% CE_initial_radius, b% CE_initial_separation, b% CE_initial_Mdonor, &
-         b% CE_initial_Maccretor, b% CE_initial_age, b% CE_initial_model_number, &
-         b% CE_b_initial_age, b% CE_b_initial_model_number, &
-         b% CE_num1, b% CE_num1_old, &
-         b% CE_num2, b% CE_num2_old, &
-         b% CE_lambda1, b% CE_lambda1_old, &
-         b% CE_lambda2, b% CE_lambda2_old, &
-         b% CE_Ebind1, b% CE_Ebind1_old, &
-         b% CE_Ebind2, b% CE_Ebind2_old, &
-         b% CE_years_detached, b% CE_years_detached_old, &
+         ! b% CE_flag, b% CE_flag_old, &
+         ! b% CE_init, b% CE_init_old, &
+         ! b% CE_nz, b% CE_initial_radius, b% CE_initial_separation, b% CE_initial_Mdonor, &
+         ! b% CE_initial_Maccretor, b% CE_initial_age, b% CE_initial_model_number, &
+         ! b% CE_b_initial_age, b% CE_b_initial_model_number, &
+         ! b% CE_num1, b% CE_num1_old, &
+         ! b% CE_num2, b% CE_num2_old, &
+         ! b% CE_lambda1, b% CE_lambda1_old, &
+         ! b% CE_lambda2, b% CE_lambda2_old, &
+         ! b% CE_Ebind1, b% CE_Ebind1_old, &
+         ! b% CE_Ebind2, b% CE_Ebind2_old, &
+         ! b% CE_years_detached, b% CE_years_detached_old, &
          b% generations, &
          b% ixtra(:), b% ixtra_old(:), &
          b% xtra(:), b% xtra_old(:), &
@@ -149,10 +149,10 @@ contains
          end do
       end if
 
-      if (b% CE_init) then
-         write(iounit, iostat = ierr) &
-            b% CE_m(:), b% CE_entropy(:), b% CE_U_in(:), b% CE_U_out(:), b% CE_Omega_in(:), b% CE_Omega_out(:)
-      end if
+      ! if (b% CE_init) then
+      !    write(iounit, iostat = ierr) &
+      !       b% CE_m(:), b% CE_entropy(:), b% CE_U_in(:), b% CE_U_out(:), b% CE_Omega_in(:), b% CE_Omega_out(:)
+      ! end if
 
       call b% other_binary_photo_write(binary_id, iounit)
 
@@ -238,18 +238,18 @@ contains
          b% model_twins_flag, b% model_twins_flag_old, &
          b% dt_why_reason, b% dt_why_reason_old, &
          b% have_star_1, b% have_star_2, &
-         b% CE_flag, b% CE_flag_old, &
-         b% CE_init, b% CE_init_old, &
-         b% CE_nz, b% CE_initial_radius, b% CE_initial_separation, b% CE_initial_Mdonor, &
-         b% CE_initial_Maccretor, b% CE_initial_age, b% CE_initial_model_number, &
-         b% CE_b_initial_age, b% CE_b_initial_model_number, &
-         b% CE_num1, b% CE_num1_old, &
-         b% CE_num2, b% CE_num2_old, &
-         b% CE_lambda1, b% CE_lambda1_old, &
-         b% CE_lambda2, b% CE_lambda2_old, &
-         b% CE_Ebind1, b% CE_Ebind1_old, &
-         b% CE_Ebind2, b% CE_Ebind2_old, &
-         b% CE_years_detached, b% CE_years_detached_old, &
+         ! b% CE_flag, b% CE_flag_old, &
+         ! b% CE_init, b% CE_init_old, &
+         ! b% CE_nz, b% CE_initial_radius, b% CE_initial_separation, b% CE_initial_Mdonor, &
+         ! b% CE_initial_Maccretor, b% CE_initial_age, b% CE_initial_model_number, &
+         ! b% CE_b_initial_age, b% CE_b_initial_model_number, &
+         ! b% CE_num1, b% CE_num1_old, &
+         ! b% CE_num2, b% CE_num2_old, &
+         ! b% CE_lambda1, b% CE_lambda1_old, &
+         ! b% CE_lambda2, b% CE_lambda2_old, &
+         ! b% CE_Ebind1, b% CE_Ebind1_old, &
+         ! b% CE_Ebind2, b% CE_Ebind2_old, &
+         ! b% CE_years_detached, b% CE_years_detached_old, &
          b% generations, &
          b% ixtra(:), b% ixtra_old(:), &
          b% xtra(:), b% xtra_old(:), &
@@ -293,14 +293,14 @@ contains
 
       end if
 
-      if (b% CE_flag .and. b% CE_init) then
-         nz = b% CE_nz
-         allocate(b% CE_m(nz), b% CE_entropy(4 * nz), &
-            b% CE_U_in(4 * nz), b% CE_U_out(4 * nz), b% CE_Omega_in(4 * nz), b% CE_Omega_out(4 * nz), stat = ierr)
-         if (ierr /= 0) stop "error during allocation in binary_photo_read"
-         read(iounit, iostat = ierr) &
-            b% CE_m(:), b% CE_entropy(:), b% CE_U_in(:), b% CE_U_out(:), b% CE_Omega_in(:), b% CE_Omega_out(:)
-      end if
+      ! if (b% CE_flag .and. b% CE_init) then
+      !    nz = b% CE_nz
+      !    allocate(b% CE_m(nz), b% CE_entropy(4 * nz), &
+      !       b% CE_U_in(4 * nz), b% CE_U_out(4 * nz), b% CE_Omega_in(4 * nz), b% CE_Omega_out(4 * nz), stat = ierr)
+      !    if (ierr /= 0) stop "error during allocation in binary_photo_read"
+      !    read(iounit, iostat = ierr) &
+      !       b% CE_m(:), b% CE_entropy(:), b% CE_U_in(:), b% CE_U_out(:), b% CE_Omega_in(:), b% CE_Omega_out(:)
+      ! end if
 
       call b% other_binary_photo_read(binary_id, iounit, ierr)
 

@@ -176,12 +176,12 @@
             b% xtra(:) = 0d0
             b% lxtra(:) = .false.
 
-            b% CE_num1 = 0
-            b% CE_num2 = 0
-            b% CE_lambda1 = 0d0
-            b% CE_lambda2 = 0d0
-            b% CE_Ebind1 = 0d0
-            b% CE_Ebind2 = 0d0
+            ! b% CE_num1 = 0
+            ! b% CE_num2 = 0
+            ! b% CE_lambda1 = 0d0
+            ! b% CE_lambda2 = 0d0
+            ! b% CE_Ebind1 = 0d0
+            ! b% CE_Ebind2 = 0d0
             b% mtransfer_rate = 0d0
 
             b% num_tries = 0
@@ -451,7 +451,7 @@
          end if
          call adjust_irradiation(b)
 
-         if (.not. b% CE_flag) then
+         ! if (.not. b% CE_flag) then
             if ((b% point_mass_i == 0 .or. b% model_twins_flag) &
                   .and. b% rl_relative_gap(b% a_i) >= 0.0d0) then
                if (b% rl_relative_gap(b% a_i) >= b% accretor_overflow_terminate) then
@@ -488,13 +488,13 @@
                end if
             end if
 
-            if (b% mtransfer_rate == -b% max_implicit_abs_mdot*Msun/secyer .and. &
-               b% CE_begin_at_max_implicit_abs_mdot) then
-               b% CE_flag = .true.
-               b% CE_init = .false.
-               binary_check_model = keep_going
-            end if
-         end if
+            ! if (b% mtransfer_rate == -b% max_implicit_abs_mdot*Msun/secyer .and. &
+            !    b% CE_begin_at_max_implicit_abs_mdot) then
+            !    b% CE_flag = .true.
+            !    b% CE_init = .false.
+            !    binary_check_model = keep_going
+            ! end if
+         ! end if
 
       end function binary_check_model
 
@@ -549,16 +549,16 @@
          b% ignore_rlof_flag_old = b% ignore_rlof_flag
          b% model_twins_flag_old = b% model_twins_flag
 
-         b% CE_flag_old = b% CE_flag
-         b% CE_init_old = b% CE_init
+         ! b% CE_flag_old = b% CE_flag
+         ! b% CE_init_old = b% CE_init
 
-         b% CE_num1_old = b% CE_num1
-         b% CE_num2_old = b% CE_num2
-         b% CE_lambda1_old = b% CE_lambda1
-         b% CE_lambda2_old = b% CE_lambda2
-         b% CE_Ebind1_old = b% CE_Ebind1
-         b% CE_Ebind2_old = b% CE_Ebind2
-         b% CE_years_detached_old = b% CE_years_detached
+         ! b% CE_num1_old = b% CE_num1
+         ! b% CE_num2_old = b% CE_num2
+         ! b% CE_lambda1_old = b% CE_lambda1
+         ! b% CE_lambda2_old = b% CE_lambda2
+         ! b% CE_Ebind1_old = b% CE_Ebind1
+         ! b% CE_Ebind2_old = b% CE_Ebind2
+         ! b% CE_years_detached_old = b% CE_years_detached
 
          b% dt_why_reason_old = b% dt_why_reason
 
@@ -620,17 +620,17 @@
             b% point_mass_i = b% point_mass_i_old
             b% ignore_rlof_flag = b% ignore_rlof_flag_old
             b% model_twins_flag = b% model_twins_flag_old
-            b% CE_flag = b% CE_flag_old
-            b% CE_init = b% CE_init_old
+            ! b% CE_flag = b% CE_flag_old
+            ! b% CE_init = b% CE_init_old
          end if
 
-         b% CE_num1 = b% CE_num1_old
-         b% CE_num2 = b% CE_num2_old
-         b% CE_lambda1 = b% CE_lambda1_old
-         b% CE_lambda2 = b% CE_lambda2_old
-         b% CE_Ebind1 = b% CE_Ebind1_old
-         b% CE_Ebind2 = b% CE_Ebind2_old
-         b% CE_years_detached = b% CE_years_detached_old
+         ! b% CE_num1 = b% CE_num1_old
+         ! b% CE_num2 = b% CE_num2_old
+         ! b% CE_lambda1 = b% CE_lambda1_old
+         ! b% CE_lambda2 = b% CE_lambda2_old
+         ! b% CE_Ebind1 = b% CE_Ebind1_old
+         ! b% CE_Ebind2 = b% CE_Ebind2_old
+         ! b% CE_years_detached = b% CE_years_detached_old
 
          b% dt_why_reason = b% dt_why_reason_old
 
@@ -669,30 +669,30 @@
             deallocate(b% e2)
             nullify(b% e2)
          end if
-         if (associated(b% CE_m)) then
-            deallocate(b% CE_m)
-            nullify(b% CE_m)
-         end if
-         if (associated(b% CE_entropy)) then
-            deallocate(b% CE_entropy)
-            nullify(b% CE_entropy)
-         end if
-         if (associated(b% CE_U_in)) then
-            deallocate(b% CE_U_in)
-            nullify(b% CE_U_in)
-         end if
-         if (associated(b% CE_U_out)) then
-            deallocate(b% CE_U_out)
-            nullify(b% CE_U_out)
-         end if
-         if (associated(b% CE_Omega_in)) then
-            deallocate(b% CE_Omega_in)
-            nullify(b% CE_Omega_in)
-         end if
-         if (associated(b% CE_Omega_out)) then
-            deallocate(b% CE_Omega_out)
-            nullify(b% CE_Omega_out)
-         end if
+         ! if (associated(b% CE_m)) then
+         !    deallocate(b% CE_m)
+         !    nullify(b% CE_m)
+         ! end if
+         ! if (associated(b% CE_entropy)) then
+         !    deallocate(b% CE_entropy)
+         !    nullify(b% CE_entropy)
+         ! end if
+         ! if (associated(b% CE_U_in)) then
+         !    deallocate(b% CE_U_in)
+         !    nullify(b% CE_U_in)
+         ! end if
+         ! if (associated(b% CE_U_out)) then
+         !    deallocate(b% CE_U_out)
+         !    nullify(b% CE_U_out)
+         ! end if
+         ! if (associated(b% CE_Omega_in)) then
+         !    deallocate(b% CE_Omega_in)
+         !    nullify(b% CE_Omega_in)
+         ! end if
+         ! if (associated(b% CE_Omega_out)) then
+         !    deallocate(b% CE_Omega_out)
+         !    nullify(b% CE_Omega_out)
+         ! end if
       end function binary_after_evolve
 
       end module binary_evolve
