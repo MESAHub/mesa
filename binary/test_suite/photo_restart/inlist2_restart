@@ -1,0 +1,49 @@
+&star_job
+
+show_log_description_at_start = .false.
+
+
+/ ! end of star_job namelist
+
+&eos
+
+/ ! end of eos namelist
+
+&colors
+
+/
+
+&kap
+
+Zbase = 0.02
+
+/ ! end of kap namelist
+
+
+&controls
+
+! check for retries as part of test_suite
+! you can/should delete this for use outside of test_suite
+retry_limit = 100
+max_number_retries = 80
+use_gold2_tolerances = .true.
+
+log_directory = 'LOGS2_restart'
+photo_digits = 5 ! 3 for ref, 5 for restart
+
+profile_interval = 1
+history_interval = 1
+photo_interval = 1
+write_header_frequency = 10
+
+varcontrol_target = 1d-3
+
+
+/ ! end of controls namelist
+
+
+&pgstar
+read_extra_pgstar_inlist(1) = .true.
+extra_pgstar_inlist_name(1)= 'inlist_pgstar'
+
+/ ! end of pgstar namelist

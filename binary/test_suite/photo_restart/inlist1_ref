@@ -1,0 +1,54 @@
+&star_job
+
+show_log_description_at_start = .false.
+save_model_when_terminate = .true.
+save_model_filename = 'final.mod'
+
+
+/ ! end of star_job namelist
+
+&eos
+
+/ ! end of eos namelist
+
+&colors
+
+/ ! end of colors namelist
+
+&kap
+Zbase = 0.02
+/ ! end of kap namelist
+
+
+
+
+
+&controls
+
+! check for retries as part of test_suite
+! you can/should delete this for use outside of test_suite
+max_number_retries = 80
+retry_limit = 100
+use_gold2_tolerances = .true.
+
+log_directory = 'LOGS1_ref'
+photo_directory = 'photos'
+photo_digits = 3 ! 3 for ref, 5 for restart
+
+profile_interval = 1
+history_interval = 1
+photo_interval = 1
+terminal_interval = 1
+write_header_frequency = 10
+
+varcontrol_target = 1d-3
+max_model_number = 4
+
+/ ! end of controls namelist
+
+
+&pgstar
+read_extra_pgstar_inlist(1) = .true.
+extra_pgstar_inlist_name(1)= 'inlist_pgstar'
+
+/ ! end of pgstar namelist
