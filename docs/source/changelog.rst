@@ -47,6 +47,11 @@ Additional controls are available for TDC envelope remeshing:
 - ``TDC_hydro_nz_inner`` adds geometrically spaced zones near the inner boundary.
 - ``TDC_hydro_nz_T_gradient`` adds zones according to the variation in ``logT`` below ``TDC_hydro_T_anchor`` while retaining the mass-based mesh.
 
+PGSTAR HR diagrams can now show labeled lines of constant stellar radius.
+Set ``show_HR_radius_lines = .true.`` in ``&pgstar`` to enable them (default
+``.false.``). See :ref:`reference/pgstar:HR window` and
+`gh-1091 <https://github.com/MESAHub/mesa/pull/1091>`_.
+
 Additional ``pgstar`` plots to visualize residuals of equations:
 - Kippenhahn-style diagram (with mass on the y-axis and model number on the x-axis) colored by ``safe_log10(maxval(abs(s%equ(1:neq, k))))``, which is the logarithm of the absolute value of the biggest residual at cell ``k`` for the *accepted* iteration of MESA's Newton-Raphson solver. The y-axis can be mass, logR, or tau.
 - Time evolution of the maximum residual across mesh points for each structure equation (ignores chemical composition equations). See ``Kipp_residuals_*`` and ``Max_eq_resid_*`` in ``pgstar.defaults``
