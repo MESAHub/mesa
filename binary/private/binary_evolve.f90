@@ -518,6 +518,13 @@
             end if
          end if
 
+         call binary_set_old_to_current(b)
+
+      end function binary_finish_step
+
+      subroutine binary_set_old_to_current(b)
+         type (binary_info), pointer :: b
+
          ! store all variables into "old"
 
          b% model_number_old = b% model_number
@@ -567,7 +574,7 @@
          b% xtra_old(:) = b% xtra(:)
          b% lxtra_old(:) = b% lxtra(:)
 
-      end function binary_finish_step
+      end subroutine binary_set_old_to_current
 
       integer function binary_prepare_to_redo(b)
          type (binary_info), pointer :: b

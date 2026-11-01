@@ -125,6 +125,11 @@ The new controls restore their incoming solver settings when relaxation ends.
 Bug Fixes
 ---------
 
+Binary photo restarts now initialize retry and redo states from the loaded
+model. Previously, a first-step retry or redo from a terminal photo could
+rewind the binary age and orbit one step while the stars remained at the
+saved model. Incomplete binary state records are also rejected.
+
 Switching to radiative transport no longer overwrites saved convective
 velocities during photo loading or retries with
 ``restore_mesh_on_retry = .true.``. Loading a photo also preserves the stored

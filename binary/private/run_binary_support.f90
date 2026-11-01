@@ -352,6 +352,13 @@ contains
       ! setup things for common envelope in case of a restart
       if (doing_restart .and. b% CE_flag .and. b% CE_init) then
          call ce_init(b, doing_restart, ierr)
+         if (ierr /= 0) return
+      end if
+
+      if (doing_restart) then
+         ! Terminal photos can retain the previous step's binary retry state.
+         ! Start binary and stellar retries from the loaded model.
+         call binary_set_old_to_current(b)
       end if
 
       evolve_loop : do while(continue_evolve_loop)  ! evolve one step per loop
