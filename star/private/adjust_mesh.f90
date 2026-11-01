@@ -325,6 +325,7 @@
             call dealloc
             return
          end if
+         s% prev_mesh_num_superad_reduction_history = prv% prev_mesh_num_superad_reduction_history
 
          if (dbg_remesh .or. dbg) write(*,*) 'call do_alloc3'
          call do_alloc3(ierr)
@@ -454,6 +455,7 @@
          end if
 
          ! restore prev_mesh info
+         nh = s% prev_mesh_num_superad_reduction_history
          do k=1, s% prev_mesh_nz
             s% prev_mesh_xa(:,k) = prv% prev_mesh_xa(:,k)
             s% prev_mesh_xh(:,k) = prv% prev_mesh_xh(:,k)
@@ -463,8 +465,8 @@
             s% prev_mesh_mlt_vc(k) = prv% prev_mesh_mlt_vc(k)
             s% prev_mesh_superad_reduction_factor(k) = &
                prv% prev_mesh_superad_reduction_factor(k)
-            s% prev_mesh_superad_reduction_history_du(:,k) = prv% prev_mesh_superad_reduction_history_du(:,k)
-            s% prev_mesh_superad_reduction_history_eta_du(:,k) = prv% prev_mesh_superad_reduction_history_eta_du(:,k)
+            s% prev_mesh_superad_reduction_history_du(1:nh,k) = prv% prev_mesh_superad_reduction_history_du(1:nh,k)
+            s% prev_mesh_superad_reduction_history_eta_du(1:nh,k) = prv% prev_mesh_superad_reduction_history_eta_du(1:nh,k)
          end do
 
          ! restore ST info (for time smoothing)

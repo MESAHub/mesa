@@ -90,7 +90,8 @@
             s% crystal_core_boundary_mass, s% num_superad_reduction_history
 
          if (failed('initial_y')) return
-         if (s% num_superad_reduction_history < 0) then
+         if (s% num_superad_reduction_history < 0 .or. &
+               s% num_superad_reduction_history > max_superad_reduction_history) then
             ierr = -1
             if (failed('num_superad_reduction_history')) return
          end if
@@ -145,7 +146,7 @@
          s% superad_reduction_factor_old(1:nz) = s% superad_reduction_factor(1:nz)
          s% have_superad_reduction_factor = .true.
          s% okay_to_set_superad_reduction_factor = .false.
-         s% superad_reduction_history_pending = .false.
+         s% superad_reduction_pending = .false.
 
          if (s% num_superad_reduction_history > 0) then
             read(iounit, iostat=ierr) &

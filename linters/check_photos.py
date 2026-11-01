@@ -103,6 +103,8 @@ def get_photo_out_variables():
 
     known_false_positives = {
         "other_photo_write",
+        "superad_reduction_du",  # Advances only the pending history snapshot
+        "superad_reduction_target",  # Advances only the pending history snapshot
     }
 
     return v - known_false_positives

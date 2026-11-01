@@ -43,9 +43,9 @@
       real(dp), pointer, dimension(:) :: mlt_vc ! (nz)
       real(dp), pointer, dimension(:) :: conv_vel ! (nz)
       integer :: num_superad_reduction_history = 0
-      ! Accepted dt/tau_conv_start and (dt/tau_conv_start)/Gamma_inst, newest first.
+      ! Accepted dt/tau_conv_start and target*dt/tau_conv_start, newest first.
       ! Only rows 1:num_superad_reduction_history are active.
-      real(dp), pointer :: superad_reduction_history_du(:,:) => null() ! (history,nz)
+      real(dp), pointer :: superad_reduction_history_du(:,:) => null() ! (max_superad_reduction_history,nz)
       real(dp), pointer :: superad_reduction_history_eta_du(:,:) => null()
 
       ! vectors of structure variables: xh(i,k) holds hydro structure variable i for point k.

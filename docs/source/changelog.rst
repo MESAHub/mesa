@@ -23,9 +23,8 @@ For a more in-depth look at the new build system, see :doc:`developing/build-sys
 
 ``Tsurf_factor`` and the associated controls and history column have been removed as they affected nothing. These controls were effectively deprecated after the removal of the black body boundary condition in 21.12.1.
 
-Photos now store the target history for the superadiabatic moving mean.
-Photos written before this change are incompatible.
-Saved ``.mod`` starting models are unaffected.
+Photos now include the superadiabatic turnover-limiter history. Earlier
+photos are incompatible; saved ``.mod`` starting models remain compatible.
 
 A substantial clean up of old or deprecated controls has been undertaken in
 ``star``, ``binary``, PGSTAR, and PGBINARY.
@@ -58,24 +57,18 @@ Additional controls are available for TDC envelope remeshing:
 - ``TDC_hydro_nz_inner`` adds geometrically spaced zones near the inner boundary.
 - ``TDC_hydro_nz_T_gradient`` adds zones according to the variation in ``logT`` below ``TDC_hydro_T_anchor`` while retaining the mass-based mesh.
 
-The new control ``superad_reduction_use_turnover_limit`` limits changes in
-``eta = 1/Gamma_factor``, the factor applied to ``gradr-gradL``.
-``superad_reduction_turnover_limit_function`` selects ``'linear'``,
-``'exponential'``, or ``'moving_mean'``. The default is ``'linear'``.
-The moving mean averages the instantaneous target over one accumulated
-turnover. A sustained target replaces the full averaging interval after
-one turnover, including when the turnover time changes between steps.
-The history is preserved through remeshing, retries, and photo restarts.
-See :ref:`reference/controls:superad_reduction_turnover_limit_function`
-for the equations and treatment of target history.
+The new control ``superad_reduction_use_turnover_limit`` averages
+``eta = 1/Gamma_factor``, the factor applied to ``gradr-gradL``, over one
+accumulated convective turnover. Storage is limited to 64 history
+intervals. Merging adjacent intervals bounds memory use and introduces
+compression error. Remeshing and photo restarts preserve the stored history.
+See :ref:`reference/controls:superad_reduction_use_turnover_limit` for the
+turnover time and averaging method.
 
-Zones with a lagged convective velocity use
-``scale_height/max(mlt_vc,1d-10 cm/s)`` for ``tau_conv``; other zones use the
-Brunt frequency. The scale height and thermodynamic state are the interpolated
-or reconstructed face values used by MLT and TDC. For ``k > 0``,
-``superad_reduction_max_logT`` uses the cell temperature at the start of
-the step, not a face temperature. Its default is ``7d0``, corresponding to
-:math:`10^7\,\mathrm{K}`. Model construction with ``k=0`` is unchanged.
+During evolution, ``superad_reduction_max_logT`` sets the upper temperature
+for superadiabatic reduction, with a default of :math:`10^7\,\mathrm{K}`.
+The temperature selection and turnover time are fixed at the start of each
+step and held during solver iterations.
 
 PGSTAR HR diagrams can now show labeled lines of constant stellar radius.
 Set ``show_HR_radius_lines = .true.`` in ``&pgstar`` to enable them (default
@@ -97,9 +90,17 @@ conserving total angular momentum. See
 Bug Fixes
 ---------
 
-Fixed ``switch_to_radiative`` zeroing saved ``mlt_vc`` during TDC photo
-restarts. This could also change the evolution after a retry with
-``restore_mesh_on_retry = .true.``.
+Switching to radiative transport no longer overwrites saved convective
+velocities during photo loading or retries with
+``restore_mesh_on_retry = .true.``. Loading a photo also preserves the stored
+superadiabatic reduction while derived quantities are rebuilt, including
+when ``run_star_extras`` enables reduction at startup.
+
+Fixed the density-inversion contribution to superadiabatic reduction to
+use ``superad_reduction_Gamma_inv_scale`` instead of
+``superad_reduction_Gamma_limit_scale``, restoring the ``alpha_2`` term in
+Jermyn et al. (2023, equation 64). Results change only when the two scales
+differ.
 
 Fixed ``switch_to_radiative`` zeroing saved ``mlt_vc`` during TDC photo
 restarts and preparation for a new step. Mixing cleanup now preserves
@@ -140,10 +141,6 @@ respect changes to the mixing length set by ``other_alpha_mlt``, and used the
 The parameter ``report_max_infall_inside_fe_core`` was ignored in versions r25.12.1 and r26.4.1 and always had it's default value. See `gh-981 https://github.com/MESAHub/mesa/pull/981`_.
 
 ``fe_core_infall_limit`` now obeys ``when_to_stop_rtol`` and ``when_to_stop_atol`` again (broken since r11532).
-
-In ``set_superad_reduction`` (``star/private/turb_support.f90``), the density inversion contribution to ``Gamma_term`` used ``superad_reduction_Gamma_limit_scale`` instead of ``superad_reduction_Gamma_inv_scale``. This made the latter control inactive. The published algorithm is restored (Jermyn et al. 2023, equation 64, ``alpha_2`` term). Existing test suite cases set the two scales to the same value and are bit-for-bit unaffected. The fix changes results only when the scales differ.
-
-Photo restarts now preserve the stored superadiabatic turnover-limiter state while ``finish_load_model`` rebuilds derived quantities. Previously, the stored reduction could be reset before ``extras_startup`` restored controls selected dynamically by ``run_star_extras``. Runs that leave superadiabatic reduction disabled still reset the factor on the first evolution step.
 
 Fixed the OPAL/SCVH blend in metallicity, which could cause discontinuities
 in the EOS at ``Z = 0.04`` with the default blend limits. See

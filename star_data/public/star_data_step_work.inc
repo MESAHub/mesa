@@ -336,6 +336,7 @@
          prev_mesh_j_rot, prev_mesh_omega, prev_mesh_dq, prev_mesh_mlt_vc, &
          prev_mesh_superad_reduction_factor
       ! Accepted history before remeshing, restored on a retry.
+      integer :: prev_mesh_num_superad_reduction_history = 0
       real(dp), pointer :: prev_mesh_superad_reduction_history_du(:,:) => null()
       real(dp), pointer :: prev_mesh_superad_reduction_history_eta_du(:,:) => null()
       logical :: prev_mesh_species_or_nvar_hydro_changed ! specifies if either species or number of hydro variables
@@ -356,11 +357,12 @@
          ! this reports effect of MLT++
          ! it is the fraction of grada used to modify gradT, so 0 means no effect.
 
-      real(dp), pointer :: superad_reduction_factor(:) ! only set when use_superad_reduction = .true.
-         ! reports effect of superad_reduction.  value = 1d0 for no effect.
-      ! Frozen dt/tau_conv_start and latest 1/Gamma_inst for the current attempt.
-      real(dp), pointer :: superad_reduction_du(:), superad_reduction_target(:)
-      ! Historical contribution to the moving mean for the current attempt.
+      real(dp), pointer :: superad_reduction_factor(:) ! Gamma_factor; 1d0 means no reduction
+      ! dt/tau_conv_start, held fixed during the solve.
+      real(dp), pointer :: superad_reduction_du(:)
+      ! Instantaneous 1/Gamma_factor from the latest convection evaluation.
+      real(dp), pointer :: superad_reduction_target(:)
+      ! eta = eta_past + min(du,1)*target; eta_past is fixed during the solve.
       real(dp), pointer :: superad_reduction_eta_past(:)
 
       ! mixing length alpha for MLT (can be set by user and can vary within model)
@@ -575,7 +577,7 @@
          real(dp), pointer, dimension(:) :: &
             dq_old, q_old, j_rot_old, omega_old, mlt_vc_old, &
             superad_reduction_factor_old
-            ! previous accepted Gamma_factor for the turnover limiter
+            ! superad_reduction_factor_old is Gamma_factor at the start of the step
          real(dp) :: time_old, dt_old, mstar_old, xmstar_old, mstar_dot_old, &
             M_center_old, v_center_old, R_center_old, L_center_old
          integer :: nz_old, model_number_old
@@ -911,11 +913,14 @@
             RSP_just_set_velocities, &
             have_new_cz_bdy_info, using_gold_tolerances, need_to_setvars, have_new_generation, &
             using_velocity_time_centering, okay_to_set_mixing_info, &
-            okay_to_set_mlt_vc, have_mlt_vc, &
-            okay_to_set_superad_reduction_factor, have_superad_reduction_factor
-            ! current factor is frozen until it has been copied to the old state
-         ! Completed interval waiting for finish_step to commit its history.
-         logical :: superad_reduction_history_pending = .false.
+            okay_to_set_mlt_vc, have_mlt_vc
+         logical :: okay_to_set_superad_reduction_factor
+            ! With the turnover limiter, allow the reduction to change during the solve.
+            ! Set false when rebuilding the model with its saved reduction.
+         logical :: have_superad_reduction_factor
+            ! The stored reduction can be held while rebuilding the model.
+         logical :: superad_reduction_pending = .false.
+            ! The converged timestep still needs to be added to the turnover history.
 
          real(dp), pointer :: xa_removed(:) ! mass fractions for removed mass (1:species)
          real(dp) :: h1_czb_mass

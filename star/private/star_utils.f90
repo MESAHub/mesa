@@ -106,7 +106,8 @@
       public :: set_scale_height
       public :: set_abs_du_div_cs
       public :: set_conv_time_scales
-      public :: superad_history_integral, get_superad_history
+      public :: superad_history_integral, compact_superad_history, advance_superad_history, set_superad_reduction_cache
+      public :: commit_superad_history
       public :: set_rv_info
       public :: smooth
       public :: safe_div_val
@@ -3745,7 +3746,7 @@
          include 'formats'
          s% min_conv_time_scale = 1d99
          s% max_conv_time_scale = 0d0
-         set_tau_conv = s% superad_reduction_use_turnover_limit
+         set_tau_conv = s% use_superad_reduction .and. s% superad_reduction_use_turnover_limit
          do k=1,s%nz
             if (set_tau_conv) then
                tau_conv = conv_time_scale(s,k)
@@ -3768,8 +3769,7 @@
 
 
       real(dp) function superad_history_integral(du, eta_du, span) result(integral)
-         real(dp), intent(in) :: du(:), eta_du(:)
-         real(dp), intent(in) :: span
+         real(dp), intent(in) :: du(:), eta_du(:), span
          real(dp) :: remaining, eta
          integer :: j
 
@@ -3781,7 +3781,7 @@
             if (du(j) <= 0d0) cycle
             eta = eta_du(j)/du(j)
             if (du(j) >= remaining) then
-               integral = integral + remaining*eta
+               integral = min(span, integral + remaining*eta)
                return
             end if
             integral = integral + eta_du(j)
@@ -3790,79 +3790,135 @@
          if (remaining > 100d0*epsilon(1d0)*max(1,size(du))) &
             call mesa_error(__FILE__, __LINE__, 'incomplete superad reduction history')
          ! Close a roundoff-sized remainder with the oldest target.
-         integral = integral + remaining*eta
+         integral = min(span, integral + remaining*eta)
       end function superad_history_integral
 
 
-      subroutine get_superad_history(s, du, eta_du, ierr, commit)
-         type(star_info), pointer :: s
-         real(dp), pointer :: du(:,:), eta_du(:,:)
-         integer, intent(out) :: ierr
-         logical, intent(in), optional :: commit
-         real(dp) :: remaining, width, target
-         integer :: j, k, n, nh, nh_alloc, nz_alloc
-         integer, parameter :: extra = 32
-         logical :: do_commit, reuse
+      subroutine compact_superad_history(du, eta_du, nh, nz)
+         real(dp), intent(inout) :: du(:,:), eta_du(:,:)
+         integer, intent(inout) :: nh
+         integer, intent(in) :: nz
+         real(dp) :: a, b, small, large, score, best_score, eta, scale, norm, cross
+         integer :: j, k, pair
 
-         nullify(du, eta_du)
-         ierr = -1
-         do_commit = .false.
-         if (present(commit)) do_commit = commit
-         nh = s% num_superad_reduction_history
-         if (nh <= 0) return
+         if (nh < max_superad_reduction_history) return
+         best_score = huge(1d0)
+         pair = 1
+         do j=1,nh-1
+            score = 0d0
+            do k=1,nz
+               a = du(j,k)
+               b = du(j+1,k)
+               small = min(a,b)
+               large = max(a,b)
+               if (small > 0d0) score = max(score, &
+                  (small/(1d0+small/large))*abs(eta_du(j,k)/a-eta_du(j+1,k)/b))
+               if (k > 1) then
+                  scale = max(a,b,du(j,k-1),du(j+1,k-1))
+                  if (scale > 0d0) then
+                     norm = a/scale+b/scale+du(j,k-1)/scale+du(j+1,k-1)/scale
+                     ! Bound the merge error between faces with different turnover clocks.
+                     cross = abs( &
+                        ((du(j+1,k-1)/scale)/norm)*eta_du(j,k) + ((b/scale)/norm)*eta_du(j,k-1) - &
+                        (((du(j,k-1)/scale)/norm)*eta_du(j+1,k) + ((a/scale)/norm)*eta_du(j+1,k-1)))
+                     score = max(score,cross)
+                  end if
+               end if
+               if (score >= best_score) exit
+            end do
+            if (score < best_score) then
+               best_score = score
+               pair = j
+            end if
+         end do
+         ! The same physical intervals must be merged at every face.
+         do k=1,nz
+            a = du(pair,k)
+            b = du(pair+1,k)
+            if (a > huge(1d0)-b) then
+               ! Preserve the mean target when the summed width exceeds the real range.
+               large = max(a,b)
+               eta = (eta_du(pair,k)/large+eta_du(pair+1,k)/large)/(a/large+b/large)
+               du(pair,k) = huge(1d0)
+               eta_du(pair,k) = huge(1d0)*min(1d0,eta)
+            else
+               du(pair,k) = a+b
+               eta_du(pair,k) = eta_du(pair,k)+eta_du(pair+1,k)
+            end if
+         end do
+         do j=pair+1,nh-1
+            du(j,1:nz) = du(j+1,1:nz)
+            eta_du(j,1:nz) = eta_du(j+1,1:nz)
+         end do
+         nh = nh-1
+      end subroutine compact_superad_history
+
+
+      subroutine advance_superad_history(du, eta_du, nh, target, width, nz)
+         real(dp), intent(inout) :: du(:,:), eta_du(:,:)
+         integer, intent(inout) :: nh
+         real(dp), intent(in) :: target(:), width(:)
+         integer, intent(in) :: nz
+         real(dp) :: remaining
+         integer :: j, k, n
+
+         if (all(width(1:nz) <= 0d0)) return
+         if (nh >= size(du,dim=1)) &
+            call mesa_error(__FILE__, __LINE__, 'full superad reduction history')
+         do k=1,nz
+            do j=nh,1,-1
+               du(j+1,k) = du(j,k)
+               eta_du(j+1,k) = eta_du(j,k)
+            end do
+            du(1,k) = width(k)
+            eta_du(1,k) = width(k)*target(k)
+         end do
+         nh = nh+1
          n = 1
-         do k=1,s% nz
-            width = s% superad_reduction_du(k)
-            target = s% superad_reduction_target(k)
-            if (is_bad_num(width) .or. is_bad_num(target)) return
-            if (width < 0d0 .or. target <= 0d0 .or. target > 1d0) return
-            remaining = 1d0 - min(width, 1d0)
-            j = 0
-            do while (remaining > 0d0 .and. j < nh)
-               j = j + 1
-               remaining = remaining - s% superad_reduction_history_du(j,k)
+         do k=1,nz
+            remaining = 1d0
+            do j=1,nh
+               remaining = remaining-du(j,k)
+               if (remaining <= 0d0) exit
             end do
-            if (remaining > 100d0*epsilon(1d0)*max(1,nh)) return
-            n = max(n, j+1)
+            n = max(n,min(j,nh))
          end do
+         nh = n
+      end subroutine advance_superad_history
 
-         nz_alloc = size(s% superad_reduction_history_du, dim=2)
-         reuse = do_commit .and. n <= size(s% superad_reduction_history_du, dim=1)
-         if (reuse) then
-            du => s% superad_reduction_history_du
-            eta_du => s% superad_reduction_history_eta_du
-         else
-            nh_alloc = n
-            if (do_commit) nh_alloc = n + extra
-            allocate(du(nh_alloc,nz_alloc), eta_du(nh_alloc,nz_alloc), stat=ierr)
-            if (ierr /= 0) then
-               if (associated(du)) deallocate(du)
-               if (associated(eta_du)) deallocate(eta_du)
-               return
-            end if
-            du(:,s% nz+1:nz_alloc) = 0d0
-            eta_du(:,s% nz+1:nz_alloc) = 0d0
-         end if
-         ! Rows are common accepted physical timesteps, newest first.
-         do k=1,s% nz
-            ! Descending copies also work when reusing the accepted arrays.
-            do j=n,2,-1
-               du(j,k) = s% superad_reduction_history_du(j-1,k)
-               eta_du(j,k) = s% superad_reduction_history_eta_du(j-1,k)
-            end do
-            du(1,k) = s% superad_reduction_du(k)
-            eta_du(1,k) = s% superad_reduction_du(k)*s% superad_reduction_target(k)
+
+      subroutine commit_superad_history(s)
+         type(star_info), pointer :: s
+         integer :: k, nh, nz
+
+         if (.not. s% superad_reduction_pending) return
+         nz = s% nz
+         call advance_superad_history(s% superad_reduction_history_du, s% superad_reduction_history_eta_du, &
+            s% num_superad_reduction_history, s% superad_reduction_target, s% superad_reduction_du, nz)
+         nh = s% num_superad_reduction_history
+         do k=1,nz
+            s% superad_reduction_factor(k) = 1d0/superad_history_integral( &
+               s% superad_reduction_history_du(1:nh,k), s% superad_reduction_history_eta_du(1:nh,k), 1d0)
          end do
-         if (do_commit) then
-            if (.not. reuse) then
-               deallocate(s% superad_reduction_history_du, s% superad_reduction_history_eta_du)
-               s% superad_reduction_history_du => du
-               s% superad_reduction_history_eta_du => eta_du
-            end if
-            s% num_superad_reduction_history = n
-         end if
-         ierr = 0
-      end subroutine get_superad_history
+         s% superad_reduction_pending = .false.
+      end subroutine commit_superad_history
+
+
+      subroutine set_superad_reduction_cache(s, nz)
+         type(star_info), pointer :: s
+         integer, intent(in) :: nz
+         real(dp) :: fraction
+         integer :: k, nh
+
+         s% superad_reduction_eta_past(1:nz) = 1d0
+         nh = s% num_superad_reduction_history
+         if (nh == 0) return
+         do k=1,nz
+            fraction = min(s% superad_reduction_du(k),1d0)
+            s% superad_reduction_eta_past(k) = superad_history_integral( &
+               s% superad_reduction_history_du(1:nh,k), s% superad_reduction_history_eta_du(1:nh,k), 1d0-fraction)
+         end do
+      end subroutine set_superad_reduction_cache
 
 
       real(dp) function QHSE_time_scale(s,k) result(tau_qhse)

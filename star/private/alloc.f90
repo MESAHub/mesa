@@ -483,13 +483,19 @@
          nvar_chem = s% nvar_chem
          use_turnover_limit = s% use_superad_reduction .and. &
             s% superad_reduction_use_turnover_limit .and. .not. s% RSP_flag
-         nh_alloc = s% num_superad_reduction_history
-         if (action_in /= do_allocate .and. associated(s% superad_reduction_history_du)) &
-            nh_alloc = max(nh_alloc, size(s% superad_reduction_history_du, dim=1))
+         nh_alloc = 0
+         ! Existing history row capacity changes only when part1 initializes the history.
+         if (action_in == do_allocate .and. use_turnover_limit) nh_alloc = max_superad_reduction_history
+         if (s% num_superad_reduction_history > 0) nh_alloc = max_superad_reduction_history
+         if (action_in /= do_allocate .and. associated(s% superad_reduction_history_du)) then
+            if (size(s% superad_reduction_history_du, dim=1) > 0) nh_alloc = max_superad_reduction_history
+         end if
          nh_prev = 0
-         ! Fresh allocation has no rollback history. Capture the source size before pointer swaps.
-         if (action_in /= do_allocate .and. associated(s% prev_mesh_superad_reduction_history_du)) &
-            nh_prev = size(s% prev_mesh_superad_reduction_history_du, dim=1)
+         if (action_in == do_allocate) nh_prev = nh_alloc
+         if (s% prev_mesh_num_superad_reduction_history > 0) nh_prev = max_superad_reduction_history
+         if (action_in /= do_allocate .and. associated(s% prev_mesh_superad_reduction_history_du)) then
+            if (size(s% prev_mesh_superad_reduction_history_du, dim=1) > 0) nh_prev = max_superad_reduction_history
+         end if
 
          c => s
          action = action_in
@@ -509,8 +515,13 @@
             end if
          end if
          if (action == do_copy_pointers_and_resize) then
-            if (associated(c% superad_reduction_history_du)) &
-               nh_alloc = max(nh_alloc, size(c% superad_reduction_history_du, dim=1))
+            if (associated(c% superad_reduction_history_du)) then
+               if (size(c% superad_reduction_history_du, dim=1) > 0) nh_alloc = max_superad_reduction_history
+            end if
+            if (associated(c% prev_mesh_superad_reduction_history_du)) then
+               if (size(c% prev_mesh_superad_reduction_history_du, dim=1) > 0) nh_prev = max_superad_reduction_history
+            end if
+            nh_prev = max(nh_prev, nh_alloc)
          end if
 
          do  ! just so can exit on failure
@@ -552,6 +563,13 @@
                call do2(s% prev_mesh_superad_reduction_history_eta_du, c% prev_mesh_superad_reduction_history_eta_du, &
                   nh_prev, 'prev_mesh_superad_reduction_history_eta_du')
                if (failed('prev_mesh_superad_reduction_history_eta_du')) exit
+               if (action == do_allocate) then
+                  s% superad_reduction_history_du = 0d0
+                  s% superad_reduction_history_eta_du = 0d0
+                  s% prev_mesh_superad_reduction_history_du = 0d0
+                  s% prev_mesh_superad_reduction_history_eta_du = 0d0
+                  s% prev_mesh_num_superad_reduction_history = 0
+               end if
 
                ! These are persistent inputs needed for ST time smoothing.
                call do1(s% D_ST_start, c% D_ST_start)
@@ -808,8 +826,8 @@
             if (failed('adjust_mlt_gradT_fraction')) exit
             call do1(s% gradT_excess_effect, c% gradT_excess_effect)
             if (failed('gradT_excess_effect')) exit
-            ! Preserve the accepted factor until it has been copied to the old model.
-            if (action /= do_fill_arrays_with_NaNs .or. .not. use_turnover_limit) then
+            ! Preserve the applied factor for rollback and photos, even with the limiter off.
+            if (action /= do_fill_arrays_with_NaNs) then
                call do1(s% superad_reduction_factor, c% superad_reduction_factor)
                if (failed('superad_reduction_factor')) exit
             end if

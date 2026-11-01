@@ -41,7 +41,7 @@
       contains
 
       subroutine set_mlt_vars(s, nzlo, nzhi, ierr, set_tau_conv)
-         use star_utils, only: start_time, update_time
+         use star_utils, only: start_time, update_time, conv_time_scale
          type (star_info), pointer :: s
          integer, intent(in) :: nzlo, nzhi
          integer, intent(out) :: ierr
@@ -55,7 +55,7 @@
          ! Keep the start-state timescale fixed during solver iterations.
          set_tau = .false.
          if (present(set_tau_conv)) set_tau = set_tau_conv
-         set_tau = set_tau .and. s% superad_reduction_use_turnover_limit
+         set_tau = set_tau .and. s% use_superad_reduction .and. s% superad_reduction_use_turnover_limit
          use_mlt_vc_tau_surface = .false.
          if (set_tau .and. s% have_mlt_vc .and. nzlo == 1) &
             use_mlt_vc_tau_surface = s% mlt_vc(1) > 0d0
@@ -77,7 +77,7 @@
          ! The surface Brunt timescale uses the first interior face.
          if (ierr == 0 .and. set_tau .and. s% use_face_reconstruction .and. &
                nzlo == 1 .and. nzhi >= 2 .and. .not. use_mlt_vc_tau_surface) &
-            s% tau_conv_start(1) = s% tau_conv_start(2)
+            s% tau_conv_start(1) = conv_time_scale(s,1)
          if (s% doing_timing) call update_time(s, time0, total, s% time_mlt)
 
       end subroutine set_mlt_vars
@@ -331,14 +331,17 @@
             real(dp) :: fraction
             include 'formats'
 
-            ! No mixing contributes a neutral target to the moving mean.
+            if (.not. s% have_superad_reduction_factor .or. &
+                  (.not. s% doing_finish_load_model .and. &
+                   (.not. s% use_superad_reduction .or. .not. s% superad_reduction_use_turnover_limit))) &
+               s% superad_reduction_factor(k) = 1d0
+            ! No mixing contributes a neutral target to the turnover mean.
             if (s% use_superad_reduction .and. s% superad_reduction_use_turnover_limit .and. &
-                  .not. s% RSP_flag .and. trim(s% superad_reduction_turnover_limit_function) == 'moving_mean' .and. &
+                  .not. s% RSP_flag .and. &
                   .not. s% doing_finish_load_model) then
-               if (.not. s% have_superad_reduction_factor) s% superad_reduction_factor(k) = 1d0
                if (s% okay_to_set_superad_reduction_factor .and. s% num_superad_reduction_history > 0) then
                   s% superad_reduction_target(k) = 1d0
-                  fraction = min(s% superad_reduction_du(k), 1d0)
+                  fraction = min(s% superad_reduction_du(k),1d0)
                   s% superad_reduction_factor(k) = 1d0/(s% superad_reduction_eta_past(k) + fraction)
                end if
             end if

@@ -2533,145 +2533,77 @@
 
       ! use_superad_reduction
       ! ~~~~~~~~~~~~~~~~~~~~~
-
       ! Implicit alternative to ``okay_to_reduce_gradT_excess``. MLT or TDC
-      ! is repeated with ``gradr`` moved toward ``gradL`` in cells near the
-      ! Eddington or density-inversion limits. The two contributions are
-      ! evaluated separately and added to ``Gamma_factor``, with
-      ! ``gradr_scaled = gradL + (gradr-gradL)/Gamma_factor``.
+      ! is repeated with ``gradr_scaled = gradL + eta*(gradr-gradL)``, where
+      ! ``eta = 1/Gamma_factor`` reduces the excess radiative gradient.
+
+      ! superad_reduction_use_turnover_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Average the instantaneous target ``eta_inst`` over one accumulated
+      ! convective turnover:
+      ! :math:`\eta(u)\simeq\int_{u-1}^{u}\eta_{\rm inst}(v)\,dv`, where
+      ! :math:`u(t)=\int_0^t dt'/\tau_{\rm conv}(t')`.
+      ! This requires ``use_superad_reduction = .true.``; with the turnover
+      ! limiter off, use the instantaneous target.
+      !
+      ! For positive lagged ``mlt_vc``, ``tau_conv`` is
+      ! ``scale_height/max(mlt_vc,1d-10)`` in seconds, with velocity in cm/s.
+      ! Other zones use the Brunt timescale. Face values match MLT or TDC;
+      ! the timescale is fixed at the start of each step during the solve.
+      ! A nonpositive or nonfinite timescale uses the instantaneous target.
+      !
+      ! Store ``du = dt/tau_conv`` and ``eta_inst*du`` for accepted intervals,
+      ! newest first, in at most 64 rows. When full, merge the same adjacent
+      ! physical intervals at every face before the next solve, using their
+      ! turnover-weighted mean. Remeshing interpolates both quantities with
+      ! the same mass-coordinate weights. Compression approximates the moving
+      ! mean; resolving target and timescale changes is still necessary, and
+      ! there is no fixed error bound for arbitrary histories.
+      !
+      ! Photos preserve the history. Disabling the limiter clears it;
+      ! enabling it initializes the history to the current eta.
+      ! Loading a saved model recomputes eta before initializing the history.
+
+      ! superad_reduction_max_logT
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! During evolution, reduction applies only where the start-of-step cell
+      ! ``logT < superad_reduction_max_logT``; hotter cells use eta = 1.
+      ! This temperature selection is fixed during solver iterations.
+
+      ! superad_reduction_Gamma_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Threshold in ``Lrad/Ledd`` for the Eddington contribution.
+
+      ! superad_reduction_Gamma_limit_scale
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Scale factor for the Eddington contribution; zero disables it.
+
+      ! superad_reduction_Gamma_inv_scale
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Scale factor for the density-inversion contribution; zero disables it.
+      ! This contribution activates above ``Lrad/Ledd = 4*(1-beta)/(4-3*beta)``,
+      ! with ``beta = Pgas/P``.
+
+      ! superad_reduction_diff_grads_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! Scale below which the reduction vanishes smoothly as ``gradT-gradL``
+      ! approaches zero.
+
+      ! superad_reduction_limit
+      ! ~~~~~~~~~~~~~~~~~~~~~~~
+      ! Upper limit for the instantaneous ``Gamma_factor``, before turnover
+      ! averaging; a value <= 1 disables the cap.
 
       ! ::
 
       use_superad_reduction = .false.
-
-
-      ! superad_reduction_max_logT
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! For k > 0, apply superadiabatic reduction only where the cell temperature
-      ! at the start of the step has ``logT`` less than this limit. This keeps
-      ! the selection fixed during solver iterations.
-
-      ! ::
-
-      superad_reduction_max_logT = 7d0
-
-
-      ! superad_reduction_Gamma_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Threshold in ``Lrad/Ledd`` for the Eddington contribution.
-
-      ! ::
-
-      superad_reduction_Gamma_limit = 0.5d0
-
-
-      ! superad_reduction_Gamma_limit_scale
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Scale factor for the Eddington contribution. Set to zero to disable
-      ! this contribution.
-
-      ! ::
-
-      superad_reduction_Gamma_limit_scale = 5d0
-
-
-      ! superad_reduction_Gamma_inv_scale
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Scale factor for the density-inversion contribution, which activates
-      ! when ``Lrad/Ledd > 4*(1-beta)/(4-3*beta)``. Set to zero to disable
-      ! this contribution.
-
-      ! ::
-
-      superad_reduction_Gamma_inv_scale = 5d0
-
-
-      ! superad_reduction_diff_grads_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Sets the scale below which the reduction decreases smoothly to zero
-      ! as ``gradT - gradL`` vanishes.
-
-      ! ::
-
-      superad_reduction_diff_grads_limit = 1d-3
-
-
-      ! superad_reduction_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Upper limit for ``Gamma_factor``. A value less than or equal to one
-      ! disables the limit.
-
-      ! ::
-
-      superad_reduction_limit = -1d0
-
-
-      ! superad_reduction_use_turnover_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Limits changes in the applied reduction using the local response time.
-      ! The response is set by ``superad_reduction_turnover_limit_function``.
-      ! In zones with a lagged convective velocity, ``tau_conv`` is
-      ! ``scale_height/max(mlt_vc,1d-10 cm/s)``. Other zones use the Brunt
-      ! frequency. The timescale is set at the start of the step and held fixed
-      ! during solver iterations. The limiter acts on ``1/Gamma_factor``, which
-      ! multiplies ``gradr-gradL``, and uses the same interpolated or
-      ! reconstructed face state as MLT or TDC.
-
-      ! ::
-
       superad_reduction_use_turnover_limit = .false.
-
-      ! superad_reduction_turnover_limit_function
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Sets the response of ``eta = 1/Gamma_factor``. The ``'linear'`` and
-      ! ``'exponential'`` options use
-      ! ``eta = eta_old + f*(eta_inst-eta_old)``, where ``eta_old`` is the
-      ! previous accepted value and ``eta_inst`` is the instantaneous target.
-      ! ``'linear'`` uses ``f = min(dt/tau_conv,1)``; ``'exponential'`` uses
-      ! ``f = 1-exp(-dt/tau_conv)``. Repeated short steps approach a sustained
-      ! target without reaching it after one turnover.
-      !
-      ! ``'moving_mean'`` averages the instantaneous target over the preceding
-      ! accumulated turnover:
-      ! :math:`\eta(u)=\int_{u-1}^{u}\eta_{\rm inst}(v)\,dv`, where
-      ! :math:`u(t)=\int_0^t dt'/\tau_{\rm conv}(t')`.
-      ! Each accepted target is constant over ``du = dt/tau_conv``, with
-      ! ``tau_conv`` fixed during each attempt. The contribution of an older
-      ! step is its target times the part of ``du`` within the last turnover.
-      ! A sustained target reaches its full value after one accumulated
-      ! turnover, even when ``tau_conv`` changes between steps. The initial
-      ! history is the previous applied ``eta``. Only accepted steps advance
-      ! the history. For each retained step, two arrays store ``du`` and
-      ! ``eta_inst*du`` at every face. Remeshing interpolates both arrays
-      ! with the same positive linear weights in mass. The target on the
-      ! new mesh is the ratio of these interpolated quantities. The stored
-      ! ``du`` is not limited to one; only its contribution to the mean is.
-      ! This preserves the common accepted steps when neighboring faces
-      ! have different turnover times. Photo restarts preserve both arrays.
-      ! A stored step is removed only after newer steps cover one turnover
-      ! at every face. Storage therefore depends on the face that requires
-      ! the largest number of accepted steps to complete a turnover.
-      !
-      ! Subdividing the same target history leaves the mean unchanged.
-      ! Timestep convergence is still required to resolve changes in the
-      ! target and turnover time.
-      !
-      ! Disabling the limiter or selecting another response clears this
-      ! history. Enabling the limiter initializes it from the current value.
-      ! A nonpositive or nonfinite timescale uses the instantaneous target.
-      ! The temperature cutoff resets that face to no reduction.
-
-      ! ::
-
-      superad_reduction_turnover_limit_function = 'linear'
+      superad_reduction_max_logT = 7d0
+      superad_reduction_Gamma_limit = 0.5d0
+      superad_reduction_Gamma_limit_scale = 5d0
+      superad_reduction_Gamma_inv_scale = 5d0
+      superad_reduction_diff_grads_limit = 1d-3
+      superad_reduction_limit = -1d0
 
    ! overshooting
    ! ____________

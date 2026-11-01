@@ -30,7 +30,7 @@
       contains
 
       subroutine new_generation(s, ierr)
-         use star_utils, only: superad_history_integral
+         use star_utils, only: set_superad_reduction_cache
          use utils_lib
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
@@ -43,14 +43,7 @@
          nz = s% nz
          s% superad_reduction_du(1:nz) = 0d0
          s% superad_reduction_target(1:nz) = 1d0
-         s% superad_reduction_eta_past(1:nz) = 0d0
-         if (s% num_superad_reduction_history > 0) then
-            do k=1,nz
-               s% superad_reduction_eta_past(k) = superad_history_integral( &
-                  s% superad_reduction_history_du(1:s% num_superad_reduction_history,k), &
-                  s% superad_reduction_history_eta_du(1:s% num_superad_reduction_history,k), 1d0)
-            end do
-         end if
+         call set_superad_reduction_cache(s, nz)
 
          if (.not. s% rsp_flag) then
 
@@ -162,7 +155,7 @@
       end subroutine new_generation
 
       subroutine set_current_to_old(s)
-         use star_utils, only: total_angular_momentum, set_m_and_dm, set_dm_bar, set_qs
+         use star_utils, only: total_angular_momentum, set_m_and_dm, set_dm_bar, set_qs, set_superad_reduction_cache
          use hydro_rotation, only: use_xh_to_update_i_rot
          use utils_lib
          type (star_info), pointer :: s
@@ -170,8 +163,11 @@
 
          include 'formats'
 
-         s% superad_reduction_history_pending = .false.
+         s% superad_reduction_pending = .false.
          s% nz = s% nz_old
+         ! Internal wind redos skip part1, so retain their frozen du.
+         s% superad_reduction_target(1:s% nz) = 1d0
+         call set_superad_reduction_cache(s, s% nz)
          s% mstar = s% mstar_old
          s% xmstar = s% xmstar_old
          s% M_center = s% M_center_old

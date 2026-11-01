@@ -1078,6 +1078,7 @@
                write(*,*) 'resize_star_info_arrays failed in do_remove_surface'
             return
          end if
+         s% prev_mesh_num_superad_reduction_history = prv% prev_mesh_num_superad_reduction_history
 
          if (dbg) write(*,2) 'prv% dm(1)/Msun', 1, prv% dm(1)/Msun
          if (dbg) write(*,2) 'prv% m(1)/msun', 1, prv% m(1)/Msun
@@ -1120,7 +1121,7 @@
          s% superad_reduction_history_du(1:nh,1:nz) = prv% superad_reduction_history_du(1:nh,1+skip:nz_old)
          s% superad_reduction_history_eta_du(1:nh,1:nz) = prv% superad_reduction_history_eta_du(1:nh,1+skip:nz_old)
          ! Surface removal can precede history commitment.
-         if (s% superad_reduction_history_pending) then
+         if (s% superad_reduction_pending) then
             s% superad_reduction_du(1:nz) = prv% superad_reduction_du(1+skip:nz_old)
             s% superad_reduction_target(1:nz) = prv% superad_reduction_target(1+skip:nz_old)
          end if
@@ -1244,8 +1245,9 @@
          save_have_mlt_vc = s% have_mlt_vc
          s% have_mlt_vc = .false.
          s% have_superad_reduction_factor = .false.
+         s% num_superad_reduction_history = 0
          s% okay_to_set_superad_reduction_factor = .false.
-         s% superad_reduction_history_pending = .false.
+         s% superad_reduction_pending = .false.
 
          !save composition and entropy profiles
          xa(:,:) = s% xa(:,k_remove:s% nz)

@@ -228,10 +228,10 @@ contains
 
       ! these are used by use_superad_reduction
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
-      real(dp) :: f_turnover, Gamma_factor_old_local, eta_old, eta_past
+      real(dp) :: f_turnover, eta_past
       type(auto_diff_real_star_order1) :: eta_inst, Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
-         diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled, Eq_div_w, check_Eq, mlt_Pturb, Ptot
-      logical :: test_partials, using_TDC, have_Y_face_guess, hold_superad_reduction_factor, use_moving_mean
+         diff_grads_factor, Gamma_term, exp_limit, gradr_scaled, Eq_div_w, check_Eq, mlt_Pturb, Ptot
+      logical :: test_partials, using_TDC, have_Y_face_guess, hold_superad_reduction_factor, use_turnover_limit
       logical, parameter :: report = .false.
       include 'formats'
 
@@ -309,14 +309,14 @@ contains
              .not. s% okay_to_set_superad_reduction_factor)
       if (k /= 0 .and. .not. hold_superad_reduction_factor) &
          s% superad_reduction_factor(k) = 1d0
-      use_moving_mean = k > 0 .and. s% use_superad_reduction .and. s% superad_reduction_use_turnover_limit .and. &
-            .not. s% RSP_flag .and. trim(s% superad_reduction_turnover_limit_function) == 'moving_mean' .and. &
+      use_turnover_limit = k > 0 .and. s% use_superad_reduction .and. s% superad_reduction_use_turnover_limit .and. &
+            .not. s% RSP_flag .and. &
             s% okay_to_set_superad_reduction_factor .and. .not. s% doing_finish_load_model .and. &
             s% num_superad_reduction_history > 0
       ! Paths that skip the reduction still contribute a neutral target.
-      if (use_moving_mean) then
+      if (use_turnover_limit) then
          s% superad_reduction_target(k) = 1d0
-         f_turnover = min(s% superad_reduction_du(k), 1d0)
+         f_turnover = min(s% superad_reduction_du(k),1d0)
          eta_past = s% superad_reduction_eta_past(k)
          s% superad_reduction_factor(k) = 1d0/(eta_past + f_turnover)
       end if
@@ -490,7 +490,7 @@ contains
 
       subroutine set_superad_reduction()
          Gamma_factor = 1d0
-         if (k > 0) then
+         if (k > 0 .and. .not. hold_superad_reduction_factor) then
             if (s% lnT_start(k)/ln10 >= s% superad_reduction_max_logT) return
          end if
 
@@ -512,12 +512,6 @@ contains
                end if
 
                Gamma_term = 0d0
-               !if (Lrad_div_Ledd > Gamma_limit) then
-               !   Gamma_term = Gamma_term + scale_value1*pow2(Lrad_div_Ledd/Gamma_limit-1d0)
-               !end if
-               !if (Lrad_div_Ledd% val > Gamma_inv_threshold) then
-               !   Gamma_term = Gamma_term + scale_value2*pow2(Lrad_div_Ledd/Gamma_inv_threshold-1d0)
-               !end if
                if (Lrad_div_Ledd > Gamma_limit) then
                   alfa0 = Lrad_div_Ledd/Gamma_limit-1d0
                   if (alfa0 < 1d0) then
@@ -525,7 +519,6 @@ contains
                   else
                      Gamma_term = Gamma_term + scale_value1*(alfa0-0.5d0)
                   end if
-                  !Gamma_term = Gamma_term + scale_value1*pow2(Lrad_div_Ledd/Gamma_limit-1d0)
                end if
                if (Lrad_div_Ledd% val > Gamma_inv_threshold) then
                   alfa0 = Lrad_div_Ledd/Gamma_inv_threshold-1d0
@@ -534,7 +527,6 @@ contains
                   else
                      Gamma_term = Gamma_term + scale_value2*(alfa0-0.5d0)
                   end if
-                  !Gamma_term = Gamma_term + scale_value2*pow2(Lrad_div_Ledd/Gamma_inv_threshold-1d0)
                end if
 
                if (Gamma_term > 0d0) then
@@ -552,34 +544,16 @@ contains
          ! Rebuilding the starting state must not advance the response.
          if (hold_superad_reduction_factor) then
             Gamma_factor = max(s% superad_reduction_factor(k), 1d0)
-         else if (use_moving_mean) then
+         else if (use_turnover_limit) then
             ! Only the current target contributes derivatives.
             eta_inst = 1d0/Gamma_factor
             s% superad_reduction_target(k) = eta_inst% val
             Gamma_factor = 1d0/(eta_past + f_turnover*eta_inst)
-         else if (s% superad_reduction_use_turnover_limit .and. k > 0 .and. &
-               trim(s% superad_reduction_turnover_limit_function) /= 'moving_mean') then
-            if (s% dt > 0d0 .and. s% tau_conv_start(k) > 0d0 .and. &
-                  s% have_superad_reduction_factor) then
-               Gamma_factor_old_local = max(s% superad_reduction_factor_old(k), 1d0)
-               if (Gamma_factor > 1d0 .or. Gamma_factor_old_local > 1d0) then
-                  select case (trim(s% superad_reduction_turnover_limit_function))
-                  case ('linear')
-                     f_turnover = min(s% dt/s% tau_conv_start(k), 1d0)
-                  case ('exponential')
-                     f_turnover = -expm1(-s% dt/s% tau_conv_start(k))
-                  end select
-                  eta_old = 1d0/Gamma_factor_old_local
-                  eta_inst = 1d0/Gamma_factor
-                  Gamma_factor = 1d0/(eta_old + f_turnover*(eta_inst - eta_old))
-               end if
-            end if
          end if
 
          if (k /= 0) s% superad_reduction_factor(k) = Gamma_factor% val
          if (Gamma_factor > 1d0) then
-            grad_scale = (gradr-gradL)/(Gamma_factor*gradr) + gradL/gradr
-            gradr_scaled = grad_scale*gradr
+            gradr_scaled = gradL + (gradr-gradL)/Gamma_factor
          end if
       end subroutine set_superad_reduction
    end subroutine Get_results
