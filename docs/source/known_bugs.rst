@@ -13,6 +13,40 @@ issue, but it may not be complete.
 r26.4.1
 =======
 
+.. _skye_ion_offset_normalization_bug:
+
+EOS: Skye ionization energy offset normalization
+------------------------------------------------
+
+With ``Skye_use_ion_offsets = .true.`` (the default), the ionization energy
+offset added to Skye's specific free energy was too large by the mean mass
+number ``abar``. The offset aligns the fully ionized energy with the neutral
+ground state used by FreeEOS.
+
+The correct specific offset is
+
+.. math::
+
+   e_{\rm off} = \frac{\mathrm{ev2erg}}{m_u}
+      \sum_i \frac{X_i}{A_i} I_{Z_i},
+
+where :math:`I_{Z_i}` is the total ionization energy in eV for element
+:math:`Z_i`. MESA uses baryon fractions :math:`X_i`, so :math:`X_i/A_i` gives
+ions per baryon. The routine incorrectly normalized these abundances to
+fractions per ion, introducing an extra factor
+:math:`\bar A = 1/\sum_i X_i/A_i` for normalized compositions.
+
+At fixed composition in pure Skye, the offset changes internal energy but
+leaves pressure, entropy, and heat capacities unchanged. It can affect energy
+evolution when composition or EOS blend weights change.
+
+This affects released versions using the Skye ionization offset, including
+``r26.4.1``, and is fixed in the main branch after ``r26.4.1``. To apply the fix
+to an existing release, remove the normalization of ``ya`` in
+``eos/private/ion_offset.f90``. Retain the per-baryon weighting ``xa/A`` and
+the final conversion by ``ev2erg/amu``. Use double-precision literals for the
+ionization energies. See `gh-1086 <https://github.com/MESAHub/mesa/issues/1086>`_.
+
 .. _duplicate_n14ag_rate_bug:
 
 Net: duplicate ``n14(a,g)f18(e+nu)o18`` reaction
@@ -93,6 +127,25 @@ mixing length set by ``other_alpha_mlt``, and used the ``mixing_length_alpha``
 instead.
 
 This is fixed in `gh-1003 <https://github.com/MESAHub/mesa/pull/1003>`_.
+
+.. _opal_scvh_high_z_blend_bug:
+
+EOS: OPAL/SCVH metallicity blend
+--------------------------------
+
+The blend from OPAL/SCVH to HELM/ideal used incorrect weights between
+``Z_all_OPAL`` and ``Z_all_HELM`` (default values ``0.035`` and ``0.04``).
+In regions using pure OPAL/SCVH, its contribution remained unchanged
+throughout this interval, then dropped to zero at the upper limit.
+
+This could cause discontinuities during stellar evolution. In the model
+reported in `gh-921 <https://github.com/MESAHub/mesa/issues/921>`_, element
+diffusion lowered the surface metallicity through ``Z = 0.04``, causing an
+abrupt change in effective temperature.
+
+The fix corrects the blend weights and their temperature and density
+derivatives so that OPAL/SCVH blends continuously into HELM/ideal across this
+interval. This is fixed after ``r26.4.1``.
 
 .. _report_max_infall_inside_fe_core_bug:
 

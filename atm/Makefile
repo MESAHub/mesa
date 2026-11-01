@@ -25,9 +25,11 @@ CHECK_RESULTS_GOLDEN := test/test_output
 
 MODULES := atm_def.mod atm_lib.mod
 INSTALL_INCLUDES :=
-EXTRACT_DATA_COMMANDS += install-atm-data
+EXTRACT_DATA_COMMANDS += ../data/atm_data/.extract-completed
 
 include $(MAKE_DIR)/Makefile
 
-install-atm-data:
-	mkdir -p ../data/atm_data && cp atm_data/* ../data/atm_data
+../data/atm_data/.extract-completed: atm_data $(wildcard atm_data/*)
+	rm -rf ../data/atm_data
+	cp -r atm_data ../data/atm_data
+	touch $@

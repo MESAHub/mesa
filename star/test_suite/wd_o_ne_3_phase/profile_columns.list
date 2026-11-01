@@ -165,7 +165,6 @@
    !logfree_e ! log10(free_e), free_e is mean number of free electrons per nucleon
    chiRho ! dlnP_dlnRho at constant T
    chiT ! dlnP_dlnT at constant Rho
-  ! chiX
 
    csound ! sound speed
    !log_csound
@@ -263,7 +262,7 @@
       ! NOTE: you can list specific categories by giving their names (from chem_def)
       pp
       cno
-      !tri_alfa
+      !tri_alpha
       !c_alpha
       !n_alpha
       !o_alpha

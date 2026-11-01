@@ -68,7 +68,7 @@ then
             # if no file exists, that means the file was probably deleted and that's OK
             # if the file exists, but is short, then it is probably the bare LFS pointer
             #   and that indicates a problem retrieving the file
-            if [ -f "${LFS_FILE}" ] && [ $(du -k "${LFS_FILE}" | cut -f1) -le 4 ];
+            if [ -f "${LFS_FILE}" ] && [ $(head -c4096 "${LFS_FILE}" | wc -c) -lt 4096 ];
             then
                 echo
                 echo "${LFS_FILE} is smaller than expected for a file tracked by git LFS"
@@ -208,12 +208,7 @@ function enum_procs {
     fi
 }
 
-# MacOS has gnumake version 3.81, which does not support -Oline
-if [ "${SYSTEM}" = "Darwin" ]; then
-    make -w -j$(enum_procs)
-else
-    make -w -Oline -j$(enum_procs)
-fi
+make -w -j$(enum_procs)
 
 if [ $? -ne 0 ]
 then
