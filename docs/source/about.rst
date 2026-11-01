@@ -105,6 +105,7 @@ Developers
 ----------
 
 * `Warrick Ball <https://warrickball.gitlab.io/>`__
+* `Brandon Barker <https://astrobarker.dev/>`__
 * `Evan Bauer <https://evbauer.github.io/>`__
 * `Earl Bellinger <https://earlbellinger.com/>`__
 * `Matteo Cantiello <http://www.matteocantiello.com/>`__

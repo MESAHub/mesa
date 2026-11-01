@@ -47,10 +47,27 @@ Additional controls are available for TDC envelope remeshing:
 - ``TDC_hydro_nz_inner`` adds geometrically spaced zones near the inner boundary.
 - ``TDC_hydro_nz_T_gradient`` adds zones according to the variation in ``logT`` below ``TDC_hydro_T_anchor`` while retaining the mass-based mesh.
 
+Additional ``pgstar`` plots to visualize residuals of equations:
+- Kippenhahn-style diagram (with mass on the y-axis and model number on the x-axis) colored by ``safe_log10(maxval(abs(s%equ(1:neq, k))))``, which is the logarithm of the absolute value of the biggest residual at cell ``k`` for the *accepted* iteration of MESA's Newton-Raphson solver. The y-axis can be mass, logR, or tau.
+- Time evolution of the maximum residual across mesh points for each structure equation (ignores chemical composition equations). See ``Kipp_residuals_*`` and ``Max_eq_resid_*`` in ``pgstar.defaults``
+
+Substantial work has been done to improve the remapping of rotation profiles
+during mesh adjustments, reducing errors in angular velocity profiles while
+conserving total angular momentum. See
+`gh-1047 <https://github.com/MESAHub/mesa/issues/1047>`_.
+
 .. _Bug Fixes main:
 
 Bug Fixes
 ---------
+
+Corrected the Skye ionization energy offset, which was too large by the mean
+mass number ``abar`` when ``Skye_use_ion_offsets = .true.``. The ionization
+energies now use double-precision literals. See
+:ref:`the known bugs entry <skye_ion_offset_normalization_bug>` and
+`gh-1086 <https://github.com/MESAHub/mesa/issues/1086>`_.
+
+Fixed a typo in the OPLIB hydrogen grid that could cause incorrect opacities or interpolation failures at low hydrogen abundance; see `gh-1078 <https://github.com/MESAHub/mesa/pull/1078>`_.
 
 Removed duplicate treatment of ``n14(a,g)f18(e+nu)o18`` in networks that
 include both the explicit hot CNO reactions and the corresponding approximate
@@ -77,6 +94,10 @@ respect changes to the mixing length set by ``other_alpha_mlt``, and used the
 The parameter ``report_max_infall_inside_fe_core`` was ignored in versions r25.12.1 and r26.4.1 and always had it's default value. See `gh-981 https://github.com/MESAHub/mesa/pull/981`_.
 
 ``fe_core_infall_limit`` now obeys ``when_to_stop_rtol`` and ``when_to_stop_atol`` again (broken since r11532).
+
+Fixed the OPAL/SCVH blend in metallicity, which could cause discontinuities
+in the EOS at ``Z = 0.04`` with the default blend limits. See
+:ref:`the known bugs entry <opal_scvh_high_z_blend_bug>`.
 
 .. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ``changelog_template.rst``).
 

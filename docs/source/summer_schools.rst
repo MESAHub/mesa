@@ -42,7 +42,7 @@ We aim for 50-50 gender representation (50% men, 50% women and gender minorities
 
 - Reserve accommodation. Hotel room blocks can be booked for discounted rates. Some universities are willing to provide discounted bulk accommodation through their own facilities (e.g. dorms), as was the case at Santa Barbara.
 
-- Open the application for students. A template for this is available from Meridith Joyce, Earl Bellinger, or Jared Goldberg (MESA-dev). A Google form is a good way to provide the application. Be aware that summer schools have been oversubscribed by more than a factor of 2 in recent years, and be prepared to rank applications in a systematic way. We aim for 50-50 gender representation among students and have a track record of achieving 35%-45% participation from women and gender minorities, on average. Achieving a well-balanced popluation of applicants can be aided by distributing the application through targeted channels in addition to a broad call to the mesa-users community.
+- Open the application for students. A template for this is available from Earl Bellinger or Jared Goldberg (MESA-dev). A Google form is a good way to provide the application. Be aware that summer schools have been oversubscribed by more than a factor of 2 in recent years, and be prepared to rank applications in a systematic way. We aim for 50-50 gender representation among students and have a track record of achieving 35%-45% participation from women and gender minorities, on average. Achieving a well-balanced popluation of applicants can be aided by distributing the application through targeted channels in addition to a broad call to the mesa-users community.
 
 6 months out (February)
 -----------------------
@@ -57,7 +57,7 @@ We aim for 50-50 gender representation (50% men, 50% women and gender minorities
 
 - Close applications
 
-- Make selections among applications. An admissions rubric used for the 2022, 2023, and 2024 Summer School programs is available from Meridith Joyce (MESA-dev)
+- Make selections among applications. Contact the MESA developers for guidance on admissions rubrics, including those used for the 2022+ Summer School programs.
 
 - Email the supervisors of potential attendees to confirm that they have their advisor's permission and funding to attend. Be aware that some prospective students may apply without having secured funding and without their advisor's knowledge.
 

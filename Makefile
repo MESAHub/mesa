@@ -2,6 +2,10 @@
 .DEFAULT_GOAL := all
 .SHELLFLAGS := -eu -c
 
+ifneq (,$(findstring output-sync,$(.FEATURES)))
+  MAKEFLAGS += -Oline
+endif
+
 BUILD_SUBDIR := @$(MAKE) -C
 CHECK_SUBDIR := @$(MAKE) check -C
 MAKE_DIR := make

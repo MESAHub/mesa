@@ -291,7 +291,7 @@ shmesa_extras () {
     contents=$(perl -pe 's/:/\\:/g; s/\n/\\n/g' "$MESA_DIR/include/standard_run_star_extras.inc")
 
     backup_copy "$rse" "$rse".bak
-    perl -i -pe "s|      include 'standard_run_star_extras.inc'|$contents|g" "$rse"
+    perl -i -pe "s|^[ \t]*include 'standard_run_star_extras.inc'|$contents|g" "$rse"
 }
 
 

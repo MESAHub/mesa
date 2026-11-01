@@ -50,26 +50,29 @@ CHECK_RESULTS_GOLDEN := test/test_output
 
 MODULES := eos_def.mod eos_lib.mod
 INSTALL_INCLUDES := public/helm_def.dek
-EXTRACT_DATA_COMMANDS += install-free-eos install-cms install-dt install-pc
+EXTRACT_DATA_COMMANDS += ../data/eosFreeEOS_data/.extract-completed ../data/eosCMS_data/.extract-completed ../data/eosDT_data/.extract-completed ../data/eosPC_support_data/.extract-completed
 
 include $(MAKE_DIR)/Makefile
 
-install-free-eos:
-	if [ ! -r ../data/eosFreeEOS_data ]; then \
-		tar -xJf eosFreeEOS_data.tar.xz -C ../data; \
-	fi
+../data/eosFreeEOS_data/.extract-completed: eosFreeEOS_data.tar.xz
+	rm -rf ../data/eosFreeEOS_data/
+	rm -rf ../data/eosDT_data/cache/
+	tar -xJf eosFreeEOS_data.tar.xz -C ../data
+	touch $@
 
-install-cms:
-	if [ ! -r ../data/eosCMS_data ]; then \
-		tar -xJf eosCMS_data.tar.xz -C ../data; \
-	fi
+../data/eosCMS_data/.extract-completed: eosCMS_data.tar.xz
+	rm -rf ../data/eosCMS_data/
+	tar -xJf eosCMS_data.tar.xz -C ../data
+	touch $@
 
-install-dt:
-	if [ ! -r ../data/eosDT_data ]; then \
-		tar -xJf eosDT_data.tar.xz -C ../data; \
-		xz --decompress --keep --stdout helm_table.dat.xz > ../data/eosDT_data/helm_table.dat; \
-	fi
+../data/eosDT_data/.extract-completed: eosDT_data.tar.xz helm_table.dat.xz
+	rm -rf ../data/eosDT_data/
+	tar -xJf eosDT_data.tar.xz -C ../data
+	xz --decompress --keep --stdout helm_table.dat.xz > ../data/eosDT_data/helm_table.dat
+	touch $@
 
-install-pc:
+../data/eosPC_support_data/.extract-completed:
+	rm -rf ../data/eosPC_support_data
 	mkdir -p ../data/eosPC_support_data
 	mkdir -p ../data/eosPC_support_data/cache
+	touch $@
