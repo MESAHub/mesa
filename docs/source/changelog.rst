@@ -38,6 +38,10 @@ for RSP, or ``use_Pvsc_art_visc`` for ``v_flag`` hydrodynamics.
 New Features
 ------------
 
+Improved the precision of ``eps_mdot`` by saving specific energies before mass
+adjustment and forming energy differences before multiplying by mass. This
+reduces spurious heating and cooling from roundoff during accretion and mass loss.
+
 MESA's documentation now includes a generated :ref:`Test Suite Gallery <tagoverview>` using metadata from test case ``README.rst`` files. The gallery groups test cases by module, physics, numerical method, workflow, and stellar object or phase. This change makes it easier to understand the purpose of each test case, and can help users more easily find a useful starting point for a MESA project. Details on the implementation can be found in :ref:`developing/test_suite:Gallery tags`.
 
 Diffusive overshooting (overmixing) prescriptions now support a

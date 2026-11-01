@@ -87,7 +87,7 @@
          integer :: nz, j
 
          ! Intermediates
-         real(dp) :: alpha, beta, dmbar1
+         real(dp) :: beta, dmbar1
 
          ! Return
          real(dp) :: interp
@@ -132,8 +132,8 @@
          if (j > 1 .and. j < nz + 1) then
             dmbar1 = (dm(j-1) + dm(j)) / 2.0d0
             beta = dm(j-1) / (2.0d0 * dmbar1)
-            alpha = 1 - beta
-            interp = alpha * vec(j-1) + beta * vec(j)
+            ! We sum this way so equal adjacent cell values give exactly the same face value.
+            interp = vec(j-1) + beta * (vec(j) - vec(j-1))
          end if
          interpolate_onto_faces = interp
 
@@ -469,12 +469,13 @@
 
       end subroutine leak
 
-      subroutine calculate_eps_mdot(s, dt, ierr)
+      subroutine calculate_eps_mdot(s, dt, te, ierr)
          use adjust_mass, only: compute_prev_mesh_dm
 
          ! Inputs
          type (star_info), pointer :: s
          real(dp) :: dt
+         real(dp), intent(in) :: te(:)
          integer :: ierr
 
          ! Intermediates
@@ -482,11 +483,11 @@
          integer :: nz, j
          real(dp) :: delta_m, change_sum, leak_sum, err, abs_err, mdot_adiabatic_surface, gradT_mid
          real(dp), dimension(:), allocatable :: &
-            p_bar, rho_bar, te_bar, te, &
-            leak_frac, thermal_energy, density_weighted_flux, eps_mdot_per_total_mass,&
+            p_bar, rho_bar, te_bar, &
+            leak_frac, thermal_energy, eps_mdot_per_total_mass,&
             accumulated, grad_r_sub_grad_a
          real(qp), dimension(:), allocatable :: change_in_dm, mass_flux, dm, prev_mesh_dm,&
-             total_mass_through_cell
+             total_mass_through_cell, density_weighted_flux
          type(accurate_real) :: sum
          integer, dimension(:,:), allocatable :: ranges
          real(qp), dimension(:), allocatable :: mesh_intersects
@@ -543,21 +544,12 @@
          end do
          !$OMP END PARALLEL DO
 
-         ! Puts total_energy in specific terms and interpolates that as well as p and rho onto faces.
+         ! Interpolate specific total energy as well as p and rho onto faces.
          ! For convenience we include the bottom face (face nz+1) and the top face (face 1), for which the
          ! interpolation just returns the value in the adjacent cell.
-         allocate(te(nz))
          allocate(p_bar(nz+1))
          allocate(rho_bar(nz+1))
          allocate(te_bar(nz+1))
-
-         !$OMP PARALLEL DO
-         do j=1,nz
-            te(j) = s% total_energy_profile_before_adjust_mass(j) / prev_mesh_dm(j)
-         end do
-         !$OMP END PARALLEL DO
-         call eval_total_energy_profile(s, s% total_energy_profile_after_adjust_mass)
-
 
          !$OMP PARALLEL DO
          do j=1,nz+1
@@ -619,23 +611,22 @@
 
             ! More numerically stable version of
             ! te_bar(j) * mass_flux(j) - te_bar(j+1) * mass_flux(j+1) - change_in_dm(j) * te(j)
-            sum = sum + real(change_in_dm(j) * te_bar(j),qp)
-            sum = sum + real(mass_flux(j+1) * (te_bar(j) - te_bar(j+1)),qp)
-            sum = sum - real(change_in_dm(j) * te(j),qp)
+            sum = sum + change_in_dm(j)*(real(te_bar(j),qp) - real(te(j),qp))
+            sum = sum + mass_flux(j+1)*(real(te_bar(j),qp) - real(te_bar(j+1),qp))
 
             ! (PV F_m - PV_0)_{k} - (PV F_m - PV_0)_{k+1}
             sum = sum + real(p_bar(j) * (mass_flux(j) / rho_bar(j) - density_weighted_flux(j)),qp)
             sum = sum - real(p_bar(j+1) * (mass_flux(j+1) / rho_bar(j+1) - density_weighted_flux(j+1)),qp)
 
-            ! Change in specific total energy in the cell with the final cell mass. The
+            ! Change in specific total energy in the cell with the final cell mass.
             ! In the absence of composition changes this is just dm_new * (change in gravitational potential),
             ! but when composition changes this term also captures that.
-            sum = sum - real(s% total_energy_profile_after_adjust_mass(j) - s%dm(j) * te(j), qp)
+            sum = sum - real(s%dm(j),qp)*(real(cell_specific_total_energy(s,j),qp) - real(te(j),qp))
 
             change_sum = change_sum + sum%value() / (dt)
 
             ! Multiplicative factors
-            eps_mdot_per_total_mass(j) = sum % value() / (s%dm(j) * dt) / total_mass_through_cell(j)
+            eps_mdot_per_total_mass(j) = sum % value() / (real(s%dm(j),qp) * dt) / total_mass_through_cell(j)
 
          end do
 
