@@ -776,7 +776,7 @@
                      yvec(i) = log10(max(tiny(yvec(i)),abs(yvec(i))))
                   end do
                end if
-               ! Make sure limits are sensible for plotting.
+         ! Make sure limits are sensible for plotting
                do i=lbound(yvec,dim=1),ubound(yvec,dim=1)
                   if (yvec(i)>100) yvec(i)=100
                   if (yvec(i)<-100) yvec(i)=-100
@@ -791,7 +791,7 @@
                      other_yvec(i) = log10(max(tiny(other_yvec(i)),abs(other_yvec(i))))
                   end do
                end if
-               ! Make sure limits are sensible for plotting.
+         ! Make sure limits are sensible for plotting
                do i=lbound(other_yvec,dim=1),ubound(other_yvec,dim=1)
                   if (other_yvec(i)>100) other_yvec(i)=100
                   if (other_yvec(i)<-100) other_yvec(i)=-100

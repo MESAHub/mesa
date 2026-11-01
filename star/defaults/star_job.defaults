@@ -463,9 +463,11 @@
       ! pre_ms_check_radiative_core_min_mass
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! |    ``pre_ms_min_steps_before_check_radiative_core``. wait this many relaxation steps before stopping for a radiative core; zero adds no waiting period
+      ! |    ``pre_ms_min_steps_before_check_radiative_core``. wait this many relaxation steps
+      ! |    before stopping for a radiative core. Zero adds no waiting period.
       ! |    ``pre_ms_check_radiative_core_start``. only start checking after have encountered ``min_conv_mx1_bot`` < this
-      ! |    this forces it to wait until after have become fully convective. The running minimum includes the initial waiting steps.
+      ! |    this forces it to wait until after have become fully convective.
+      ! |    ``min_conv_mx1_bot`` includes all steps in this relaxation, including the waiting period.
       ! |    ``pre_ms_check_radiative_core_stop``. stop when ``conv_mx1_bot`` > this (measured in q).
       ! |    The relaxation to a radiative core is stopped if Lnuc/L > ``pre_ms_check_radiative_core_Lnuc_div_L_limit``,
       ! |    or when the mass is below ``pre_ms_check_radiative_core_min_mass`` (in Msun).

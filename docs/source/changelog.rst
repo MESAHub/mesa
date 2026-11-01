@@ -23,6 +23,10 @@ For a more in-depth look at the new build system, see :doc:`developing/build-sys
 
 ``Tsurf_factor`` and the associated controls and history column have been removed as they affected nothing. These controls were effectively deprecated after the removal of the black body boundary condition in 21.12.1.
 
+Removed the unused ``RSP_Qvisc_*`` controls for the obsolete ``Qvisc`` form
+(Section 4.2 of |MESA III|). Use ``Pvsc`` instead: ``RSP_cq`` and ``RSP_zsh``
+for RSP, or ``use_Pvsc_art_visc`` for ``v_flag`` hydrodynamics.
+
 .. _New Features main:
 
 New Features

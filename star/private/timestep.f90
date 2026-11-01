@@ -437,7 +437,6 @@
          hard_limit = -1
          if (s% using_gold_tolerances) then
             limit = s% gold_solver_iters_timestep_limit
-            ! Use the same level-2 selection as struct_burn_mix.
             if ((s% use_gold2_tolerances .and. s% steps_before_use_gold2_tolerances < 0) .or. &
                 (s% steps_before_use_gold2_tolerances >= 0 .and. &
                    s% model_number > s% steps_before_use_gold2_tolerances + max(0,s% init_model_number))) then

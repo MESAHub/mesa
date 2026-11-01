@@ -3229,6 +3229,9 @@
       ! can eliminate most/all interior dissipation while still providing for extreme cases.
       ! using this parameter the dependence of limiting amplitude on cq is very weak.
 
+      ! The Qvisc form of artificial viscosity in Section 4.2 of |MESA III| is no longer available.
+      ! RSP uses Pvsc, controlled by ``RSP_cq`` and ``RSP_zsh``.
+
       ! surface pressure.  Provides outer boundary condition for momentum equation.
 
       ! ::
@@ -8707,9 +8710,14 @@
     min_X_for_conv_timescale = 0d0
     max_q_for_conv_timescale = 1d0
     min_q_for_conv_timescale = 0d0
-      ! tau_QHSE_yrs is the maximum of abs(delta_v)/(G*m_grav/r^2) over this q range.
-      ! The maximum is calculated only when this history value is requested.
-      ! The profile tau_qhse uses the same cell calculation. No selected cells gives zero.
+
+      ! ``tau_QHSE_yrs`` is the maximum of ``abs(delta_v)/(G*m_grav/r^2)``
+      ! over this q range, converted from seconds to years.
+      ! ``delta_v`` is the change in face velocity since the start of the step.
+      ! The maximum is calculated only when requested by history.
+      ! The profile ``tau_qhse`` uses seconds. No selected cells gives zero.
+
+      ! ::
 
     max_q_for_QHSE_timescale = 1d0
     min_q_for_QHSE_timescale = 0d0
@@ -9279,7 +9287,6 @@
 
       ! Pvsc is artificial pressure to push back against compression
       ! this is the form of artificial viscosity used in RSP
-      ! if using this, do not set use_artificial_viscosity true.
 
       ! artificial viscosity controls
       ! for the equations see: Appendix C in
@@ -9302,7 +9309,8 @@
       ! use_artificial_viscosity
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! use_artificial_viscosity has been replaced by use_Pvsc_art_visc.
+      ! The Qvisc form of artificial viscosity in Section 4.2 of |MESA III| is no longer available.
+      ! For ``v_flag`` models, use ``use_Pvsc_art_visc`` with ``Pvsc_cq`` and ``Pvsc_zsh``.
 
 ! split burn
 ! ==========
