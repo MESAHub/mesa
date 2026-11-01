@@ -51,6 +51,11 @@ Additional ``pgstar`` plots to visualize residuals of equations:
 - Kippenhahn-style diagram (with mass on the y-axis and model number on the x-axis) colored by ``safe_log10(maxval(abs(s%equ(1:neq, k))))``, which is the logarithm of the absolute value of the biggest residual at cell ``k`` for the *accepted* iteration of MESA's Newton-Raphson solver. The y-axis can be mass, logR, or tau.
 - Time evolution of the maximum residual across mesh points for each structure equation (ignores chemical composition equations). See ``Kipp_residuals_*`` and ``Max_eq_resid_*`` in ``pgstar.defaults``
 
+Substantial work has been done to improve the remapping of rotation profiles
+during mesh adjustments, reducing errors in angular velocity profiles while
+conserving total angular momentum. See
+`gh-1047 <https://github.com/MESAHub/mesa/issues/1047>`_.
+
 .. _Bug Fixes main:
 
 Bug Fixes
