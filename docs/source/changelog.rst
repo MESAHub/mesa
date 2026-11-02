@@ -73,6 +73,9 @@ conserving total angular momentum. See
 Bug Fixes
 ---------
 
+Incomplete split burns now trigger a stellar retry when they reach
+``burn_steps_hard_limit``.
+
 Fixed: ``gold2_tolerances`` accidentally used ``gold_solver_iters_timestep_limit`` instead of ``gold2_solver_iters_timestep_limit``.
 
 Corrected the Skye ionization energy offset, which was too large by the mean
