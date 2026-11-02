@@ -1288,17 +1288,6 @@
    CE_alpha_th = 1d0
 
 
-! CE_alpha_core
-! ~~~~~~~~~~~~~
-
-! Efficiency at which the change of energy in the core of the star contributes
-! to envelope ejection.
-
-! ::
-
-   CE_alpha_core = 0d0
-
-
 ! CE_mass_loss_rate_high
 ! ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1514,6 +1503,8 @@
    use_other_CE_binary_evolve_step = .false.
    use_other_CE_binary_finish_step = .false.
    use_other_e2 = .false.
+   use_other_pgbinary_plots = .false.
+   use_other_tidal_deformation_switch_function = .false.
 
 ! x_ctrl
 ! ~~~~~~
@@ -1529,3 +1520,15 @@
    x_integer_ctrl(1:binary_num_x_ctrls) = 0
    x_logical_ctrl(1:binary_num_x_ctrls) = .false.
    x_character_ctrl(1:binary_num_x_ctrls) = ''
+
+
+! extra inlists
+! =============
+
+! Read additional binary_controls namelists from the named files when the
+! corresponding read flag is true. Files are read in array order.
+
+! ::
+
+   read_extra_binary_controls_inlist(:) = .false.
+   extra_binary_controls_inlist_name(:) = 'undefined'

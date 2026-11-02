@@ -23,6 +23,13 @@ For a more in-depth look at the new build system, see :doc:`developing/build-sys
 
 ``Tsurf_factor`` and the associated controls and history column have been removed as they affected nothing. These controls were effectively deprecated after the removal of the black body boundary condition in 21.12.1.
 
+A substantial clean up of old or deprecated controls has been undertaken in
+``star``, ``binary``, PGSTAR, and PGBINARY.
+
+Removed the unused ``RSP_Qvisc_*`` controls for the obsolete ``Qvisc`` form
+(Section 4.2 of |MESA III|). Use ``Pvsc`` instead: ``RSP_cq`` and ``RSP_zsh``
+for RSP, or ``use_Pvsc_art_visc`` for ``v_flag`` hydrodynamics.
+
 .. _New Features main:
 
 New Features
@@ -47,6 +54,11 @@ Additional controls are available for TDC envelope remeshing:
 - ``TDC_hydro_nz_inner`` adds geometrically spaced zones near the inner boundary.
 - ``TDC_hydro_nz_T_gradient`` adds zones according to the variation in ``logT`` below ``TDC_hydro_T_anchor`` while retaining the mass-based mesh.
 
+PGSTAR HR diagrams can now show labeled lines of constant stellar radius.
+Set ``show_HR_radius_lines = .true.`` in ``&pgstar`` to enable them (default
+``.false.``). See :ref:`reference/pgstar:HR window` and
+`gh-1091 <https://github.com/MESAHub/mesa/pull/1091>`_.
+
 Additional ``pgstar`` plots to visualize residuals of equations:
 - Kippenhahn-style diagram (with mass on the y-axis and model number on the x-axis) colored by ``safe_log10(maxval(abs(s%equ(1:neq, k))))``, which is the logarithm of the absolute value of the biggest residual at cell ``k`` for the *accepted* iteration of MESA's Newton-Raphson solver. The y-axis can be mass, logR, or tau.
 - Time evolution of the maximum residual across mesh points for each structure equation (ignores chemical composition equations). See ``Kipp_residuals_*`` and ``Max_eq_resid_*`` in ``pgstar.defaults``
@@ -60,6 +72,8 @@ conserving total angular momentum. See
 
 Bug Fixes
 ---------
+
+Fixed: ``gold2_tolerances`` accidentally used ``gold_solver_iters_timestep_limit`` instead of ``gold2_solver_iters_timestep_limit``.
 
 Corrected the Skye ionization energy offset, which was too large by the mean
 mass number ``abar`` when ``Skye_use_ion_offsets = .true.``. The ionization
