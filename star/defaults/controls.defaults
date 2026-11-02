@@ -2320,6 +2320,22 @@
      TDC_include_eturb_in_energy_equation = .false.
 
 
+      ! TDC_adjust_mass_fallback_to_mlt
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! With ``MLT_option = 'TDC'``, use instantaneous MLT in cells touched
+      ! by mass adjustment if true. If false, retain TDC in those cells.
+      ! In either case, the starting turbulent energy is conservatively
+      ! transported on the face mass volumes. Accreted material brings no
+      ! starting turbulent energy. Inclusion of turbulent energy in the
+      ! stellar energy equation is selected separately by
+      ! ``TDC_include_eturb_in_energy_equation``.
+
+      ! ::
+
+     TDC_adjust_mass_fallback_to_mlt = .true.
+
+
       ! use_rsp_form_of_scale_height
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

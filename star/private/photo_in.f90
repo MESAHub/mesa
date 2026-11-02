@@ -45,6 +45,8 @@
          include 'formats'
 
          ierr = 0
+         s% have_mlt_vc_start = .false.
+         s% okay_to_set_mlt_vc = .false.
          part_number = 0  ! part_numbers are just a consistency check
 
          write(*, *) 'read ', trim(fname)

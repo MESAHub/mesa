@@ -43,6 +43,19 @@ Improved the precision of ``eps_mdot`` by saving specific energies before mass
 adjustment and forming energy differences before multiplying by mass. This
 reduces spurious heating and cooling from roundoff during accretion and mass loss.
 
+TDC now transports its starting turbulent energy with the material moved during
+mass adjustment, using the mass volumes associated with the face velocities.
+Accreted material brings zero starting turbulent energy, and winds export the
+turbulent energy carried by the removed material. When
+``TDC_include_eturb_in_energy_equation`` is true, this transport is accounted for
+separately from the thermal ``eps_mdot`` correction and the subsequent exchange
+of energy between turbulence and gas. The
+:ref:`reference/controls:TDC_adjust_mass_fallback_to_mlt` control is now listed
+beside ``TDC_include_eturb_in_energy_equation`` in the main TDC controls.
+Its default remains true, selecting instantaneous MLT in cells
+touched by mass adjustment. Setting it to false retains TDC with the transported
+starting state. Both choices use the same turbulent energy remap.
+
 Added ``atm_T_tau_Rho_outer`` to set the density used to estimate the
 initial gas pressure in an atmosphere with varying opacity. The default
 remains ``1d-10`` g/cm^3.

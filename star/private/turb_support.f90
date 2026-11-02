@@ -37,16 +37,15 @@ public :: get_TDC_dynamical_gradL
 
 contains
 
-   !> Determines if it is safe (physically) to use TDC instead of MLT.
+   !> Selects the optional MLT closure in cells touched by mass adjustment.
    !!
-   !! Currently we only know we have to fall back to MLT in cells that get touched
-   !! by adjust_mass, because there the convection speeds at the start of the
-   !! step can be badly out of whack. This can be disabled with TDC_adjust_mass_fallback_to_mlt
-   !! to let those cells use TDC.
+   !! The starting turbulent energy is transported with the mass in either case.
+   !! TDC_adjust_mass_fallback_to_mlt selects instantaneous MLT or time-dependent
+   !! convection for the subsequent solve.
    !!
    !! @param s star pointer
    !! @param k face index
-   !! @param fallback False if we can use TDC, True if we can fall back to MLT.
+   !! @param fallback True if the cell should use MLT instead of TDC.
    logical function check_if_must_fall_back_to_MLT(s, k) result(fallback)
       type (star_info), pointer :: s
       integer, intent(in) :: k
@@ -95,7 +94,7 @@ contains
       if (s% have_mlt_vc .and. s% okay_to_set_mlt_vc .and. &
             s% include_mlt_Pturb_in_thermodynamic_gradients .and. &
             s% mlt_Pturb_factor > 0d0) then
-         conv_vel = s% mlt_vc_old(k)
+         conv_vel = get_mlt_vc_start(s,k)
          if (present(mlt_vc_ad)) conv_vel = mlt_vc_ad
          Ptrb00 = s% mlt_Pturb_factor*pow2(conv_vel)*wrap_d_00(s, k)/3d0
          Ptrbm1 = s% mlt_Pturb_factor*pow2(conv_vel)*wrap_d_m1(s, k)/3d0
@@ -320,7 +319,7 @@ contains
 
       ! Wrap Pturb into P
       if (s% okay_to_set_mlt_vc .and. s% include_mlt_Pturb_in_thermodynamic_gradients .and. k > 0) then
-         mlt_Pturb = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*rho/3d0
+         mlt_Pturb = s% mlt_Pturb_factor*pow2(get_mlt_vc_start(s,k))*rho/3d0
          Ptot = P + mlt_Pturb
       else
          Ptot = P
@@ -434,7 +433,7 @@ contains
       if (using_TDC) then
          if (report) write(*,3) 'call set_TDC', k, s% solver_iter
          if (s% okay_to_set_mlt_vc) then
-            conv_vel_start = s% mlt_vc_old(k)
+            conv_vel_start = get_mlt_vc_start(s,k)
          else
             conv_vel_start = s% mlt_vc(k)
          end if

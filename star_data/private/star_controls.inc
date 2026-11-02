@@ -257,6 +257,7 @@
             TDC_include_inner_boundary_eddy_viscosity
          logical :: include_mlt_corr_to_TDC
          logical :: TDC_include_eturb_in_energy_equation, use_rsp_form_of_scale_height
+         logical :: TDC_adjust_mass_fallback_to_mlt
          real(dp) :: TDC_num_innermost_cells_forced_nonturbulent
          real(dp) :: TDC_num_outermost_cells_forced_nonturbulent
          real(dp) :: threshold_for_smooth_gradL_composition_term

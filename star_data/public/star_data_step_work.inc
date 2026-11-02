@@ -576,6 +576,8 @@
                ! 2 means have current and old
 
          real(dp), pointer, dimension(:,:) :: xh_old, xa_old
+         real(dp), pointer :: mlt_vc_start(:)
+            ! mass-adjusted TDC start state; mlt_vc_old remains the retry checkpoint
          real(dp), pointer, dimension(:) :: &
             dq_old, q_old, j_rot_old, omega_old, mlt_vc_old, &
             superad_reduction_factor_old
@@ -916,7 +918,7 @@
             RSP_just_set_velocities, &
             have_new_cz_bdy_info, using_gold_tolerances, need_to_setvars, have_new_generation, &
             using_velocity_time_centering, okay_to_set_mixing_info, &
-            okay_to_set_mlt_vc, have_mlt_vc
+            okay_to_set_mlt_vc, have_mlt_vc, have_mlt_vc_start
          logical :: okay_to_set_superad_reduction_factor
             ! With the turnover limiter, allow the reduction to change during the solve.
             ! Set false when rebuilding the model with its saved reduction.

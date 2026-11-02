@@ -21,7 +21,7 @@
 
       use star_private_def
       use const_def, only: dp, pi, ln10
-      use star_utils, only: em1, e00, ep1
+      use star_utils, only: em1, e00, ep1, get_mlt_vc_start
       use utils_lib
       use auto_diff
       use auto_diff_support
@@ -532,8 +532,8 @@
                conv_vel_00 = mlt_vc_ad(k)
                conv_vel_m1 = mlt_vc_ad(k - 1)
             else
-               conv_vel_00 = s% mlt_vc_old(k)
-               conv_vel_m1 = s% mlt_vc_old(k - 1)
+               conv_vel_00 = get_mlt_vc_start(s,k)
+               conv_vel_m1 = get_mlt_vc_start(s,k - 1)
             end if
          end if
          call calc_Ptot_ad_tw( &

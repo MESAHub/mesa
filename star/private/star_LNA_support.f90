@@ -55,7 +55,7 @@
          get_reconstructed_face_eos_kap_ad
       use star_utils, only: get_Cp_face, get_dke_dt_dpe_dt, get_grada_face, &
          get_gradr_face, get_kap_face, get_Peos_face, get_rho_face, &
-         get_scale_height_face, get_T_face
+         get_scale_height_face, get_T_face, get_mlt_vc_start
       use utils_lib, only: folder_exists, is_bad, mkdir
 
       implicit none
@@ -810,7 +810,7 @@
 
          if (s% u_flag) then
             P_surf_ad = 0d0
-            conv_vel_ad = s% mlt_vc_old(k)
+            conv_vel_ad = get_mlt_vc_start(s,k)
             if (tdc_lna_active(s)) call tdc_conv_vel_for_star_LNA(s, k, conv_vel_ad)
             ! Omit finite-step centering and add the static LNA Uq below.
             call eval_Riemann_dudt_rhs( &
@@ -1155,7 +1155,7 @@
             P_cell = P_cell_ad%val
             if (s% eps_grav_form_for_energy_eqn) P_cell = P_cell - s% Peos(k)
             if (s% mlt_Pturb_factor > 0d0 .and. k > 1) then
-               conv_vel_ad = s% mlt_vc_old(k)
+               conv_vel_ad = get_mlt_vc_start(s,k)
                if (tdc_lna_active(s)) call tdc_conv_vel_for_star_LNA(s, k, conv_vel_ad)
                rho_face_ad = get_rho_face(s, k)
                if (conv_vel_ad%val > 0d0) P_cell = P_cell + &

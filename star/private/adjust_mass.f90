@@ -28,6 +28,7 @@
       private
       public :: do_adjust_mass
       public :: compute_prev_mesh_dm
+      public :: remap_tdc_turbulent_energy
 
       logical, parameter :: dbg_adjm = .false.
 
@@ -132,6 +133,71 @@
 
       end subroutine compute_prev_mesh_dm
 
+
+      subroutine remap_tdc_turbulent_energy( &
+            nz, cell_dm_old, cell_dm_new, vc_old, vc_new, energy_removed, ierr)
+         use mass_utils, only: make_compressed_intersect
+         integer, intent(in) :: nz
+         real(qp), intent(in) :: cell_dm_old(:), cell_dm_new(:)
+         real(dp), intent(in) :: vc_old(:)
+         real(dp), intent(out) :: vc_new(:)
+         real(qp), intent(out) :: energy_removed
+         integer, intent(out) :: ierr
+         real(qp) :: dm_old(nz), dm_new(nz), eturb_old(nz), eturb_new(nz), &
+            mesh_intersects(2*nz), vc
+         integer :: ranges(2*nz,2), i, j, k
+         logical :: unchanged(nz)
+
+         ierr = -1
+         energy_removed = 0.0_qp
+         if (nz < 1) return
+         if (min(size(cell_dm_old),size(cell_dm_new),size(vc_old),size(vc_new)) < nz) return
+         if (any(.not. (cell_dm_old(1:nz) > 0.0_qp)) .or. &
+               any(.not. (cell_dm_new(1:nz) > 0.0_qp))) return
+         if (any(cell_dm_old(1:nz) > huge(1.0_qp)) .or. &
+               any(cell_dm_new(1:nz) > huge(1.0_qp))) return
+         if (any(is_bad(vc_old(1:nz))) .or. any(vc_old(1:nz) < 0d0)) return
+
+         ! These dual masses give exactly the cell turbulent-energy quadrature.
+         ! The prescribed inner face has zero turbulent energy.
+         dm_old(1) = 0.5_qp*cell_dm_old(1)
+         dm_new(1) = 0.5_qp*cell_dm_new(1)
+         do k=2,nz
+            dm_old(k) = 0.5_qp*(cell_dm_old(k-1) + cell_dm_old(k))
+            dm_new(k) = 0.5_qp*(cell_dm_new(k-1) + cell_dm_new(k))
+         end do
+         do k=1,nz
+            vc = real(vc_old(k),qp)
+            eturb_old(k) = 1.5_qp*vc*vc
+         end do
+         call make_compressed_intersect(dm_new, dm_old, nz, mesh_intersects, ranges)
+
+         eturb_new = 0.0_qp
+         unchanged = .true.
+         do i=1,2*nz
+            if (mesh_intersects(i) <= 0.0_qp) cycle
+            j = ranges(i,1)
+            k = ranges(i,2)
+            if (j == 0) then
+               energy_removed = energy_removed + mesh_intersects(i)*eturb_old(k)
+            else if (k > 0) then
+               eturb_new(j) = eturb_new(j) + mesh_intersects(i)*eturb_old(k)
+               if (eturb_old(k) /= eturb_old(j)) unchanged(j) = .false.
+            else
+               ! Accreted material brings no starting turbulent energy.
+               if (eturb_old(j) /= 0.0_qp) unchanged(j) = .false.
+            end if
+         end do
+         do k=1,nz
+            if (unchanged(k)) then
+               vc_new(k) = vc_old(k)
+            else
+               vc_new(k) = real(sqrt(2.0_qp*eturb_new(k)/(3.0_qp*dm_new(k))),dp)
+            end if
+         end do
+         ierr = 0
+      end subroutine remap_tdc_turbulent_energy
+
       ! Updates the radii of cells after adjust mass. Note that the radius appears in many
       ! places in s. Currently those are: r, r_start, rmid, rmid_start, R2 (r^2), and lnR (log(r)).
       ! If more of these are added they should also be updated here.
@@ -169,7 +235,7 @@
 
       subroutine do_adjust_mass( &
             s, species, specific_energy_before_adjust_mass, velocity_remap_kinetic_energy, &
-            kinetic_energy_removed, ierr)
+            kinetic_energy_removed, turbulent_energy_removed, ierr)
          use adjust_xyz, only: get_xa_for_accretion
          use star_utils, only: report_xa_bad_nums, &
             start_time, update_time, cell_specific_total_energy
@@ -181,6 +247,7 @@
          real(dp), intent(out) :: specific_energy_before_adjust_mass(:)
          real(dp), intent(out) :: velocity_remap_kinetic_energy(:)
          real(qp), intent(out) :: kinetic_energy_removed
+         real(qp), intent(out) :: turbulent_energy_removed
          integer, intent(out) :: ierr
 
          real(dp) :: &
@@ -194,6 +261,7 @@
             oldloc, newloc, oldval, newval, xm_old, xm_new, &
             xq_center_old, xq_center_new, velocity_old
          real(dp), dimension(:,:), allocatable :: xa_old
+         real(qp), allocatable :: cell_dm_before(:), cell_dm_after(:), change_in_dm(:)
          real(dp), pointer :: work(:)
 
          integer :: j, k, l, m, k_const_mass, nz, k_below_just_added, k_newval
@@ -201,7 +269,7 @@
          real(dp) :: partial_xa_mass, region_total_mass
          real(dp) :: starting_j_rot_surf
 
-         logical :: use_velocity_remap
+         logical :: use_velocity_remap, use_turbulent_remap
          logical, parameter :: dbg = .false.
 
          include 'formats'
@@ -211,6 +279,8 @@
          specific_energy_before_adjust_mass(:) = 0d0
          velocity_remap_kinetic_energy(:) = 0d0
          kinetic_energy_removed = 0.0_qp
+         turbulent_energy_removed = 0.0_qp
+         s% have_mlt_vc_start = .false.
          call save_for_eps_mdot(s)
 
          ierr = 0
@@ -264,14 +334,20 @@
             delta_m = new_mstar - old_mstar
             s% mstar_dot = delta_m/dt
          end if
+         if (delta_m == 0d0) return
+         ! The mesh and energy correction must use the same limited mass change.
+         new_xmstar = old_xmstar + delta_m
 
          ! Select the energy components after the wind rate and mass limits
          ! are set, before changing the mesh.
          use_velocity_remap = delta_m < 0d0 .and. (s% u_flag .or. s% v_flag) .and. &
             .not. s% use_mass_corrections
+         use_turbulent_remap = s% MLT_option == 'TDC' .and. s% have_mlt_vc .and. &
+            .not. (s% RSP_flag .or. s% RSP2_flag)
          do k=1,nz
             specific_energy_before_adjust_mass(k) = cell_specific_total_energy( &
-               s, k, use_TDC_mlt_vc_old=.true., include_radial_kinetic_energy=.not. use_velocity_remap)
+               s, k, use_TDC_mlt_vc_old=.true., include_radial_kinetic_energy=.not. use_velocity_remap, &
+               include_TDC_turbulent_energy=.not. use_turbulent_remap)
          end do
 
          frac = old_xmstar/new_xmstar
@@ -456,6 +532,21 @@
             if (s% report_ierr) write(*,*) s% retry_message
             call dealloc
             return
+         end if
+
+         if (use_turbulent_remap) then
+            allocate(cell_dm_before(nz), cell_dm_after(nz), change_in_dm(nz))
+            call compute_prev_mesh_dm(s, cell_dm_before, cell_dm_after, change_in_dm)
+            call remap_tdc_turbulent_energy( &
+               nz, cell_dm_before, cell_dm_after, s% mlt_vc_old, s% mlt_vc_start, &
+               turbulent_energy_removed, ierr)
+            if (ierr /= 0) then
+               s% retry_message = 'remap_tdc_turbulent_energy failed in adjust mass'
+               call dealloc
+               return
+            end if
+            s% have_mlt_vc_start = .true.
+            s% mlt_vc(1:nz) = s% mlt_vc_start(1:nz)
          end if
 
          if (s% rotation_flag) then

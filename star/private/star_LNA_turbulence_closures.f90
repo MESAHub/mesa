@@ -34,7 +34,7 @@
       use hydro_rsp2, only: get_RSP2_alfa_beta_face_weights, compute_Source, compute_D, compute_Dr
       use reconstructed_face_support, only: &
          get_reconstructed_face_eos_kap_ad, get_reconstructed_face_state_ad
-      use star_utils, only: get_mlt_mixing_length, get_rho_face_val
+      use star_utils, only: get_mlt_mixing_length, get_rho_face_val, get_mlt_vc_start
       use tdc_hydro, only: get_TDC_mixing_length_face, get_TDC_mixing_length_cell
       use turb, only: set_TDC_LNA
       use turb_support, only: get_TDC_dynamical_gradL
@@ -149,7 +149,7 @@
                if (tdc_lna_active(s)) then
                   call tdc_conv_vel_for_star_LNA(s, k, conv_vel_ad)
                else
-                  conv_vel_ad = s% mlt_vc_old(k)
+                  conv_vel_ad = get_mlt_vc_start(s,k)
                end if
                mlt_Ptrb_face = s% mlt_Pturb_factor*pow2(conv_vel_ad)*rho_face/3d0
                Ppoint = Ppoint + mlt_Ptrb_face
@@ -172,12 +172,12 @@
                      wrap_d_m1(s, k)/3d0
                end if
             else
-               mlt_Ptrb00 = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))* &
+               mlt_Ptrb00 = s% mlt_Pturb_factor*pow2(get_mlt_vc_start(s,k))* &
                   wrap_d_00(s, k)/3d0
                if (k == 1) then
                   mlt_Ptrbm1 = 0d0
                else
-                  mlt_Ptrbm1 = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))* &
+                  mlt_Ptrbm1 = s% mlt_Pturb_factor*pow2(get_mlt_vc_start(s,k))* &
                      wrap_d_m1(s, k)/3d0
                end if
             end if
@@ -333,11 +333,11 @@
             d_mlt_Pturb_ad = &
                s% mlt_Pturb_factor*pow2(conv_vel_ad)*(rho_m1 - rho_00)/3d0
          else if (s% star_LNA_perturb_turbulent_pressure .and. &
-               s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_old(k) > 0d0) then
+               s% mlt_Pturb_factor > 0d0 .and. get_mlt_vc_start(s,k) > 0d0) then
             rho_00 = wrap_d_00(s, k)
             rho_m1 = wrap_d_m1(s, k)
             d_mlt_Pturb_ad = &
-               s% mlt_Pturb_factor*s% mlt_vc_old(k)*s% mlt_vc_old(k)*(rho_m1 - rho_00)/3d0
+               s% mlt_Pturb_factor*pow2(get_mlt_vc_start(s,k))*(rho_m1 - rho_00)/3d0
          else
             d_mlt_Pturb_ad = 0d0
          end if
@@ -384,9 +384,9 @@
             P_face = P_face + &
                s% mlt_Pturb_factor*s% mlt_vc(k)*s% mlt_vc(k)* &
                rho_face_ad% val/3d0
-         else if (s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_old(k) > 0d0) then
+         else if (s% mlt_Pturb_factor > 0d0 .and. get_mlt_vc_start(s,k) > 0d0) then
             P_face = P_face + &
-               s% mlt_Pturb_factor*s% mlt_vc_old(k)*s% mlt_vc_old(k)* &
+               s% mlt_Pturb_factor*pow2(get_mlt_vc_start(s,k))* &
                get_rho_face_val(s, k)/3d0
          end if
       end subroutine static_face_pressure_for_star_LNA

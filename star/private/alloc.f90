@@ -549,6 +549,8 @@
                if (failed('j_rot')) exit
                call do1(s% mlt_vc, c% mlt_vc)
                if (failed('mlt_vc')) exit
+               call do1(s% mlt_vc_start, c% mlt_vc_start)
+               if (failed('mlt_vc_start')) exit
                call do1(s% conv_vel, c% conv_vel)
                if (failed('conv_vel')) exit
                call do2(s% superad_reduction_history_du, c% superad_reduction_history_du, &

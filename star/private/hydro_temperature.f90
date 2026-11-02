@@ -20,6 +20,7 @@
       module hydro_temperature
 
       use star_private_def
+      use star_utils, only: get_mlt_vc_start
       use const_def, only: dp, ln10, pi4, crad, clight, convective_mixing
       use reconstructed_face_support, only: get_reconstructed_face_eos_kap_ad, &
          get_effective_gradr_factor_ad, get_Lrad_per_gradT_face_ad
@@ -489,7 +490,7 @@
                .and. s% mlt_Pturb_factor > 0d0) then
                ! Keep the lagged convective velocity, but form the pressure term from the same
                ! face density used by the reconstructed face thermodynamic quantities.
-               mlt_Ptrb_face = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*rho_face/3d0
+               mlt_Ptrb_face = s% mlt_Pturb_factor*pow2(get_mlt_vc_start(s,k))*rho_face/3d0
                Ppoint = Ppoint + mlt_Ptrb_face
             end if
          else
@@ -498,11 +499,11 @@
             if ((s% have_mlt_vc .and. s% okay_to_set_mlt_vc) .and. s% include_mlt_Pturb_in_thermodynamic_gradients &
                .and. s% mlt_Pturb_factor > 0d0) then
                if (k ==1) then
-                  mlt_Ptrb00 = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*wrap_d_00(s,k)/3d0
+                  mlt_Ptrb00 = s% mlt_Pturb_factor*pow2(get_mlt_vc_start(s,k))*wrap_d_00(s,k)/3d0
                   mlt_Ptrbm1 = 0d0
                else
-                  mlt_Ptrb00 = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*wrap_d_00(s,k)/3d0
-                  mlt_Ptrbm1 = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*wrap_d_m1(s,k)/3d0
+                  mlt_Ptrb00 = s% mlt_Pturb_factor*pow2(get_mlt_vc_start(s,k))*wrap_d_00(s,k)/3d0
+                  mlt_Ptrbm1 = s% mlt_Pturb_factor*pow2(get_mlt_vc_start(s,k))*wrap_d_m1(s,k)/3d0
                end if
             else ! no mlt_pturb
                mlt_Ptrb00 = 0d0

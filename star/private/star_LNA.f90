@@ -20,6 +20,7 @@
       module star_lna
 
       use star_private_def
+      use star_utils, only: get_mlt_vc_start
       use auto_diff
       use hydro_vars, only: set_vars_if_needed
       use hydro_riemann, only: do_uface_and_Pface
@@ -76,7 +77,7 @@
             if (ierr /= 0) goto 100
             if (Riemann_Pturb) then
                do k = 1, s% nz
-                  mlt_vc_ad(k) = s% mlt_vc_old(k)
+                  mlt_vc_ad(k) = get_mlt_vc_start(s,k)
                   if (tdc_lna_active(s)) call tdc_conv_vel_for_star_LNA(s, k, mlt_vc_ad(k))
                end do
                call do_uface_and_Pface(s, ierr, mlt_vc_ad)

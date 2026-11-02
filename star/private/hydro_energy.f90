@@ -24,7 +24,7 @@
       use utils_lib, only: mesa_error, is_bad
       use auto_diff
       use auto_diff_support
-      use star_utils, only: em1, e00, ep1, set_energy_eqn_scal
+      use star_utils, only: em1, e00, ep1, set_energy_eqn_scal, get_mlt_vc_start
 
       implicit none
 
@@ -470,8 +470,8 @@
                ! write a wrapper for this.
                   if (k < s% nz) then
                      if (s% okay_to_set_mlt_vc) then ! have mlt_vc_old
-                        TDC_eturb_cell_start = 0.75d0*(pow2(s% mlt_vc_old(k)) + &
-                           pow2(s% mlt_vc_old(k+1)))
+                        TDC_eturb_cell_start = 0.75d0*(pow2(get_mlt_vc_start(s,k)) + &
+                           pow2(get_mlt_vc_start(s,k+1)))
                      else
                         TDC_eturb_cell_start = 0d0
                      end if
@@ -479,7 +479,7 @@
                         pow2(shift_p1(s% mlt_vc_ad(k+1))))
                   else ! center cell averaged with 0 for inner face
                      if (s% okay_to_set_mlt_vc) then ! have mlt_vc_old
-                        TDC_eturb_cell_start = 0.75d0*pow2(s% mlt_vc_old(k))
+                        TDC_eturb_cell_start = 0.75d0*pow2(get_mlt_vc_start(s,k))
                      else
                         TDC_eturb_cell_start = 0d0
                      end if
@@ -861,8 +861,8 @@
 
             ! set mlt_Pturb_ad
             mlt_Pturb_ad = 0d0
-            if (s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_old(k) > 0d0) &
-               mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*get_rho_face(s,k)/3d0
+            if (s% mlt_Pturb_factor > 0d0 .and. get_mlt_vc_start(s,k) > 0d0) &
+               mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(get_mlt_vc_start(s,k))*get_rho_face(s,k)/3d0
 
             P_face_sum_ad = Peos_ad
             P_face_sum_ad = P_face_sum_ad + Pvsc_ad
@@ -967,7 +967,7 @@
          dV = Av_face00_ad - Av_facep1_ad
 
          include_mlt_Pturb = s% mlt_Pturb_factor > 0d0 &
-            .and. s% mlt_vc_old(k) > 0d0 .and. k > 1
+            .and. get_mlt_vc_start(s,k) > 0d0 .and. k > 1
 
          call calc_Ptot_ad_tw( &
             s, k, skip_P, .not. include_mlt_Pturb, Ptot_ad, d_Ptot_dxa, ierr)

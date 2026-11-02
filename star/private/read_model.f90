@@ -84,6 +84,7 @@
          integer :: k, nz
          include 'formats'
          ierr = 0
+         s% have_mlt_vc_start = .false.
          nz = s% nz
          s% brunt_B(1:nz) = 0  ! temporary proxy for brunt_B
          call set_qs(s, nz, s% q, s% dq, ierr)
@@ -157,9 +158,8 @@
             end if
          end if
 
-         if (.not. s% have_mlt_vc) then
-            s% okay_to_set_mlt_vc = .true.
-         end if
+         ! A loaded velocity precedes the next step's old-state checkpoint.
+         s% okay_to_set_mlt_vc = .not. s% have_mlt_vc
 
          s% doing_finish_load_model = .true.
          call set_vars(s, s% dt, ierr)
@@ -239,6 +239,8 @@
          ! Saved models do not contain the turnover history.
          s% have_superad_reduction_factor = .false.
          s% okay_to_set_superad_reduction_factor = .false.
+         s% have_mlt_vc_start = .false.
+         s% okay_to_set_mlt_vc = .false.
          open(newunit=iounit, file=trim(filename), status='old', action='read', iostat=ierr)
          if (ierr /= 0) then
             write(*,*) 'open failed', ierr, iounit

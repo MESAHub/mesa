@@ -496,19 +496,6 @@
 ! ===
 
 
-      ! TDC_adjust_mass_fallback_to_mlt
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! If TDC_adjust_mass_fallback_to_mlt = .true., cells touched by
-      ! adjust_mass use MLT instead of TDC.
-      ! If false, TDC remains enabled in those cells and uses the TDC
-      ! convective velocity for the zone.
-
-      ! ::
-
-    TDC_adjust_mass_fallback_to_mlt = .true.
-
-
       ! TDC_use_dynamical_gradL
       ! ~~~~~~~~~~~~~~~~~~~~~~~
 

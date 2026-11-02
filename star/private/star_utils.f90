@@ -97,6 +97,7 @@
       public :: get_gradr_face
       public :: get_scale_height_face
       public :: get_mlt_mixing_length
+      public :: get_mlt_vc_start
       public :: get_tau
       public :: after_c_burn
       public :: get_shock_info
@@ -2427,6 +2428,18 @@
       end function eval_deltaM_total_from_profile
 
 
+      real(dp) function get_mlt_vc_start(s, k) result(vc)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+
+         if (s% have_mlt_vc_start) then
+            vc = s% mlt_vc_start(k)
+         else
+            vc = s% mlt_vc_old(k)
+         end if
+      end function get_mlt_vc_start
+
+
       real(dp) function tdc_cell_specific_turbulent_energy( &
             s, k, use_mlt_vc_old) result(cell_turbulent_energy)
          type (star_info), pointer :: s
@@ -2434,9 +2447,9 @@
          logical, intent(in) :: use_mlt_vc_old
 
          if (use_mlt_vc_old) then
-            cell_turbulent_energy = 0.75d0*pow2(s% mlt_vc_old(k))
+            cell_turbulent_energy = 0.75d0*pow2(get_mlt_vc_start(s,k))
             if (k < s% nz) cell_turbulent_energy = cell_turbulent_energy + &
-               0.75d0*pow2(s% mlt_vc_old(k+1))
+               0.75d0*pow2(get_mlt_vc_start(s,k+1))
          else
             cell_turbulent_energy = 0.75d0*pow2(s% mlt_vc(k))
             if (k < s% nz) cell_turbulent_energy = cell_turbulent_energy + &
@@ -2446,13 +2459,14 @@
 
 
       real(dp) function cell_specific_total_energy( &
-            s, k, use_TDC_mlt_vc_old, include_radial_kinetic_energy) result(cell_total)
+            s, k, use_TDC_mlt_vc_old, include_radial_kinetic_energy, include_TDC_turbulent_energy) result(cell_total)
          type (star_info), pointer :: s
          integer, intent(in) :: k
          logical, intent(in), optional :: use_TDC_mlt_vc_old
          logical, intent(in), optional :: include_radial_kinetic_energy
+         logical, intent(in), optional :: include_TDC_turbulent_energy
          real(dp) :: d_dv00, d_dvp1, d_dlnR00, d_dlnRp1
-         logical :: use_old_mlt_vc, include_radial_ke
+         logical :: use_old_mlt_vc, include_radial_ke, include_TDC_eturb
          include 'formats'
          use_old_mlt_vc = .false.
          if (present(use_TDC_mlt_vc_old)) &
@@ -2460,6 +2474,9 @@
          include_radial_ke = .true.
          if (present(include_radial_kinetic_energy)) &
             include_radial_ke = include_radial_kinetic_energy
+         include_TDC_eturb = .true.
+         if (present(include_TDC_turbulent_energy)) &
+            include_TDC_eturb = include_TDC_turbulent_energy
          cell_total = s% energy(k)
          if (include_radial_ke .and. (s% v_flag .or. s% u_flag)) &
             cell_total = cell_total + cell_specific_KE(s,k,d_dv00,d_dvp1)
@@ -2467,7 +2484,7 @@
          if (s% rotation_flag .and. s% include_rotation_in_total_energy) &
                cell_total = cell_total + cell_specific_rotational_energy(s,k)
          if (s% RSP2_flag) cell_total = cell_total + pow2(s% w(k))
-         if (.not. s%RSP2_flag .and. s%MLT_option == 'TDC' .and. &
+         if (include_TDC_eturb .and. .not. s%RSP2_flag .and. s%MLT_option == 'TDC' .and. &
                s%TDC_include_eturb_in_energy_equation) then
             cell_total = cell_total + &
                tdc_cell_specific_turbulent_energy(s, k, use_old_mlt_vc)
@@ -3525,11 +3542,11 @@
             if (present(mlt_vc_ad)) then
                mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(mlt_vc_ad)*get_rho_face(s,k)/3d0
             else
-               mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*get_rho_face(s,k)/3d0
+               mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(get_mlt_vc_start(s,k))*get_rho_face(s,k)/3d0
             end if
             if (time_center) then
                mlt_Pturb_start = &
-                  s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*(s% rho_start(k-1) + s% rho_start(k))/6d0
+                  s% mlt_Pturb_factor*pow2(get_mlt_vc_start(s,k))*(s% rho_start(k-1) + s% rho_start(k))/6d0
                mlt_Pturb_ad = alfa*mlt_Pturb_ad + beta*mlt_Pturb_start
             end if
          end if
@@ -4242,7 +4259,7 @@
          if (s% have_mlt_vc .and. s% okay_to_set_mlt_vc .and. s% include_mlt_Pturb_in_thermodynamic_gradients &
             .and. s% mlt_Pturb_factor > 0d0 .and. k > 1) then
             gamma1_face = alfa*wrap_gamma1_00(s,k) + beta*wrap_gamma1_m1(s,k)
-            mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*get_rho_face(s,k)/3d0
+            mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(get_mlt_vc_start(s,k))*get_rho_face(s,k)/3d0
             alpha = mlt_Pturb_ad/ (P*gamma1_face)
             grada_face = grada_face*(P+mlt_Pturb_ad) / (P * (1d0 + alpha))
          end if

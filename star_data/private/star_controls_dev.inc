@@ -3,7 +3,6 @@
          logical :: use_TDC_Y_face_seeded_newton
          character(32) :: hydro_matrix_solver
 
-         logical :: TDC_adjust_mass_fallback_to_mlt
          logical :: TDC_use_dynamical_gradL
          logical :: include_mlt_Pturb_in_thermodynamic_gradients
          logical :: use_TDC_enthalpy_flux_limiter

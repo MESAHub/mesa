@@ -322,6 +322,7 @@
          s% need_to_setvars = .true.  ! always start fresh
          s% okay_to_set_mixing_info = .true.  ! set false by element diffusion
          s% okay_to_set_mlt_vc = .false.  ! don't change mlt_vc until have set mlt_vc_old
+         s% have_mlt_vc_start = .false.
          s% okay_to_set_superad_reduction_factor = .false.
          s% superad_reduction_pending = .false.
          if (.not. use_turnover_limit) then
@@ -594,7 +595,7 @@
             too_large_wind_mdot, too_small_wind_mdot, boost, mstar_dot_nxt, &
             surf_omega_div_omega_crit_limit, dt
          real(dp), allocatable :: velocity_remap_kinetic_energy(:), specific_energy_before_adjust_mass(:)
-         real(qp) :: kinetic_energy_removed
+         real(qp) :: kinetic_energy_removed, turbulent_energy_removed
 
          integer :: ph_k, mdot_action
          real(dp) :: implicit_mdot, ph_L, iwind_tolerance, iwind_lambda
@@ -653,7 +654,7 @@
 
                call do_adjust_mass( &
                   s, s% species, specific_energy_before_adjust_mass, velocity_remap_kinetic_energy, &
-                  kinetic_energy_removed, ierr)
+                  kinetic_energy_removed, turbulent_energy_removed, ierr)
                if (failed('do_adjust_mass')) return
                s% star_mdot = s% mstar_dot/(Msun/secyer)      ! dm/dt in msolar per year
                call set_vars_if_needed(s, dt, 'after do_adjust_mass', ierr)
@@ -661,7 +662,7 @@
 
                call calculate_eps_mdot( &
                   s, dt, specific_energy_before_adjust_mass, velocity_remap_kinetic_energy, &
-                  kinetic_energy_removed, ierr)
+                  kinetic_energy_removed, turbulent_energy_removed, ierr)
                if (failed('calculate_eps_mdot')) return
 
                if (s% mstar_dot /= 0d0) then

@@ -23,7 +23,7 @@
       use const_def, only: dp, ln10, secyer
       use utils_lib, only: mesa_error, is_bad
       use auto_diff
-      use star_utils, only: em1, e00, ep1
+      use star_utils, only: em1, e00, ep1, get_mlt_vc_start
 
       implicit none
 
@@ -238,10 +238,10 @@
             type(auto_diff_real_star_order1) :: rho_00, rho_m1
             ierr = 0
             ! d_mlt_Pturb = difference in MLT convective pressure across face
-            if (s% mlt_Pturb_factor > 0d0 .and. s% mlt_vc_old(k) > 0d0) then
+            if (s% mlt_Pturb_factor > 0d0 .and. get_mlt_vc_start(s,k) > 0d0) then
                rho_00 = wrap_d_00(s,k)
                rho_m1 = wrap_d_m1(s,k)
-               d_mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*(rho_m1 - rho_00)/3d0
+               d_mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(get_mlt_vc_start(s,k))*(rho_m1 - rho_00)/3d0
             else
                d_mlt_Pturb_ad = 0d0
             end if

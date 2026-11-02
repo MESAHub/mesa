@@ -239,9 +239,9 @@ contains
       if (s% okay_to_set_mlt_vc .and. &
             s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation) then
          if (k < s%nz) then
-            w_cell = 0.5d0*(s%mlt_vc_old(k) + s%mlt_vc_old(k+1))/sqrt_2_div_3
+            w_cell = 0.5d0*(get_mlt_vc_start(s,k) + get_mlt_vc_start(s,k+1))/sqrt_2_div_3
          else
-            w_cell = 0.5d0*s%mlt_vc_old(k)/sqrt_2_div_3
+            w_cell = 0.5d0*get_mlt_vc_start(s,k)/sqrt_2_div_3
          end if
       else
          if (k < s%nz) then
@@ -455,7 +455,7 @@ contains
          w_face = s%mlt_vc_ad(k)/sqrt_2_div_3
          if (s% okay_to_set_mlt_vc .and. &
                s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation) then
-            w_momentum = s%mlt_vc_old(k)/sqrt_2_div_3
+            w_momentum = get_mlt_vc_start(s,k)/sqrt_2_div_3
          else
             w_momentum = w_face
          end if
@@ -535,7 +535,7 @@ contains
 
          if (s% okay_to_set_mlt_vc .and. &
             s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation) then
-            w_00 = s% mlt_vc_old(k)/sqrt_2_div_3
+            w_00 = get_mlt_vc_start(s,k)/sqrt_2_div_3
          else
             w_00 = s% mlt_vc_ad(k)/sqrt_2_div_3
          end if
@@ -546,7 +546,7 @@ contains
          if (k < s% nz) then
             if (s% okay_to_set_mlt_vc .and. &
                s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation) then
-               w_p1 = s% mlt_vc_old(k+1)/sqrt_2_div_3
+               w_p1 = get_mlt_vc_start(s,k+1)/sqrt_2_div_3
             else
                w_p1 = shift_p1(s% mlt_vc_ad(k+1))/sqrt_2_div_3
             end if
@@ -558,7 +558,7 @@ contains
             if (ierr /= 0) return
             if (s% okay_to_set_mlt_vc .and. &
                   s% TDC_alpha_M_use_explicit_mlt_vc_in_momentum_equation) then
-               w_p1 = s%mlt_vc_old(k)/sqrt_2_div_3
+               w_p1 = get_mlt_vc_start(s,k)/sqrt_2_div_3
             else
                w_p1 = s%mlt_vc_ad(k)/sqrt_2_div_3
             end if

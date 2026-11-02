@@ -23,6 +23,7 @@ module reconstructed_face_support
   use const_def, only: dp, ln10, pi4, clight, crad
   use auto_diff
   use kap_support, only: get_kap
+  use star_utils, only: get_mlt_vc_start
 
   implicit none
 
@@ -394,7 +395,7 @@ contains
 
     if (s% have_mlt_vc .and. s% okay_to_set_mlt_vc .and. s% include_mlt_Pturb_in_thermodynamic_gradients &
        .and. s% mlt_Pturb_factor > 0d0 .and. k > 1) then
-       mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*rho_face/3d0
+       mlt_Pturb_ad = s% mlt_Pturb_factor*pow2(get_mlt_vc_start(s,k))*rho_face/3d0
        alpha = mlt_Pturb_ad/(P_face*gamma1_face)
        grada_face = grada_face*(P_face + mlt_Pturb_ad)/(P_face*(1d0 + alpha))
     end if

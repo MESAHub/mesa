@@ -62,6 +62,9 @@ contains
          ierr = -1
          return
       end if
+      ! A new mesh precedes the next step's old-state checkpoint.
+      s% have_mlt_vc_start = .false.
+      s% okay_to_set_mlt_vc = .false.
       call setvars2(ierr)
       if (ierr /= 0) call mesa_error(__FILE__, __LINE__, 'remesh_for_TDC failed in setvars')
       old_J = 0d0
