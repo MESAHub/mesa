@@ -99,10 +99,12 @@ module star_pgstar
    integer, parameter :: i_R_L = i_L_Teff + 1
    integer, parameter :: i_R_Teff = i_R_L + 1
    integer, parameter :: i_logL_Teff = i_R_Teff + 1
-   integer, parameter :: i_HR = i_logL_Teff + 1
+   integer, parameter :: i_logL_R = i_logL_Teff + 1
+   integer, parameter :: i_logL_v = i_logL_R + 1
+   integer, parameter :: i_HR = i_logL_v + 1
    integer, parameter :: i_TRho = i_HR + 1
    integer, parameter :: i_TmaxRho = i_TRho + 1
-   integer, parameter :: i_Dynamo = i_TRho + 1
+   integer, parameter :: i_Dynamo = i_TmaxRho + 1
    integer, parameter :: i_Mixing = i_Dynamo + 1
    integer, parameter :: i_rti = i_Mixing + 1
    integer, parameter :: i_Kipp = i_rti + 1

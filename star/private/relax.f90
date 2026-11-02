@@ -3393,6 +3393,7 @@
             min_conv_mx1_bot = s% conv_mx1_bot
             rpar(2) = min_conv_mx1_bot
          end if
+         if (s% model_number < s% job% pre_ms_min_steps_before_check_radiative_core) return
          if (min_conv_mx1_bot < s% job% pre_ms_check_radiative_core_start) then
             if (s% conv_mx1_bot > s% job% pre_ms_check_radiative_core_stop) then
                write(*,2) 'finished relax to begin radiative core', s% model_number, s% conv_mx1_bot
