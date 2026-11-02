@@ -73,6 +73,10 @@ conserving total angular momentum. See
 Bug Fixes
 ---------
 
+Fixed ``switch_to_radiative`` zeroing saved ``mlt_vc`` during TDC photo
+restarts and preparation for a new step. Mixing cleanup now preserves
+the velocity until it has been copied to ``mlt_vc_old``.
+
 Fixed: ``gold2_tolerances`` accidentally used ``gold_solver_iters_timestep_limit`` instead of ``gold2_solver_iters_timestep_limit``.
 
 Corrected the Skye ionization energy offset, which was too large by the mean

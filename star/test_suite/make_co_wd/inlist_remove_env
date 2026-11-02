@@ -68,6 +68,7 @@
 ! solver controls
       ignore_too_large_correction = .true.
       convergence_ignore_equL_residuals = .true.
+      make_gradr_sticky_in_solver_iters = .true.
       ! max_resid_jump_limit = 1d9
       relax_max_number_retries = 3000
 
