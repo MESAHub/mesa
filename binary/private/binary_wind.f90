@@ -139,14 +139,17 @@
       real(dp) :: dm
       real(dp), DIMENSION(b% anomaly_steps):: rl_d, r_rl, mdot
 
-      if (s% id == b% s1% id) then
+      s_i = 2
+      if (b% have_star_1) then
+         if (s% id == b% star_ids(1)) s_i = 1
+      end if
+
+      if (s_i == 1) then
          if (.not. b% do_enhance_wind_1) return
          B_wind = b% tout_B_wind_1
-         s_i = 1
       else
          if (.not. b% do_enhance_wind_2) return
          B_wind = b% tout_B_wind_2
-         s_i = 2
       end if
 
       do i = 1,b% anomaly_steps  !limit radius / roche lobe

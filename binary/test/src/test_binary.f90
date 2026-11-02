@@ -2,21 +2,23 @@ module test_binary_mod
 
    use binary_lib
    use binary_timestep, only: binary_pick_next_timestep
+   use binary_wind, only: Tout_enhance_wind
    use binary_def
    use binary_private_def
    use star_def
    use star_lib
    use const_def
    use math_lib
+   use utils_lib, only: mesa_error
    implicit none
 
 contains
 
    subroutine do_test
-      integer :: binary_id, id, ierr, res
-      real(dp) :: fL2
+      integer :: binary_id, id, ierr, res, wind_id, wind_case
+      real(dp) :: fL2, expected_wind
       type(binary_info), pointer :: b
-      type(star_info), pointer :: s
+      type(star_info), pointer :: s, wind_secondary, wind_star
 
       include 'formats'
 
@@ -93,6 +95,48 @@ contains
       fL2 = binary_L2_mass_loss_fraction(20.0_dp, 18.0_dp, 0.0_dp, 304.0_dp, 0.1_dp, 0.64_dp, ierr)
 
       write (*, 1) 'fL2', fL2  ! should be 0.0
+
+      ! Check component selection in the actual wind enhancement routine.
+      call alloc_star(wind_id, ierr)
+      call star_ptr(wind_id, wind_secondary, ierr)
+      b% anomaly_steps = 2
+      allocate(b% theta_co(2), b% time_co(2))
+      b% theta_co = [0d0, pi]
+      b% time_co = [0d0, 1d0]
+      b% eccentricity = 0d0
+      b% r = 1d0
+      b% rl = 2d0
+      b% do_enhance_wind_1 = .true.
+      b% do_enhance_wind_2 = .true.
+      b% tout_B_wind_1 = 128d0
+      b% tout_B_wind_2 = 64d0
+      do wind_case = 1, 4
+         b% point_mass_i = 0
+         if (wind_case == 3) b% point_mass_i = 1
+         if (wind_case == 4) b% point_mass_i = 2
+         b% have_star_1 = wind_case /= 3
+         b% have_star_2 = wind_case /= 4
+         b% star_ids = [id, wind_id]
+         b% s1 => s
+         b% s2 => wind_secondary
+         if (.not. b% have_star_1) then
+            ! An absent primary may retain the surviving star's ID.
+            b% star_ids(1) = wind_id
+            nullify(b% s1)
+         end if
+         if (.not. b% have_star_2) nullify(b% s2)
+         wind_star => s
+         if (wind_case == 2 .or. wind_case == 3) wind_star => wind_secondary
+         expected_wind = merge(-3d0, -2d0, wind_case == 1 .or. wind_case == 4)
+         wind_star% mstar_dot = -1d0
+         call Tout_enhance_wind(b, wind_star)
+         if (abs(wind_star% mstar_dot - expected_wind) > 1d-12) &
+            call mesa_error(__FILE__, __LINE__, 'Incorrect wind enhancement component')
+      end do
+      deallocate(b% theta_co, b% time_co)
+      nullify(b% theta_co, b% time_co, b% s1, b% s2, wind_star)
+      call free_star(wind_id, ierr)
+      nullify(wind_secondary)
 
       write (*, '(a)') 'done'
 
