@@ -580,6 +580,7 @@
          s% model_number_of_history_values = -1
          s% need_to_set_history_names_etc = .true.
          s% doing_finish_load_model = .false.
+         s% doing_load_restart_photo = .false.
 
          nullify(s% finish_relax_step)
          nullify(s% finished_relax)
@@ -904,7 +905,9 @@
             if (ierr /= 0) return
             if (s% rotation_flag) s% have_j_rot = .true.
             call init_def(s)  ! RSP
+            s% doing_load_restart_photo = .true.
             call finish_load_model(s, restart, ierr)
+            s% doing_load_restart_photo = .false.
             if (s% max_years_for_timestep > 0) &
                s% dt_next = min(s% dt_next, secyer*s% max_years_for_timestep)
             return

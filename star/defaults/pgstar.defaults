@@ -1329,7 +1329,7 @@
 ! "rti" window
 ! ============
 
-      ! history of Rayleigh-Taylor instabilities.
+      ! history of Rayleigh-Taylor turbulence.
 
       ! ::
 
@@ -1339,7 +1339,10 @@
       !     and if you have set M_center > 0, then also include
       !            log_xmstar
 
-      ! Display history of Rayleigh-Taylor Instability
+      ! Display regions with alpha_RTI > 0 when RTI_flag is true, independently of the mixing type.
+      ! ``rti_regions <num>`` in history_columns.list counts active and inactive regions from the center outward.
+      ! Increase the count if outer regions are missing.
+      ! Use ``rti`` as the plot name to include this plot in a grid.
 
       ! ::
 
@@ -1370,16 +1373,16 @@
     rti_step_xmax = -1
     rti_xaxis_name = 'model_number'
 
-      ! If ``rti_max_width`` is negative, then all steps will be shown,
-      ! thereby overriding ``rti_step_xmin``
+      ! Positive ``rti_max_width`` limits the model-number span ending at ``rti_step_xmax``.
+      ! Nonpositive values leave the selected ``rti_step_xmin``/``rti_step_xmax`` range in effect.
 
       ! ::
 
     rti_max_width = -1
 
-      ! Changes to ``rti_xaxis_log``, ``rti_xmin``, ``rti_xmax``, ``rti_xmargin``,
-      ! ``rti_xaxis_reversed``, ``rti_xaxis_in_seconds``, ``rti_xaxis_in_Myr``,
-      ! and ``rti_xaxis_time_from_present`` all require ``rti_xaxis_name = star_age``
+      ! Axis limits, margins, logarithms and reversal apply to either x-axis.
+      ! Only ``rti_xaxis_in_seconds``, ``rti_xaxis_in_Myr`` and
+      ! ``rti_xaxis_time_from_present`` require ``rti_xaxis_name = 'star_age'``.
 
       ! ::
 
@@ -1409,6 +1412,7 @@
 
       ! ``rti_interval`` sets the model number step in between
       ! updates of the displayed rti data
+      ! Values less than 1 are treated as 1.
       ! ::
 
     rti_line_weight = 10
@@ -1579,6 +1583,13 @@
 
     TmaxRho_fname = ''
 
+      ! ``TmaxRho_use_decorator`` enables calling a subroutine to add extra information to a plot,
+      ! see ``$MESA_DIR/star/other/pgstar_decorator.f90``
+
+      ! ::
+
+    TmaxRho_use_decorator = .false.
+
       ! **File output**
 
       ! ::
@@ -1643,6 +1654,7 @@
     show_HR_classical_instability_strip = .false.
     show_HR_Mira_instability_region = .false.
     show_HR_WD_instabilities = .false.
+    show_HR_radius_lines = .false.
 
       ! ::
 
@@ -3118,6 +3130,7 @@
 
       ! ::
 
+    Profile_Panels4_same_yaxis_range(:) = .false.
     Profile_Panels4_yaxis_name(:) = ''
     Profile_Panels4_yaxis_reversed(:) = .false.
     Profile_Panels4_yaxis_log(:) = .false.
@@ -4857,6 +4870,7 @@
 
     History_Panels5_other_yaxis_name(:) = ''
     History_Panels5_other_yaxis_reversed(:) = .false.
+    History_Panels5_other_yaxis_log(:) = .false.
     History_Panels6_other_yaxis_log(:) = .false.
     History_Panels5_other_ymin(:) = -101d0
     History_Panels5_other_ymax(:) = -101d0
@@ -5254,6 +5268,8 @@
 ! ======================
 
       ! Plots either color-color, color-magnitude, magnitude-color or magnitude-magnitude
+      ! Log-axis flags apply log10(max(tiny,abs(value))) after any column subtraction.
+      ! Axis bounds are in the resulting plotted units.
 
 
       ! Color_magnitude1
@@ -5285,8 +5301,8 @@
     Color_magnitude1_xaxis2_name = ''
     Color_magnitude1_xmin = -101d0
     Color_magnitude1_xmax = -101d0
-    Color_magnitude1_max_width = 100
     Color_magnitude1_dxmin = -1
+    Color_Magnitude1_xmargin = 0.0
     Color_magnitude1_xaxis_reversed = .false.
     Color_magnitude1_xaxis_log = .false.
 
@@ -5330,7 +5346,6 @@
     Color_magnitude1_xaxis2_name = ''
     Color_magnitude1_xmin = -101d0
     Color_magnitude1_xmax = -101d0
-    Color_magnitude1_max_width = 100
     Color_magnitude1_dxmin = -1
     Color_magnitude1_xaxis_reversed = .false.
     Color_magnitude1_xaxis_log = .false.
@@ -5409,8 +5424,8 @@
     Color_magnitude2_xaxis2_name = ''
     Color_magnitude2_xmin = -101d0
     Color_magnitude2_xmax = -101d0
-    Color_magnitude2_max_width = 100
     Color_magnitude2_dxmin = -1
+    Color_Magnitude2_xmargin = 0.0
     Color_magnitude2_xaxis_reversed = .false.
     Color_magnitude2_xaxis_log = .false.
 
@@ -5454,7 +5469,6 @@
     Color_magnitude2_xaxis2_name = ''
     Color_magnitude2_xmin = -101d0
     Color_magnitude2_xmax = -101d0
-    Color_magnitude2_max_width = 100
     Color_magnitude2_dxmin = -1
     Color_magnitude2_xaxis_reversed = .false.
     Color_magnitude2_xaxis_log = .false.
@@ -5533,8 +5547,8 @@
     Color_magnitude3_xaxis2_name = ''
     Color_magnitude3_xmin = -101d0
     Color_magnitude3_xmax = -101d0
-    Color_magnitude3_max_width = 100
     Color_magnitude3_dxmin = -1
+    Color_Magnitude3_xmargin = 0.0
     Color_magnitude3_xaxis_reversed = .false.
     Color_magnitude3_xaxis_log = .false.
 
@@ -5578,7 +5592,6 @@
     Color_magnitude3_xaxis2_name = ''
     Color_magnitude3_xmin = -101d0
     Color_magnitude3_xmax = -101d0
-    Color_magnitude3_max_width = 100
     Color_magnitude3_dxmin = -1
     Color_magnitude3_xaxis_reversed = .false.
     Color_magnitude3_xaxis_log = .false.
@@ -5657,8 +5670,8 @@
     Color_magnitude4_xaxis2_name = ''
     Color_magnitude4_xmin = -101d0
     Color_magnitude4_xmax = -101d0
-    Color_magnitude4_max_width = 100
     Color_magnitude4_dxmin = -1
+    Color_Magnitude4_xmargin = 0.0
     Color_magnitude4_xaxis_reversed = .false.
     Color_magnitude4_xaxis_log = .false.
 
@@ -5702,7 +5715,6 @@
     Color_magnitude4_xaxis2_name = ''
     Color_magnitude4_xmin = -101d0
     Color_magnitude4_xmax = -101d0
-    Color_magnitude4_max_width = 100
     Color_magnitude4_dxmin = -1
     Color_magnitude4_xaxis_reversed = .false.
     Color_magnitude4_xaxis_log = .false.
@@ -5781,8 +5793,8 @@
     Color_magnitude5_xaxis2_name = ''
     Color_magnitude5_xmin = -101d0
     Color_magnitude5_xmax = -101d0
-    Color_magnitude5_max_width = 100
     Color_magnitude5_dxmin = -1
+    Color_Magnitude5_xmargin = 0.0
     Color_magnitude5_xaxis_reversed = .false.
     Color_magnitude5_xaxis_log = .false.
 
@@ -5826,7 +5838,6 @@
     Color_magnitude5_xaxis2_name = ''
     Color_magnitude5_xmin = -101d0
     Color_magnitude5_xmax = -101d0
-    Color_magnitude5_max_width = 100
     Color_magnitude5_dxmin = -1
     Color_magnitude5_xaxis_reversed = .false.
     Color_magnitude5_xaxis_log = .false.
@@ -5905,8 +5916,8 @@
     Color_magnitude6_xaxis2_name = ''
     Color_magnitude6_xmin = -101d0
     Color_magnitude6_xmax = -101d0
-    Color_magnitude6_max_width = 100
     Color_magnitude6_dxmin = -1
+    Color_Magnitude6_xmargin = 0.0
     Color_magnitude6_xaxis_reversed = .false.
     Color_magnitude6_xaxis_log = .false.
 
@@ -5950,7 +5961,6 @@
     Color_magnitude6_xaxis2_name = ''
     Color_magnitude6_xmin = -101d0
     Color_magnitude6_xmax = -101d0
-    Color_magnitude6_max_width = 100
     Color_magnitude6_dxmin = -1
     Color_magnitude6_xaxis_reversed = .false.
     Color_magnitude6_xaxis_log = .false.
@@ -6029,8 +6039,8 @@
     Color_magnitude7_xaxis2_name = ''
     Color_magnitude7_xmin = -101d0
     Color_magnitude7_xmax = -101d0
-    Color_magnitude7_max_width = 100
     Color_magnitude7_dxmin = -1
+    Color_Magnitude7_xmargin = 0.0
     Color_magnitude7_xaxis_reversed = .false.
     Color_magnitude7_xaxis_log = .false.
 
@@ -6074,7 +6084,6 @@
     Color_magnitude7_xaxis2_name = ''
     Color_magnitude7_xmin = -101d0
     Color_magnitude7_xmax = -101d0
-    Color_magnitude7_max_width = 100
     Color_magnitude7_dxmin = -1
     Color_magnitude7_xaxis_reversed = .false.
     Color_magnitude7_xaxis_log = .false.
@@ -6153,8 +6162,8 @@
     Color_magnitude8_xaxis2_name = ''
     Color_magnitude8_xmin = -101d0
     Color_magnitude8_xmax = -101d0
-    Color_magnitude8_max_width = 100
     Color_magnitude8_dxmin = -1
+    Color_Magnitude8_xmargin = 0.0
     Color_magnitude8_xaxis_reversed = .false.
     Color_magnitude8_xaxis_log = .false.
 
@@ -6198,7 +6207,6 @@
     Color_magnitude8_xaxis2_name = ''
     Color_magnitude8_xmin = -101d0
     Color_magnitude8_xmax = -101d0
-    Color_magnitude8_max_width = 100
     Color_magnitude8_dxmin = -1
     Color_magnitude8_xaxis_reversed = .false.
     Color_magnitude8_xaxis_log = .false.
@@ -6277,8 +6285,8 @@
     Color_magnitude9_xaxis2_name = ''
     Color_magnitude9_xmin = -101d0
     Color_magnitude9_xmax = -101d0
-    Color_magnitude9_max_width = 100
     Color_magnitude9_dxmin = -1
+    Color_Magnitude9_xmargin = 0.0
     Color_magnitude9_xaxis_reversed = .false.
     Color_magnitude9_xaxis_log = .false.
 
@@ -6322,7 +6330,6 @@
     Color_magnitude9_xaxis2_name = ''
     Color_magnitude9_xmin = -101d0
     Color_magnitude9_xmax = -101d0
-    Color_magnitude9_max_width = 100
     Color_magnitude9_dxmin = -1
     Color_magnitude9_xaxis_reversed = .false.
     Color_magnitude9_xaxis_log = .false.
@@ -7813,6 +7820,70 @@
     Grid9_file_interval = 5
     Grid9_file_width = -1
     Grid9_file_aspect_ratio = -1
+
+
+      ! Max_eq_resid
+      ! ------------
+
+      ! ::
+
+   Max_eq_resid_win_flag = .false.
+   Max_eq_resid_win_width = 7
+   Max_eq_resid_win_aspect_ratio = 5d-1
+
+   Max_eq_resid_xleft = 0.15
+   Max_eq_resid_xright = 0.85
+   Max_eq_resid_ybot = 0.15
+   Max_eq_resid_ytop = 0.85
+   Max_eq_resid_txt_scale = 1
+   Max_eq_resid_title = 'Max equation residuals'
+   Max_eq_resid_max_width = -1
+
+      ! **File output**
+
+      ! ::
+
+   Max_eq_resid_file_flag = .false.
+   Max_eq_resid_file_interval = 5
+   Max_eq_resid_file_dir = 'png'
+   Max_eq_resid_file_prefix = 'max_eq_resid_'
+   Max_eq_resid_file_width = -1
+   Max_eq_resid_file_aspect_ratio = -1
+
+
+      ! Kipp_residuals
+      ! --------------
+
+      ! ::
+
+   Kipp_residuals_win_flag = .false.
+   Kipp_residuals_win_width = 9
+   Kipp_residuals_win_aspect_ratio = 6d-1
+
+      ! ::
+
+   Kipp_residuals_xleft = 0.15
+   Kipp_residuals_xright = 0.85
+   Kipp_residuals_ybot = 0.15
+   Kipp_residuals_ytop = 0.85
+   Kipp_residuals_txt_scale = 1
+   Kipp_residuals_title = 'Kippenhahn residuals'
+   Kipp_residuals_max_width = -1         ! <0 means unlimited
+   Kipp_residuals_yaxis_name = 'mass'    ! can be also 'logR' or 'tau'
+   Kipp_residuals_max_residual = -101.0d0 ! -101.0d0 means adapt to data
+   Kipp_residuals_min_residual = -101.0d0
+
+      ! **File output**
+
+      ! ::
+
+   Kipp_residuals_file_flag = .false.
+   Kipp_residuals_file_interval = 5
+   Kipp_residuals_file_dir = 'png'
+   Kipp_residuals_file_prefix = 'kipp_residuals_'
+   Kipp_residuals_file_width = -1
+   Kipp_residuals_file_aspect_ratio = -1
+
 
 ! Annotation
 ! ==========

@@ -662,8 +662,9 @@
       integer, parameter :: h_C_cntr = h_lg_Dsurf + 1
       integer, parameter :: h_TDC_num_cells = h_C_cntr + 1
       integer, parameter :: h_retries = h_TDC_num_cells + 1
+      integer, parameter :: h_rti_regions = h_retries + 1
 
-      integer, parameter :: h_max_eff_mix_speed_div_csound = h_retries + 1
+      integer, parameter :: h_max_eff_mix_speed_div_csound = h_rti_regions + 1
       integer, parameter :: h_max_effective_mixing_speed_div_csound = h_max_eff_mix_speed_div_csound + 1
 
       integer, parameter :: h_col_id_max = h_max_effective_mixing_speed_div_csound
@@ -748,6 +749,7 @@
 
          history_column_name(h_mix_relr_regions) = 'mix_relr_regions'
          history_column_name(h_mixing_regions) = 'mixing_regions'
+         history_column_name(h_rti_regions) = 'rti_regions'
 
          history_column_name(h_epsnuc_M_1) = 'epsnuc_M_1'
          history_column_name(h_epsnuc_M_2) = 'epsnuc_M_2'
