@@ -722,8 +722,8 @@
                if (s% lnT(k) > ln10*12) then
                   if (report) write(*,2) 'after hydro, logT > 12 in cell k', k, s% lnT(k)
                   converged = .false.  !; exit
-               else if (s% lnT(k) < ln10) then
-                  if (report) write(*,*) 'after hydro, logT < 1 in cell k', k
+               else if (s% lnT(k) < ln10*s% hydro_mtx_min_allowed_logT) then
+                  if (report) write(*,*) 'after hydro, logT < hydro_mtx_min_allowed_logT in cell k', k
                   converged = .false.  !; exit
                else if (s% lnd(k) > ln10*12) then
                   if (report) write(*,*) 'after hydro, logRho > 12 in cell k', k

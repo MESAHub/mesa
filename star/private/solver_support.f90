@@ -343,7 +343,9 @@
          if (s% include_L_in_correction_limits) then
             skip1 = 0
             do k=1,nz
-               s% correction_weight(s% i_lum,k) = 1d0/(frac*s% L_start(1) + abs(s% L(k)))
+               ! Keep zero luminosity from producing a nonfinite correction weight.
+               s% correction_weight(s% i_lum,k) = 1d0/ &
+                  max(1d0, frac*abs(s% L_start(1)) + abs(s% L(k)))
             end do
          else
             skip1 = s% i_lum
