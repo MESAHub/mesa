@@ -24,6 +24,7 @@
       use chem_def, only: ih1, ihe3, ihe4
       use utils_lib
       use auto_diff_support
+      use star_utils, only: superad_history_integral
 
       implicit none
 
@@ -488,7 +489,7 @@
          real(dp), intent(inout) :: new_xa(species)
          integer, intent(out) :: ierr
          logical :: merge_center
-         integer :: i, ip, i0, im, q, nz, qi_max, qim_max
+         integer :: i, ip, i0, im, q, nz, qi_max, qim_max, nh
          real(dp) :: &
             drR, drL, v, &
             dm, dm_i, dm_ip, star_PE0, star_PE1, &
@@ -503,6 +504,7 @@
 
          ierr = 0
          s% need_to_setvars = .true.
+         nh = s% num_superad_reduction_history
          star_PE0 = get_star_PE(s)
          nz = s% nz
 
@@ -657,6 +659,9 @@
             s% lnT(im) = s% lnT(i0)
             s% D_mix(im) = s% D_mix(i0)
             s% mlt_vc(im) = s% mlt_vc(i0)
+            s% superad_reduction_factor(im) = s% superad_reduction_factor(i0)
+            s% superad_reduction_history_du(1:nh,im) = s% superad_reduction_history_du(1:nh,i0)
+            s% superad_reduction_history_eta_du(1:nh,im) = s% superad_reduction_history_eta_du(1:nh,i0)
             s% csound(im) = s% csound(i0)
             s% tau(im) = s% tau(i0)
             s% opacity(im) = s% opacity(i0)
@@ -822,7 +827,7 @@
          real(dp) :: tau_center, grad_xa(species), new_xa(species)
          integer, intent(out) :: ierr
          integer :: i, ip, j, jp, q, nz, nz_old, &
-            iR, iC, iL
+            iR, iC, iL, nh
          real(dp) :: &
             cell_Esum_old, cell_KE_old, cell_PE_old, cell_IE_old, cell_Etrb_old, &
             rho_RR, rho_iR, rR, rL, dr, dr_old, rC, dV, dVR, dVL, dM, dML, dMR, rho, &
@@ -831,7 +836,8 @@
             sumx, sumxp, new_xaL, new_xaR, star_PE0, star_PE1, &
             grad_alpha, f, new_alphaL, new_alphaR, v_R, v_C, v_L, min_dm, &
             mlt_vcL, mlt_vcR, tauL, tauR, etrb, etrb_L, etrb_C, etrb_R, grad_etrb, &
-            j_rot_new, dmbar_old, dmbar_p1_old, dmbar_new, dmbar_p1_new, dmbar_p2_new, J_old
+            j_rot_new, dmbar_old, dmbar_p1_old, dmbar_new, dmbar_p1_new, dmbar_p2_new, J_old, &
+            superad_reduction_factorL, superad_reduction_factorR
          logical :: done, use_new_grad_rho
          include 'formats'
 
@@ -839,6 +845,7 @@
          star_PE0 = get_star_PE(s)
          s% need_to_setvars = .true.
          nz = s% nz
+         nh = s% num_superad_reduction_history
          s% num_hydro_splits = s% num_hydro_splits + 1
          done = .false.
          nz_old = nz
@@ -868,13 +875,16 @@
 
          rR = s% r(i)
          mlt_vcR = s% mlt_vc(i)
+         superad_reduction_factorR = s% superad_reduction_factor(i)
          if (i == nz) then
             rL = s% R_center
             mlt_vcL = 0d0
+            superad_reduction_factorL = 1d0
             tauL = tau_center
          else
             rL = s% r(ip)
             mlt_vcL = s% mlt_vc(ip)
+            superad_reduction_factorL = s% superad_reduction_factor(ip)
             tauL = s% tau(ip)
          end if
 
@@ -1038,6 +1048,9 @@
                s% lnT(jp) = s% lnT(j)
                s% D_mix(jp) = s% D_mix(j)
                s% mlt_vc(jp) = s% mlt_vc(j)
+               s% superad_reduction_factor(jp) = s% superad_reduction_factor(j)
+               s% superad_reduction_history_du(1:nh,jp) = s% superad_reduction_history_du(1:nh,j)
+               s% superad_reduction_history_eta_du(1:nh,jp) = s% superad_reduction_history_eta_du(1:nh,j)
                s% csound(jp) = s% csound(j)
                s% tau(jp) = s% tau(j)
                s% opacity(jp) = s% opacity(j)
@@ -1175,9 +1188,31 @@
             s% dPdr_dRhodr_info(ip) = s% dPdr_dRhodr_info(i)
          end if
 
-         ! mlt_vc is face-based, so a split creates a new interior face value here.
+         ! These are face-based, so a split creates new interior face values here.
          ! Interpolate using the same left/right orientation as tau(ip).
          s% mlt_vc(ip) = mlt_vcR + (mlt_vcL - mlt_vcR)*dMR/dM
+         ! Derive the applied factor from the interpolated history.
+         if (nh > 0) then
+            f = dMR/dM
+            if (i < nz_old) then
+               ! The shift leaves the original inner face at ip+1.
+               s% superad_reduction_history_du(1:nh,ip) = &
+                  (1d0-f)*s% superad_reduction_history_du(1:nh,i) + f*s% superad_reduction_history_du(1:nh,ip+1)
+               s% superad_reduction_history_eta_du(1:nh,ip) = &
+                  (1d0-f)*s% superad_reduction_history_eta_du(1:nh,i) + f*s% superad_reduction_history_eta_du(1:nh,ip+1)
+            else
+               ! The inner boundary has no reduction.
+               s% superad_reduction_history_du(1:nh,ip) = s% superad_reduction_history_du(1:nh,i)
+               s% superad_reduction_history_eta_du(1:nh,ip) = &
+                  (1d0-f)*s% superad_reduction_history_eta_du(1:nh,i) + f*s% superad_reduction_history_du(1:nh,i)
+            end if
+            s% superad_reduction_factor(ip) = &
+               1d0/superad_history_integral( &
+                  s% superad_reduction_history_du(1:nh,ip), s% superad_reduction_history_eta_du(1:nh,ip), 1d0)
+         else
+            s% superad_reduction_factor(ip) = superad_reduction_factorR + &
+               (superad_reduction_factorL - superad_reduction_factorR)*dMR/dM
+         end if
 
          s% tau(ip) = tauR + (tauL - tauR)*dMR/dM
          if (is_bad(s% tau(ip))) then

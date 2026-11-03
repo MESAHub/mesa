@@ -32,17 +32,45 @@
          use rates_def,only:num_rvs
          use rsp_def, only: rsp_photo_out
          use alloc
+         use star_utils, only: advance_superad_history, superad_history_integral
          type (star_info), pointer :: s
          integer, intent(in) :: iounit
          integer, intent(out) :: ierr
 
          integer :: part_number, nz, len_history_col_spec
-         integer :: k
+         integer :: k, n
+         logical :: pending_history
+         real(dp), pointer :: history_du(:,:), history_eta_du(:,:), factor(:)
 
          include 'formats'
 
          ierr = 0
          nz = s% nz
+         n = s% num_superad_reduction_history
+         pending_history = s% superad_reduction_pending
+         ! Advance a copy so saving a photo does not consume the pending interval.
+         if (pending_history) then
+            nullify(history_du, history_eta_du, factor)
+            allocate(history_du(max_superad_reduction_history,nz), &
+               history_eta_du(max_superad_reduction_history,nz), factor(nz), stat=ierr)
+            if (ierr /= 0) then
+               if (associated(history_du)) deallocate(history_du)
+               if (associated(history_eta_du)) deallocate(history_eta_du)
+               if (associated(factor)) deallocate(factor)
+               return
+            end if
+            history_du(1:n,:) = s% superad_reduction_history_du(1:n,1:nz)
+            history_eta_du(1:n,:) = s% superad_reduction_history_eta_du(1:n,1:nz)
+            call advance_superad_history(history_du, history_eta_du, n, &
+               s% superad_reduction_target(1:nz), s% superad_reduction_du(1:nz), nz)
+            do k=1,nz
+               factor(k) = 1d0/superad_history_integral(history_du(1:n,k), history_eta_du(1:n,k), 1d0)
+            end do
+         else
+            history_du => s% superad_reduction_history_du
+            history_eta_du => s% superad_reduction_history_eta_du
+            factor => s% superad_reduction_factor
+         end if
 
          part_number = 0  ! part_numbers are just a consistency check on the data file
 
@@ -69,7 +97,7 @@
             s% cumulative_energy_error, s% cumulative_extra_heating, &
             s% have_initial_energy_integrals, s% total_energy_initial, &
             s% force_tau_factor, s% force_opacity_factor, &
-            s% crystal_core_boundary_mass
+            s% crystal_core_boundary_mass, n
 
          write(iounit) s% net_name
 
@@ -77,8 +105,13 @@
          write(iounit) &
             s% dq(1:nz), s% xa(:,1:nz), s% xh(:,1:nz), &
             s% omega(1:nz), s% j_rot(1:nz), s% mlt_vc(1:nz), s% conv_vel(1:nz), &
+            factor(1:nz), &
             s% D_ST_start(1:nz), s% nu_ST_start(1:nz), &  ! needed for ST time smoothing
             s% have_ST_start_info, s% mstar_old
+
+         if (n > 0) write(iounit, iostat=ierr) history_du(1:n,1:nz), history_eta_du(1:n,1:nz)
+         if (pending_history) deallocate(history_du, history_eta_du, factor)
+         if (ierr /= 0) return
 
          call write_part_number(iounit)
          write(iounit) &

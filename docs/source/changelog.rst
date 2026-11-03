@@ -23,6 +23,9 @@ For a more in-depth look at the new build system, see :doc:`developing/build-sys
 
 ``Tsurf_factor`` and the associated controls and history column have been removed as they affected nothing. These controls were effectively deprecated after the removal of the black body boundary condition in 21.12.1.
 
+Photos now include the superadiabatic turnover-limiter history. Earlier
+photos are incompatible; saved ``.mod`` starting models remain compatible.
+
 A substantial clean up of old or deprecated controls has been undertaken in
 ``star``, ``binary``, PGSTAR, and PGBINARY.
 
@@ -54,12 +57,26 @@ Additional controls are available for TDC envelope remeshing:
 - ``TDC_hydro_nz_inner`` adds geometrically spaced zones near the inner boundary.
 - ``TDC_hydro_nz_T_gradient`` adds zones according to the variation in ``logT`` below ``TDC_hydro_T_anchor`` while retaining the mass-based mesh.
 
+The new control ``superad_reduction_use_turnover_limit`` averages
+``eta = 1/Gamma_factor``, the factor applied to ``gradr-gradL``, over one
+accumulated convective turnover. Storage is limited to 64 history
+intervals. Merging adjacent intervals bounds memory use and introduces
+compression error. Remeshing and photo restarts preserve the stored history.
+See :ref:`reference/controls:superad_reduction_use_turnover_limit` for the
+turnover time and averaging method.
+
+During evolution, ``superad_reduction_max_logT`` sets the upper temperature
+for superadiabatic reduction, with a default of :math:`10^7\,\mathrm{K}`.
+The temperature selection and turnover time are fixed at the start of each
+step and held during solver iterations.
+
 PGSTAR HR diagrams can now show labeled lines of constant stellar radius.
 Set ``show_HR_radius_lines = .true.`` in ``&pgstar`` to enable them (default
 ``.false.``). See :ref:`reference/pgstar:HR window` and
 `gh-1091 <https://github.com/MESAHub/mesa/pull/1091>`_.
 
 Additional ``pgstar`` plots to visualize residuals of equations:
+
 - Kippenhahn-style diagram (with mass on the y-axis and model number on the x-axis) colored by ``safe_log10(maxval(abs(s%equ(1:neq, k))))``, which is the logarithm of the absolute value of the biggest residual at cell ``k`` for the *accepted* iteration of MESA's Newton-Raphson solver. The y-axis can be mass, logR, or tau.
 - Time evolution of the maximum residual across mesh points for each structure equation (ignores chemical composition equations). See ``Kipp_residuals_*`` and ``Max_eq_resid_*`` in ``pgstar.defaults``
 
@@ -72,6 +89,18 @@ conserving total angular momentum. See
 
 Bug Fixes
 ---------
+
+Switching to radiative transport no longer overwrites saved convective
+velocities during photo loading or retries with
+``restore_mesh_on_retry = .true.``. Loading a photo also preserves the stored
+superadiabatic reduction while derived quantities are rebuilt, including
+when ``run_star_extras`` enables reduction at startup.
+
+Fixed the density-inversion contribution to superadiabatic reduction to
+use ``superad_reduction_Gamma_inv_scale`` instead of
+``superad_reduction_Gamma_limit_scale``, restoring the ``alpha_2`` term in
+Jermyn et al. (2023, equation 64). Results change only when the two scales
+differ.
 
 Fixed ``switch_to_radiative`` zeroing saved ``mlt_vc`` during TDC photo
 restarts and preparation for a new step. Mixing cleanup now preserves

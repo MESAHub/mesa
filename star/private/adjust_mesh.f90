@@ -48,12 +48,12 @@
          type (star_info), pointer :: s
 
          integer :: alloc_level, i, k, ierr, species, nvar, nz, nz_new, nz_old, &
-            num_gvals, j, cid, cid_max, unchanged, split, merged, revised
+            num_gvals, j, cid, cid_max, unchanged, split, merged, revised, nh
          type (star_info), target :: copy_info
          type (star_info), pointer :: c, prv
          real(dp) :: delta_coeff, sum_L_other, sum_L_other_limit, A_max, &
             mesh_max_allowed_ratio, tmp, J_tot1, J_tot2, center_logT, alfa, beta, &
-            d_dlnR00, d_dlnRp1, d_dv00, d_dvp1
+            d_dlnR00, d_dlnRp1, d_dv00, d_dvp1, history_weight
          real(dp), pointer, dimension(:) :: &
             delta_gval_max, specific_PE, specific_KE, &
             xq_old, xq_new, dq_new
@@ -325,6 +325,7 @@
             call dealloc
             return
          end if
+         s% prev_mesh_num_superad_reduction_history = prv% prev_mesh_num_superad_reduction_history
 
          if (dbg_remesh .or. dbg) write(*,*) 'call do_alloc3'
          call do_alloc3(ierr)
@@ -410,6 +411,7 @@
             prv% j_rot, prv% i_rot, prv% omega, prv% D_omega, &
             prv% mlt_vc, prv% lnT, prv% w, specific_PE, specific_KE, &
             prv% m, prv% r, prv% rho, prv% dPdr_dRhodr_info, prv% D_mix, &
+            prv% superad_reduction_factor, &
             cell_type, comes_from, prv% dq, xq_old, s% xh, s% xa, s% dq, xq_new, ierr)
          if (ierr /= 0) then
             s% retry_message = 'do_mesh_adjust failed in mesh_adjust'
@@ -421,7 +423,39 @@
          end if
          if (dbg_remesh) write(*,*) 'back from do_mesh_adjust'
 
+         ! Use the same mass weights for interval widths and target integrals.
+         nh = s% num_superad_reduction_history
+         if (nh > 0) then
+            j = 1
+            do k=1,nz
+               do while (j < nz_old)
+                  if (xq_new(k) <= xq_old(j+1)) exit
+                  j = j + 1
+               end do
+               if (j < nz_old) then
+                  history_weight = max(0d0, min(1d0, &
+                     (xq_new(k)-xq_old(j))/(xq_old(j+1)-xq_old(j))))
+                  s% superad_reduction_history_du(1:nh,k) = &
+                     (1d0-history_weight)*prv% superad_reduction_history_du(1:nh,j) + &
+                     history_weight*prv% superad_reduction_history_du(1:nh,j+1)
+                  s% superad_reduction_history_eta_du(1:nh,k) = &
+                     (1d0-history_weight)*prv% superad_reduction_history_eta_du(1:nh,j) + &
+                     history_weight*prv% superad_reduction_history_eta_du(1:nh,j+1)
+               else
+                  history_weight = max(0d0, min(1d0, &
+                     (xq_new(k)-xq_old(j))/(1d0-xq_old(j))))
+                  s% superad_reduction_history_du(1:nh,k) = prv% superad_reduction_history_du(1:nh,j)
+                  s% superad_reduction_history_eta_du(1:nh,k) = &
+                     (1d0-history_weight)*prv% superad_reduction_history_eta_du(1:nh,j) + &
+                     history_weight*prv% superad_reduction_history_du(1:nh,j)
+               end if
+               s% superad_reduction_factor(k) = 1d0/superad_history_integral( &
+                  s% superad_reduction_history_du(1:nh,k), s% superad_reduction_history_eta_du(1:nh,k), 1d0)
+            end do
+         end if
+
          ! restore prev_mesh info
+         nh = s% prev_mesh_num_superad_reduction_history
          do k=1, s% prev_mesh_nz
             s% prev_mesh_xa(:,k) = prv% prev_mesh_xa(:,k)
             s% prev_mesh_xh(:,k) = prv% prev_mesh_xh(:,k)
@@ -429,6 +463,10 @@
             s% prev_mesh_omega(k) = prv% prev_mesh_omega(k)
             s% prev_mesh_dq(k) = prv% prev_mesh_dq(k)
             s% prev_mesh_mlt_vc(k) = prv% prev_mesh_mlt_vc(k)
+            s% prev_mesh_superad_reduction_factor(k) = &
+               prv% prev_mesh_superad_reduction_factor(k)
+            s% prev_mesh_superad_reduction_history_du(1:nh,k) = prv% prev_mesh_superad_reduction_history_du(1:nh,k)
+            s% prev_mesh_superad_reduction_history_eta_du(1:nh,k) = prv% prev_mesh_superad_reduction_history_eta_du(1:nh,k)
          end do
 
          ! restore ST info (for time smoothing)

@@ -3782,7 +3782,7 @@
             finish_model, restore_at_end, &
             lipar, ipar, lrpar, rpar, ierr)
          use evolve
-         use star_utils, only: yrs_for_init_timestep
+         use star_utils, only: yrs_for_init_timestep, commit_superad_history
          use pgstar
          use history_specs, only: set_history_columns
          use profile, only: set_profile_columns
@@ -4001,6 +4001,10 @@
             end if
 
          end do evolve_loop
+
+         ! check_model can finish relaxation before finish_step commits the interval.
+         if (s% termination_code == t_relax_finished_okay .or. s% termination_code == t_extras_check_model) &
+            call commit_superad_history(s)
 
          if (.not. s% job% disable_pgstar_during_relax_flag .and. s% job% pgstar_flag) then
          ! Can't use the star_lib versions otherwise we have a circular dependency in the makefile

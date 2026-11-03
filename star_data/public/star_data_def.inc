@@ -1,9 +1,10 @@
 
       character(len=24) :: version_number ! mesa version from file $MESA_DIR/data/version_number
 
-      integer, parameter :: star_def_version = 19
+      integer, parameter :: star_def_version = 20
 
       integer, parameter :: nz_alloc_extra = 200
+      integer, parameter :: max_superad_reduction_history = 64
 
 
       integer, parameter :: XL = dp

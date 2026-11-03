@@ -30,6 +30,7 @@
       contains
 
       subroutine new_generation(s, ierr)
+         use star_utils, only: set_superad_reduction_cache
          use utils_lib
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
@@ -40,6 +41,9 @@
 
          ierr = 0
          nz = s% nz
+         s% superad_reduction_du(1:nz) = 0d0
+         s% superad_reduction_target(1:nz) = 1d0
+         call set_superad_reduction_cache(s, nz)
 
          if (.not. s% rsp_flag) then
 
@@ -57,6 +61,12 @@
 
             call copy_to_old(s% mlt_vc, s% mlt_vc_old, ierr)
             if (ierr /= 0) return
+
+            call copy_to_old(s% superad_reduction_factor, &
+               s% superad_reduction_factor_old, ierr)
+            if (ierr /= 0) return
+            s% have_superad_reduction_factor = .true.
+            s% okay_to_set_superad_reduction_factor = .true.
 
             call enlarge_if_needed_2(s% xh_old,s% nvar_hydro,nz,nz_alloc_extra,ierr)
             if (ierr /= 0) return
@@ -145,7 +155,7 @@
       end subroutine new_generation
 
       subroutine set_current_to_old(s)
-         use star_utils, only: total_angular_momentum, set_m_and_dm, set_dm_bar, set_qs
+         use star_utils, only: total_angular_momentum, set_m_and_dm, set_dm_bar, set_qs, set_superad_reduction_cache
          use hydro_rotation, only: use_xh_to_update_i_rot
          use utils_lib
          type (star_info), pointer :: s
@@ -153,7 +163,11 @@
 
          include 'formats'
 
+         s% superad_reduction_pending = .false.
          s% nz = s% nz_old
+         ! Internal wind redos skip part1, so retain their frozen du.
+         s% superad_reduction_target(1:s% nz) = 1d0
+         call set_superad_reduction_cache(s, s% nz)
          s% mstar = s% mstar_old
          s% xmstar = s% xmstar_old
          s% M_center = s% M_center_old
@@ -191,8 +205,10 @@
                end do
                s% dq(k) = s% dq_old(k)
                s% mlt_vc(k) = s% mlt_vc_old(k)
+               s% superad_reduction_factor(k) = s% superad_reduction_factor_old(k)
             end do
             s% okay_to_set_mlt_vc = .true.
+            s% okay_to_set_superad_reduction_factor = .true.
 
             call set_qs(s, s% nz, s% q, s% dq, ierr)
             if (ierr /= 0) then

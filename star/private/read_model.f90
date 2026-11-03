@@ -233,6 +233,12 @@
          include 'formats'
 
          ierr = 0
+         s% superad_reduction_pending = .false.
+         s% num_superad_reduction_history = 0
+         s% prev_mesh_num_superad_reduction_history = 0
+         ! Saved models do not contain the turnover history.
+         s% have_superad_reduction_factor = .false.
+         s% okay_to_set_superad_reduction_factor = .false.
          open(newunit=iounit, file=trim(filename), status='old', action='read', iostat=ierr)
          if (ierr /= 0) then
             write(*,*) 'open failed', ierr, iounit

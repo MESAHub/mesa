@@ -20,7 +20,7 @@
 module turb_support
 
 use star_private_def
-use const_def, only: dp, crad, no_mixing
+use const_def, only: dp, crad, ln10, no_mixing
 use num_lib
 use utils_lib
 use auto_diff_support
@@ -228,9 +228,10 @@ contains
 
       ! these are used by use_superad_reduction
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
-      type(auto_diff_real_star_order1) :: Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
-         diff_grads_factor, Gamma_term, exp_limit, grad_scale, gradr_scaled, Eq_div_w, check_Eq, mlt_Pturb, Ptot
-      logical ::  test_partials, using_TDC, have_Y_face_guess
+      real(dp) :: f_turnover, eta_past
+      type(auto_diff_real_star_order1) :: eta_inst, Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
+         diff_grads_factor, Gamma_term, exp_limit, gradr_scaled, Eq_div_w, check_Eq, mlt_Pturb, Ptot
+      logical :: test_partials, using_TDC, have_Y_face_guess, hold_superad_reduction_factor, use_turnover_limit
       logical, parameter :: report = .false.
       include 'formats'
 
@@ -298,7 +299,27 @@ contains
       conv_vel = 0d0
       D = 0d0
       Gamma = 0d0
-      if (k /= 0) s% superad_reduction_factor(k) = 1d0
+      hold_superad_reduction_factor = .false.
+      ! Preserve stored photo state while finish_load_model rebuilds derived quantities.
+      if (k > 0 .and. s% have_superad_reduction_factor) &
+         hold_superad_reduction_factor = &
+            s% doing_finish_load_model .or. &
+            (s% use_superad_reduction .and. &
+             s% superad_reduction_use_turnover_limit .and. &
+             .not. s% okay_to_set_superad_reduction_factor)
+      if (k /= 0 .and. .not. hold_superad_reduction_factor) &
+         s% superad_reduction_factor(k) = 1d0
+      use_turnover_limit = k > 0 .and. s% use_superad_reduction .and. s% superad_reduction_use_turnover_limit .and. &
+            .not. s% RSP_flag .and. &
+            s% okay_to_set_superad_reduction_factor .and. .not. s% doing_finish_load_model .and. &
+            s% num_superad_reduction_history > 0
+      ! Paths that skip the reduction still contribute a neutral target.
+      if (use_turnover_limit) then
+         s% superad_reduction_target(k) = 1d0
+         f_turnover = min(s% superad_reduction_du(k),1d0)
+         eta_past = s% superad_reduction_eta_past(k)
+         s% superad_reduction_factor(k) = 1d0/(eta_past + f_turnover)
+      end if
 
       ! Bail if we asked for no mixing, or if parameters are bad.
       if (MLT_option == 'none' .or. beta < 1d-10 .or. mixing_length_alpha <= 0d0 .or. &
@@ -468,6 +489,11 @@ contains
       contains
 
       subroutine set_superad_reduction()
+         Gamma_factor = 1d0
+         if (k > 0 .and. .not. hold_superad_reduction_factor) then
+            if (s% lnT_start(k)/ln10 >= s% superad_reduction_max_logT) return
+         end if
+
          Gamma_limit = s% superad_reduction_Gamma_limit
          scale_value1 = s% superad_reduction_Gamma_limit_scale
          scale_value2 = s% superad_reduction_Gamma_inv_scale
@@ -476,7 +502,6 @@ contains
          Lrad_div_Ledd = 4d0*crad/3d0*pow4(T)/P*gradT
          Gamma_inv_threshold = 4d0*(1d0-beta)/(4d0-3*beta)
 
-         Gamma_factor = 1d0
          if (gradT > gradL) then
             if (Lrad_div_Ledd > Gamma_limit .or. Lrad_div_Ledd > Gamma_inv_threshold) then
                alfa0 = (gradT-gradL)/diff_grads_limit
@@ -487,12 +512,6 @@ contains
                end if
 
                Gamma_term = 0d0
-               !if (Lrad_div_Ledd > Gamma_limit) then
-               !   Gamma_term = Gamma_term + scale_value1*pow2(Lrad_div_Ledd/Gamma_limit-1d0)
-               !end if
-               !if (Lrad_div_Ledd% val > Gamma_inv_threshold) then
-               !   Gamma_term = Gamma_term + scale_value2*pow2(Lrad_div_Ledd/Gamma_inv_threshold-1d0)
-               !end if
                if (Lrad_div_Ledd > Gamma_limit) then
                   alfa0 = Lrad_div_Ledd/Gamma_limit-1d0
                   if (alfa0 < 1d0) then
@@ -500,16 +519,14 @@ contains
                   else
                      Gamma_term = Gamma_term + scale_value1*(alfa0-0.5d0)
                   end if
-                  !Gamma_term = Gamma_term + scale_value1*pow2(Lrad_div_Ledd/Gamma_limit-1d0)
                end if
                if (Lrad_div_Ledd% val > Gamma_inv_threshold) then
                   alfa0 = Lrad_div_Ledd/Gamma_inv_threshold-1d0
                   if (alfa0 < 1d0) then
-                     Gamma_term = Gamma_term + scale_value1*(0.5d0*alfa0*alfa0)
+                     Gamma_term = Gamma_term + scale_value2*(0.5d0*alfa0*alfa0)
                   else
-                     Gamma_term = Gamma_term + scale_value1*(alfa0-0.5d0)
+                     Gamma_term = Gamma_term + scale_value2*(alfa0-0.5d0)
                   end if
-                  !Gamma_term = Gamma_term + scale_value2*pow2(Lrad_div_Ledd/Gamma_inv_threshold-1d0)
                end if
 
                if (Gamma_term > 0d0) then
@@ -523,10 +540,20 @@ contains
                end if
             end if
          end if
+
+         ! Rebuilding the starting state must not advance the response.
+         if (hold_superad_reduction_factor) then
+            Gamma_factor = max(s% superad_reduction_factor(k), 1d0)
+         else if (use_turnover_limit) then
+            ! Only the current target contributes derivatives.
+            eta_inst = 1d0/Gamma_factor
+            s% superad_reduction_target(k) = eta_inst% val
+            Gamma_factor = 1d0/(eta_past + f_turnover*eta_inst)
+         end if
+
          if (k /= 0) s% superad_reduction_factor(k) = Gamma_factor% val
          if (Gamma_factor > 1d0) then
-            grad_scale = (gradr-gradL)/(Gamma_factor*gradr) + gradL/gradr
-            gradr_scaled = grad_scale*gradr
+            gradr_scaled = gradL + (gradr-gradL)/Gamma_factor
          end if
       end subroutine set_superad_reduction
    end subroutine Get_results

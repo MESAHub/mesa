@@ -383,6 +383,8 @@
          if (failed('dq_old')) return
          call do1D(s, s% mlt_vc_old, nz, action, ierr)
          if (failed('mlt_vc_old')) return
+         call do1D(s, s% superad_reduction_factor_old, nz, action, ierr)
+         if (failed('superad_reduction_factor_old')) return
          call do1D(s, s% omega_old, nz, action, ierr)
          if (failed('omega_old')) return
          call do1D(s, s% j_rot_old, nz, action, ierr)
@@ -463,7 +465,8 @@
          integer, intent(in) :: action_in
          integer, intent(out) :: ierr
 
-         integer :: nz, species, num_reactions, nvar, nvar_hydro, nvar_chem, sz_new, action
+         integer :: nz, species, num_reactions, nvar, nvar_hydro, nvar_chem, sz_new, action, nh_alloc, nh_prev
+         logical :: use_turnover_limit
          type (star_info), pointer :: c
          character (len=128) :: null_str
 
@@ -478,6 +481,21 @@
          nvar = s% nvar_total
          nvar_hydro = s% nvar_hydro
          nvar_chem = s% nvar_chem
+         use_turnover_limit = s% use_superad_reduction .and. &
+            s% superad_reduction_use_turnover_limit .and. .not. s% RSP_flag
+         nh_alloc = 0
+         ! Existing history row capacity changes only when part1 initializes the history.
+         if (action_in == do_allocate .and. use_turnover_limit) nh_alloc = max_superad_reduction_history
+         if (s% num_superad_reduction_history > 0) nh_alloc = max_superad_reduction_history
+         if (action_in /= do_allocate .and. associated(s% superad_reduction_history_du)) then
+            if (size(s% superad_reduction_history_du, dim=1) > 0) nh_alloc = max_superad_reduction_history
+         end if
+         nh_prev = 0
+         if (action_in == do_allocate) nh_prev = nh_alloc
+         if (s% prev_mesh_num_superad_reduction_history > 0) nh_prev = max_superad_reduction_history
+         if (action_in /= do_allocate .and. associated(s% prev_mesh_superad_reduction_history_du)) then
+            if (size(s% prev_mesh_superad_reduction_history_du, dim=1) > 0) nh_prev = max_superad_reduction_history
+         end if
 
          c => s
          action = action_in
@@ -495,6 +513,15 @@
             else  ! nothing to copy, so switch to allocate
                action = do_allocate
             end if
+         end if
+         if (action == do_copy_pointers_and_resize) then
+            if (associated(c% superad_reduction_history_du)) then
+               if (size(c% superad_reduction_history_du, dim=1) > 0) nh_alloc = max_superad_reduction_history
+            end if
+            if (associated(c% prev_mesh_superad_reduction_history_du)) then
+               if (size(c% prev_mesh_superad_reduction_history_du, dim=1) > 0) nh_prev = max_superad_reduction_history
+            end if
+            nh_prev = max(nh_prev, nh_alloc)
          end if
 
          do  ! just so can exit on failure
@@ -524,6 +551,25 @@
                if (failed('mlt_vc')) exit
                call do1(s% conv_vel, c% conv_vel)
                if (failed('conv_vel')) exit
+               call do2(s% superad_reduction_history_du, c% superad_reduction_history_du, &
+                  nh_alloc, 'superad_reduction_history_du')
+               if (failed('superad_reduction_history_du')) exit
+               call do2(s% superad_reduction_history_eta_du, c% superad_reduction_history_eta_du, &
+                  nh_alloc, 'superad_reduction_history_eta_du')
+               if (failed('superad_reduction_history_eta_du')) exit
+               call do2(s% prev_mesh_superad_reduction_history_du, c% prev_mesh_superad_reduction_history_du, &
+                  nh_prev, 'prev_mesh_superad_reduction_history_du')
+               if (failed('prev_mesh_superad_reduction_history_du')) exit
+               call do2(s% prev_mesh_superad_reduction_history_eta_du, c% prev_mesh_superad_reduction_history_eta_du, &
+                  nh_prev, 'prev_mesh_superad_reduction_history_eta_du')
+               if (failed('prev_mesh_superad_reduction_history_eta_du')) exit
+               if (action == do_allocate) then
+                  s% superad_reduction_history_du = 0d0
+                  s% superad_reduction_history_eta_du = 0d0
+                  s% prev_mesh_superad_reduction_history_du = 0d0
+                  s% prev_mesh_superad_reduction_history_eta_du = 0d0
+                  s% prev_mesh_num_superad_reduction_history = 0
+               end if
 
                ! These are persistent inputs needed for ST time smoothing.
                call do1(s% D_ST_start, c% D_ST_start)
@@ -780,8 +826,23 @@
             if (failed('adjust_mlt_gradT_fraction')) exit
             call do1(s% gradT_excess_effect, c% gradT_excess_effect)
             if (failed('gradT_excess_effect')) exit
-            call do1(s% superad_reduction_factor, c% superad_reduction_factor)
-            if (failed('superad_reduction_factor')) exit
+            ! Preserve the applied factor for rollback and photos, even with the limiter off.
+            if (action /= do_fill_arrays_with_NaNs) then
+               call do1(s% superad_reduction_factor, c% superad_reduction_factor)
+               if (failed('superad_reduction_factor')) exit
+            end if
+            if (action == do_allocate) s% superad_reduction_factor = 1d0
+            call do1(s% superad_reduction_du, c% superad_reduction_du)
+            if (failed('superad_reduction_du')) exit
+            call do1(s% superad_reduction_target, c% superad_reduction_target)
+            if (failed('superad_reduction_target')) exit
+            call do1(s% superad_reduction_eta_past, c% superad_reduction_eta_past)
+            if (failed('superad_reduction_eta_past')) exit
+            if (action == do_allocate) then
+               s% superad_reduction_du = 0d0
+               s% superad_reduction_target = 1d0
+               s% superad_reduction_eta_past = 1d0
+            end if
 
             call do1(s% domega_dlnR, c% domega_dlnR)
             if (failed('domega_dlnR')) exit
@@ -1163,6 +1224,9 @@
             if (failed('unsmoothed_brunt_B')) exit
             call do1(s% smoothed_brunt_B, c% smoothed_brunt_B)
             if (failed('smoothed_brunt_B')) exit
+            call do1(s% tau_conv_start, c% tau_conv_start)
+            if (failed('tau_conv_start')) exit
+            if (action == do_allocate) s% tau_conv_start = 0d0
 
             call do1(s% RTI_du_diffusion_kick, c% RTI_du_diffusion_kick)
             if (failed('RTI_du_diffusion_kick')) exit
@@ -1427,6 +1491,8 @@
             if (failed('prev_mesh_omega')) exit
             call do1(s% prev_mesh_mlt_vc, c% prev_mesh_mlt_vc)
             if (failed('prev_mesh_mlt_vc')) exit
+            call do1(s% prev_mesh_superad_reduction_factor, c% prev_mesh_superad_reduction_factor)
+            if (failed('prev_mesh_superad_reduction_factor')) exit
             call do1(s% prev_mesh_dq, c% prev_mesh_dq)
             if (failed('prev_mesh_dq')) exit
             ! These are needed for time-smoothing of ST mixing
