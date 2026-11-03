@@ -78,6 +78,7 @@
 
          integer :: j
 
+         ! Use the same starting turbulent energy as the energy equation.
          call eval_deltaM_total_energy_integrals( &
             s, 1, s% nz, s% mstar, .true., &
             s% total_energy_profile_before_adjust_mass, &
@@ -86,7 +87,7 @@
             s% total_radial_kinetic_energy_before_adjust_mass, &
             s% total_rotational_kinetic_energy_before_adjust_mass, &
             s% total_turbulent_energy_before_adjust_mass, &
-            s% total_energy_before_adjust_mass)
+            s% total_energy_before_adjust_mass, use_TDC_mlt_vc_old=.true.)
 
          do j=1,s%nz
             s% dm_before_adjust_mass(j) = s% dm(j)
@@ -166,15 +167,20 @@
 
       end subroutine update_radius
 
-      subroutine do_adjust_mass(s, species, ierr)
+      subroutine do_adjust_mass( &
+            s, species, specific_energy_before_adjust_mass, velocity_remap_kinetic_energy, &
+            kinetic_energy_removed, ierr)
          use adjust_xyz, only: get_xa_for_accretion
          use star_utils, only: report_xa_bad_nums, &
-            start_time, update_time
+            start_time, update_time, cell_specific_total_energy
          use hydro_rotation, only: set_omega
          use chem_def
 
          type (star_info), pointer :: s
          integer, intent(in) :: species
+         real(dp), intent(out) :: specific_energy_before_adjust_mass(:)
+         real(dp), intent(out) :: velocity_remap_kinetic_energy(:)
+         real(qp), intent(out) :: kinetic_energy_removed
          integer, intent(out) :: ierr
 
          real(dp) :: &
@@ -186,7 +192,7 @@
          real(dp), dimension(:), allocatable :: &
             rxm_old, rxm_new, old_cell_mass, new_cell_mass, &
             oldloc, newloc, oldval, newval, xm_old, xm_new, &
-            xq_center_old, xq_center_new
+            xq_center_old, xq_center_new, velocity_old
          real(dp), dimension(:,:), allocatable :: xa_old
          real(dp), pointer :: work(:)
 
@@ -195,12 +201,16 @@
          real(dp) :: partial_xa_mass, region_total_mass
          real(dp) :: starting_j_rot_surf
 
+         logical :: use_velocity_remap
          logical, parameter :: dbg = .false.
 
          include 'formats'
 
          if (dbg) write(*,*) 'do_adjust_mass'
 
+         specific_energy_before_adjust_mass(:) = 0d0
+         velocity_remap_kinetic_energy(:) = 0d0
+         kinetic_energy_removed = 0.0_qp
          call save_for_eps_mdot(s)
 
          ierr = 0
@@ -255,6 +265,15 @@
             s% mstar_dot = delta_m/dt
          end if
 
+         ! Select the energy components after the wind rate and mass limits
+         ! are set, before changing the mesh.
+         use_velocity_remap = delta_m < 0d0 .and. (s% u_flag .or. s% v_flag) .and. &
+            .not. s% use_mass_corrections
+         do k=1,nz
+            specific_energy_before_adjust_mass(k) = cell_specific_total_energy( &
+               s, k, use_TDC_mlt_vc_old=.true., include_radial_kinetic_energy=.not. use_velocity_remap)
+         end do
+
          frac = old_xmstar/new_xmstar
          new_xmstar = old_xmstar/frac
          if (new_xmstar <= 0) then
@@ -281,6 +300,11 @@
 
          do k=1,nz
             old_cell_mass(k) = old_xmstar*s% dq(k)
+            if (s% u_flag) then
+               velocity_old(k) = s% xh(s% i_u,k)
+            else if (s% v_flag) then
+               velocity_old(k) = s% xh(s% i_v,k)
+            end if
          end do
          xm_old(1) = 0
          xq_center_old(1) = 0.5d0*s% dq(1)
@@ -418,6 +442,13 @@
             end if
          end do
 
+         ! The momentum projection uses Newtonian inertial masses.
+         if ((s% u_flag .or. s% v_flag) .and. delta_m < 0d0 .and. &
+               .not. s% use_mass_corrections) then
+            call remap_velocity_for_mass_loss( &
+               s, nz, velocity_old, velocity_remap_kinetic_energy, kinetic_energy_removed)
+         end if
+
          call set_xa(s, nz, k_const_mass, species, xa_old, xaccrete, &
             rxm_old, rxm_new, mmax, old_cell_mass, new_cell_mass, ierr)
          if (ierr /= 0) then
@@ -524,6 +555,99 @@
          contains
 
 
+         subroutine remap_velocity_for_mass_loss( &
+               s, nz, velocity_old, remap_kinetic_energy, kinetic_energy_removed)
+            use mass_utils, only: make_compressed_intersect
+            type (star_info), pointer :: s
+            integer, intent(in) :: nz
+            real(dp), intent(in) :: velocity_old(:)
+            real(dp), intent(out) :: remap_kinetic_energy(:)
+            real(qp), intent(out) :: kinetic_energy_removed
+
+            integer :: i, j, k
+            integer :: ranges(2*nz,2)
+            real(dp) :: velocity_new(nz)
+            real(qp) :: dm_old(nz), dm_new(nz), change_in_dm(nz), &
+               cell_dm_old(nz), cell_dm_new(nz), mesh_intersects(2*nz), &
+               delta_velocity(nz), remap_heat(nz), delta_v
+
+            call compute_prev_mesh_dm(s, cell_dm_old, cell_dm_new, change_in_dm)
+
+            do k=1,nz
+               if (s% u_flag) then
+                  dm_old(k) = cell_dm_old(k)
+                  dm_new(k) = cell_dm_new(k)
+               else if (k == 1) then
+                  ! v(1) has only the outer half of cell 1 in its dual cell.
+                  dm_old(k) = 0.5d0*cell_dm_old(k)
+                  dm_new(k) = 0.5d0*cell_dm_new(k)
+               else
+                  ! Other v points have half of each adjacent cell.
+                  dm_old(k) = 0.5d0*(cell_dm_old(k-1) + cell_dm_old(k))
+                  dm_new(k) = 0.5d0*(cell_dm_new(k-1) + cell_dm_new(k))
+               end if
+            end do
+
+            call make_compressed_intersect(dm_new, dm_old, nz, mesh_intersects, ranges)
+
+            ! Sum velocity differences to retain small changes in a large bulk flow.
+            delta_velocity(:) = 0.0_qp
+            kinetic_energy_removed = 0.0_qp
+            do i=1,2*nz
+               if (mesh_intersects(i) <= 0.0_qp) cycle
+               j = ranges(i,1)
+               k = ranges(i,2)
+               if (j == 0) then
+                  kinetic_energy_removed = kinetic_energy_removed + &
+                     0.5_qp*mesh_intersects(i)*real(velocity_old(k),qp)**2
+               else if (k > 0) then
+                  delta_v = real(velocity_old(k),qp) - real(velocity_old(j),qp)
+                  delta_velocity(j) = delta_velocity(j) + mesh_intersects(i)*delta_v
+               end if
+            end do
+            do k=1,nz
+               delta_velocity(k) = delta_velocity(k)/dm_new(k)
+               velocity_new(k) = real(real(velocity_old(k),qp) + delta_velocity(k),dp)
+            end do
+
+            ! Evaluate the variance directly instead of subtracting bulk kinetic energies.
+            remap_heat(:) = 0.0_qp
+            do i=1,2*nz
+               if (mesh_intersects(i) <= 0.0_qp) cycle
+               j = ranges(i,1)
+               k = ranges(i,2)
+               if (j <= 0 .or. k <= 0) cycle
+               delta_v = real(velocity_old(k),qp) - real(velocity_old(j),qp) - delta_velocity(j)
+               remap_heat(j) = remap_heat(j) + 0.5_qp*mesh_intersects(i)*delta_v**2
+            end do
+
+            remap_kinetic_energy(:) = 0d0
+            ! The hydro step starts from the projected velocities.
+            do k=1,nz
+               if (s% u_flag) then
+                  s% u(k) = velocity_new(k)
+                  s% u_start(k) = s% u(k)
+                  s% xh(s% i_u,k) = s% u(k)
+                  remap_kinetic_energy(k) = remap_heat(k)
+               else
+                  s% v(k) = velocity_new(k)
+                  s% v_start(k) = s% v(k)
+                  s% xh(s% i_v,k) = s% v(k)
+                  remap_kinetic_energy(k) = remap_kinetic_energy(k) + &
+                     0.5_qp*cell_dm_new(k)*remap_heat(k)/dm_new(k)
+                  if (k > 1) remap_kinetic_energy(k-1) = remap_kinetic_energy(k-1) + &
+                     0.5_qp*cell_dm_new(k-1)*remap_heat(k)/dm_new(k)
+               end if
+            end do
+            if (s% v_flag .and. .not. s% u_flag) then
+               ! The inner half cell has the prescribed center velocity.
+               kinetic_energy_removed = kinetic_energy_removed + &
+                  0.25_qp*(cell_dm_old(nz) - cell_dm_new(nz))*real(s% v_center,qp)**2
+            end if
+
+         end subroutine remap_velocity_for_mass_loss
+
+
          real(dp) function angular_momentum_removed(ierr) result(J)
             ! when call this, s% j_rot is still for old mass
             integer, intent(out) :: ierr
@@ -580,7 +704,7 @@
             integer, intent(out) :: ierr
             allocate(rxm_old(nz), rxm_new(nz), old_cell_mass(nz), new_cell_mass(nz), &
                xa_old(species,nz), oldloc(nz), newloc(nz), oldval(nz), newval(nz), &
-               xm_old(nz), xm_new(nz), xq_center_old(nz), xq_center_new(nz))
+               xm_old(nz), xm_new(nz), xq_center_old(nz), xq_center_new(nz), velocity_old(nz))
             call do_work_arrays(.true.,ierr)
          end subroutine do_alloc
 

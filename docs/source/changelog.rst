@@ -38,6 +38,10 @@ for RSP, or ``use_Pvsc_art_visc`` for ``v_flag`` hydrodynamics.
 New Features
 ------------
 
+Improved the precision of ``eps_mdot`` by saving specific energies before mass
+adjustment and forming energy differences before multiplying by mass. This
+reduces spurious heating and cooling from roundoff during accretion and mass loss.
+
 MESA's documentation now includes a generated :ref:`Test Suite Gallery <tagoverview>` using metadata from test case ``README.rst`` files. The gallery groups test cases by module, physics, numerical method, workflow, and stellar object or phase. This change makes it easier to understand the purpose of each test case, and can help users more easily find a useful starting point for a MESA project. Details on the implementation can be found in :ref:`developing/test_suite:Gallery tags`.
 
 Diffusive overshooting (overmixing) prescriptions now support a
@@ -111,6 +115,10 @@ resolved shocks using the default-off ``Riemann_shock_D_mix_reduction_on`` and
 ``Riemann_shock_D_mix_reduction_full_on`` controls. Corresponding compression,
 pressure-jump, shock-strength, and diffusion-factor profile columns are
 available for diagnostics.
+
+Entropy-profile relaxation can now use an implicit or normalized energy
+source and can temporarily select the Newton correction scale and retry hold.
+The new controls restore their incoming solver settings when relaxation ends.
 
 .. _Bug Fixes main:
 
@@ -220,6 +228,17 @@ RTI mixing cannot incorrectly make an active convective face radiative.
 Added an optional floor on the atmospheric pressure used by the momentum
 outer boundary. The floor prevents a hydrostatic atmosphere from supplying
 less than the radiation pressure at its boundary temperature.
+
+Fixed velocity remapping during mass loss. Momentum is now conservatively
+remapped on the cell or dual cell mass coordinates, and unresolved kinetic
+energy is returned locally through ``eps_mdot`` instead of being lost.
+
+Fixed nonpositive surface optical depths after removing surface cells from a
+dynamic model. Surface removal now retains the existing optical depth when
+the hydrostatic pressure estimate is nonphysical. Split/merge metric zoning
+also disables its logarithmic optical-depth component when the optical-depth
+coordinate is not positive, preventing invalid logarithms from driving
+unbounded mesh refinement.
 
 Important bug fix for ``r26.4.1`` identified by Emily Sandford and Louis Siebenaler: the ``lowT_Freedman11`` opacity option used ``[M/H]`` labels as the metal mass fraction when interpolating in ``Z``, resulting in incorrect opacities. We recommend users who use these low-temperature opacities, such as in planet models, update to the latest MESA version or employ the fixes in :ref:`the known bugs entry <freedman_lowt_z_bug>` and `gh-993 <https://github.com/MESAHub/mesa/pull/993>`_.
 
