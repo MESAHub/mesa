@@ -20,7 +20,7 @@
       module hydro_temperature
 
       use star_private_def
-      use star_utils, only: get_mlt_vc_start
+      use star_utils, only: get_mlt_vc_start, get_T_face, get_Peos_face, get_kap_face
       use const_def, only: dp, ln10, pi4, crad, clight, convective_mixing
       use reconstructed_face_support, only: get_reconstructed_face_eos_kap_ad, &
          get_effective_gradr_factor_ad, get_Lrad_per_gradT_face_ad
@@ -35,6 +35,8 @@
       public :: do1_gradT_eqn
       public :: do1_dlnT_dm_eqn
       public :: do1_constant_L_eqn
+      public :: get_structure_temperature_gradient
+      public :: expected_HSE_grav_term
 
       contains
 
@@ -46,21 +48,17 @@
       ! L_rad_start = (-d_P_rad/dm_bar*clight*area^2/<opacity_face>)_start
       subroutine do1_alt_dlnT_dm_eqn(s, k, nvar, ierr)
          use eos_def
-         use star_utils, only: save_eqn_residual_info, get_T_face, get_Peos_face, get_kap_face
+         use star_utils, only: save_eqn_residual_info
          type (star_info), pointer :: s
          integer, intent(in) :: k, nvar
          integer, intent(out) :: ierr
 
-         real(dp) :: scale, dm_bar
-         type(auto_diff_real_star_order1) :: L_ad, r_00, area, area2, Lrad_ad, &
-            opacity_face, kap_face, L0_ad, gradr_factor, &
-            d_P_rad_expected_ad, T_m1, T4_m1, T_00, T4_00, &
-            P_rad_m1, P_rad_00, d_P_rad_actual_ad, resid
-         type(auto_diff_real_star_order1) :: T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grada_face
-         type(auto_diff_real_star_order1) :: flxR, flxLambda
+         real(dp) :: scale
+         type(auto_diff_real_star_order1) :: L_ad, Lrad_ad, L0_ad, gradr_factor, &
+            Lrad_coeff, d_P_rad_actual_ad, resid, flxR, flxLambda
 
          integer :: i_equL
-         logical :: dbg
+         logical :: dbg, use_convective_gradient
          logical :: test_partials
 
          include 'formats'
@@ -79,75 +77,27 @@
          dbg = .false.
 
          scale = s% energy_start(k)*s% rho_start(k)
-         dm_bar = s% dm_bar(k)
-         ! Use ordinary cell-center spacing next to an excised inner boundary.
-         if (s% R_center > 0d0 .and. k == s% nz) &
-            dm_bar = 0.5d0*(s% dm(k - 1) + s% dm(k))
          L_ad = wrap_L_00(s,k)
-         r_00 = wrap_r_00(s,k)
-         area = pi4*pow2(r_00); area2 = pow2(area)
-
-         if (s% use_face_reconstruction) then
-            call get_reconstructed_face_eos_kap_ad( &
-               s, k, T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grada_face, opacity_face, ierr)
-            if (ierr /= 0) return
-         else
-            T_face = get_T_face(s, k)
-            P_face = get_Peos_face(s, k)
-            opacity_face = get_kap_face(s, k)
-         end if
-
-         gradr_factor = get_effective_gradr_factor_ad(s, k)
+         use_convective_gradient = .not. s% RSP2_flag .and. s% lnT(k)/ln10 <= s% max_logT_for_mlt &
+            .and. s% mlt_mixing_type(k) == convective_mixing
+         call get_dPrad_dm_temperature_gradient_terms(s, k, use_convective_gradient, Lrad_coeff, d_P_rad_actual_ad, &
+            L0_ad, gradr_factor, flxR, flxLambda, ierr)
+         if (ierr /= 0) return
          ! RTI can replace the final chemical-mixing label while MLT remains active.
          if (s% RSP2_flag) then
             Lrad_ad = s% Lr_ad(k)
-         else if (s% lnT(k)/ln10 <= s% max_logT_for_mlt &
-               .and. s% mlt_mixing_type(k) == convective_mixing &
-               .and. abs(gradr_factor%val) > 1d-20) then
+         else if (use_convective_gradient .and. abs(gradr_factor%val) > 1d-20) then
             ! Evaluate L/gradr analytically so the split is finite at zero luminosity.
-            L0_ad = get_Lrad_per_gradT_face_ad( &
-               s, k, T_face, P_face, opacity_face, gradr_factor)
             Lrad_ad = L0_ad*s% gradT_ad(k)  ! C&G 14.109
          else
             Lrad_ad = L_ad
          end if
 
-         kap_face = opacity_face
-         if (kap_face%val < s% min_kap_for_dPrad_dm_eqn) &
-            kap_face = s% min_kap_for_dPrad_dm_eqn
+         s% flux_limit_R(k) = flxR%val
+         s% flux_limit_lambda(k) = 0d0
+         if (s% use_flux_limiting_with_dPrad_dm_form) s% flux_limit_lambda(k) = flxLambda%val
 
-         ! calculate expected d_P_rad from current L_rad
-         d_P_rad_expected_ad = -dm_bar*kap_face*Lrad_ad/(clight*area2)
-
-         ! calculate actual d_P_rad in current model
-         T_m1 = wrap_T_m1(s,k); T4_m1 = pow4(T_m1)
-         T_00 = wrap_T_00(s,k); T4_00 = pow4(T_00)
-
-         P_rad_m1 = (crad/3._dp)*T4_m1
-         P_rad_00 = (crad/3._dp)*T4_00
-         d_P_rad_actual_ad = P_rad_m1 - P_rad_00
-
-         ! enable flux-limited radiation transport derived by Levermore & Pomraning 1981
-         s% flux_limit_R(k) = 0._dp
-         s% flux_limit_lambda(k) =0._dp
-         if (s% use_flux_limiting_with_dPrad_dm_form) then
-            ! calculate the flux ratio R
-            flxR = area * abs(T4_m1 - T4_00) / dm_bar / &
-                  (kap_face * 0.5_dp * (T4_m1 + T4_00))
-
-            s% flux_limit_R(k) = flxR%val
-
-            ! calculate the flux limiter lambda
-            flxLambda = (6._dp + 3._dp*flxR) / (6._dp + (3._dp + flxR)*flxR)
-
-            s% flux_limit_lambda(k) = flxLambda%val
-
-            ! calculate d_P_rad given the flux limiter
-            d_P_rad_expected_ad = d_P_rad_expected_ad / flxLambda
-         end if
-
-         ! residual
-         resid = (d_P_rad_expected_ad - d_P_rad_actual_ad)/scale
+         resid = (Lrad_coeff*Lrad_ad - d_P_rad_actual_ad)/scale
          s% equ(i_equL, k) = resid%val
 
          if (is_bad(resid%val)) then
@@ -197,8 +147,7 @@
          if (i_equL == 0) return
 
          gradT = s% gradT_ad(k)
-         dlnT = wrap_lnT_m1(s,k) - wrap_lnT_00(s,k)
-         dlnP = wrap_lnPeos_m1(s,k) - wrap_lnPeos_00(s,k)
+         call get_actual_temperature_gradient_terms(s, k, dlnP, dlnT)
 
          resid = gradT*dlnP - dlnT
          s% equ(i_equL, k) = resid%val
@@ -258,9 +207,7 @@
          integer, intent(in) :: k, nvar
          integer, intent(out) :: ierr
 
-         type(auto_diff_real_star_order1) :: resid, &
-            dlnPdm, Ppoint, gradT, dlnTdm, T00, Tm1, dT, Tpoint, lnTdiff
-         real(dp) :: delm, alfa
+         type(auto_diff_real_star_order1) :: resid, gradT, delta_lnP, delta_lnT
          integer :: i_equL
          logical :: test_partials
 
@@ -299,21 +246,10 @@
          ! (MLT assumes hydrostatic equilibrium)
          ! see comment in K&W chpt 9.1.
 
-         call eval_dlnPdm_qhse(s, k, dlnPdm, Ppoint, ierr)
+         call get_qhse_temperature_gradient_terms(s, k, delta_lnP, delta_lnT, ierr)
          if (ierr /= 0) return
-
          gradT = s% gradT_ad(k)
-         dlnTdm = dlnPdm*gradT
-
-         Tm1 = wrap_T_m1(s,k)
-         T00 = wrap_T_00(s,k)
-         dT = Tm1 - T00
-         alfa = s% dm(k-1)/(s% dm(k-1) + s% dm(k))
-         Tpoint = alfa*T00 + (1d0 - alfa)*Tm1
-         lnTdiff = dT/Tpoint  ! use this in place of lnT(k-1)-lnT(k)
-         delm = (s% dm(k) + s% dm(k-1))/2
-
-         resid = delm*dlnTdm - lnTdiff
+         resid = delta_lnP*gradT - delta_lnT
          s% equ(i_equL, k) = resid%val
 
          if (is_bad(s% equ(i_equL, k))) then
@@ -322,9 +258,8 @@
             if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'hydro eqns')
             return
             write(*,2) 'equ(i_equL, k)', k, s% equ(i_equL, k)
-            write(*,2) 'lnTdiff', k, lnTdiff
-            write(*,2) 'delm', k, delm
-            write(*,2) 'dlnPdm', k, dlnPdm
+            write(*,2) 'delta_lnT', k, delta_lnT
+            write(*,2) 'delta_lnP', k, delta_lnP
             write(*,2) 'gradT', k, gradT
             call mesa_error(__FILE__,__LINE__,'i_equL')
          end if
@@ -430,10 +365,167 @@
 
       end subroutine set_RSP_Lsurf_BC
 
-      ! only used for dlnT_dm equation
+      ! Infer the gradient from the current trial structure before evaluating
+      ! convection. The gradient and mixing label returned by an earlier
+      ! convection call do not enter this calculation.
+      subroutine get_structure_temperature_gradient(s, k, gradT_structure, have_constraint, ierr)
+         type(star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1), intent(out) :: gradT_structure
+         logical, intent(out) :: have_constraint
+         integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1) :: gradient_coeff, temperature_diff, &
+            Lrad_coeff, L0, gradr_factor, flux_R, flux_lambda
+
+         ierr = 0
+         have_constraint = .false.
+         gradT_structure = 0d0
+         if (k <= 1 .or. k > s% nz .or. s% constant_L) return
+
+         ! Match the temperature equation's order of precedence.
+         if (s% use_gradT_actual_vs_gradT_MLT_for_T_gradient_eqn) then
+            call get_actual_temperature_gradient_terms(s, k, gradient_coeff, temperature_diff)
+         else if (s% use_dPrad_dm_form_of_T_gradient_eqn) then
+            call get_dPrad_dm_temperature_gradient_terms(s, k, .true., Lrad_coeff, temperature_diff, &
+               L0, gradr_factor, flux_R, flux_lambda, ierr)
+            if (ierr /= 0) return
+            ! Use the active-convection relation to define the gradient even if
+            ! the previous call returned a radiative solution. The stellar
+            ! equation separately uses Lrad = L when convection is absent.
+            gradient_coeff = Lrad_coeff*L0
+         else
+            call get_qhse_temperature_gradient_terms(s, k, gradient_coeff, temperature_diff, ierr)
+            if (ierr /= 0) return
+         end if
+
+         if (is_bad(gradient_coeff%val) .or. is_bad(temperature_diff%val)) return
+         if (gradient_coeff%val == 0d0) return
+         gradT_structure = temperature_diff/gradient_coeff
+         have_constraint = .not. is_bad(gradT_structure%val)
+      end subroutine get_structure_temperature_gradient
+
+
+      subroutine get_actual_temperature_gradient_terms(s, k, delta_lnP, delta_lnT)
+         type(star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1), intent(out) :: delta_lnP, delta_lnT
+
+         delta_lnP = wrap_lnPeos_m1(s, k) - wrap_lnPeos_00(s, k)
+         delta_lnT = wrap_lnT_m1(s, k) - wrap_lnT_00(s, k)
+      end subroutine get_actual_temperature_gradient_terms
+
+
+      subroutine get_qhse_temperature_gradient_terms(s, k, delta_lnP, delta_lnT, ierr)
+         type(star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1), intent(out) :: delta_lnP, delta_lnT
+         integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1) :: dlnPdm, Ppoint, Tm1, T00, Tpoint
+         real(dp) :: alfa, delm
+
+         call eval_dlnPdm_qhse(s, k, dlnPdm, Ppoint, ierr)
+         if (ierr /= 0) return
+         Tm1 = wrap_T_m1(s, k)
+         T00 = wrap_T_00(s, k)
+         alfa = s% dm(k-1)/(s% dm(k-1) + s% dm(k))
+         Tpoint = alfa*T00 + (1d0-alfa)*Tm1
+         delta_lnT = (Tm1-T00)/Tpoint
+         delm = 0.5d0*(s% dm(k) + s% dm(k-1))
+         delta_lnP = delm*dlnPdm
+      end subroutine get_qhse_temperature_gradient_terms
+
+
+      ! The radiation-pressure equation is
+      ! Lrad_coeff*Lrad - delta_Prad = 0. Its convective branch uses Lrad = L0*gradT.
+      ! Keep the opacity floor, flux limiter, face state, and rotation factors
+      ! common to the stellar residual and the structural-gradient calculation.
+      subroutine get_dPrad_dm_temperature_gradient_terms(s, k, need_L0, Lrad_coeff, delta_Prad, &
+            L0, gradr_factor, flux_R, flux_lambda, ierr)
+         type(star_info), pointer :: s
+         integer, intent(in) :: k
+         logical, intent(in) :: need_L0
+         type(auto_diff_real_star_order1), intent(out) :: Lrad_coeff, delta_Prad, &
+            L0, gradr_factor, flux_R, flux_lambda
+         integer, intent(out) :: ierr
+         type(auto_diff_real_star_order1) :: area, area2, opacity_face, kap_face, T4m1, T400, &
+            T_face, rho_face, P_face, Cp_face, ChiRho_face, ChiT_face, grada_face
+         real(dp) :: dm_bar
+
+         ierr = 0
+         dm_bar = s% dm_bar(k)
+         if (s% R_center > 0d0 .and. k == s% nz) &
+            dm_bar = 0.5d0*(s% dm(k-1) + s% dm(k))
+         area = pi4*pow2(wrap_r_00(s, k))
+         area2 = pow2(area)
+
+         if (s% use_face_reconstruction) then
+            call get_reconstructed_face_eos_kap_ad(s, k, T_face, rho_face, P_face, &
+               Cp_face, ChiRho_face, ChiT_face, grada_face, opacity_face, ierr)
+            if (ierr /= 0) return
+         else
+            T_face = get_T_face(s, k)
+            P_face = get_Peos_face(s, k)
+            opacity_face = get_kap_face(s, k)
+         end if
+
+         gradr_factor = get_effective_gradr_factor_ad(s, k)
+         L0 = 0d0
+         if (need_L0 .and. abs(gradr_factor%val) > 1d-20) &
+            L0 = get_Lrad_per_gradT_face_ad(s, k, T_face, P_face, opacity_face, gradr_factor)
+
+         kap_face = opacity_face
+         if (kap_face%val < s% min_kap_for_dPrad_dm_eqn) kap_face = s% min_kap_for_dPrad_dm_eqn
+         T4m1 = pow4(wrap_T_m1(s, k))
+         T400 = pow4(wrap_T_00(s, k))
+         delta_Prad = (crad/3d0)*T4m1 - (crad/3d0)*T400
+         Lrad_coeff = -dm_bar*kap_face/(clight*area2)
+
+         flux_R = 0d0
+         flux_lambda = 1d0
+         if (s% use_flux_limiting_with_dPrad_dm_form) then
+            flux_R = area*abs(T4m1-T400)/dm_bar/(kap_face*0.5d0*(T4m1+T400))
+            flux_lambda = (6d0+3d0*flux_R)/(6d0+(3d0+flux_R)*flux_R)
+            Lrad_coeff = Lrad_coeff/flux_lambda
+         end if
+      end subroutine get_dPrad_dm_temperature_gradient_terms
+
+      ! returns -G*m/r^2 with possible modifications for rotation.  MESA 2, eqn 22.
+      subroutine expected_HSE_grav_term(s, k, grav, area, ierr)
+         use star_utils, only: get_area_info_opt_time_center
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         type(auto_diff_real_star_order1), intent(out) :: area, grav
+         integer, intent(out) :: ierr
+
+         type(auto_diff_real_star_order1) :: inv_R2
+         logical :: test_partials
+
+         include 'formats'
+         ierr = 0
+
+         call get_area_info_opt_time_center(s, k, area, inv_R2, ierr)
+         if (ierr /= 0) return
+
+         if (s% rotation_flag .and. s% use_gravity_rotation_correction) then
+            grav = -s% cgrav(k)*s% m_grav(k)*inv_R2*s% fp_rot(k)
+         else
+            grav = -s% cgrav(k)*s% m_grav(k)*inv_R2
+         end if
+
+         !test_partials = (k == s% solver_test_partials_k)
+         test_partials = .false.
+
+         if (test_partials) then
+            s% solver_test_partials_val = 0
+            s% solver_test_partials_var = 0
+            s% solver_test_partials_dval_dx = 0
+            write(*,*) 'expected_HSE_grav_term', s% solver_test_partials_var
+         end if
+
+      end subroutine expected_HSE_grav_term
+
       subroutine eval_dlnPdm_qhse(s, k, &  ! calculate the expected dlnPdm for HSE
             dlnPdm_qhse, Ppoint, ierr)
-         use hydro_momentum, only: expected_HSE_grav_term
          type (star_info), pointer :: s
          integer, intent(in) :: k
          type(auto_diff_real_star_order1), intent(out) :: dlnPdm_qhse, Ppoint
