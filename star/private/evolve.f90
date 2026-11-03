@@ -289,7 +289,6 @@
          use mix_info, only: set_cz_bdy_mass
          use hydro_rotation, only: use_xh_to_update_i_rot, set_rotation_info
          use star_utils
-         use utils_lib, only: realloc_double2
          use report, only: do_report
          use rsp, only: rsp_total_energy_integrals
          logical, intent(in) :: first_try
@@ -323,22 +322,15 @@
          s% need_to_setvars = .true.  ! always start fresh
          s% okay_to_set_mixing_info = .true.  ! set false by element diffusion
          s% okay_to_set_mlt_vc = .false.  ! don't change mlt_vc until have set mlt_vc_old
+         s% have_mlt_vc_start = .false.
          s% okay_to_set_superad_reduction_factor = .false.
          s% superad_reduction_pending = .false.
          if (.not. use_turnover_limit) then
             s% num_superad_reduction_history = 0
          else if (s% num_superad_reduction_history == 0) then
-            call realloc_double2(s% superad_reduction_history_du, &
-               max_superad_reduction_history, size(s% superad_reduction_factor), ierr)
-            if (failed('realloc superad_reduction_history_du')) return
-            call realloc_double2(s% superad_reduction_history_eta_du, &
-               max_superad_reduction_history, size(s% superad_reduction_factor), ierr)
-            if (failed('realloc superad_reduction_history_eta_du')) return
             ! Initialize the history from the current eta before the first remesh.
-            s% num_superad_reduction_history = 1
-            s% superad_reduction_history_du(1,1:s% nz) = 1d0
-            s% superad_reduction_history_eta_du(1,1:s% nz) = &
-               1d0/max(s% superad_reduction_factor(1:s% nz),1d0)
+            call initialize_superad_reduction_history(s, ierr)
+            if (failed('initialize_superad_reduction_history')) return
          end if
          if (s% num_superad_reduction_history == max_superad_reduction_history) then
             ! Compress before snapshots so retries reuse the same accepted history.
@@ -410,6 +402,11 @@
 
          if (first_try) then  ! i.e., not a redo or retry
             s% have_new_generation = .false.
+            ! Remesh the start state with the same time centering as the solve.
+            if ((s% steps_before_use_velocity_time_centering == 0) .or. &
+                (s% steps_before_use_velocity_time_centering > 0 .and. &
+                   s% model_number >= s% steps_before_use_velocity_time_centering)) &
+               s% using_velocity_time_centering = .true.
             do_step_part1 = prepare_for_new_step(s)
             if (do_step_part1 /= keep_going) then
                if (s% report_ierr) &
@@ -418,10 +415,6 @@
             end if
             s% have_new_generation = .true.
             s% have_new_cz_bdy_info = .false.
-            if ((s% steps_before_use_velocity_time_centering == 0) .or. &
-                (s% steps_before_use_velocity_time_centering > 0 .and. &
-                   s% model_number >= s% steps_before_use_velocity_time_centering)) &
-               s% using_velocity_time_centering = .true.
             if (.not. s% doing_relax .and. s% steps_before_use_TDC > 0) then
                if (s% model_number >= s% steps_before_use_TDC) then
                   s% MLT_option = 'TDC'
@@ -602,7 +595,7 @@
             too_large_wind_mdot, too_small_wind_mdot, boost, mstar_dot_nxt, &
             surf_omega_div_omega_crit_limit, dt
          real(dp), allocatable :: velocity_remap_kinetic_energy(:), specific_energy_before_adjust_mass(:)
-         real(qp) :: kinetic_energy_removed
+         real(qp) :: kinetic_energy_removed, turbulent_energy_removed
 
          integer :: ph_k, mdot_action
          real(dp) :: implicit_mdot, ph_L, iwind_tolerance, iwind_lambda
@@ -661,7 +654,7 @@
 
                call do_adjust_mass( &
                   s, s% species, specific_energy_before_adjust_mass, velocity_remap_kinetic_energy, &
-                  kinetic_energy_removed, ierr)
+                  kinetic_energy_removed, turbulent_energy_removed, ierr)
                if (failed('do_adjust_mass')) return
                s% star_mdot = s% mstar_dot/(Msun/secyer)      ! dm/dt in msolar per year
                call set_vars_if_needed(s, dt, 'after do_adjust_mass', ierr)
@@ -669,7 +662,7 @@
 
                call calculate_eps_mdot( &
                   s, dt, specific_energy_before_adjust_mass, velocity_remap_kinetic_energy, &
-                  kinetic_energy_removed, ierr)
+                  kinetic_energy_removed, turbulent_energy_removed, ierr)
                if (failed('calculate_eps_mdot')) return
 
                if (s% mstar_dot /= 0d0) then
@@ -1885,17 +1878,19 @@
          use star_utils, only: use_xh_to_set_rho_to_dm_div_dV, set_phot_info
          use hydro_vars, only: set_vars_if_needed
          use utils_lib, only: realloc_double2
+         use set_flags, only: set_pulsation_envelope_mesh
 
          type (star_info), pointer :: s
 
          integer :: ierr, k
          real(dp) :: force_timestep_min, force_timestep
-         logical :: trace
+         logical :: trace, did_TDC_remesh
 
          include 'formats'
 
          ierr = 0
          trace = s% trace_evolve
+         did_TDC_remesh = .false.
 
          prepare_for_new_step = keep_going
 
@@ -1926,6 +1921,16 @@
          if (s% set_rho_to_dm_div_dV .and. .not. (s% u_flag .or. s% RSP_flag)) then
             call use_xh_to_set_rho_to_dm_div_dV(s,ierr)
             if (failed('use_xh_to_set_rho_to_dm_div_dV ierr')) return
+         end if
+
+         ! Remesh before saving prev_mesh so retries retain the TDC mesh.
+         if (s% steps_before_remesh_for_TDC_pulsations > 0 .and. &
+               s% job% load_saved_model .and. &
+               s% model_number == s% init_model_number + &
+                  s% steps_before_remesh_for_TDC_pulsations) then
+            call set_pulsation_envelope_mesh(s% id, ierr)
+            if (failed('set_pulsation_envelope_mesh ierr')) return
+            did_TDC_remesh = .true.
          end if
 
          if (.not. s% RSP_flag) then  ! store mesh info for following step eps_mdot
@@ -1968,7 +1973,7 @@
             end if
          end if
 
-         if (s% okay_to_remesh) then
+         if (s% okay_to_remesh .and. .not. did_TDC_remesh) then
             if (s% rsp_flag .or. .not. s% doing_first_model_of_run) then
                call set_start_of_step_info(s, 'before do_mesh', ierr)
                if (failed('set_start_of_step_info ierr')) return

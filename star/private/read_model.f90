@@ -84,6 +84,7 @@
          integer :: k, nz
          include 'formats'
          ierr = 0
+         s% have_mlt_vc_start = .false.
          nz = s% nz
          s% brunt_B(1:nz) = 0  ! temporary proxy for brunt_B
          call set_qs(s, nz, s% q, s% dq, ierr)
@@ -157,9 +158,8 @@
             end if
          end if
 
-         if (.not. s% have_mlt_vc) then
-            s% okay_to_set_mlt_vc = .true.
-         end if
+         ! A loaded velocity precedes the next step's old-state checkpoint.
+         s% okay_to_set_mlt_vc = .not. s% have_mlt_vc
 
          s% doing_finish_load_model = .true.
          call set_vars(s, s% dt, ierr)
@@ -239,6 +239,8 @@
          ! Saved models do not contain the turnover history.
          s% have_superad_reduction_factor = .false.
          s% okay_to_set_superad_reduction_factor = .false.
+         s% have_mlt_vc_start = .false.
+         s% okay_to_set_mlt_vc = .false.
          open(newunit=iounit, file=trim(filename), status='old', action='read', iostat=ierr)
          if (ierr /= 0) then
             write(*,*) 'open failed', ierr, iounit
@@ -532,7 +534,7 @@
             q, dq, omega, j_rot
          integer, intent(out) :: ierr
 
-         integer :: j, k, n, i_lnd, i_lnT, i_lnR, i_lum, i_w, i_Hp, &
+         integer :: j, k, n, i_lnd, i_lnT, i_lnR, i_lum, i_w, i_Y, &
             i_Et_RSP, i_erad_RSP, i_Fr_RSP, i_v, i_u, i_alpha_RTI, ii
          real(dp), target :: vec_ary(species + nvar_hydro + max_increment)
          real(dp), pointer :: vec(:)
@@ -548,7 +550,7 @@
          i_lnR = s% i_lnR
          i_lum = s% i_lum
          i_w = s% i_w
-         i_Hp = s% i_Hp
+         i_Y = s% i_Y
          i_v = s% i_v
          i_u = s% i_u
          i_alpha_RTI = s% i_alpha_RTI
@@ -564,7 +566,7 @@
          if (s% am_nu_rot_flag) n = n+increment_for_am_nu_rot_flag  ! read am_nu_rot
          if (s% RTI_flag) n = n+increment_for_RTI_flag  ! read alpha_RTI
          if (s% RSP_flag) n = n+increment_for_RSP_flag  ! read RSP_et, erad, Fr
-         if (s% RSP2_flag) n = n+increment_for_RSP2_flag  ! read w, Hp
+         if (s% RSP2_flag) n = n+increment_for_RSP2_flag  ! read w, Y_face
 
 !$omp critical (read1_model_loop)
 ! make this a critical section to so don't have to dynamically allocate buf
@@ -600,7 +602,7 @@
                j=j+1; xh(i_Fr_RSP,k) = vec(j)
             else if (s% RSP2_flag) then
                j=j+1; xh(i_w,k) = vec(j)
-               j=j+1; xh(i_Hp,k) = vec(j)
+               j=j+1; xh(i_Y,k) = vec(j)
             end if
             if (i_lum /= 0) then
                j=j+1; xh(i_lum,k) = vec(j)

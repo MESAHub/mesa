@@ -330,7 +330,8 @@
 
          end do
 
-         if (j > 1) then
+         ! side identifies the remaining mesh, including when j == k == 1.
+         if (side == 1) then
             do i=j,1,-1
                ranges(counter,1) = i
                ranges(counter,2) = 0

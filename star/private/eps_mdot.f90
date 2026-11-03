@@ -471,7 +471,7 @@
 
       subroutine calculate_eps_mdot( &
             s, dt, te, velocity_remap_kinetic_energy, &
-            kinetic_energy_removed, ierr)
+            kinetic_energy_removed, turbulent_energy_removed, ierr)
          use adjust_mass, only: compute_prev_mesh_dm
 
          ! Inputs
@@ -480,11 +480,13 @@
          real(dp), intent(in) :: te(:)
          real(dp), intent(in) :: velocity_remap_kinetic_energy(:)
          real(qp), intent(in) :: kinetic_energy_removed
+         real(qp), intent(in) :: turbulent_energy_removed
          integer, intent(out) :: ierr
 
          ! Intermediates
          logical, parameter :: dbg = .false.
-         logical :: use_velocity_remap
+         logical :: use_velocity_remap, use_turbulent_remap
+         real(qp) :: advected_energy_removed
          integer :: nz, j
          real(dp) :: delta_m, change_sum, leak_sum, err, abs_err, mdot_adiabatic_surface, gradT_mid
          real(dp), dimension(:), allocatable :: &
@@ -518,6 +520,7 @@
          delta_m = s%mstar_dot * dt
          use_velocity_remap = delta_m < 0d0 .and. (s% u_flag .or. s% v_flag) .and. &
             .not. s% use_mass_corrections
+         use_turbulent_remap = s% have_mlt_vc_start .and. s% TDC_include_eturb_in_energy_equation
 
          allocate(prev_mesh_dm(nz), dm(nz), change_in_dm(nz))
          call compute_prev_mesh_dm(s, prev_mesh_dm, dm, change_in_dm)
@@ -573,11 +576,15 @@
             s% surface_cell_specific_total_energy_old = te_bar(1)
          end if
 
-         if (use_velocity_remap) then
-            ! Radial kinetic energy is transported by the momentum overlaps.
-            ! Include its exact escaping energy in the surface energy diagnostic.
-            s% surface_cell_specific_total_energy_old = te_bar(1) + &
-               real(kinetic_energy_removed/real(-delta_m,qp),dp)
+         if (use_velocity_remap .or. use_turbulent_remap) then
+            ! Separately transported energies do not pass through thermal leakage.
+            advected_energy_removed = 0.0_qp
+            if (use_velocity_remap) advected_energy_removed = kinetic_energy_removed
+            if (use_turbulent_remap) &
+               advected_energy_removed = advected_energy_removed + turbulent_energy_removed
+            s% surface_cell_specific_total_energy_old = te_bar(1)
+            if (delta_m < 0d0) s% surface_cell_specific_total_energy_old = te_bar(1) + &
+               real(advected_energy_removed/real(-delta_m,qp),dp)
          end if
 
          ! Calculate grad_r_sub_grad_a
@@ -636,10 +643,10 @@
             ! Change in specific total energy in the cell with the final cell mass.
             ! In the absence of composition changes this is just dm_new * (change in gravitational potential),
             ! but when composition changes this term also captures that.
-            ! Hold the starting turbulent energy fixed during mass adjustment;
-            ! radial kinetic energy is already transported by the wind remap.
+            ! Bulk and turbulent kinetic energy have their own conservative remaps.
             sum = sum - real(s%dm(j),qp)*(real(cell_specific_total_energy( &
-               s, j, use_TDC_mlt_vc_old=.true., include_radial_kinetic_energy=.not. use_velocity_remap),qp) - &
+               s, j, use_TDC_mlt_vc_old=.true., include_radial_kinetic_energy=.not. use_velocity_remap, &
+               include_TDC_turbulent_energy=.not. use_turbulent_remap),qp) - &
                real(te(j),qp))
 
             change_sum = change_sum + &

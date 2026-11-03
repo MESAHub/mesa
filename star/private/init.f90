@@ -538,6 +538,7 @@
          s% okay_to_set_mixing_info = .true.
          s% okay_to_set_mlt_vc = .false.  ! not until have set mlt_cv_old
          s% have_mlt_vc = .false.
+         s% have_mlt_vc_start = .false.
          s% okay_to_set_superad_reduction_factor = .false.
          s% have_superad_reduction_factor = .false.
          s% superad_reduction_pending = .false.

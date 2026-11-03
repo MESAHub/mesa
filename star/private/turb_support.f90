@@ -20,12 +20,13 @@
 module turb_support
 
 use star_private_def
-use const_def, only: dp, crad, ln10, no_mixing
+use const_def, only: dp, crad, ln10, pi4, no_mixing
 use num_lib
 use utils_lib
 use auto_diff_support
 use star_utils
 use turb
+use hydro_temperature, only: get_structure_temperature_gradient
 
 implicit none
 
@@ -33,19 +34,19 @@ private
 public :: get_gradT
 public :: do1_mlt_eval
 public :: Get_results
+public :: get_TDC_dynamical_gradL
 
 contains
 
-   !> Determines if it is safe (physically) to use TDC instead of MLT.
+   !> Selects the optional MLT closure in cells touched by mass adjustment.
    !!
-   !! Currently we only know we have to fall back to MLT in cells that get touched
-   !! by adjust_mass, because there the convection speeds at the start of the
-   !! step can be badly out of whack. This can be disabled with TDC_adjust_mass_fallback_to_mlt
-   !! to let those cells use TDC.
+   !! The starting turbulent energy is transported with the mass in either case.
+   !! TDC_adjust_mass_fallback_to_mlt selects instantaneous MLT or time-dependent
+   !! convection for the subsequent solve.
    !!
    !! @param s star pointer
    !! @param k face index
-   !! @param fallback False if we can use TDC, True if we can fall back to MLT.
+   !! @param fallback True if the cell should use MLT instead of TDC.
    logical function check_if_must_fall_back_to_MLT(s, k) result(fallback)
       type (star_info), pointer :: s
       integer, intent(in) :: k
@@ -55,6 +56,61 @@ contains
          fallback = .true.
       end if
    end function check_if_must_fall_back_to_MLT
+
+
+   subroutine get_TDC_dynamical_gradL(s, k, gradL, tdc_gradL, ierr, mlt_vc_ad)
+      type(star_info), pointer :: s
+      integer, intent(in) :: k
+      type(auto_diff_real_star_order1), intent(in) :: gradL
+      type(auto_diff_real_star_order1), intent(out) :: tdc_gradL
+      integer, intent(out) :: ierr
+      type(auto_diff_real_star_order1), intent(in), optional :: mlt_vc_ad
+
+      real(dp) :: dm_face
+      type(auto_diff_real_star_order1) :: r_00, inv_R2, area, grav, P00, Pm1, &
+         Ptrb00, Ptrbm1, delta_P_qhse, pressure_gradient_factor, conv_vel
+
+      ierr = 0
+      tdc_gradL = gradL
+      if (k <= 1 .or. .not. (s% u_flag .or. s% v_flag)) return
+
+      ! The RSP pressure-gradient factor is an instantaneous spatial quantity.
+      r_00 = wrap_r_00(s, k)
+      inv_R2 = 1d0/pow2(r_00)
+      area = pi4*pow2(r_00)
+      grav = -s% cgrav(k)*s% m_grav(k)*inv_R2
+      if (s% rotation_flag .and. s% use_gravity_rotation_correction) &
+         grav = grav*s% fp_rot(k)
+
+      if (s% use_mass_corrections) then
+         dm_face = 0.5d0*(s% dm(k)*s% mass_correction(k) + &
+            s% dm(k - 1)*s% mass_correction(k - 1))
+      else
+         dm_face = 0.5d0*(s% dm(k) + s% dm(k - 1))
+      end if
+
+      P00 = wrap_Peos_00(s, k)
+      Pm1 = wrap_Peos_m1(s, k)
+
+      if (s% have_mlt_vc .and. s% okay_to_set_mlt_vc .and. &
+            s% include_mlt_Pturb_in_thermodynamic_gradients .and. &
+            s% mlt_Pturb_factor > 0d0) then
+         conv_vel = get_mlt_vc_start(s,k)
+         if (present(mlt_vc_ad)) conv_vel = mlt_vc_ad
+         Ptrb00 = s% mlt_Pturb_factor*pow2(conv_vel)*wrap_d_00(s, k)/3d0
+         Ptrbm1 = s% mlt_Pturb_factor*pow2(conv_vel)*wrap_d_m1(s, k)/3d0
+         P00 = P00 + Ptrb00
+         Pm1 = Pm1 + Ptrbm1
+      end if
+
+      delta_P_qhse = grav*dm_face/area
+      if (delta_P_qhse% val == 0d0 .or. is_bad_num(delta_P_qhse% val)) return
+
+      ! Convert the neutral gradient to the gravity-normalized TDC coordinate.
+      pressure_gradient_factor = (Pm1 - P00)/delta_P_qhse
+      if (is_bad_num(pressure_gradient_factor% val)) return
+      tdc_gradL = pressure_gradient_factor*gradL
+   end subroutine get_TDC_dynamical_gradL
 
    subroutine get_gradT(s, MLT_option, &  ! used to create models
          r, L, T, P, opacity, rho, chiRho, chiT, Cp, gradr, grada, scale_height, &
@@ -234,8 +290,9 @@ contains
       type(auto_diff_real_star_order1), intent(out), optional :: mixing_length
 
       type(auto_diff_real_star_order1) :: &
-         Pr, Pg, grav, Hp_for_mlt, Lambda, legacy_Lambda, mixing_length_alpha_ad, gradL, beta
-      real(dp) :: conv_vel_start, scale, max_conv_vel, Y_face_guess
+         Pr, Pg, grav, Hp_for_mlt, Lambda, legacy_Lambda, mixing_length_alpha_ad, gradL, tdc_gradL, beta, &
+         gradT_structure
+      real(dp) :: conv_vel_start, scale, max_conv_vel, Y_face_guess, Y_structure
 
       ! these are used by use_superad_reduction
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
@@ -243,6 +300,7 @@ contains
       type(auto_diff_real_star_order1) :: eta_inst, Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
          diff_grads_factor, Gamma_term, exp_limit, gradr_scaled, Eq_div_w, check_Eq, mlt_Pturb, Ptot
       logical :: test_partials, using_TDC, have_Y_face_guess, hold_superad_reduction_factor, use_turnover_limit
+      logical :: have_structure_constraint
       logical, parameter :: report = .false.
       include 'formats'
 
@@ -264,7 +322,7 @@ contains
 
       ! Wrap Pturb into P
       if (s% okay_to_set_mlt_vc .and. s% include_mlt_Pturb_in_thermodynamic_gradients .and. k > 0) then
-         mlt_Pturb = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*rho/3d0
+         mlt_Pturb = s% mlt_Pturb_factor*pow2(get_mlt_vc_start(s,k))*rho/3d0
          Ptot = P + mlt_Pturb
       else
          Ptot = P
@@ -303,6 +361,11 @@ contains
       else
          gradL = grada
       end if
+      tdc_gradL = gradL
+      if (using_TDC .and. s% TDC_use_dynamical_gradL) then
+         call get_TDC_dynamical_gradL(s, k, gradL, tdc_gradL, ierr)
+         if (ierr /= 0) return
+      end if
 
       ! maximum convection velocity.
       if (k > 0) then
@@ -323,7 +386,7 @@ contains
       ! Initialize with no mixing
       mixing_type = no_mixing
       gradT = gradr
-      Y_face = gradT - gradL
+      Y_face = gradT - tdc_gradL
       conv_vel = 0d0
       D = 0d0
       Gamma = 0d0
@@ -331,7 +394,7 @@ contains
       ! Preserve stored photo state while finish_load_model rebuilds derived quantities.
       if (k > 0 .and. s% have_superad_reduction_factor) &
          hold_superad_reduction_factor = &
-            s% doing_finish_load_model .or. &
+            s% doing_finish_load_model .or. s% hold_pulsation_background .or. &
             (s% use_superad_reduction .and. &
              s% superad_reduction_use_turnover_limit .and. &
              .not. s% okay_to_set_superad_reduction_factor)
@@ -373,7 +436,7 @@ contains
       if (using_TDC) then
          if (report) write(*,3) 'call set_TDC', k, s% solver_iter
          if (s% okay_to_set_mlt_vc) then
-            conv_vel_start = s% mlt_vc_old(k)
+            conv_vel_start = get_mlt_vc_start(s,k)
          else
             conv_vel_start = s% mlt_vc(k)
          end if
@@ -394,14 +457,22 @@ contains
             Y_face_guess = 0d0
          end if
 
+         ! Evaluate the selected temperature equation at the current stellar
+         ! trial. TDC receives only the structural superadiabaticity and its
+         ! availability; it does not reconstruct the stellar equation.
+         call get_structure_temperature_gradient(s, k, gradT_structure, have_structure_constraint, ierr)
+         if (ierr /= 0) return
+         Y_structure = 0d0
+         if (have_structure_constraint) Y_structure = gradT_structure%val - tdc_gradL%val
+
          call set_TDC(&
             conv_vel_start, mixing_length_alpha_ad, Lambda, s%TDC_alpha_D, s%TDC_alpha_R, s%TDC_alpha_Pt, &
             s%dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, Ptot, T, rho, dV, Cp, opacity, &
-            Hp_for_mlt, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
+            Hp_for_mlt, tdc_gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
             Eq_div_w, grav, &
             s% include_mlt_corr_to_TDC, s% TDC_alpha_C, s% TDC_alpha_S, s% use_TDC_enthalpy_flux_limiter, energy, &
-            Y_face_guess, ierr)
+            Y_face_guess, ierr, Y_structure, have_structure_constraint)
          s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
 
             if (ierr /= 0) then
@@ -420,10 +491,10 @@ contains
                   conv_vel_start, mixing_length_alpha_ad, Lambda, s%TDC_alpha_D, s%TDC_alpha_R, s%TDC_alpha_Pt, &
                   s%dt, cgrav, m, report, &
                   mixing_type, scale, chiT, chiRho, gradr_scaled, r, Ptot, T, rho, dV, Cp, opacity, &
-                  Hp_for_mlt, gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
+                  Hp_for_mlt, tdc_gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
                   Eq_div_w, grav, &
                   s% include_mlt_corr_to_TDC, s% TDC_alpha_C, s% TDC_alpha_S, s% use_TDC_enthalpy_flux_limiter, energy, &
-                  Y_face_guess, ierr)
+                  Y_face_guess, ierr, Y_structure, have_structure_constraint)
                s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
                if (ierr /= 0) then
                   if (s% report_ierr) write(*,*) 'ierr from set_TDC when using superad_reduction'

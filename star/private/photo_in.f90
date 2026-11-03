@@ -45,6 +45,8 @@
          include 'formats'
 
          ierr = 0
+         s% have_mlt_vc_start = .false.
+         s% okay_to_set_mlt_vc = .false.
          part_number = 0  ! part_numbers are just a consistency check
 
          write(*, *) 'read ', trim(fname)
@@ -165,10 +167,10 @@
 
          read(iounit, iostat=ierr) &
             s% i_lnd, s% i_lnT, s% i_lnR, s% i_lum, s% i_Et_RSP, s% i_erad_RSP, s% i_Fr_RSP, &
-            s% i_v, s% i_u, s% i_alpha_RTI, s% i_w, s% i_Hp, s% i_w_div_wc, s% i_j_rot, &
+            s% i_v, s% i_u, s% i_alpha_RTI, s% i_w, s% i_Y, s% i_w_div_wc, s% i_j_rot, &
             s% i_dv_dt, s% i_equL, s% i_dlnd_dt, s% i_dlnE_dt, &
             s% i_dEt_RSP_dt, s% i_derad_RSP_dt, s% i_dFr_RSP_dt, s% i_du_dt, s% i_dlnR_dt, &
-            s% i_dalpha_RTI_dt, s% i_detrb_dt, s% i_equ_Hp
+            s% i_dalpha_RTI_dt, s% i_detrb_dt, s% i_rsp2_flux
          if (failed('i_dalpha_RTI_dt')) return
 
          read(iounit, iostat=ierr) &

@@ -60,6 +60,8 @@ known_false_positives = {
     "i_dj_rot_dt",  # Shadows s% i_j_rot
     "i_equ_w_div_wc",  # Shadows s% i_w_div_wc
     "have_j_rot",  # Set from s% rotation_flag
+    "have_mlt_vc_start",  # Transient mass-adjusted TDC state, invalidated on load
+    "okay_to_set_mlt_vc",  # Reconstructed from have_mlt_vc during model loading
     "nz_old",
 }
 

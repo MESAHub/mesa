@@ -131,7 +131,7 @@
          else if (s% RSP2_flag) then
             do k = 1, nz
                s% conv_vel(k) = get_RSP2_conv_velocity(s,k)
-               s% D_mix(k) = s% conv_vel(k)*s% mixing_length_alpha*s% Hp_face(k)/3d0
+               s% D_mix(k) = s% conv_vel(k)*s% mlt_mixing_length(k)/3d0
                s% cdc(k) = cdc_factor(k)*s% D_mix(k)
                L_val = max(1d-99,abs(s% L(k)))
                if (abs(s% Lt(k)) > &
@@ -362,7 +362,8 @@
          ! as last thing, update conv_vel from D_mix and mixing length.
          ! this updates the effective conv vel for rotation and overshooting effects
          do k=2,nz
-            if (s% harmonic_dissipation_length_beta > 0d0 .and. .not. RSP2_or_RSP) then
+            if (s% RSP2_flag .or. &
+                  (s% harmonic_dissipation_length_beta > 0d0 .and. .not. RSP2_or_RSP)) then
                mixing_length = s% mlt_mixing_length(k)
             else
                mixing_length = s% alpha_mlt(k)*s% scale_height(k)

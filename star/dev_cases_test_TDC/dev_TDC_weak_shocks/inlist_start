@@ -1,0 +1,228 @@
+
+&star_job
+  show_log_description_at_start = .false.
+
+  ! show plots during the run
+  pgstar_flag = .false.
+
+  ! save final model for future use
+  save_model_when_terminate = .true.
+  save_model_filename = 'mods/start.mod'
+
+  ! start from a saved model
+  load_saved_model = .true.
+  load_model_filename = 'mods/0.80Msun_Tc_3e7_mdot_1.00e-08.mod'
+
+  ! Rezero all clocks
+  set_initial_age = .true.
+  initial_age = 0
+  set_initial_model_number = .true.
+  initial_model_number = 0
+
+  ! Set outer boundary condition to be at optical depth of 30
+  set_to_this_tau_factor = 30
+  set_initial_tau_factor = .true.
+  relax_initial_tau_factor = .true.
+  relax_to_this_tau_factor = 1
+
+  ! Allow for at least minimal hydrodynamics (shock treatment probably requires
+  ! more controls than this)
+  change_v_flag = .true.
+  new_v_flag = .true.
+
+  ! Strong Hydrogen burning => good CNO network
+  new_net_name = 'cno_extras_o18_to_mg26_plus_fe56.net'
+  change_initial_net = .true.
+
+  auto_extend_net = .false.
+
+/ ! end of star_job namelist
+
+&kap
+  ! this is necessary to get opacities right in metal-enhanced areas
+  use_Type2_opacities = .true.
+  Zbase = 0.02d0
+
+/ ! end of kap namelist
+
+&controls
+  ! initial conditions (ignored for a loaded model)
+  initial_mass = 0.8
+  initial_z = 0.02
+
+  ! stopping condition
+  max_model_number = 1 ! 1000
+
+  ! ouput
+  terminal_interval = 1
+  write_header_frequency = 10
+  photo_interval = 10
+  history_interval = 1
+  profile_interval = 10
+
+  ! Things to panic about if they become important
+  gamma_center_limit = 1000
+
+  min_timestep_limit = 1d-12
+
+  ! Convection parameters
+  mixing_length_alpha = 1.9
+  ! use_Ledoux_criterion = .true.
+  ! alpha_semiconvection = 0.001
+  ! thermohaline_coeff = 2
+  MLT_option = 'TDC'
+  max_q_for_convection_with_hydro_on = 0.999968377223398d0
+
+  ! Allow elemental diffusion
+  do_element_diffusion = .true.
+  ! as of 9793, this is the default behavior
+  ! diffusion_use_cgs_solver = .true.
+
+  ! Outer boundary condition; important during mass loss
+  Pextra_factor = -1
+
+  ! Accretion rate during quiescence (run_star_extras sets this to zero during
+  ! a flash and then restores it for you afterwards)
+  mass_change = 1d-10
+
+  ! Primary mass loss mechanism: super Eddington winds
+  super_eddington_scaling_factor = 1
+  super_eddington_wind_Ledd_factor = 1
+
+  mass_change_full_on_dt = 1d-06
+  mass_change_full_off_dt = 1d-06
+
+  ! fallback mass loss: Roche lobe overflow starting at radius of 1 Rsun
+  rlo_scaling_factor = 1
+  rlo_wind_min_L = 1000
+  rlo_wind_max_Teff = 300000
+  rlo_wind_roche_lobe_radius = 1
+  rlo_wind_base_mdot = 1d-07
+  rlo_wind_scale_height = 1
+
+  ! shut off accretion when R/R_L > 0.8 (redundant with run_star_extras...)
+  roche_lobe_xfer_full_off = 0.8
+
+  ! set composition of accreted material
+  accrete_same_as_surface = .false.
+  accrete_given_mass_fractions = .false.
+  accretion_h1 = 7d-1
+  accretion_he3 = 5d-4
+  accretion_he4 = 2.795d-1
+  accretion_zfracs = 4
+
+  ! you can be really anal about how to specify accreted material
+  ! accretion_species_id(1) = 'h1'
+  ! accretion_species_id(2) = 'he3'
+  ! accretion_species_id(3) = 'he4'
+  ! accretion_species_id(4) = 'c12'
+  ! accretion_species_id(5) = 'c13'
+  ! accretion_species_id(6) = 'n13'
+  ! accretion_species_id(7) = 'n14'
+  ! accretion_species_id(8) = 'n15'
+  ! accretion_species_id(9) = 'o14'
+  ! accretion_species_id(10) = 'o15'
+  ! accretion_species_id(11) = 'o16'
+  ! accretion_species_id(12) = 'o17'
+  ! accretion_species_id(13) = 'o18'
+  ! accretion_species_id(14) = 'f17'
+  ! accretion_species_id(15) = 'f18'
+  ! accretion_species_id(16) = 'f19'
+  ! accretion_species_id(17) = 'ne18'
+  ! accretion_species_id(18) = 'ne19'
+  ! accretion_species_id(19) = 'ne20'
+  ! accretion_species_id(20) = 'ne22'
+  ! accretion_species_id(21) = 'mg22'
+  ! accretion_species_id(22) = 'mg24'
+  ! accretion_species_id(23) = 'mg26'
+  ! accretion_species_id(24) = 'fe56'
+  ! accretion_species_xa(1) = 0.7
+  ! accretion_species_xa(2) = 5.21387d-05
+  ! accretion_species_xa(3) = 0.279971
+  ! accretion_species_xa(4) = 0.00375441
+  ! accretion_species_xa(5) = 4.55587d-05
+  ! accretion_species_xa(6) = 0
+  ! accretion_species_xa(7) = 0.00121563
+  ! accretion_species_xa(8) = 4.7882d-06
+  ! accretion_species_xa(9) = 0
+  ! accretion_species_xa(10) = 0
+  ! accretion_species_xa(11) = 0.0100818
+  ! accretion_species_xa(12) = 3.99609d-06
+  ! accretion_species_xa(13) = 2.27405d-05
+  ! accretion_species_xa(14) = 0
+  ! accretion_species_xa(15) = 0
+  ! accretion_species_xa(16) = 7.14171d-07
+  ! accretion_species_xa(17) = 0
+  ! accretion_species_xa(18) = 0
+  ! accretion_species_xa(19) = 0.00178399
+  ! accretion_species_xa(20) = 0.000144328
+  ! accretion_species_xa(21) = 0
+  ! accretion_species_xa(22) = 0.000864143
+  ! accretion_species_xa(23) = 0.000130483
+  ! accretion_species_xa(24) = 0.00192424
+
+  ! might need this if you go to higher resolution (mesh_delta_coeff < 1.0)
+  ! max_allowed_nz = 20000
+  mesh_delta_coeff = 1.0
+
+  ! make remesher care more about changes in h1 and he4 abundances
+  xa_function_species(1) = 'h1'
+  xa_function_species(2) = 'he4'
+  xa_function_weight(1) = 20
+  xa_function_weight(2) = 20
+
+  xa_function_param(1) = 1d-06
+  xa_function_param(2) = 0.01
+
+  ! make timesteps bigger and cut down on retries at the expense of
+  ! sloppier convergence
+  tol_max_correction = 0.03
+
+  ! shrink this to get finer time resolution during "happy" times
+  varcontrol_target = 1e-3
+
+  ! set limits on how much different quantities can change between timesteps
+  delta_lgRho_limit = 1
+  delta_lgRho_hard_limit = -1
+
+  delta_lgT_limit = 0.5
+
+  delta_lgL_H_limit = 0.1
+  delta_lgL_H_hard_limit = 0.5
+  lgL_H_burn_min = 1
+
+  delta_lgL_He_limit = 0.25
+
+  lgL_He_burn_min = 2.5
+
+  delta_lgTeff_limit = 0.1
+
+  delta_lgL_limit = 0.05
+
+/ ! end of controls namelist
+
+&pgstar
+  read_extra_pgstar_inlist(1) = .true.
+  extra_pgstar_inlist_name(1) = 'inlist_pgstar'
+
+  Abundance_xaxis_name = 'logxm'
+  Abundance_xaxis_reversed = .true.
+  Abundance_xmin = -8
+  Abundance_xmax = -3
+
+  Summary_Burn_xaxis_name = 'logxm'
+  Summary_Burn_xaxis_reversed = .true.
+  Summary_Burn_xmin = -8
+  Summary_Burn_xmax = -3
+
+  Grid8_win_flag = .true.
+  Grid8_win_width = 7
+
+  Grid8_file_flag = .false.
+  Grid8_file_dir = 'png'
+  Grid8_file_prefix = '1.00Msun_Tc_3e7_mdot_1.00e-09_Z0.00_grid8_'
+  Grid8_file_interval = 1
+  Grid8_file_width = -1
+  Grid8_file_aspect_ratio = -1
+
+/ ! end of pgstar namelist

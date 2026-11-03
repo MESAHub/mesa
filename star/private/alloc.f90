@@ -549,6 +549,8 @@
                if (failed('j_rot')) exit
                call do1(s% mlt_vc, c% mlt_vc)
                if (failed('mlt_vc')) exit
+               call do1(s% mlt_vc_start, c% mlt_vc_start)
+               if (failed('mlt_vc_start')) exit
                call do1(s% conv_vel, c% conv_vel)
                if (failed('conv_vel')) exit
                call do2(s% superad_reduction_history_du, c% superad_reduction_history_du, &
@@ -640,8 +642,6 @@
             if (failed('w')) exit
             call do1(s% w_start, c% w_start)
             if (failed('w_start')) exit
-            call do1(s% Hp_face_start, c% Hp_face_start)
-            if (failed('Hp_face_start')) exit
 
             call do1(s% dxh_lnR, c% dxh_lnR)
             if (failed('dxh_lnR')) exit
@@ -1235,6 +1235,10 @@
             if (failed('u_face_ad')) exit
             call do1(s% u_face_start, c% u_face_start)
             if (failed('u_face_start')) exit
+            call do1_ad(s% u_face_P_ad, c% u_face_P_ad)
+            if (failed('u_face_P_ad')) exit
+            call do1(s% u_face_P_start, c% u_face_P_start)
+            if (failed('u_face_P_start')) exit
             call do1(s% u_face_val, c% u_face_val)
             if (failed('u_face_val')) exit
             call do1(s% d_uface_domega, c% d_uface_domega)
@@ -2446,10 +2450,10 @@
 
          if (s% RSP2_flag) then
             i = i+1; s% i_w = i
-            i = i+1; s% i_Hp = i
+            i = i+1; s% i_Y = i
          else
             s% i_w = 0
-            s% i_Hp = 0
+            s% i_Y = 0
          end if
 
          if (s% w_div_wc_flag) then
@@ -2482,7 +2486,7 @@
          end if
 
          s% i_detrb_dt = s% i_w
-         s% i_equ_Hp = s% i_Hp
+         s% i_rsp2_flux = s% i_Y
          s% i_dalpha_RTI_dt = s% i_alpha_RTI
          s% i_dEt_RSP_dt = s% i_Et_RSP
          s% i_derad_RSP_dt = s% i_erad_RSP
@@ -2500,7 +2504,7 @@
          if (s% i_lum /= 0) s% nameofvar(s% i_lum) = 'L'
          if (s% i_v /= 0) s% nameofvar(s% i_v) = 'v'
          if (s% i_w /= 0) s% nameofvar(s% i_w) = 'w'
-         if (s% i_Hp/= 0) s% nameofvar(s% i_Hp) = 'Hp'
+         if (s% i_Y/= 0) s% nameofvar(s% i_Y) = 'Y_face'
          if (s% i_alpha_RTI /= 0) s% nameofvar(s% i_alpha_RTI) = 'alpha_RTI'
          if (s% i_Et_RSP /= 0) s% nameofvar(s% i_Et_RSP) = 'etrb_RSP'
          if (s% i_erad_RSP /= 0) s% nameofvar(s% i_erad_RSP) = 'erad_RSP'
@@ -2516,7 +2520,7 @@
          if (s% i_dlnE_dt /= 0) s% nameofequ(s% i_dlnE_dt) = 'dlnE_dt'
          if (s% i_dlnR_dt /= 0) s% nameofequ(s% i_dlnR_dt) = 'dlnR_dt'
          if (s% i_detrb_dt /= 0) s% nameofequ(s% i_detrb_dt) = 'detrb_dt'
-         if (s% i_equ_Hp /= 0) s% nameofequ(s% i_equ_Hp) = 'equ_Hp'
+         if (s% i_rsp2_flux /= 0) s% nameofequ(s% i_rsp2_flux) = 'rsp2_flux'
          if (s% i_dalpha_RTI_dt /= 0) s% nameofequ(s% i_dalpha_RTI_dt) = 'dalpha_RTI_dt'
          if (s% i_dEt_RSP_dt /= 0) s% nameofequ(s% i_dEt_RSP_dt) = 'dEt_RSP_dt'
          if (s% i_derad_RSP_dt /= 0) s% nameofequ(s% i_derad_RSP_dt) = 'derad_RSP_dt'

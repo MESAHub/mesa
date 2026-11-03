@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd -- "$(dirname -- "$0")"
+export MESA_DIR="$(cd ../../.. && pwd)"
+export OMP_NUM_THREADS="${OMP_NUM_THREADS:-8}"
+exec ./build/bin/star

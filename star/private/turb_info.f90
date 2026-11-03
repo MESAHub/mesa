@@ -307,11 +307,13 @@
             s% gradT(k) = s% gradT_ad(k)%val
             s% mlt_gradT(k) = s% gradT(k)  ! prior to adjustments
 
-            s% Y_face_ad(k) = Y_face_ad
-            s% Y_face(k) = s% Y_face_ad(k)%val
+            if (.not. s% RSP2_flag) then
+               s% Y_face_ad(k) = Y_face_ad
+               s% Y_face(k) = s% Y_face_ad(k)%val
+            end if
 
             s% mlt_vc_ad(k) = mlt_vc_ad
-            if (s% okay_to_set_mlt_vc) s% mlt_vc(k) = s% mlt_vc_ad(k)%val
+            if (s% okay_to_set_mlt_vc .and. .not. s% hold_pulsation_background) s% mlt_vc(k) = s% mlt_vc_ad(k)%val
 
             s% mlt_D_ad(k) = D_ad
             s% mlt_D(k) = D_ad%val
@@ -340,18 +342,20 @@
             real(dp) :: fraction
             include 'formats'
 
-            if (.not. s% have_superad_reduction_factor .or. &
-                  (.not. s% doing_finish_load_model .and. &
-                   (.not. s% use_superad_reduction .or. .not. s% superad_reduction_use_turnover_limit))) &
-               s% superad_reduction_factor(k) = 1d0
-            ! No mixing contributes a neutral target to the turnover mean.
-            if (s% use_superad_reduction .and. s% superad_reduction_use_turnover_limit .and. &
-                  .not. s% RSP_flag .and. &
-                  .not. s% doing_finish_load_model) then
-               if (s% okay_to_set_superad_reduction_factor .and. s% num_superad_reduction_history > 0) then
-                  s% superad_reduction_target(k) = 1d0
-                  fraction = min(s% superad_reduction_du(k),1d0)
-                  s% superad_reduction_factor(k) = 1d0/(s% superad_reduction_eta_past(k) + fraction)
+            if (.not. s% hold_pulsation_background) then
+               if (.not. s% have_superad_reduction_factor .or. &
+                     (.not. s% doing_finish_load_model .and. &
+                      (.not. s% use_superad_reduction .or. .not. s% superad_reduction_use_turnover_limit))) &
+                  s% superad_reduction_factor(k) = 1d0
+               ! No mixing contributes a neutral target to the turnover mean.
+               if (s% use_superad_reduction .and. s% superad_reduction_use_turnover_limit .and. &
+                     .not. s% RSP_flag .and. &
+                     .not. s% doing_finish_load_model) then
+                  if (s% okay_to_set_superad_reduction_factor .and. s% num_superad_reduction_history > 0) then
+                     s% superad_reduction_target(k) = 1d0
+                     fraction = min(s% superad_reduction_du(k),1d0)
+                     s% superad_reduction_factor(k) = 1d0/(s% superad_reduction_eta_past(k) + fraction)
+                  end if
                end if
             end if
 
@@ -365,11 +369,13 @@
             s% gradT(k) = s% gradT_ad(k)%val
 
             Y_face_ad = gradT_ad - grada_face_ad
-            s% Y_face_ad(k) = Y_face_ad
-            s% Y_face(k) = s% Y_face_ad(k)%val
+            if (.not. s% RSP2_flag) then
+               s% Y_face_ad(k) = Y_face_ad
+               s% Y_face(k) = s% Y_face_ad(k)%val
+            end if
 
             s% mlt_vc_ad(k) = 0d0
-            if (s% okay_to_set_mlt_vc) s% mlt_vc(k) = 0d0
+            if (s% okay_to_set_mlt_vc .and. .not. s% hold_pulsation_background) s% mlt_vc(k) = 0d0
 
             s% mlt_D_ad(k) = 0d0
             s% mlt_D(k) = 0d0
@@ -456,7 +462,7 @@
          s% mlt_mixing_length(k) = 0
          s% mlt_D(k) = 0
          s% mlt_cdc(k) = 0d0
-         if (s% okay_to_set_mlt_vc) s% mlt_vc(k) = 0
+         if (s% okay_to_set_mlt_vc .and. .not. s% hold_pulsation_background) s% mlt_vc(k) = 0
          s% gradT_ad(k) = s% gradr_ad(k)
          s% gradT(k) = s% gradT_ad(k)%val
       end subroutine switch_to_radiative

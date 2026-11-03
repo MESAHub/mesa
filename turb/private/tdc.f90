@@ -48,22 +48,32 @@ contains
    !! @param tdc_num_iters Number of iterations taken in the TDC solver.
    !! @param ierr Tracks errors (output).
    !! @param Y_face_guess Candidate superadiabaticity for the local solve. Non-positive values disable seeding.
-   subroutine get_TDC_solution(info, scale, Zlb, Zub, conv_vel, Y_face, tdc_num_iters, Y_face_guess, ierr)
+   !! @param Y_structure Superadiabaticity required by the stellar temperature equation, if available.
+   !! @param have_structure_constraint False disables structural root selection. Defaults to present(Y_structure).
+   subroutine get_TDC_solution(info, scale, Zlb, Zub, conv_vel, Y_face, tdc_num_iters, Y_face_guess, &
+         ierr, Y_structure, have_structure_constraint)
       type(tdc_info), intent(in) :: info
       real(dp), intent(in) :: scale
       type(auto_diff_real_tdc), intent(in) :: Zlb, Zub
       type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face
       integer, intent(out) :: tdc_num_iters, ierr
       real(dp), intent(in) :: Y_face_guess
+      real(dp), intent(in), optional :: Y_structure
+      logical, intent(in), optional :: have_structure_constraint
 
-      logical :: Y_is_positive
-      type(auto_diff_real_tdc) :: Af, Y, Y0, Y1, Z0, Z1, radY
+      logical :: Y_is_positive, use_radY
+      type(auto_diff_real_tdc) :: Af, Af0, Af_structure, Y, Y0, Y1, Z0, Z1, radY
+      type(auto_diff_real_tdc) :: first_Zlb, first_Zub, next_Zlb, next_Zub
       type(auto_diff_real_tdc) :: Q, Q0
-      logical :: has_root
+      logical :: has_root, prefer_radiative_root, use_structure_constraint
       integer :: iter
       include 'formats'
 
       ierr = 0
+      tdc_num_iters = 0
+      use_structure_constraint = present(Y_structure)
+      if (present(have_structure_constraint)) &
+         use_structure_constraint = use_structure_constraint .and. have_structure_constraint
       if (info%Lambda <= 0d0 .or. info%dt <= 0d0) then
          call mesa_error(__FILE__,__LINE__,'bad call to TDC get_TDC_solution')
       end if
@@ -76,7 +86,7 @@ contains
       ! If Q(Y=0) is negative then the luminosity can be carried by radiation alone, so we'll
       ! necessarily have Y < 0.
       Y = 0d0
-      call compute_Q(info, Y, Q0, Af)
+      call compute_Q(info, Y, Q0, Af0)
       if (Q0 > 0d0) then
          Y_is_positive = .true.
       else
@@ -95,7 +105,10 @@ contains
       end if
 
       ! Start down the chain of logic...
-      if (Y_is_positive) then
+      if (Q0 == 0d0) then
+         ! Retain the flux response at Y = 0, including shear-driven turbulence.
+         Y = Q0/(info%L0 + info%c0*Af0)
+      else if (Y_is_positive) then
          ! If Y > 0 then Q(Y) is monotone and we can jump straight to the search.
          call bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Zub, Y_face, Af, tdc_num_iters, &
             Y_face_guess, ierr)
@@ -107,16 +120,23 @@ contains
          ! If Y < 0 then Q(Y) is not guaranteed to be monotone, so we have to be more careful.
          ! One root we could have is the radiative solution (with Af==0), given by
          radY = (info%L - info%L0 * info%gradL) / info%L0
+         call compute_Q(info, radY, Q, Af)
+         prefer_radiative_root = .false.
+         if (use_structure_constraint) then
+            if (.not. is_bad(Y_structure) .and. Y_structure < 0d0) then
+               Y = Y_structure
+               call compute_Q(info, Y, Q, Af_structure)
+               prefer_radiative_root = Af == 0d0 .and. Af_structure == 0d0
+            end if
+         end if
 
-         ! If A0 == 0 then, because Af(Y) is monotone-increasing in Y, we know that for Y < 0, Af(Y) = 0.
-         ! As a result we can directly write down the solution and get just radY.
-         ! For numerical reasons we impose a cutoff of 1d-10 cm/s (much smaller than this and the point where
-         ! A0 reaches zero could be at Z < lower_bound_Z).
-         if (info%A0 < 1d-10) then
+         ! Shear can drive turbulence even when the starting amplitude is zero.
+         ! A radiative shortcut requires zero final amplitude at that root.
+         use_radY = info%A0 < 1d-10 .and. Af == 0d0
+         if (use_radY .or. prefer_radiative_root) then
             Y = radY
-            if (info%report) write(*,*) 'A0 == 0, Y=',Y%val
+            if (info%report) write(*,*) 'Af(radY) == 0, Y=',Y%val
          else
-            if (info%report) write(*,*) 'A0 > 0.'
             ! Otherwise, we keep going.
 
             ! We divide the possible functions Af(Z) into three classes:
@@ -180,17 +200,32 @@ contains
                      Y = radY
                   else
                      if (info%report) write(*,*) 'Root has Q>0. Q(Y1)=',Q%val
-                     ! Do a search over [lower_bound, Z1]. If we find a root, that's the root closest to zero so call it done.
-                     if (info%report) write(*,*) 'Searching from Y=',-exp(Zlb%val),'to Y=',-exp(Z1%val)
-                     call bracket_plus_Newton_search(info, scale, Y_is_positive, Zlb, Z1, Y_face, Af, tdc_num_iters, &
+                     ! At a converged stellar state, Y must also match the
+                     ! temperature equation. Its gradient can lie on either
+                     ! active branch, separated by the extremum at Y1.
+                     first_Zlb = Zlb
+                     first_Zub = Z1
+                     next_Zlb = Z1
+                     next_Zub = Z0
+                     if (use_structure_constraint) then
+                        if (.not. is_bad(Y_structure) .and. Y_structure < Y1%val) then
+                           first_Zlb = Z1
+                           first_Zub = Z0
+                           next_Zlb = Zlb
+                           next_Zub = Z1
+                        end if
+                     end if
+                     if (info%report) write(*,*) 'Searching from Y=',-exp(first_Zlb%val),'to Y=',-exp(first_Zub%val)
+                     call bracket_plus_Newton_search(info, scale, Y_is_positive, first_Zlb, first_Zub, &
+                        Y_face, Af, tdc_num_iters, &
                         0d0, ierr)
                      Y = convert(Y_face)
                      if (info%report) write(*,*) 'ierr',ierr, tdc_num_iters
                      if (ierr /= 0) then
-                        if (info%report) write(*,*) 'No root found. Searching from Y=',-exp(Z1%val),'to Y=',-exp(Z0%val)
-                        ! Do a search over [Z1, Z0]. If we find a root, that's the root closest to zero so call it done.
-                        ! Note that if we get to this stage there is (mathematically) guaranteed to be a root, modulo precision issues.
-                        call bracket_plus_Newton_search(info, scale, Y_is_positive, Z1, Z0, Y_face, Af, tdc_num_iters, &
+                        if (info%report) write(*,*) 'No root found. Searching from Y=',-exp(next_Zlb%val),'to Y=',-exp(next_Zub%val)
+                        ! The other active branch may be the only one with a root.
+                        call bracket_plus_Newton_search(info, scale, Y_is_positive, next_Zlb, next_Zub, &
+                           Y_face, Af, tdc_num_iters, &
                            0d0, ierr)
                         Y = convert(Y_face)
                      end if
@@ -213,6 +248,7 @@ contains
          end if
       end if
 
+      if (ierr /= 0) return
 
       ! Process Y into the various outputs.
       call compute_Q(info, Y, Q, Af)
@@ -250,6 +286,7 @@ contains
       type(auto_diff_real_tdc) :: dQdZ
       integer :: iter, line_iter
       logical :: converged, have_derivatives, corr_has_derivatives
+      real(dp) :: residual_scale
       real(dp), parameter :: correction_tolerance = 1d-13
       real(dp), parameter :: residual_tolerance = 1d-8
       integer, parameter :: max_iter = 200
@@ -257,6 +294,12 @@ contains
       include 'formats'
 
       ierr = 0
+
+      ! A remote luminosity peak must not loosen this face's closure tolerance.
+      ! Include the local radiative luminosity at gradL for cancelling fluxes,
+      ! and retain a tighter scale supplied by the caller, with an erg/s floor.
+      residual_scale = max(1d0, min(scale, &
+         max(abs(info%L%val), abs(info%L0%val*info%gradL%val))))
 
       ! We start by bisecting to find a narrow interval around the root.
       lower_bound_Z = Zlb
@@ -290,9 +333,9 @@ contains
             exit
          end if
 
-         if (abs(Q%val)/scale <= residual_tolerance .and. have_derivatives) then
+         if (abs(Q%val)/residual_scale <= residual_tolerance .and. have_derivatives) then
             ! Can't exit on the first iteration, otherwise we have no derivative information.
-            if (info%report) write(*,2) 'converged', iter, abs(Q%val)/scale, residual_tolerance
+            if (info%report) write(*,2) 'converged', iter, abs(Q%val)/residual_scale, residual_tolerance
             converged = .true.
             exit
          end if
@@ -370,7 +413,8 @@ contains
             write(*,*) 'failed get_TDC_solution TDC_iter', &
                iter
             write(*,*) 'scale', scale
-            write(*,*) 'Q/scale', Q%val/scale
+            write(*,*) 'local residual scale', residual_scale
+            write(*,*) 'Q/local residual scale', Q%val/residual_scale
             write(*,*) 'tolerance', residual_tolerance
             write(*,*) 'dQdZ', dQdZ%val
             write(*,*) 'Y', Y%val

@@ -41,6 +41,7 @@
 
          ierr = 0
          nz = s% nz
+         s% have_mlt_vc_start = .false.
          s% superad_reduction_du(1:nz) = 0d0
          s% superad_reduction_target(1:nz) = 1d0
          call set_superad_reduction_cache(s, nz)
@@ -164,6 +165,7 @@
          include 'formats'
 
          s% superad_reduction_pending = .false.
+         s% have_mlt_vc_start = .false.
          s% nz = s% nz_old
          ! Internal wind redos skip part1, so retain their frozen du.
          s% superad_reduction_target(1:s% nz) = 1d0

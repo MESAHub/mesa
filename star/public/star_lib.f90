@@ -819,13 +819,13 @@
       end subroutine star_set_j_rot_flag
 
       subroutine remesh_for_TDC_pulsation(id, ierr)
-         use set_flags, only: set_TDC_to_RSP2_mesh
+         use set_flags, only: set_pulsation_envelope_mesh
          integer, intent(in) :: id
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         call set_TDC_to_RSP2_mesh(id, ierr)
+         call set_pulsation_envelope_mesh(id, ierr)
       end subroutine remesh_for_TDC_pulsation
 
       subroutine star_set_RSP2_flag(id, et_flag, ierr)
@@ -3170,6 +3170,18 @@
          integer, intent(out) :: ierr
          call do1_rsp_build(s,ierr)
       end subroutine star_do1_rsp_build
+
+
+      subroutine star_do_LNA(id, ierr)
+         use star_lna, only: do_star_LNA
+         integer, intent(in) :: id
+         integer, intent(out) :: ierr
+         type(star_info), pointer :: s
+         ierr = 0
+         call star_ptr(id, s, ierr)
+         if (ierr /= 0) return
+         call do_star_LNA(s, ierr)
+      end subroutine star_do_LNA
 
 
       subroutine rsp_do1_eos_and_kap(s,k,ierr)
