@@ -56,6 +56,9 @@ Additional ``pgstar`` plots to visualize residuals of equations:
 Bug Fixes
 ---------
 
+Corrected terms in the Bremsstrahlung routines of the ``neu`` module including the Fermi temperature and its derivative.
+See `gh-1103 <https://github.com/MESAHub/mesa/pull/1103>`_.
+
 Corrected the Skye ionization energy offset, which was too large by the mean
 mass number ``abar`` when ``Skye_use_ion_offsets = .true.``. The ionization
 energies now use double-precision literals. See
