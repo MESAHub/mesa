@@ -19,6 +19,7 @@ am_log_nu_ST
 c12
 cell_specific_IE
 conv_vel
+effective_mixing_speed ! effective speed from total D_mix (cm/sec)
 cp
 csound
 dE_dRho

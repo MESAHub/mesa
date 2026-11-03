@@ -92,7 +92,8 @@ log_surf_optical_depth
 !log_total_angular_momentum
 log_xmstar
 mass_conv_core
-max_conv_vel_div_csound
+max_conv_vel_div_csound ! maximum mlt_vc/csound from mlt/TDC; zero for RSP
+max_effective_mixing_speed_div_csound ! maximum effective mixing speed divided by sound speed
 max_entropy
 max_gradT_div_grada
 mdot_timescale

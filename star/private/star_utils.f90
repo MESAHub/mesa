@@ -64,6 +64,7 @@
       public :: interp_val_to_pt
       public :: get_log_concentration
       public :: get_lconv
+      public :: get_effective_mixing_speed
       public :: get_ladv
       public :: get_lrad_div_ledd
       public :: get_lrad
@@ -2114,6 +2115,23 @@
          integer, intent(in) :: k
          get_Lrad = s% L(k) - get_Lconv(s,k)
       end function get_Lrad
+
+
+      real(dp) function get_effective_mixing_speed(s,k) result(v_mix)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp) :: lambda
+
+         v_mix = 0d0
+         if (k == 1) return  ! retain the zero surface value used for plotting
+         if (s% RSP2_flag .or. &
+               (s% harmonic_dissipation_length_beta > 0d0 .and. .not. s% RSP_flag)) then
+            lambda = s% mlt_mixing_length(k)
+         else
+            lambda = s% alpha_mlt(k)*s% scale_height(k)
+         end if
+         if (lambda > 0d0) v_mix = 3d0*s% D_mix(k)/lambda
+      end function get_effective_mixing_speed
 
 
       real(dp) function get_Lconv(s,k)

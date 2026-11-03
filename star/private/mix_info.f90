@@ -60,7 +60,7 @@
 
          integer :: nz, k, max_conv_bdy, max_mix_bdy, k_Tmax, i_h1, i_he4, i_c12
          real(dp) :: rho_face, f, Tmax, min_conv_vel_for_convective_mixing_type, &
-            region_bottom_q, region_top_q, L_val, mixing_length
+            region_bottom_q, region_top_q, L_val
          real(dp), allocatable, dimension(:) :: eps_h, eps_he, eps_z, cdc_factor
 
          logical :: RSP2_or_RSP
@@ -182,6 +182,13 @@
          call check('after get remove_mixing_glitches')
 
          call do_mix_envelope(s)
+
+         ! Keep convection velocities before adding other mixing sources.
+         if (.not. s% RSP2_flag) then
+            do k=1,nz
+               if (s% mixing_type(k) /= convective_mixing) s% conv_vel(k) = 0d0
+            end do
+         end if
 
          do k=1,s% nz
             eps_h(k) = s% eps_nuc_categories(ipp,k) + &
@@ -358,22 +365,6 @@
                end if
             end do
          end if
-
-         ! as last thing, update conv_vel from D_mix and mixing length.
-         ! this updates the effective conv vel for rotation and overshooting effects
-         do k=2,nz
-            if (s% RSP2_flag .or. &
-                  (s% harmonic_dissipation_length_beta > 0d0 .and. .not. RSP2_or_RSP)) then
-               mixing_length = s% mlt_mixing_length(k)
-            else
-               mixing_length = s% alpha_mlt(k)*s% scale_height(k)
-            end if
-            if (mixing_length > 0d0) then
-               s% conv_vel(k) = 3d0*s% D_mix(k)/mixing_length
-            else
-               s% conv_vel(k) = 0
-            end if
-         end do
 
          call reduce_D_mix_at_Riemann_shocks(s, ierr)
          if (failed('reduce_D_mix_at_Riemann_shocks')) return
@@ -1054,18 +1045,17 @@
                if (s% cdc(k-1) /= 0 .and. s% cdc(k+1) /= 0) then
                   s% cdc(k) = (s% cdc(k-1) + s% cdc(k+1))/2
                   s% D_mix(k) = s% cdc(k)/pow2(pi4*s% r(k)*s% r(k)*s% rho(k))
-                  if (s% harmonic_dissipation_length_beta > 0d0) then
-                     lambda = (s% mlt_mixing_length(k-1) + s% mlt_mixing_length(k+1))/2
-                  else
-                     lambda = s% alpha_mlt(k)* &
-                        (s% scale_height(k-1) + s% scale_height(k+1))/2
-                  end if
-                  if (lambda > 0d0) then
-                     s% conv_vel(k) = 3d0*s% D_mix(k)/lambda
-                  else
-                     s% conv_vel(k) = 0d0
-                  end if
                   s% mixing_type(k) = max(s% mixing_type(k-1), s% mixing_type(k+1))
+                  s% conv_vel(k) = 0d0
+                  if (s% mixing_type(k) == convective_mixing) then
+                     if (s% harmonic_dissipation_length_beta > 0d0) then
+                        lambda = (s% mlt_mixing_length(k-1) + s% mlt_mixing_length(k+1))/2
+                     else
+                        lambda = s% alpha_mlt(k)* &
+                           (s% scale_height(k-1) + s% scale_height(k+1))/2
+                     end if
+                     if (lambda > 0d0) s% conv_vel(k) = 3d0*s% D_mix(k)/lambda
+                  end if
                if (dbg) write(*,3) 'remove radiative singleton', k, nz
                end if
             else if (s% okay_to_remove_mixing_singleton) then
@@ -1084,8 +1074,10 @@
             if (s% cdc(2) /= 0) then
                s% cdc(1) = s% cdc(2)
                s% D_mix(1) = s% D_mix(2)
-               s% conv_vel(1) = s% conv_vel(2)
                s% mixing_type(1) = s% mixing_type(2)
+               s% conv_vel(1) = 0d0
+               if (s% mixing_type(1) == convective_mixing) &
+                  s% conv_vel(1) = s% conv_vel(2)
                if (dbg) write(*,3) 'remove radiative singleton', 1, nz
             end if
          else
@@ -1103,8 +1095,10 @@
             if (s% cdc(nz-1) /= 0) then
                s% cdc(nz) = s% cdc(nz-1)
                s% D_mix(nz) = s% D_mix(nz-1)
-               s% conv_vel(nz) = s% conv_vel(nz-1)
                s% mixing_type(nz) = s% mixing_type(nz-1)
+               s% conv_vel(nz) = 0d0
+               if (s% mixing_type(nz) == convective_mixing) &
+                  s% conv_vel(nz) = s% conv_vel(nz-1)
                if (dbg) write(*,2) 'remove radiative singleton: s% cdc(nz-1)', nz, s% cdc(nz-1)
             end if
          else
@@ -1197,14 +1191,18 @@
                         s% cdc(ktop+1:kbot-1) = (s% cdc(ktop) + s% cdc(kbot))/2
                         s% D_mix(ktop+1:kbot-1) = &
                            (s% D_mix(ktop) + s% D_mix(kbot))/2
-                        s% conv_vel(ktop+1:kbot-1) = (s% conv_vel(ktop) + s% conv_vel(kbot))/2
+                        s% conv_vel(ktop+1:kbot-1) = 0d0
+                        if (mix_type == convective_mixing) &
+                           s% conv_vel(ktop+1:kbot-1) = (s% conv_vel(ktop) + s% conv_vel(kbot))/2
                         s% mixing_type(ktop+1:kbot-1) = mix_type
                         if (dbg) write(*,3) 'close mixing gap', &
                               ktop+1, kbot-1, (rtop - rbot)/Hp, rtop - rbot, Hp
                      else
                         s% cdc(ktop+1:kbot) = s% cdc(ktop)
                         s% D_mix(ktop+1:kbot) = s% D_mix(ktop)
-                        s% conv_vel(ktop+1:kbot) = s% conv_vel(ktop)
+                        s% conv_vel(ktop+1:kbot) = 0d0
+                        if (mix_type == convective_mixing) &
+                           s% conv_vel(ktop+1:kbot) = s% conv_vel(ktop)
                         s% mixing_type(ktop+1:kbot) = mix_type
                         if (dbg) write(*,3) 'close mixing gap', &
                            ktop+1, kbot, (rtop - rbot)/Hp, rtop - rbot, Hp
@@ -1262,7 +1260,7 @@
                         beta = 1 - alfa
                         s% cdc(j) = alfa*s% cdc(ktop-1) + beta*s% cdc(kbot+1)
                         s% D_mix(j) = alfa*s% D_mix(ktop-1) + beta*s% D_mix(kbot+1)
-                        s% conv_vel(j) = alfa*s% conv_vel(ktop-1) + beta*s% conv_vel(kbot+1)
+                        s% conv_vel(j) = 0d0
                         s% mixing_type(j) = thermohaline_mixing
                      end do
                   end if
@@ -1415,8 +1413,9 @@
             return  ! no convection in region with T < T_mix_limit
          end if
          ! extend convection region to surface
-         j = maxloc(s% cdc(1:i), dim=1)
+         j = maxloc(s% cdc(1:i), dim=1, mask=s% mixing_type(1:i) == convective_mixing)
          s% conv_vel(1:i) = s% conv_vel(j)
+         j = maxloc(s% cdc(1:i), dim=1)
          s% cdc(1:i) = s% cdc(j)
          do k = 1,i
             s% D_mix(k) = s% D_mix(j)
@@ -2407,8 +2406,7 @@
          integer, intent(out) :: ierr
 
          integer :: nz, k
-         real(dp) :: coeff, D, P_face, r_face, q_face, cdc, Hp, vc, &
-            alfa, beta, rho_face, lg_coeff, full_off, full_on, min_m
+         real(dp) :: coeff, D, cdc, alfa, beta, rho_face, lg_coeff, full_off, full_on, min_m
          logical :: dbg
 
          include 'formats'
@@ -2449,20 +2447,9 @@
             alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
             beta = 1 - alfa
             rho_face = alfa*s% rho(k) + beta*s% rho(k-1)
-            P_face = alfa*s% Peos(k) + beta*s% Peos(k-1)
-            r_face = s% r(k)
-            q_face = s% q(k)
             cdc = pow2(pi4*s% r(k)*s% r(k)*rho_face)*D  ! gm^2/sec
-            if (s% cgrav(k) <= 0) then
-               Hp = s% r(k)
-            else
-               Hp = P_face/(rho_face*s% cgrav(k)* &
-                  (s% M_center + s% xmstar*q_face)/(r_face*r_face))
-            end if
-            vc = 3*D/(s% alpha_mlt(k)*Hp)
             s% cdc(k) = cdc
             s% D_mix(k) = D
-            s% conv_vel(k) = vc
          end do
 
       end subroutine add_RTI_turbulence

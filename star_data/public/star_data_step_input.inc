@@ -40,8 +40,8 @@
       logical :: have_ST_start_info
 
       ! convection
-      real(dp), pointer, dimension(:) :: mlt_vc ! (nz)
-      real(dp), pointer, dimension(:) :: conv_vel ! (nz)
+      real(dp), pointer, dimension(:) :: mlt_vc ! (nz) mlt/TDC velocity for the thermal state (cm/sec)
+      real(dp), pointer, dimension(:) :: conv_vel ! (nz) convective mixing velocity, including predictive mixing (cm/sec)
       integer :: num_superad_reduction_history = 0
       ! Accepted dt/tau_conv_start and target*dt/tau_conv_start, newest first.
       ! Only rows 1:num_superad_reduction_history are active.

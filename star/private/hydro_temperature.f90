@@ -21,7 +21,7 @@
 
       use star_private_def
       use star_utils, only: get_mlt_vc_start, get_T_face, get_Peos_face, get_kap_face
-      use const_def, only: dp, ln10, pi4, crad, clight, convective_mixing
+      use const_def, only: dp, ln10, pi4, crad, clight, convective_mixing, semiconvective_mixing
       use reconstructed_face_support, only: get_reconstructed_face_eos_kap_ad, &
          get_effective_gradr_factor_ad, get_Lrad_per_gradT_face_ad
       use utils_lib, only: mesa_error, is_bad
@@ -79,7 +79,8 @@
          scale = s% energy_start(k)*s% rho_start(k)
          L_ad = wrap_L_00(s,k)
          use_convective_gradient = .not. s% RSP2_flag .and. s% lnT(k)/ln10 <= s% max_logT_for_mlt &
-            .and. s% mlt_mixing_type(k) == convective_mixing
+            .and. (s% mlt_mixing_type(k) == convective_mixing &
+               .or. s% mlt_mixing_type(k) == semiconvective_mixing)
          call get_dPrad_dm_temperature_gradient_terms(s, k, use_convective_gradient, Lrad_coeff, d_P_rad_actual_ad, &
             L0_ad, gradr_factor, flxR, flxLambda, ierr)
          if (ierr /= 0) return

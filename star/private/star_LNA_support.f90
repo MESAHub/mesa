@@ -38,7 +38,7 @@
          turbulent_energy_inertia_for_star_LNA, turbulent_viscous_heating_for_star_LNA, &
          Uq_cell_for_star_LNA, Uq_face_for_star_LNA
       use const_def, only: &
-         clight, convective_mixing, crad, dp, ln10, Msun, pi, Rsun, secyer, sqrt_2_div_3
+         clight, convective_mixing, crad, dp, ln10, Msun, pi, Rsun, secyer, semiconvective_mixing, sqrt_2_div_3
       use eos_lib, only: Radiation_Pressure
       use math_lib, only: pow2, pow4
       use auto_diff
@@ -1442,7 +1442,8 @@
          if (s% RSP2_flag) then
             Lrad_ad = s% Lr_ad(k)
          else if (s% lnT(k)/ln10 <= s% max_logT_for_mlt .and. &
-               s% mlt_mixing_type(k) == convective_mixing .and. &
+               (s% mlt_mixing_type(k) == convective_mixing .or. &
+                s% mlt_mixing_type(k) == semiconvective_mixing) .and. &
                abs(gradr_factor_ad%val) > 1d-20) then
             L0_ad = get_Lrad_per_gradT_face_ad( &
                s, k, T_face_ad, P_face_ad, opacity_face_ad, gradr_factor_ad)

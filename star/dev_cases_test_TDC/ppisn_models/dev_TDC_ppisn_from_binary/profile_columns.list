@@ -444,6 +444,10 @@
    !mlt_Pturb
    !alpha_mlt
 
+   !effective_mixing_speed ! effective speed from total D_mix (cm/sec)
+   !eff_mix_speed ! same as effective_mixing_speed
+   log_effective_mixing_speed ! log10(effective_mixing_speed)
+   !log_eff_mix_speed ! same as log_effective_mixing_speed
    !conv_vel ! convection velocity (cm/sec)
    log_conv_vel ! log10 convection velocity (cm/sec)
 
@@ -481,6 +485,7 @@
    !log_gradT_div_gradr ! log10 gradT/gradr at cell boundary
    log_mlt_Gamma ! convective efficiency
    conv_vel_div_csound ! convection velocity divided by sound speed
+   effective_mixing_speed_div_csound ! effective mixing speed divided by sound speed
    !conv_vel_div_L_vel ! L_vel is velocity needed to carry L by convection; L = 4*pi*r^2*rho*vel**3
    log_mlt_D_mix ! log10 diffusion coefficient for mixing from mlt (cm^2/sec)
 
@@ -509,6 +514,7 @@
 
    superad_reduction_factor
    !conv_vel_div_mlt_vc
+   !effective_mixing_speed_div_mlt_vc ! effective mixing speed divided by mlt_vc
 
    !log_Lconv
    !log_Lconv_div_L
@@ -879,9 +885,11 @@
    !dt_cs_div_dr
    !dt_div_tau_conv
    !dt_times_conv_vel_div_mixing_length
+   !dt_times_effective_mixing_speed_div_mixing_length ! dt*effective_mixing_speed/mlt_mixing_length
    !log_dt_cs_div_dr
    !log_dt_div_tau_conv
    !log_dt_times_conv_vel_div_mixing_length
+   !log_dt_times_effective_mixing_speed_div_mixing_length ! log10(dt*effective_mixing_speed/mlt_mixing_length)
    !log_du_kick_div_du
    !du
    !dvdt_dPdm
