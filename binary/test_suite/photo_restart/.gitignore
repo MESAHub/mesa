@@ -1,0 +1,7 @@
+inlist
+*.mod
+LOGS*/*
+photos/*
+
+*.txt
+*.yml

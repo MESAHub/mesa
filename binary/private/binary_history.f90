@@ -719,27 +719,27 @@ contains
          else
             int_val = 0d0
          end if
-      case(bh_CE_flag)
-         is_int_val = .true.
-         if (b% CE_flag) then
-            int_val = 1d0
-         else
-            int_val = 0d0
-         end if
-      case(bh_CE_lambda1)
-         val = b% CE_lambda1
-      case(bh_CE_lambda2)
-         val = b% CE_lambda2
-      case(bh_CE_Ebind1)
-         val = b% CE_Ebind1
-      case(bh_CE_Ebind2)
-         val = b% CE_Ebind2
-      case(bh_CE_num1)
-         is_int_val = .true.
-         int_val = b% CE_num1
-      case(bh_CE_num2)
-         is_int_val = .true.
-         int_val = b% CE_num2
+      ! case(bh_CE_flag)
+      !    is_int_val = .true.
+      !    if (b% CE_flag) then
+      !       int_val = 1d0
+      !    else
+      !       int_val = 0d0
+      !    end if
+      ! case(bh_CE_lambda1)
+      !    val = b% CE_lambda1
+      ! case(bh_CE_lambda2)
+      !    val = b% CE_lambda2
+      ! case(bh_CE_Ebind1)
+      !    val = b% CE_Ebind1
+      ! case(bh_CE_Ebind2)
+      !    val = b% CE_Ebind2
+      ! case(bh_CE_num1)
+      !    is_int_val = .true.
+      !    int_val = b% CE_num1
+      ! case(bh_CE_num2)
+      !    is_int_val = .true.
+      !    int_val = b% CE_num2
 
       case default
          ierr = -1
