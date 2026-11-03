@@ -73,7 +73,7 @@ conserving total angular momentum. See
 Bug Fixes
 ---------
 
-Add a division by zero guard in `find0_quadratic`. This could occur when the points used for the quadratic interpolant did not bracket a root.
+Fixed an issue where the `find0_quadratic` subroutine provided by the `num` module could accidentally divide by 0 when the points used for the quadratic interpolant did not bracket a root.
 
 Fixed ``switch_to_radiative`` zeroing saved ``mlt_vc`` during TDC photo
 restarts and preparation for a new step. Mixing cleanup now preserves
