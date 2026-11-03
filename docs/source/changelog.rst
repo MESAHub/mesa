@@ -125,6 +125,18 @@ The new controls restore their incoming solver settings when relaxation ends.
 Bug Fixes
 ---------
 
+Fixed crashes when restarting a binary with a primary point mass. The
+loader assigned the secondary to the primary's stellar pointer and left
+the donor pointer unset. The secondary now loads as component 2. Wind
+enhancement checks for a primary stellar model before reading its ID.
+Binary evolution could sometimes attempt to read composition information
+from point mass companions, resulting in crashes.
+
+Binary photo restarts now initialize retry and redo states from the loaded
+model. Previously, a first-step retry or redo from a terminal photo could
+rewind the binary age and orbit one step while the stars remained at the
+saved model. Incomplete binary state records are also rejected.
+
 Switching to radiative transport no longer overwrites saved convective
 velocities during photo loading or retries with
 ``restore_mesh_on_retry = .true.``. Loading a photo also preserves the stored

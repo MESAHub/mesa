@@ -352,6 +352,13 @@ contains
       ! setup things for common envelope in case of a restart
       if (doing_restart .and. b% CE_flag .and. b% CE_init) then
          call ce_init(b, doing_restart, ierr)
+         if (ierr /= 0) return
+      end if
+
+      if (doing_restart) then
+         ! Terminal photos can retain the previous step's binary retry state.
+         ! Start binary and stellar retries from the loaded model.
+         call binary_set_old_to_current(b)
       end if
 
       evolve_loop : do while(continue_evolve_loop)  ! evolve one step per loop
@@ -496,7 +503,7 @@ contains
 
                   ! set accretion composition
                   if (.not. b% CE_flag) then
-                     if (i == 2) call set_accretion_composition(b, j)
+                     if (b% point_mass_i == 0) call set_accretion_composition(b, j)
                   end if
 
                   result = worst_result(result, &
@@ -880,7 +887,7 @@ contains
       s% job% save_photo_when_terminate = .false.
       s% photo_digits = b% photo_digits
 
-      if (b% donor_id == -1) then
+      if (b% have_star_1 .and. b% donor_id == -1) then
          b% donor_id = id
          b% s1 => s
          s% initial_mass = b% m1

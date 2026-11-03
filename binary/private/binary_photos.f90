@@ -255,6 +255,8 @@ contains
          b% xtra(:), b% xtra_old(:), &
          b% lxtra(:), b% lxtra_old(:)
 
+      if (failed('binary state')) return
+
       read(iounit, iostat = ierr) len_history_col_spec
       if (failed('len_history_col_spec')) return
       if (len_history_col_spec > 0) then
