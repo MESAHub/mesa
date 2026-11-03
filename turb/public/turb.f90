@@ -113,12 +113,14 @@ module turb
    !! @param tdc_num_iters Number of iterations taken in the TDC solver.
    !! @param ierr Tracks errors (output).
    !! @param Y_face_guess Candidate superadiabaticity for the local solve. Non-positive values disable seeding.
+   !! @param Y_structure Superadiabaticity required by the stellar temperature equation, if available.
+   !! @param have_structure_constraint False disables structural root selection. Defaults to present(Y_structure).
    subroutine set_TDC( &
             conv_vel_start, mixing_length_alpha, Lambda, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt, dt, cgrav, m, report, &
             mixing_type, scale, chiT, chiRho, gradr, r, P, T, rho, dV, Cp, opacity, &
             scale_height, gradL, grada, conv_vel, D, Y_face, gradT, tdc_num_iters, &
             max_conv_vel, Eq_div_w, grav, include_mlt_corr_to_TDC, TDC_alpha_C, &
-            TDC_alpha_S, use_TDC_enthalpy_flux_limiter, energy, Y_face_guess, ierr)
+            TDC_alpha_S, use_TDC_enthalpy_flux_limiter, energy, Y_face_guess, ierr, Y_structure, have_structure_constraint)
       use tdc
       use tdc_support
       real(dp), intent(in) :: conv_vel_start, TDC_alpha_D, TDC_alpha_R, TDC_alpha_Pt
@@ -128,6 +130,8 @@ module turb
          scale_height, gradL, grada, Eq_div_w, grav, energy
       logical, intent(in) :: report, include_mlt_corr_to_TDC, use_TDC_enthalpy_flux_limiter
       real(dp), intent(in) :: Y_face_guess
+      real(dp), intent(in), optional :: Y_structure
+      logical, intent(in), optional :: have_structure_constraint
       type(auto_diff_real_star_order1),intent(out) :: conv_vel, Y_face, gradT, D
       integer, intent(out) :: tdc_num_iters, mixing_type, ierr
       type(tdc_info) :: info
@@ -189,7 +193,8 @@ module turb
       ! Get solution
       Zub = upper_bound_Z
       Zlb = lower_bound_Z
-      call get_TDC_solution(info, scale, Zlb, Zub, conv_vel, Y_face, tdc_num_iters, Y_face_guess, ierr)
+      call get_TDC_solution(info, scale, Zlb, Zub, conv_vel, Y_face, tdc_num_iters, Y_face_guess, &
+         ierr, Y_structure, have_structure_constraint)
       if (ierr /= 0) return
 
       ! Cap conv_vel at max_conv_vel_div_csound*cs

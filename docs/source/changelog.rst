@@ -289,6 +289,13 @@ replaced by the surface luminosity. ``photosphere_L`` and ``Teff`` therefore
 use the same photospheric radius and luminosity, while ``log_L`` continues to
 report the surface luminosity.
 
+Stable TDC faces now use the gradient required by the stellar temperature
+equation to select among existing luminosity roots. A radiative root is
+preferred when that gradient also predicts zero final turbulent velocity.
+When two active roots coexist, the branch containing the structural gradient
+is searched first. Calls without a temperature constraint retain their
+previous root preference.
+
 Fixed the radiative luminosity split in the ``dPrad/dm`` temperature gradient
 equation when an actively convective face has negative ``gradr``.
 The equation now retains the counterflowing convective luminosity instead of

@@ -26,6 +26,7 @@ use utils_lib
 use auto_diff_support
 use star_utils
 use turb
+use hydro_temperature, only: get_structure_temperature_gradient
 
 implicit none
 
@@ -289,8 +290,9 @@ contains
       type(auto_diff_real_star_order1), intent(out), optional :: mixing_length
 
       type(auto_diff_real_star_order1) :: &
-         Pr, Pg, grav, Hp_for_mlt, Lambda, legacy_Lambda, mixing_length_alpha_ad, gradL, tdc_gradL, beta
-      real(dp) :: conv_vel_start, scale, max_conv_vel, Y_face_guess
+         Pr, Pg, grav, Hp_for_mlt, Lambda, legacy_Lambda, mixing_length_alpha_ad, gradL, tdc_gradL, beta, &
+         gradT_structure
+      real(dp) :: conv_vel_start, scale, max_conv_vel, Y_face_guess, Y_structure
 
       ! these are used by use_superad_reduction
       real(dp) :: Gamma_limit, scale_value1, scale_value2, diff_grads_limit, reduction_limit, lambda_limit
@@ -298,6 +300,7 @@ contains
       type(auto_diff_real_star_order1) :: eta_inst, Lrad_div_Ledd, Gamma_inv_threshold, Gamma_factor, alfa0, &
          diff_grads_factor, Gamma_term, exp_limit, gradr_scaled, Eq_div_w, check_Eq, mlt_Pturb, Ptot
       logical :: test_partials, using_TDC, have_Y_face_guess, hold_superad_reduction_factor, use_turnover_limit
+      logical :: have_structure_constraint
       logical, parameter :: report = .false.
       include 'formats'
 
@@ -454,6 +457,14 @@ contains
             Y_face_guess = 0d0
          end if
 
+         ! Evaluate the selected temperature equation at the current stellar
+         ! trial. TDC receives only the structural superadiabaticity and its
+         ! availability; it does not reconstruct the stellar equation.
+         call get_structure_temperature_gradient(s, k, gradT_structure, have_structure_constraint, ierr)
+         if (ierr /= 0) return
+         Y_structure = 0d0
+         if (have_structure_constraint) Y_structure = gradT_structure%val - tdc_gradL%val
+
          call set_TDC(&
             conv_vel_start, mixing_length_alpha_ad, Lambda, s%TDC_alpha_D, s%TDC_alpha_R, s%TDC_alpha_Pt, &
             s%dt, cgrav, m, report, &
@@ -461,7 +472,7 @@ contains
             Hp_for_mlt, tdc_gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
             Eq_div_w, grav, &
             s% include_mlt_corr_to_TDC, s% TDC_alpha_C, s% TDC_alpha_S, s% use_TDC_enthalpy_flux_limiter, energy, &
-            Y_face_guess, ierr)
+            Y_face_guess, ierr, Y_structure, have_structure_constraint)
          s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
 
             if (ierr /= 0) then
@@ -483,7 +494,7 @@ contains
                   Hp_for_mlt, tdc_gradL, grada, conv_vel, D, Y_face, gradT, s%tdc_num_iters(k), max_conv_vel, &
                   Eq_div_w, grav, &
                   s% include_mlt_corr_to_TDC, s% TDC_alpha_C, s% TDC_alpha_S, s% use_TDC_enthalpy_flux_limiter, energy, &
-                  Y_face_guess, ierr)
+                  Y_face_guess, ierr, Y_structure, have_structure_constraint)
                s% dvc_dt_TDC(k) = (conv_vel%val - conv_vel_start) / s%dt
                if (ierr /= 0) then
                   if (s% report_ierr) write(*,*) 'ierr from set_TDC when using superad_reduction'
