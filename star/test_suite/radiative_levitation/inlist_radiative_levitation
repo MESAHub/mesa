@@ -71,6 +71,7 @@
       mesh_delta_coeff = 1.5
 
       min_dq = 1d-16
+      min_dq_for_split = 1d-16
       max_surface_cell_dq = 1d-14
 
       photo_interval = 10

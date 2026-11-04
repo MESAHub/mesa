@@ -55,6 +55,9 @@
       max_model_number = 700
 
       mesh_delta_coeff = 0.6
+      min_dq = 1d-18
+      min_dq_for_split = 1d-18
+      max_surface_cell_dq = 3d-18
 
       initial_mass = 1.5
       initial_z = 0.01d0

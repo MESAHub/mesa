@@ -5856,8 +5856,8 @@
       ! ~~~~~~~~~~~~~~~~~~~
 
       ! Largest and smallest allowed dq at surface.
-      ! Must be larger than min_dq, and should be larger than min_dq_for_split as well
-      ! so that nearby zones can adjust to comparable resolution if necessary.
+      ! max_surface_cell_dq must be larger than min_dq, and should be larger than min_dq_for_split
+      ! as well so that nearby zones can adjust to comparable resolution if necessary.
 
       ! ::
 
