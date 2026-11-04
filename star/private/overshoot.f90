@@ -67,6 +67,7 @@ contains
        write(*, 3) 'add_overshooting; model, n_conv_bdy=', s%model_number, s%num_conv_boundaries
     end if
 
+    ! Keep the convective reference velocities fixed during this loop.
     ! Loop over convective boundaries, from center to surface
 
     conv_bdy_loop : do i = 1, s%num_conv_boundaries
@@ -275,13 +276,11 @@ contains
 
                 s%cdc(k) = cdc
                 s%D_mix(k) = D(k)
-                s%conv_vel(k) = vc(k)
 
              elseif (D(k) > s%D_mix(k)) then
 
                 s%cdc(k) = cdc
                 s%D_mix(k) = D(k)
-                s%conv_vel(k) = vc(k)
                 s%mixing_type(k) = overshoot_mixing
 
              end if
@@ -293,7 +292,6 @@ contains
 
           s%cdc(k:k_cb:dk) = 0._dp
           s%D_mix(k:k_cb:dk) = 0._dp
-          s%conv_vel(k:k_cb:dk) = 0._dp
           s%mixing_type(k:k_cb:dk) = no_mixing
 
           ! Finish (we apply at most a single overshoot scheme to each boundary)

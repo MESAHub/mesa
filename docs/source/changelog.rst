@@ -76,6 +76,10 @@ Bug Fixes
 Incomplete split burns now trigger a stellar retry when they reach
 ``burn_steps_hard_limit``.
 
+Fixed ``switch_to_radiative`` zeroing saved ``mlt_vc`` during TDC photo
+restarts and preparation for a new step. Mixing cleanup now preserves
+the velocity until it has been copied to ``mlt_vc_old``.
+
 Fixed: ``gold2_tolerances`` accidentally used ``gold_solver_iters_timestep_limit`` instead of ``gold2_solver_iters_timestep_limit``.
 
 Corrected the Skye ionization energy offset, which was too large by the mean
@@ -85,6 +89,20 @@ energies now use double-precision literals. See
 `gh-1086 <https://github.com/MESAHub/mesa/issues/1086>`_.
 
 Fixed a typo in the OPLIB hydrogen grid that could cause incorrect opacities or interpolation failures at low hydrogen abundance; see `gh-1078 <https://github.com/MESAHub/mesa/pull/1078>`_.
+
+Fixed a bug in the dPrad/dm temperature equation where rotational mixing could
+remove the convective heat flux contribution, and the contribution from
+semiconvection was also omitted.
+
+MESA's profile output columns previously reported ``conv_vel`` as an effective
+speed that could include overshooting, semiconvection, thermohaline mixing,
+rotation, and other contributions to ``D_mix``. This label gave users the false
+sense that ``conv_vel`` was purely the convection velocity from MLT/TDC. This
+has been amended to provide clarity to users. ``conv_vel`` now reports only
+the convective mixing velocity, including predictive mixing. ``mlt_vc`` remains
+the physical convective velocity from MLT/TDC. A new profile column
+``effective_mixing_speed`` (or ``eff_mix_speed``) now reports the effective
+speed from total ``D_mix``.
 
 Removed duplicate treatment of ``n14(a,g)f18(e+nu)o18`` in networks that
 include both the explicit hot CNO reactions and the corresponding approximate
