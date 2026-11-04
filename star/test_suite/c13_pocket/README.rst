@@ -42,7 +42,7 @@ convective envelope that mixes the protons into the intershell.
 At the end of this test, MESA has successfully evolved through a
 thermal pulse and the :math:`^{13}{\rm C}` pocket is apparent.
 
-.. image:: ../../../star/test_suite/c13_pocket/docs/grid1001915.png
+.. image:: ../../../star/test_suite/c13_pocket/docs/grid1001945.png
 
 .. note::
 
@@ -52,4 +52,4 @@ thermal pulse and the :math:`^{13}{\rm C}` pocket is apparent.
   Uncomment the parts in ``rn`` and then grep in the output for
   ``[TestHub]``.
 
-Last-Updated: 2020-03-12 (mesa r12778) by Josiah Schwab
+Last-Updated: 2026-11-03 by EbF

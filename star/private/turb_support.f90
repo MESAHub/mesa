@@ -115,7 +115,7 @@ contains
          gradr_in, grada, scale_height, mixing_length_alpha, &
          mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
       use chem_def, only: ih1
-      use const_def, only: ln10
+      use const_def, only: ln10, convective_mixing
       use starspots, only: starspot_tweak_gradr
       type (star_info), pointer :: s
       integer, intent(in) :: k
@@ -199,6 +199,10 @@ contains
             s% alpha_semiconvection, s% thermohaline_coeff, &
             mixing_type, gradT, Y_face, mlt_vc, D, Gamma, energy, ierr)
       end if
+      if (ierr /= 0) return
+
+      ! Do not use diffusion velocities as MLT/TDC turbulent velocity.
+      if (mixing_type /= convective_mixing) mlt_vc = 0d0
 
    end subroutine do1_mlt_eval
 

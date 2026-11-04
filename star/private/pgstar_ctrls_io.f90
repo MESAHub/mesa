@@ -102,10 +102,6 @@
 
             Profile_Panels1_win_flag, &
             Profile_Panels1_file_flag, &
-            do_Profile_Panels1_win, &
-            do_Profile_Panels1_file, &
-            id_Profile_Panels1_win, &
-            id_Profile_Panels1_file, &
             Profile_Panels1_file_interval, &
             Profile_Panels1_file_dir, &
             Profile_Panels1_file_prefix, &
@@ -123,12 +119,8 @@
             Profile_Panels1_ybot, &
             Profile_Panels1_ytop, &
             Profile_Panels1_txt_scale, &
-            prev_Profile_Panels1_win_width, &
-            prev_Profile_Panels1_win_ratio, &
             Profile_Panels1_file_width, &
             Profile_Panels1_file_aspect_ratio, &
-            prev_Profile_Panels1_file_width, &
-            prev_Profile_Panels1_file_ratio, &
             Profile_Panels1_num_panels, &
             Profile_Panels1_yaxis_name, &
             Profile_Panels1_other_yaxis_name, &
@@ -152,10 +144,6 @@
 
             Profile_Panels2_win_flag, &
             Profile_Panels2_file_flag, &
-            do_Profile_Panels2_win, &
-            do_Profile_Panels2_file, &
-            id_Profile_Panels2_win, &
-            id_Profile_Panels2_file, &
             Profile_Panels2_file_interval, &
             Profile_Panels2_file_dir, &
             Profile_Panels2_file_prefix, &
@@ -173,12 +161,8 @@
             Profile_Panels2_ybot, &
             Profile_Panels2_ytop, &
             Profile_Panels2_txt_scale, &
-            prev_Profile_Panels2_win_width, &
-            prev_Profile_Panels2_win_ratio, &
             Profile_Panels2_file_width, &
             Profile_Panels2_file_aspect_ratio, &
-            prev_Profile_Panels2_file_width, &
-            prev_Profile_Panels2_file_ratio, &
             Profile_Panels2_num_panels, &
             Profile_Panels2_yaxis_name, &
             Profile_Panels2_other_yaxis_name, &
@@ -202,10 +186,6 @@
 
             Profile_Panels3_win_flag, &
             Profile_Panels3_file_flag, &
-            do_Profile_Panels3_win, &
-            do_Profile_Panels3_file, &
-            id_Profile_Panels3_win, &
-            id_Profile_Panels3_file, &
             Profile_Panels3_file_interval, &
             Profile_Panels3_file_dir, &
             Profile_Panels3_file_prefix, &
@@ -223,12 +203,8 @@
             Profile_Panels3_ybot, &
             Profile_Panels3_ytop, &
             Profile_Panels3_txt_scale, &
-            prev_Profile_Panels3_win_width, &
-            prev_Profile_Panels3_win_ratio, &
             Profile_Panels3_file_width, &
             Profile_Panels3_file_aspect_ratio, &
-            prev_Profile_Panels3_file_width, &
-            prev_Profile_Panels3_file_ratio, &
             Profile_Panels3_num_panels, &
             Profile_Panels3_yaxis_name, &
             Profile_Panels3_other_yaxis_name, &
@@ -252,10 +228,6 @@
 
             Profile_Panels4_win_flag, &
             Profile_Panels4_file_flag, &
-            do_Profile_Panels4_win, &
-            do_Profile_Panels4_file, &
-            id_Profile_Panels4_win, &
-            id_Profile_Panels4_file, &
             Profile_Panels4_file_interval, &
             Profile_Panels4_file_dir, &
             Profile_Panels4_file_prefix, &
@@ -273,12 +245,8 @@
             Profile_Panels4_ybot, &
             Profile_Panels4_ytop, &
             Profile_Panels4_txt_scale, &
-            prev_Profile_Panels4_win_width, &
-            prev_Profile_Panels4_win_ratio, &
             Profile_Panels4_file_width, &
             Profile_Panels4_file_aspect_ratio, &
-            prev_Profile_Panels4_file_width, &
-            prev_Profile_Panels4_file_ratio, &
             Profile_Panels4_num_panels, &
             Profile_Panels4_yaxis_name, &
             Profile_Panels4_other_yaxis_name, &
@@ -303,10 +271,6 @@
 
             Profile_Panels5_win_flag, &
             Profile_Panels5_file_flag, &
-            do_Profile_Panels5_win, &
-            do_Profile_Panels5_file, &
-            id_Profile_Panels5_win, &
-            id_Profile_Panels5_file, &
             Profile_Panels5_file_interval, &
             Profile_Panels5_file_dir, &
             Profile_Panels5_file_prefix, &
@@ -324,12 +288,8 @@
             Profile_Panels5_ybot, &
             Profile_Panels5_ytop, &
             Profile_Panels5_txt_scale, &
-            prev_Profile_Panels5_win_width, &
-            prev_Profile_Panels5_win_ratio, &
             Profile_Panels5_file_width, &
             Profile_Panels5_file_aspect_ratio, &
-            prev_Profile_Panels5_file_width, &
-            prev_Profile_Panels5_file_ratio, &
             Profile_Panels5_num_panels, &
             Profile_Panels5_yaxis_name, &
             Profile_Panels5_other_yaxis_name, &
@@ -354,10 +314,6 @@
 
             Profile_Panels6_win_flag, &
             Profile_Panels6_file_flag, &
-            do_Profile_Panels6_win, &
-            do_Profile_Panels6_file, &
-            id_Profile_Panels6_win, &
-            id_Profile_Panels6_file, &
             Profile_Panels6_file_interval, &
             Profile_Panels6_file_dir, &
             Profile_Panels6_file_prefix, &
@@ -375,12 +331,8 @@
             Profile_Panels6_ybot, &
             Profile_Panels6_ytop, &
             Profile_Panels6_txt_scale, &
-            prev_Profile_Panels6_win_width, &
-            prev_Profile_Panels6_win_ratio, &
             Profile_Panels6_file_width, &
             Profile_Panels6_file_aspect_ratio, &
-            prev_Profile_Panels6_file_width, &
-            prev_Profile_Panels6_file_ratio, &
             Profile_Panels6_num_panels, &
             Profile_Panels6_yaxis_name, &
             Profile_Panels6_other_yaxis_name, &
@@ -405,10 +357,6 @@
 
             Profile_Panels7_win_flag, &
             Profile_Panels7_file_flag, &
-            do_Profile_Panels7_win, &
-            do_Profile_Panels7_file, &
-            id_Profile_Panels7_win, &
-            id_Profile_Panels7_file, &
             Profile_Panels7_file_interval, &
             Profile_Panels7_file_dir, &
             Profile_Panels7_file_prefix, &
@@ -426,12 +374,8 @@
             Profile_Panels7_ybot, &
             Profile_Panels7_ytop, &
             Profile_Panels7_txt_scale, &
-            prev_Profile_Panels7_win_width, &
-            prev_Profile_Panels7_win_ratio, &
             Profile_Panels7_file_width, &
             Profile_Panels7_file_aspect_ratio, &
-            prev_Profile_Panels7_file_width, &
-            prev_Profile_Panels7_file_ratio, &
             Profile_Panels7_num_panels, &
             Profile_Panels7_yaxis_name, &
             Profile_Panels7_other_yaxis_name, &
@@ -456,10 +400,6 @@
 
             Profile_Panels8_win_flag, &
             Profile_Panels8_file_flag, &
-            do_Profile_Panels8_win, &
-            do_Profile_Panels8_file, &
-            id_Profile_Panels8_win, &
-            id_Profile_Panels8_file, &
             Profile_Panels8_file_interval, &
             Profile_Panels8_file_dir, &
             Profile_Panels8_file_prefix, &
@@ -477,12 +417,8 @@
             Profile_Panels8_ybot, &
             Profile_Panels8_ytop, &
             Profile_Panels8_txt_scale, &
-            prev_Profile_Panels8_win_width, &
-            prev_Profile_Panels8_win_ratio, &
             Profile_Panels8_file_width, &
             Profile_Panels8_file_aspect_ratio, &
-            prev_Profile_Panels8_file_width, &
-            prev_Profile_Panels8_file_ratio, &
             Profile_Panels8_num_panels, &
             Profile_Panels8_yaxis_name, &
             Profile_Panels8_other_yaxis_name, &
@@ -507,10 +443,6 @@
 
             Profile_Panels9_win_flag, &
             Profile_Panels9_file_flag, &
-            do_Profile_Panels9_win, &
-            do_Profile_Panels9_file, &
-            id_Profile_Panels9_win, &
-            id_Profile_Panels9_file, &
             Profile_Panels9_file_interval, &
             Profile_Panels9_file_dir, &
             Profile_Panels9_file_prefix, &
@@ -528,12 +460,8 @@
             Profile_Panels9_ybot, &
             Profile_Panels9_ytop, &
             Profile_Panels9_txt_scale, &
-            prev_Profile_Panels9_win_width, &
-            prev_Profile_Panels9_win_ratio, &
             Profile_Panels9_file_width, &
             Profile_Panels9_file_aspect_ratio, &
-            prev_Profile_Panels9_file_width, &
-            prev_Profile_Panels9_file_ratio, &
             Profile_Panels9_num_panels, &
             Profile_Panels9_yaxis_name, &
             Profile_Panels9_other_yaxis_name, &
@@ -2161,7 +2089,6 @@
             Color_Magnitude1_xmax, &
             Color_Magnitude1_xmin, &
             Color_Magnitude1_dxmin, &
-            Color_Magnitude1_max_width, &
             Color_Magnitude1_num_panels, &
             Color_Magnitude1_xaxis1_name, &
             Color_Magnitude1_xaxis2_name, &
@@ -2204,7 +2131,6 @@
             Color_Magnitude2_xmax, &
             Color_Magnitude2_xmin, &
             Color_Magnitude2_dxmin, &
-            Color_Magnitude2_max_width, &
             Color_Magnitude2_num_panels, &
             Color_Magnitude2_xaxis1_name, &
             Color_Magnitude2_xaxis2_name, &
@@ -2247,7 +2173,6 @@
             Color_Magnitude3_xmax, &
             Color_Magnitude3_xmin, &
             Color_Magnitude3_dxmin, &
-            Color_Magnitude3_max_width, &
             Color_Magnitude3_num_panels, &
             Color_Magnitude3_xaxis1_name, &
             Color_Magnitude3_xaxis2_name, &
@@ -2290,7 +2215,6 @@
             Color_Magnitude4_xmax, &
             Color_Magnitude4_xmin, &
             Color_Magnitude4_dxmin, &
-            Color_Magnitude4_max_width, &
             Color_Magnitude4_num_panels, &
             Color_Magnitude4_xaxis1_name, &
             Color_Magnitude4_xaxis2_name, &
@@ -2333,7 +2257,6 @@
             Color_Magnitude5_xmax, &
             Color_Magnitude5_xmin, &
             Color_Magnitude5_dxmin, &
-            Color_Magnitude5_max_width, &
             Color_Magnitude5_num_panels, &
             Color_Magnitude5_xaxis1_name, &
             Color_Magnitude5_xaxis2_name, &
@@ -2376,7 +2299,6 @@
             Color_Magnitude6_xmax, &
             Color_Magnitude6_xmin, &
             Color_Magnitude6_dxmin, &
-            Color_Magnitude6_max_width, &
             Color_Magnitude6_num_panels, &
             Color_Magnitude6_xaxis1_name, &
             Color_Magnitude6_xaxis2_name, &
@@ -2419,7 +2341,6 @@
             Color_Magnitude7_xmax, &
             Color_Magnitude7_xmin, &
             Color_Magnitude7_dxmin, &
-            Color_Magnitude7_max_width, &
             Color_Magnitude7_num_panels, &
             Color_Magnitude7_xaxis1_name, &
             Color_Magnitude7_xaxis2_name, &
@@ -2462,7 +2383,6 @@
             Color_Magnitude8_xmax, &
             Color_Magnitude8_xmin, &
             Color_Magnitude8_dxmin, &
-            Color_Magnitude8_max_width, &
             Color_Magnitude8_num_panels, &
             Color_Magnitude8_xaxis1_name, &
             Color_Magnitude8_xaxis2_name, &
@@ -2505,7 +2425,6 @@
             Color_Magnitude9_xmax, &
             Color_Magnitude9_xmin, &
             Color_Magnitude9_dxmin, &
-            Color_Magnitude9_max_width, &
             Color_Magnitude9_num_panels, &
             Color_Magnitude9_xaxis1_name, &
             Color_Magnitude9_xaxis2_name, &
@@ -3220,10 +3139,6 @@
 
          s% pg% Profile_Panels1_win_flag = Profile_Panels1_win_flag
          s% pg% Profile_Panels1_file_flag = Profile_Panels1_file_flag
-         s% pg% do_Profile_Panels1_win = do_Profile_Panels1_win
-         s% pg% do_Profile_Panels1_file = do_Profile_Panels1_file
-         s% pg% id_Profile_Panels1_win = id_Profile_Panels1_win
-         s% pg% id_Profile_Panels1_file = id_Profile_Panels1_file
          s% pg% Profile_Panels1_file_interval = Profile_Panels1_file_interval
          s% pg% Profile_Panels1_file_dir = Profile_Panels1_file_dir
          s% pg% Profile_Panels1_file_prefix = Profile_Panels1_file_prefix
@@ -3242,12 +3157,8 @@
          s% pg% Profile_Panels1_ybot = Profile_Panels1_ybot
          s% pg% Profile_Panels1_ytop = Profile_Panels1_ytop
          s% pg% Profile_Panels1_txt_scale = Profile_Panels1_txt_scale
-         s% pg% prev_Profile_Panels1_win_width = prev_Profile_Panels1_win_width
-         s% pg% prev_Profile_Panels1_win_ratio = prev_Profile_Panels1_win_ratio
          s% pg% Profile_Panels1_file_width = Profile_Panels1_file_width
          s% pg% Profile_Panels1_file_aspect_ratio = Profile_Panels1_file_aspect_ratio
-         s% pg% prev_Profile_Panels1_file_width = prev_Profile_Panels1_file_width
-         s% pg% prev_Profile_Panels1_file_ratio = prev_Profile_Panels1_file_ratio
          s% pg% Profile_Panels1_num_panels = Profile_Panels1_num_panels
          s% pg% Profile_Panels1_yaxis_name = Profile_Panels1_yaxis_name
          s% pg% Profile_Panels1_other_yaxis_name = Profile_Panels1_other_yaxis_name
@@ -3271,10 +3182,6 @@
 
          s% pg% Profile_Panels2_win_flag = Profile_Panels2_win_flag
          s% pg% Profile_Panels2_file_flag = Profile_Panels2_file_flag
-         s% pg% do_Profile_Panels2_win = do_Profile_Panels2_win
-         s% pg% do_Profile_Panels2_file = do_Profile_Panels2_file
-         s% pg% id_Profile_Panels2_win = id_Profile_Panels2_win
-         s% pg% id_Profile_Panels2_file = id_Profile_Panels2_file
          s% pg% Profile_Panels2_file_interval = Profile_Panels2_file_interval
          s% pg% Profile_Panels2_file_dir = Profile_Panels2_file_dir
          s% pg% Profile_Panels2_file_prefix = Profile_Panels2_file_prefix
@@ -3292,12 +3199,8 @@
          s% pg% Profile_Panels2_ybot = Profile_Panels2_ybot
          s% pg% Profile_Panels2_ytop = Profile_Panels2_ytop
          s% pg% Profile_Panels2_txt_scale = Profile_Panels2_txt_scale
-         s% pg% prev_Profile_Panels2_win_width = prev_Profile_Panels2_win_width
-         s% pg% prev_Profile_Panels2_win_ratio = prev_Profile_Panels2_win_ratio
          s% pg% Profile_Panels2_file_width = Profile_Panels2_file_width
          s% pg% Profile_Panels2_file_aspect_ratio = Profile_Panels2_file_aspect_ratio
-         s% pg% prev_Profile_Panels2_file_width = prev_Profile_Panels2_file_width
-         s% pg% prev_Profile_Panels2_file_ratio = prev_Profile_Panels2_file_ratio
          s% pg% Profile_Panels2_num_panels = Profile_Panels2_num_panels
          s% pg% Profile_Panels2_yaxis_name = Profile_Panels2_yaxis_name
          s% pg% Profile_Panels2_other_yaxis_name = Profile_Panels2_other_yaxis_name
@@ -3321,10 +3224,6 @@
 
          s% pg% Profile_Panels3_win_flag = Profile_Panels3_win_flag
          s% pg% Profile_Panels3_file_flag = Profile_Panels3_file_flag
-         s% pg% do_Profile_Panels3_win = do_Profile_Panels3_win
-         s% pg% do_Profile_Panels3_file = do_Profile_Panels3_file
-         s% pg% id_Profile_Panels3_win = id_Profile_Panels3_win
-         s% pg% id_Profile_Panels3_file = id_Profile_Panels3_file
          s% pg% Profile_Panels3_file_interval = Profile_Panels3_file_interval
          s% pg% Profile_Panels3_file_dir = Profile_Panels3_file_dir
          s% pg% Profile_Panels3_file_prefix = Profile_Panels3_file_prefix
@@ -3342,12 +3241,8 @@
          s% pg% Profile_Panels3_ybot = Profile_Panels3_ybot
          s% pg% Profile_Panels3_ytop = Profile_Panels3_ytop
          s% pg% Profile_Panels3_txt_scale = Profile_Panels3_txt_scale
-         s% pg% prev_Profile_Panels3_win_width = prev_Profile_Panels3_win_width
-         s% pg% prev_Profile_Panels3_win_ratio = prev_Profile_Panels3_win_ratio
          s% pg% Profile_Panels3_file_width = Profile_Panels3_file_width
          s% pg% Profile_Panels3_file_aspect_ratio = Profile_Panels3_file_aspect_ratio
-         s% pg% prev_Profile_Panels3_file_width = prev_Profile_Panels3_file_width
-         s% pg% prev_Profile_Panels3_file_ratio = prev_Profile_Panels3_file_ratio
          s% pg% Profile_Panels3_num_panels = Profile_Panels3_num_panels
          s% pg% Profile_Panels3_yaxis_name = Profile_Panels3_yaxis_name
          s% pg% Profile_Panels3_other_yaxis_name = Profile_Panels3_other_yaxis_name
@@ -3371,10 +3266,6 @@
 
          s% pg% Profile_Panels4_win_flag = Profile_Panels4_win_flag
          s% pg% Profile_Panels4_file_flag = Profile_Panels4_file_flag
-         s% pg% do_Profile_Panels4_win = do_Profile_Panels4_win
-         s% pg% do_Profile_Panels4_file = do_Profile_Panels4_file
-         s% pg% id_Profile_Panels4_win = id_Profile_Panels4_win
-         s% pg% id_Profile_Panels4_file = id_Profile_Panels4_file
          s% pg% Profile_Panels4_file_interval = Profile_Panels4_file_interval
          s% pg% Profile_Panels4_file_dir = Profile_Panels4_file_dir
          s% pg% Profile_Panels4_file_prefix = Profile_Panels4_file_prefix
@@ -3392,12 +3283,8 @@
          s% pg% Profile_Panels4_ybot = Profile_Panels4_ybot
          s% pg% Profile_Panels4_ytop = Profile_Panels4_ytop
          s% pg% Profile_Panels4_txt_scale = Profile_Panels4_txt_scale
-         s% pg% prev_Profile_Panels4_win_width = prev_Profile_Panels4_win_width
-         s% pg% prev_Profile_Panels4_win_ratio = prev_Profile_Panels4_win_ratio
          s% pg% Profile_Panels4_file_width = Profile_Panels4_file_width
          s% pg% Profile_Panels4_file_aspect_ratio = Profile_Panels4_file_aspect_ratio
-         s% pg% prev_Profile_Panels4_file_width = prev_Profile_Panels4_file_width
-         s% pg% prev_Profile_Panels4_file_ratio = prev_Profile_Panels4_file_ratio
          s% pg% Profile_Panels4_num_panels = Profile_Panels4_num_panels
          s% pg% Profile_Panels4_yaxis_name = Profile_Panels4_yaxis_name
          s% pg% Profile_Panels4_other_yaxis_name = Profile_Panels4_other_yaxis_name
@@ -3421,10 +3308,6 @@
 
          s% pg% Profile_Panels5_win_flag = Profile_Panels5_win_flag
          s% pg% Profile_Panels5_file_flag = Profile_Panels5_file_flag
-         s% pg% do_Profile_Panels5_win = do_Profile_Panels5_win
-         s% pg% do_Profile_Panels5_file = do_Profile_Panels5_file
-         s% pg% id_Profile_Panels5_win = id_Profile_Panels5_win
-         s% pg% id_Profile_Panels5_file = id_Profile_Panels5_file
          s% pg% Profile_Panels5_file_interval = Profile_Panels5_file_interval
          s% pg% Profile_Panels5_file_dir = Profile_Panels5_file_dir
          s% pg% Profile_Panels5_file_prefix = Profile_Panels5_file_prefix
@@ -3442,12 +3325,8 @@
          s% pg% Profile_Panels5_ybot = Profile_Panels5_ybot
          s% pg% Profile_Panels5_ytop = Profile_Panels5_ytop
          s% pg% Profile_Panels5_txt_scale = Profile_Panels5_txt_scale
-         s% pg% prev_Profile_Panels5_win_width = prev_Profile_Panels5_win_width
-         s% pg% prev_Profile_Panels5_win_ratio = prev_Profile_Panels5_win_ratio
          s% pg% Profile_Panels5_file_width = Profile_Panels5_file_width
          s% pg% Profile_Panels5_file_aspect_ratio = Profile_Panels5_file_aspect_ratio
-         s% pg% prev_Profile_Panels5_file_width = prev_Profile_Panels5_file_width
-         s% pg% prev_Profile_Panels5_file_ratio = prev_Profile_Panels5_file_ratio
          s% pg% Profile_Panels5_num_panels = Profile_Panels5_num_panels
          s% pg% Profile_Panels5_yaxis_name = Profile_Panels5_yaxis_name
          s% pg% Profile_Panels5_other_yaxis_name = Profile_Panels5_other_yaxis_name
@@ -3471,10 +3350,6 @@
 
          s% pg% Profile_Panels6_win_flag = Profile_Panels6_win_flag
          s% pg% Profile_Panels6_file_flag = Profile_Panels6_file_flag
-         s% pg% do_Profile_Panels6_win = do_Profile_Panels6_win
-         s% pg% do_Profile_Panels6_file = do_Profile_Panels6_file
-         s% pg% id_Profile_Panels6_win = id_Profile_Panels6_win
-         s% pg% id_Profile_Panels6_file = id_Profile_Panels6_file
          s% pg% Profile_Panels6_file_interval = Profile_Panels6_file_interval
          s% pg% Profile_Panels6_file_dir = Profile_Panels6_file_dir
          s% pg% Profile_Panels6_file_prefix = Profile_Panels6_file_prefix
@@ -3492,12 +3367,8 @@
          s% pg% Profile_Panels6_ybot = Profile_Panels6_ybot
          s% pg% Profile_Panels6_ytop = Profile_Panels6_ytop
          s% pg% Profile_Panels6_txt_scale = Profile_Panels6_txt_scale
-         s% pg% prev_Profile_Panels6_win_width = prev_Profile_Panels6_win_width
-         s% pg% prev_Profile_Panels6_win_ratio = prev_Profile_Panels6_win_ratio
          s% pg% Profile_Panels6_file_width = Profile_Panels6_file_width
          s% pg% Profile_Panels6_file_aspect_ratio = Profile_Panels6_file_aspect_ratio
-         s% pg% prev_Profile_Panels6_file_width = prev_Profile_Panels6_file_width
-         s% pg% prev_Profile_Panels6_file_ratio = prev_Profile_Panels6_file_ratio
          s% pg% Profile_Panels6_num_panels = Profile_Panels6_num_panels
          s% pg% Profile_Panels6_yaxis_name = Profile_Panels6_yaxis_name
          s% pg% Profile_Panels6_other_yaxis_name = Profile_Panels6_other_yaxis_name
@@ -3521,10 +3392,6 @@
 
          s% pg% Profile_Panels7_win_flag = Profile_Panels7_win_flag
          s% pg% Profile_Panels7_file_flag = Profile_Panels7_file_flag
-         s% pg% do_Profile_Panels7_win = do_Profile_Panels7_win
-         s% pg% do_Profile_Panels7_file = do_Profile_Panels7_file
-         s% pg% id_Profile_Panels7_win = id_Profile_Panels7_win
-         s% pg% id_Profile_Panels7_file = id_Profile_Panels7_file
          s% pg% Profile_Panels7_file_interval = Profile_Panels7_file_interval
          s% pg% Profile_Panels7_file_dir = Profile_Panels7_file_dir
          s% pg% Profile_Panels7_file_prefix = Profile_Panels7_file_prefix
@@ -3542,12 +3409,8 @@
          s% pg% Profile_Panels7_ybot = Profile_Panels7_ybot
          s% pg% Profile_Panels7_ytop = Profile_Panels7_ytop
          s% pg% Profile_Panels7_txt_scale = Profile_Panels7_txt_scale
-         s% pg% prev_Profile_Panels7_win_width = prev_Profile_Panels7_win_width
-         s% pg% prev_Profile_Panels7_win_ratio = prev_Profile_Panels7_win_ratio
          s% pg% Profile_Panels7_file_width = Profile_Panels7_file_width
          s% pg% Profile_Panels7_file_aspect_ratio = Profile_Panels7_file_aspect_ratio
-         s% pg% prev_Profile_Panels7_file_width = prev_Profile_Panels7_file_width
-         s% pg% prev_Profile_Panels7_file_ratio = prev_Profile_Panels7_file_ratio
          s% pg% Profile_Panels7_num_panels = Profile_Panels7_num_panels
          s% pg% Profile_Panels7_yaxis_name = Profile_Panels7_yaxis_name
          s% pg% Profile_Panels7_other_yaxis_name = Profile_Panels7_other_yaxis_name
@@ -3571,10 +3434,6 @@
 
          s% pg% Profile_Panels8_win_flag = Profile_Panels8_win_flag
          s% pg% Profile_Panels8_file_flag = Profile_Panels8_file_flag
-         s% pg% do_Profile_Panels8_win = do_Profile_Panels8_win
-         s% pg% do_Profile_Panels8_file = do_Profile_Panels8_file
-         s% pg% id_Profile_Panels8_win = id_Profile_Panels8_win
-         s% pg% id_Profile_Panels8_file = id_Profile_Panels8_file
          s% pg% Profile_Panels8_file_interval = Profile_Panels8_file_interval
          s% pg% Profile_Panels8_file_dir = Profile_Panels8_file_dir
          s% pg% Profile_Panels8_file_prefix = Profile_Panels8_file_prefix
@@ -3592,12 +3451,8 @@
          s% pg% Profile_Panels8_ybot = Profile_Panels8_ybot
          s% pg% Profile_Panels8_ytop = Profile_Panels8_ytop
          s% pg% Profile_Panels8_txt_scale = Profile_Panels8_txt_scale
-         s% pg% prev_Profile_Panels8_win_width = prev_Profile_Panels8_win_width
-         s% pg% prev_Profile_Panels8_win_ratio = prev_Profile_Panels8_win_ratio
          s% pg% Profile_Panels8_file_width = Profile_Panels8_file_width
          s% pg% Profile_Panels8_file_aspect_ratio = Profile_Panels8_file_aspect_ratio
-         s% pg% prev_Profile_Panels8_file_width = prev_Profile_Panels8_file_width
-         s% pg% prev_Profile_Panels8_file_ratio = prev_Profile_Panels8_file_ratio
          s% pg% Profile_Panels8_num_panels = Profile_Panels8_num_panels
          s% pg% Profile_Panels8_yaxis_name = Profile_Panels8_yaxis_name
          s% pg% Profile_Panels8_other_yaxis_name = Profile_Panels8_other_yaxis_name
@@ -3622,10 +3477,6 @@
 
          s% pg% Profile_Panels9_win_flag = Profile_Panels9_win_flag
          s% pg% Profile_Panels9_file_flag = Profile_Panels9_file_flag
-         s% pg% do_Profile_Panels9_win = do_Profile_Panels9_win
-         s% pg% do_Profile_Panels9_file = do_Profile_Panels9_file
-         s% pg% id_Profile_Panels9_win = id_Profile_Panels9_win
-         s% pg% id_Profile_Panels9_file = id_Profile_Panels9_file
          s% pg% Profile_Panels9_file_interval = Profile_Panels9_file_interval
          s% pg% Profile_Panels9_file_dir = Profile_Panels9_file_dir
          s% pg% Profile_Panels9_file_prefix = Profile_Panels9_file_prefix
@@ -3643,12 +3494,8 @@
          s% pg% Profile_Panels9_ybot = Profile_Panels9_ybot
          s% pg% Profile_Panels9_ytop = Profile_Panels9_ytop
          s% pg% Profile_Panels9_txt_scale = Profile_Panels9_txt_scale
-         s% pg% prev_Profile_Panels9_win_width = prev_Profile_Panels9_win_width
-         s% pg% prev_Profile_Panels9_win_ratio = prev_Profile_Panels9_win_ratio
          s% pg% Profile_Panels9_file_width = Profile_Panels9_file_width
          s% pg% Profile_Panels9_file_aspect_ratio = Profile_Panels9_file_aspect_ratio
-         s% pg% prev_Profile_Panels9_file_width = prev_Profile_Panels9_file_width
-         s% pg% prev_Profile_Panels9_file_ratio = prev_Profile_Panels9_file_ratio
          s% pg% Profile_Panels9_num_panels = Profile_Panels9_num_panels
          s% pg% Profile_Panels9_yaxis_name = Profile_Panels9_yaxis_name
          s% pg% Profile_Panels9_other_yaxis_name = Profile_Panels9_other_yaxis_name
@@ -5393,7 +5240,6 @@
          s% pg% Color_Magnitude1_xmax = Color_Magnitude1_xmax
          s% pg% Color_Magnitude1_xmin = Color_Magnitude1_xmin
          s% pg% Color_Magnitude1_dxmin = Color_Magnitude1_dxmin
-         s% pg% Color_Magnitude1_max_width = Color_Magnitude1_max_width
          s% pg% Color_Magnitude1_num_panels = Color_Magnitude1_num_panels
          s% pg% Color_Magnitude1_xaxis1_name = Color_Magnitude1_xaxis1_name
          s% pg% Color_Magnitude1_xaxis2_name = Color_Magnitude1_xaxis2_name
@@ -5436,7 +5282,6 @@
          s% pg% Color_Magnitude2_xmax = Color_Magnitude2_xmax
          s% pg% Color_Magnitude2_xmin = Color_Magnitude2_xmin
          s% pg% Color_Magnitude2_dxmin = Color_Magnitude2_dxmin
-         s% pg% Color_Magnitude2_max_width = Color_Magnitude2_max_width
          s% pg% Color_Magnitude2_num_panels = Color_Magnitude2_num_panels
          s% pg% Color_Magnitude2_xaxis1_name = Color_Magnitude2_xaxis1_name
          s% pg% Color_Magnitude2_xaxis2_name = Color_Magnitude2_xaxis2_name
@@ -5479,7 +5324,6 @@
          s% pg% Color_Magnitude3_xmax = Color_Magnitude3_xmax
          s% pg% Color_Magnitude3_xmin = Color_Magnitude3_xmin
          s% pg% Color_Magnitude3_dxmin = Color_Magnitude3_dxmin
-         s% pg% Color_Magnitude3_max_width = Color_Magnitude3_max_width
          s% pg% Color_Magnitude3_num_panels = Color_Magnitude3_num_panels
          s% pg% Color_Magnitude3_xaxis1_name = Color_Magnitude3_xaxis1_name
          s% pg% Color_Magnitude3_xaxis2_name = Color_Magnitude3_xaxis2_name
@@ -5522,7 +5366,6 @@
          s% pg% Color_Magnitude4_xmax = Color_Magnitude4_xmax
          s% pg% Color_Magnitude4_xmin = Color_Magnitude4_xmin
          s% pg% Color_Magnitude4_dxmin = Color_Magnitude4_dxmin
-         s% pg% Color_Magnitude4_max_width = Color_Magnitude4_max_width
          s% pg% Color_Magnitude4_num_panels = Color_Magnitude4_num_panels
          s% pg% Color_Magnitude4_xaxis1_name = Color_Magnitude4_xaxis1_name
          s% pg% Color_Magnitude4_xaxis2_name = Color_Magnitude4_xaxis2_name
@@ -5565,7 +5408,6 @@
          s% pg% Color_Magnitude5_xmax = Color_Magnitude5_xmax
          s% pg% Color_Magnitude5_xmin = Color_Magnitude5_xmin
          s% pg% Color_Magnitude5_dxmin = Color_Magnitude5_dxmin
-         s% pg% Color_Magnitude5_max_width = Color_Magnitude5_max_width
          s% pg% Color_Magnitude5_num_panels = Color_Magnitude5_num_panels
          s% pg% Color_Magnitude5_xaxis1_name = Color_Magnitude5_xaxis1_name
          s% pg% Color_Magnitude5_xaxis2_name = Color_Magnitude5_xaxis2_name
@@ -5608,7 +5450,6 @@
          s% pg% Color_Magnitude6_xmax = Color_Magnitude6_xmax
          s% pg% Color_Magnitude6_xmin = Color_Magnitude6_xmin
          s% pg% Color_Magnitude6_dxmin = Color_Magnitude6_dxmin
-         s% pg% Color_Magnitude6_max_width = Color_Magnitude6_max_width
          s% pg% Color_Magnitude6_num_panels = Color_Magnitude6_num_panels
          s% pg% Color_Magnitude6_xaxis1_name = Color_Magnitude6_xaxis1_name
          s% pg% Color_Magnitude6_xaxis2_name = Color_Magnitude6_xaxis2_name
@@ -5651,7 +5492,6 @@
          s% pg% Color_Magnitude7_xmax = Color_Magnitude7_xmax
          s% pg% Color_Magnitude7_xmin = Color_Magnitude7_xmin
          s% pg% Color_Magnitude7_dxmin = Color_Magnitude7_dxmin
-         s% pg% Color_Magnitude7_max_width = Color_Magnitude7_max_width
          s% pg% Color_Magnitude7_num_panels = Color_Magnitude7_num_panels
          s% pg% Color_Magnitude7_xaxis1_name = Color_Magnitude7_xaxis1_name
          s% pg% Color_Magnitude7_xaxis2_name = Color_Magnitude7_xaxis2_name
@@ -5694,7 +5534,6 @@
          s% pg% Color_Magnitude8_xmax = Color_Magnitude8_xmax
          s% pg% Color_Magnitude8_xmin = Color_Magnitude8_xmin
          s% pg% Color_Magnitude8_dxmin = Color_Magnitude8_dxmin
-         s% pg% Color_Magnitude8_max_width = Color_Magnitude8_max_width
          s% pg% Color_Magnitude8_num_panels = Color_Magnitude8_num_panels
          s% pg% Color_Magnitude8_xaxis1_name = Color_Magnitude8_xaxis1_name
          s% pg% Color_Magnitude8_xaxis2_name = Color_Magnitude8_xaxis2_name
@@ -5737,7 +5576,6 @@
          s% pg% Color_Magnitude9_xmax = Color_Magnitude9_xmax
          s% pg% Color_Magnitude9_xmin = Color_Magnitude9_xmin
          s% pg% Color_Magnitude9_dxmin = Color_Magnitude9_dxmin
-         s% pg% Color_Magnitude9_max_width = Color_Magnitude9_max_width
          s% pg% Color_Magnitude9_num_panels = Color_Magnitude9_num_panels
          s% pg% Color_Magnitude9_xaxis1_name = Color_Magnitude9_xaxis1_name
          s% pg% Color_Magnitude9_xaxis2_name = Color_Magnitude9_xaxis2_name
@@ -6388,7 +6226,6 @@
          History_Panels5_yaxis_reversed(:) = .false.
          History_Panels5_other_yaxis_reversed(:) = .false.
          History_Panels5_yaxis_log(:) = .false.
-         History_Panels5_other_yaxis_log(:) = .false.
          History_Panels5_same_yaxis_range(:) = .false.
          History_Panels5_ymin(:) = 0
          History_Panels5_other_ymin(:) = 0

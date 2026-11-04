@@ -23,6 +23,13 @@ For a more in-depth look at the new build system, see :doc:`developing/build-sys
 
 ``Tsurf_factor`` and the associated controls and history column have been removed as they affected nothing. These controls were effectively deprecated after the removal of the black body boundary condition in 21.12.1.
 
+A substantial clean up of old or deprecated controls has been undertaken in
+``star``, ``binary``, PGSTAR, and PGBINARY.
+
+Removed the unused ``RSP_Qvisc_*`` controls for the obsolete ``Qvisc`` form
+(Section 4.2 of |MESA III|). Use ``Pvsc`` instead: ``RSP_cq`` and ``RSP_zsh``
+for RSP, or ``use_Pvsc_art_visc`` for ``v_flag`` hydrodynamics.
+
 .. _New Features main:
 
 New Features
@@ -47,9 +54,19 @@ Additional controls are available for TDC envelope remeshing:
 - ``TDC_hydro_nz_inner`` adds geometrically spaced zones near the inner boundary.
 - ``TDC_hydro_nz_T_gradient`` adds zones according to the variation in ``logT`` below ``TDC_hydro_T_anchor`` while retaining the mass-based mesh.
 
+PGSTAR HR diagrams can now show labeled lines of constant stellar radius.
+Set ``show_HR_radius_lines = .true.`` in ``&pgstar`` to enable them (default
+``.false.``). See :ref:`reference/pgstar:HR window` and
+`gh-1091 <https://github.com/MESAHub/mesa/pull/1091>`_.
+
 Additional ``pgstar`` plots to visualize residuals of equations:
 - Kippenhahn-style diagram (with mass on the y-axis and model number on the x-axis) colored by ``safe_log10(maxval(abs(s%equ(1:neq, k))))``, which is the logarithm of the absolute value of the biggest residual at cell ``k`` for the *accepted* iteration of MESA's Newton-Raphson solver. The y-axis can be mass, logR, or tau.
 - Time evolution of the maximum residual across mesh points for each structure equation (ignores chemical composition equations). See ``Kipp_residuals_*`` and ``Max_eq_resid_*`` in ``pgstar.defaults``
+
+Substantial work has been done to improve the remapping of rotation profiles
+during mesh adjustments, reducing errors in angular velocity profiles while
+conserving total angular momentum. See
+`gh-1047 <https://github.com/MESAHub/mesa/issues/1047>`_.
 
 .. _Bug Fixes main:
 
@@ -59,6 +76,14 @@ Bug Fixes
 Corrected terms in the Bremsstrahlung routines of the ``neu`` module including the Fermi temperature and its derivative.
 See `gh-1103 <https://github.com/MESAHub/mesa/pull/1103>`_.
 
+Fixed an issue where the `find0_quadratic` subroutine provided by the `num` module could accidentally divide by 0 when the points used for the quadratic interpolant did not bracket a root.
+
+Fixed ``switch_to_radiative`` zeroing saved ``mlt_vc`` during TDC photo
+restarts and preparation for a new step. Mixing cleanup now preserves
+the velocity until it has been copied to ``mlt_vc_old``.
+
+Fixed: ``gold2_tolerances`` accidentally used ``gold_solver_iters_timestep_limit`` instead of ``gold2_solver_iters_timestep_limit``.
+
 Corrected the Skye ionization energy offset, which was too large by the mean
 mass number ``abar`` when ``Skye_use_ion_offsets = .true.``. The ionization
 energies now use double-precision literals. See
@@ -66,6 +91,20 @@ energies now use double-precision literals. See
 `gh-1086 <https://github.com/MESAHub/mesa/issues/1086>`_.
 
 Fixed a typo in the OPLIB hydrogen grid that could cause incorrect opacities or interpolation failures at low hydrogen abundance; see `gh-1078 <https://github.com/MESAHub/mesa/pull/1078>`_.
+
+Fixed a bug in the dPrad/dm temperature equation where rotational mixing could
+remove the convective heat flux contribution, and the contribution from
+semiconvection was also omitted.
+
+MESA's profile output columns previously reported ``conv_vel`` as an effective
+speed that could include overshooting, semiconvection, thermohaline mixing,
+rotation, and other contributions to ``D_mix``. This label gave users the false
+sense that ``conv_vel`` was purely the convection velocity from MLT/TDC. This
+has been amended to provide clarity to users. ``conv_vel`` now reports only
+the convective mixing velocity, including predictive mixing. ``mlt_vc`` remains
+the physical convective velocity from MLT/TDC. A new profile column
+``effective_mixing_speed`` (or ``eff_mix_speed``) now reports the effective
+speed from total ``D_mix``.
 
 Removed duplicate treatment of ``n14(a,g)f18(e+nu)o18`` in networks that
 include both the explicit hot CNO reactions and the corresponding approximate
