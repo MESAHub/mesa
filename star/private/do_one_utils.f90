@@ -669,9 +669,9 @@
             delta_nu = 0d0
          end if
 
-         if (s% dxdt_nuc_factor > 0d0) then
+         if (s% dxdt_nuc_factor > 0d0 .and. .not. s% RSP_flag) then
             k = maxloc(s% eps_nuc(1:nz), dim=1)
-            peak_burn_vconv_div_cs = s% conv_vel(k)/s% csound(k)
+            peak_burn_vconv_div_cs = s% mlt_vc(k)/s% csound(k)
          else
             peak_burn_vconv_div_cs = 0d0
          end if
@@ -740,7 +740,7 @@
                peak_burn_vconv_div_cs / s% peak_burn_vconv_div_cs_limit, &
                peak_burn_vconv_div_cs, s% peak_burn_vconv_div_cs_limit
             k = maxloc(s% eps_nuc(1:nz), dim=1)
-            write(*,2) 'maxloc eps_nuc', k, s% conv_vel(k), s% csound(k), s% eps_nuc(k)
+            write(*,2) 'maxloc eps_nuc', k, s% mlt_vc(k), s% csound(k), s% eps_nuc(k)
             call mesa_error(__FILE__,__LINE__,'test do_one_utils')
          end if
 

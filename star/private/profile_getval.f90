@@ -1384,20 +1384,48 @@
                int_flag = .true.
 
             case (p_conv_vel_div_mlt_vc)
-               if (s% mlt_vc(k) > 0d0) val = s% conv_vel(k)/s% mlt_vc(k)
+               if (.not. s% RSP_flag) then
+                  if (s% mlt_vc(k) > 0d0) val = s% conv_vel(k)/s% mlt_vc(k)
+               end if
+            case (p_eff_mix_speed_div_mlt_vc, p_effective_mixing_speed_div_mlt_vc)
+               if (.not. s% RSP_flag) then
+                  if (s% mlt_vc(k) > 0d0) val = get_effective_mixing_speed(s,k)/s% mlt_vc(k)
+               end if
 
             case (p_conv_vel)
                val = s% conv_vel(k)
+            case (p_eff_mix_speed, p_effective_mixing_speed)
+               val = get_effective_mixing_speed(s,k)
             case (p_dt_times_conv_vel_div_mixing_length)
-               val = s% dt*s% conv_vel(k)/s% mlt_mixing_length(k)
+               if (.not. s% RSP_flag .and. s% mixing_length_alpha > 0d0) then
+                  if (s% mlt_mixing_length(k) > 0d0) &
+                     val = s% dt*s% conv_vel(k)/s% mlt_mixing_length(k)
+               end if
+            case (p_dt_times_eff_mix_speed_div_mixing_length, p_dt_times_effective_mixing_speed_div_mixing_length)
+               if (.not. s% RSP_flag .and. s% mixing_length_alpha > 0d0) then
+                  if (s% mlt_mixing_length(k) > 0d0) &
+                     val = s% dt*get_effective_mixing_speed(s,k)/s% mlt_mixing_length(k)
+               end if
             case (p_log_dt_times_conv_vel_div_mixing_length)
-               val = safe_log10(s% dt*s% conv_vel(k)/s% mlt_mixing_length(k))
+               if (.not. s% RSP_flag .and. s% mixing_length_alpha > 0d0) then
+                  if (s% mlt_mixing_length(k) > 0d0) &
+                     val = safe_log10(s% dt*s% conv_vel(k)/s% mlt_mixing_length(k))
+               end if
+            case (p_log_dt_times_eff_mix_speed_div_mixing_length, p_log_dt_times_effective_mixing_speed_div_mixing_length)
+               if (.not. s% RSP_flag .and. s% mixing_length_alpha > 0d0) then
+                  if (s% mlt_mixing_length(k) > 0d0) &
+                     val = safe_log10(s% dt*get_effective_mixing_speed(s,k)/s% mlt_mixing_length(k))
+               end if
             case (p_log_conv_vel)
                val = safe_log10(s% conv_vel(k))
+            case (p_log_eff_mix_speed, p_log_effective_mixing_speed)
+               val = safe_log10(get_effective_mixing_speed(s,k))
             case (p_conv_vel_div_L_vel)
                val = s% conv_vel(k)/max(1d0,get_L_vel(k))
             case (p_conv_vel_div_csound)
                val = s% conv_vel(k)/s% csound_face(k)
+            case (p_eff_mix_speed_div_csound, p_effective_mixing_speed_div_csound)
+               val = get_effective_mixing_speed(s,k)/s% csound_face(k)
             case (p_dvc_dt_TDC_div_g)
                val = s%dvc_dt_TDC(k) / s%grav(k)
             case (p_mix_type)
@@ -1685,9 +1713,9 @@
             case (p_log_mlt_Gamma)
                val = safe_log10(s% mlt_Gamma(k))
             case (p_log_mlt_vc)
-               val = safe_log10(s% mlt_vc(k))
+               if (.not. s% RSP_flag) val = safe_log10(s% mlt_vc(k))
             case (p_mlt_vc)
-               val = s% mlt_vc(k)
+               if (.not. s% RSP_flag) val = s% mlt_vc(k)
             case (p_mlt_D)
                val = s% mlt_D(k)
             case (p_mlt_gradT)

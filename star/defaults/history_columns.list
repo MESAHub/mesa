@@ -100,7 +100,10 @@
 
 !# mixing and convection
 
-      !max_conv_vel_div_csound
+      !max_conv_vel_div_csound ! maximum mlt_vc/csound from mlt/TDC; zero for RSP
+      !max_effective_mixing_speed_div_csound ! maximum effective mixing speed divided by sound speed
+      !max_eff_mix_speed_div_csound ! same as max_effective_mixing_speed_div_csound
+         ! All three maxima use max_conv_vel_div_csound_maxq to select zones.
       !max_gradT_div_grada
       !max_gradT_sub_grada
       !min_log_mlt_Gamma
@@ -447,7 +450,7 @@
       !dt_div_min_dr_div_cs
       !log_dt_div_min_dr_div_cs
 
-      !min_t_eddy ! minimum value of scale_height/conv_velocity
+      !min_t_eddy ! minimum value of scale_height/conv_vel, including predictive mixing
 
 !----------------------------------------------------------------------------------------------
 

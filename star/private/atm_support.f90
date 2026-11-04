@@ -523,8 +523,8 @@ contains
        if (s% report_ierr) write(*, *) s% retry_message
        return
     end if
-    
-    ! If completely off the table, use the same 
+
+    ! If completely off the table, use the same
     ! attachment depth for the table and backup atmosphere.
     call atm_get_table_base(table_id, tau_base, ierr)
     if (ierr /= 0) then

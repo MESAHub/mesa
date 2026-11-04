@@ -40,8 +40,8 @@
       logical :: have_ST_start_info
 
       ! convection
-      real(dp), pointer, dimension(:) :: mlt_vc ! (nz)
-      real(dp), pointer, dimension(:) :: conv_vel ! (nz)
+      real(dp), pointer, dimension(:) :: mlt_vc ! (nz) mlt/TDC velocity for the thermal state (cm/sec)
+      real(dp), pointer, dimension(:) :: conv_vel ! (nz) convective mixing velocity, including predictive mixing (cm/sec)
 
       ! vectors of structure variables: xh(i,k) holds hydro structure variable i for point k.
          ! note: abundances are in xa, not in xh.  dq, j_rot, and omega are not in xh.
