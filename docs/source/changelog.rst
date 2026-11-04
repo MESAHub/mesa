@@ -73,6 +73,9 @@ conserving total angular momentum. See
 Bug Fixes
 ---------
 
+Incomplete split burns now trigger a stellar retry when they reach
+``burn_steps_hard_limit``.
+
 Fixed ``switch_to_radiative`` zeroing saved ``mlt_vc`` during TDC photo
 restarts and preparation for a new step. Mixing cleanup now preserves
 the velocity until it has been copied to ``mlt_vc_old``.
