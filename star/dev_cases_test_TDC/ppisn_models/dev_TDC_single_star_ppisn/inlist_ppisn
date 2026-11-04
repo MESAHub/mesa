@@ -383,7 +383,8 @@ mass_fraction_limit_for_Skye = 1d-8
 
    x_ctrl(17) = 5d4 ! km/s: cap the emergency fixed surface velocity.
 
-   x_integer_ctrl(2) = 1 ! Surface ejecta removal: 0 disabled, 1 direct.
+   x_integer_ctrl(2) = 1 ! Direct surface ejecta removal: 0 disabled, 1 enabled.
+                         ! Removal through relaxation is controlled separately.
                          ! (surface_ejecta_removal_mode)
    x_ctrl(18) = 1d4 ! Minimum radius in Rsun for removal.
                     ! (surface_ejecta_radius_limit)
@@ -399,8 +400,9 @@ mass_fraction_limit_for_Skye = 1d-8
 
    TDC_adjust_mass_fallback_to_mlt = .true.
 
-   x_logical_ctrl(1) = .false.! If true, terminate after evolving 100d after first relax
-                              ! (stop_100d_after_pulse)
+   x_logical_ctrl(1) = .false. ! Stop 100 days after the first relaxation or at the onset
+                               ! of the second pulse.
+                               ! (stop_after_first_relax_or_second_onset)
 
    x_logical_ctrl(3) = .false. ! Enable RTI during Riemann-hydro phases.
                               ! (use_RTI_during_hydro)

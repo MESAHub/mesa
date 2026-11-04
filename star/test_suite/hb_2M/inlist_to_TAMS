@@ -1,5 +1,7 @@
 &star_job
 
+      pgstar_flag = .true.
+
       create_pre_main_sequence_model = .true.
       load_saved_model = .false.
 
@@ -84,28 +86,3 @@
       write_header_frequency = 10
       
 / ! end of controls namelist
-
-&pgstar
-      
-      !Grid2_win_flag = .true.
-      !file_digits = 7
-      !Grid2_file_dir = 'png'
-      !Grid2_file_prefix = 'grid'
-
-      !Abundance_xmax = 0.5
-
-      !Kipp_win_flag = .true.
-      
-      !Kipp_xaxis_name = 'star_age'
-      !Kipp_xaxis_in_Myr = .true.
-      !Kipp_win_width = 9
-      !Kipp_win_aspect_ratio = 0.75 ! aspect_ratio = height/width
-      !Kipp_show_burn = .false.
-      !Kipp_mass_max = 0.16 ! (Msun units) negative means use default
-      !Kipp_mass_max = -1 ! (Msun units) negative means use default
-      !Kipp_xmin = -1 ! step number.  negative means use default.
-      !Kipp_max_width = 0 ! only used if > 0.  causes xmin to move with xmax.
-      !Kipp_mix_interval = 1
-
-/ ! end of pgstar namelist
-

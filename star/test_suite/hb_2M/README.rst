@@ -13,7 +13,6 @@ We also provide in this doc figures comparing the results obtained using Predict
 with results obtained using CPM (see |MESA V|) schemes
 (see section `Comparing results obtained with CPM and Predictive mixing`_ below).
 
-
 Building the TAMS model
 =======================
 
@@ -22,6 +21,9 @@ The initial model is created by evolving a model from the pre-main sequence to t
 Inlists for MESA are composed of three main sections labelled ``&star_job``, ``&controls``.
 and ``&pgstar``. The ``&star_job`` section contains instructions about which MESA modules should be used, while the ``&controls`` section is where the star module options are specified.
 The ``&pgstar`` section contains the commands for creating pgstar plots. See Josiah's doc for info on this section (TBD).
+
+All three stages read ``inlist_pgstar`` through their header inlists.
+It displays the Grid6 window and saves a PNG in ``png/`` every five models.
 
 &star_job
 ---------
@@ -120,6 +122,11 @@ We write info to the terminal every 10 steps (default is 1), and we output the l
    :start-after:  output controls
    :end-before: end of controls
 
+.. figure:: ../../../star/test_suite/hb_2M/docs/hb_2M_tams.png
+   :alt: Grid6 snapshot near the end of the main sequence.
+
+   Grid6 output near TAMS, when hydrogen in the core is nearly exhausted.
+
 
 Building the ZACHeB model
 =========================
@@ -148,10 +155,7 @@ We use the same metal fraction, opacity tables, and nuclear reactions network as
 ---------
 
 As before, we use the dedt form of the energy equation for good energy conservation.
-In addition, our model will go through helium flash, which is very difficult to model.
-In order for MESA to pass the helium flash without going to extremely small timesteps,
-it is sometimes useful to relax some of the very strict convergence controls.
-This is in particular true when using the mixing controls we choose to use in this case.
+The solver checks the energy equation residuals throughout the helium flash.
 
 .. literalinclude:: ../../../star/test_suite/hb_2M/inlist_to_ZACHeB
    :start-after: &controls
@@ -162,7 +166,7 @@ Again we specify that we use the Type 2 opacities with a base metallicity of 0.0
 We use the same mixing controls as for the PMS-to-TAMS part of the evolution.
 
 .. literalinclude:: ../../../star/test_suite/hb_2M/inlist_to_ZACHeB
-   :start-after: flash
+   :start-at: initial_mass
    :end-before: num_
 
 We use the ``HB_limit`` control to find the beginning of the Horizontal Branch (our ZACheB model).
@@ -175,17 +179,23 @@ We use the ``HB_limit`` control to find the beginning of the Horizontal Branch (
 
 
 .. literalinclude:: ../../../star/test_suite/hb_2M/inlist_to_ZACHeB
-   :start-after: HB
-   :end-before: output
+   :start-at: max_model_number =
+   :end-at: max_model_number =
 
 We specify the output. We define a LOG directory for this part of the evolution, ``log_directory = 'LOGS_POSTMS'``.
 We save a photo every 500 steps (default is 50). We use 5 digits for the photo_name (default is 3).
 We write a profile every 500 steps (default is 50), and write a line in the history file every step (default is 5).
-We write info to the terminal every 20 steps (default is 1), and we output the log header to the terminal every 100 times we write step info (which is the default)
+We write info to the terminal every 10 steps (default is 1), and we output the log header to the terminal every 100 times we write step info (which is the default)
 
 .. literalinclude:: ../../../star/test_suite/hb_2M/inlist_to_ZACHeB
    :start-after: output controls
    :end-before: end of
+
+.. figure:: ../../../star/test_suite/hb_2M/docs/hb_2M_zacheb.png
+   :alt: Grid6 snapshot near the start of core helium burning.
+
+   Grid6 output near ZACHeB, after the helium flash and at the start of
+   stable core helium burning.
 
 
 Evolution along the CHeB
@@ -211,6 +221,11 @@ As before, we use the dedt form of the energy equation for good energy conservat
 
 We use the same mass, initial_z, opacities, and mixing controls as previously. Note that here, in order to prevent the occurrence of breathing pulses at the end of the CHeB evolution, we use the control ``predictive_avoid_reversal(1)='he4'`` (see `MESAIV <https://arxiv.org/pdf/1710.08424.pdf>`__)..
 
+The test records the convective core mass when the central helium mass
+fraction first falls below 0.5. At the end of the run, it checks that this
+mass lies between 0.14 and 0.25 solar masses, as specified by ``x_ctrl(1)``
+and ``x_ctrl(2)``.
+
 .. literalinclude:: ../../../star/test_suite/hb_2M/inlist_hb_2M
    :start-after: controls
    :end-before: num_cells
@@ -233,12 +248,17 @@ We specify the output. Here we use the default LOG directory, so we do not speci
    :start-after: output controls
    :end-before: num_trace_history_values = 2
 
+.. figure:: ../../../star/test_suite/hb_2M/docs/hb_2M_tacheb.png
+   :alt: Grid6 snapshot near the end of core helium burning.
 
-
-
+   Grid6 output near TACHeB, when helium in the core is nearly exhausted.
+   The age is measured from the start of core helium burning.
 
 Convergence study
 =================
+
+The following figures come from separate runs that compare timestep limits
+and the treatment of breathing pulses.
 
 In this section we show results obtained using the controls of the test_suite inlist, as well as results obtained using a smaller allowed maximum timestep ``max_years_for_timestep=1d5``. We also show results obtained using the smaller timestep and allowing the breathing pulses to occur. We show that the timestep used in the test_case inlist does NOT produce converged results.
 
@@ -267,3 +287,5 @@ Comparing results obtained with CPM and Predictive mixing
 =========================================================
 
 In the figure below we show the evolution of the convective core boundary and of the central helium abundance along the CHeB, using the CPM and the Predictive schemes.
+
+Last-Updated: 04Nov2026 (MESA 9dc715cca) by EbF.

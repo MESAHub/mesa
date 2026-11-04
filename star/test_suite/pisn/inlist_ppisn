@@ -371,7 +371,8 @@ mass_fraction_limit_for_Skye = 1d-8
 
    x_ctrl(17) = 5d4 ! km/s: cap the emergency fixed surface velocity.
 
-   x_integer_ctrl(2) = 1 ! Surface ejecta removal: 0 disabled, 1 direct.
+   x_integer_ctrl(2) = 1 ! Direct surface ejecta removal: 0 disabled, 1 enabled.
+                         ! Removal through relaxation is controlled separately.
                          ! (surface_ejecta_removal_mode)
    x_ctrl(18) = 1d4 ! Minimum radius in Rsun for removal.
                     ! (surface_ejecta_radius_limit)

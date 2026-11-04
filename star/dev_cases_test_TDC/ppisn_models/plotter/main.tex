@@ -1,0 +1,213 @@
+\documentclass[tikz,border=6pt,multi=tikzpicture]{standalone}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric}
+% Control flow adapted from Josiah Schwab's MESA documentation diagram.
+% https://docs.mesastar.org/en/latest/using_mesa/extending_mesa.html#control-flow
+% Order checked against star/job/run_star_support.f90 and
+% star/private/struct_burn_mix.f90. Page 2 maps the implemented routines.
+% Styling follows the restrained schematics in MESA I Fig. 9 and IV Fig. 52.
+% Regenerate: python plotter/plot.py (from the ppisn_models directory).
+\newcommand{\rtn}[1]{\texttt{\detokenize{#1}}}
+\definecolor{mesaStep}{HTML}{1F5A91}
+\definecolor{mesaSurface}{HTML}{167C6B}
+\definecolor{mesaPhysics}{HTML}{A45A14}
+\newcommand{\stepcall}[1]{\textcolor{mesaStep}{\rtn{#1}}}
+\newcommand{\ejectacall}[1]{\textcolor{mesaSurface}{\rtn{#1}}}
+\newcommand{\physicscall}[1]{\textcolor{mesaPhysics}{\rtn{#1}}}
+\ifdefined\BinaryProduct
+  \newcommand{\FlowTitle}{Binary-product PISN and PPISN control flow}
+  \newcommand{\ModelSource}{Imported model: \rtn{binary_progenitor.mod}}
+  \newcommand{\LoadModel}{Load binary-product model\\or restart a photo}
+  \newcommand{\StructureTitle}{Binary-product routine organization and calls}
+\else
+  \newcommand{\FlowTitle}{PISN and PPISN control flow}
+  \newcommand{\ModelSource}{Helium-star preparation or saved \rtn{he_dep.mod}}
+  \newcommand{\LoadModel}{Create / load model or read photo}
+  \newcommand{\StructureTitle}{Single-star routine organization and calls}
+\fi
+\hyphenpenalty=10000
+\tikzset{
+  every node/.style={font=\rmfamily\fontsize{9.5}{11.5}\selectfont},
+  base/.style={align=center,inner sep=4pt,text width=5.1cm,minimum height=5mm},
+  core/.style={base},
+  hook/.style={base,draw=mesaStep,text=mesaStep,line width=.5pt},
+  frame/.style={base,draw=black,line width=.5pt},
+  note/.style={base,align=flush left,text width=8cm,inner sep=0pt},
+  decision/.style={base,draw,diamond,aspect=3,text width=1.8cm,inner sep=1.5pt},
+  arrow/.style={-{Latex[length=1.7mm,width=1.2mm]},line width=.5pt},
+  link/.style={draw=black!50,densely dashed,line width=.4pt},
+  label/.style={font=\rmfamily\fontsize{8.5}{10}\selectfont,fill=white,inner sep=2pt}
+}
+\begin{document}
+% Page 1: driver sequence at left, case-specific work at right.
+\begin{tikzpicture}
+\node[font=\bfseries\fontsize{11}{13}\selectfont] at (7.7,1.35) {\FlowTitle};
+\node at (7.7,.75) {\ModelSource};
+\node at (3,.25) {\textit{MESA driver}};
+\node at (10.95,.25) {\textit{Case-specific work}};
+\draw[line width=.5pt] (.25,-.1) -- (5.75,-.1);
+\draw[line width=.5pt] (6.9,-.1) -- (15,-.1);
+\node[core] (read) at (3,-.8) {Read inlists};
+\node[hook] (controls) at (3,-1.65) {\rtn{extras_controls}};
+\node[core] (load) at (3,-2.5) {\LoadModel};
+\node[hook] (startup) at (3,-3.35) {\rtn{extras_startup}};
+\node[core] (prepare) at (3,-4.6) {Prepare for a model step};
+\node[hook] (start) at (3,-5.55) {\rtn{extras_start_step}};
+\node[frame,text width=5.5cm,minimum height=43mm] (take) at (3,-8.3) {};
+\node[align=center] at (3,-6.95)
+  {\rtn{star_evolve_step}\\Mesh and mass preparation};
+\node[hook,text width=4.7cm,inner sep=3pt] (before_solve) at (3,-7.95)
+  {\rtn{my_before_struct_burn_mix}};
+\node[frame,text width=4.6cm,inner sep=3pt,minimum height=15mm] (newton) at (3,-9.3)
+  {\textbf{Global Newton iterations}\\Residuals and Jacobian\\Corrections; test convergence};
+\draw[arrow] (before_solve.south) -- (newton.north);
+\draw[arrow] ([yshift=-2mm]newton.east) -- ++(3mm,0)
+  |- ([yshift=2mm]newton.east);
+\node[core] (check) at (3,-11.1) {\rtn{star_check_model}};
+\node[hook] (extra_check) at (3,-11.95) {\rtn{extras_check_model}};
+\node[core] (pick) at (3,-12.8) {\rtn{star_pick_next_timestep}};
+\node[decision] (result) at (3,-13.9) {Result?};
+\node[hook] (finish) at (3,-15.25) {\rtn{extras_finish_step}};
+\node[decision] (continue) at (3,-16.4) {Continue?};
+\node[core] (save) at (3,-17.8)
+  {Native finish and output\\\rtn{star_finish_step}\\PGSTAR and \rtn{do_saves}};
+\node[note] (controls_note) at (10.95,-1.65)
+  {Register callbacks and physics hooks.\\Read the inlist controls.};
+\node[note] (startup_note) at (10.95,-3.35)
+  {Initialize state, or restore hydro, RTI and the\\saved surface BC after a photo restart.};
+\node[note] (start_note) at (10.95,-5.55)
+  {\ejectacall{remove_surface_ejecta}: eligible direct cuts.\\
+   \ejectacall{relax_after_pulse}: conditional relaxation.\\
+   Gamma diagnostics, hydro / RTI and pulse timing.\\
+   \textit{Once per model step, outside the retry loop.}};
+\node[note] (try_note) at (10.95,-7.95)
+  {Reload hydro controls; \textcolor{mesaSurface}{reapply the saved BC}.\\Set velocity, timestep, wind and solver limits.\\
+   \textit{Each structural attempt; explicit calls also occur\\
+   in the start-step and relaxation paths.}};
+\node[note] (newton_note) at (10.95,-9.75)
+  {Global coupled solve across the stellar mesh.\\
+   Iterate until convergence, or leave the attempt.\\
+   \textcolor{mesaPhysics}{Physics hooks are evaluated where needed.}};
+\draw[link] (newton.east |- newton_note.west) -- (newton_note.west);
+\node[note] (check_note) at (10.95,-11.95)
+  {Check complete disruption\\on the converged candidate.\\Advance through checks only while \rtn{keep_going}.};
+\node[note] (finish_note) at (10.95,-15.25)
+  {Update counters and optional pulse stops.\\Also called on termination:\\preserve the existing error or limit reason.};
+\node[core,text width=8cm] (final) at (10.95,-16.9)
+  {Normal termination: save final files.\\Errors retain their failure reason.};
+\node[hook,text width=8cm] (after) at (10.95,-18.35) {\rtn{extras_after_evolve}};
+\node[note,align=center] at (10.95,-19.15)
+  {End-of-run callback\\Test-suite validation where enabled};
+\foreach \a/\b in {read/controls,controls/load,load/startup,startup/prepare,
+  prepare/start,start/take,take/check,check/extra_check,extra_check/pick,pick/result,
+  result/finish,finish/continue,continue/save,final/after}
+  \draw[arrow] (\a.south) -- (\b.north);
+\draw[arrow] (result.west) -- node[label,above]{retry / redo} (-.4,-13.9)
+  -- node[label,rotate=90,above]{prepare retry / redo} (-.4,-8.3) -- (take.west);
+\draw[arrow] (save.west) -- (-1.2,-17.8)
+  -- node[label,rotate=90,above]{next model step} (-1.2,-4.6) -- (prepare.west);
+\draw[arrow] (continue.east) -- node[label,above]{no} (6.5,-16.4) |- (final.west);
+\node[label,right] at (3.1,-14.65) {keep going or terminate};
+\node[label,right] at (3.1,-17.1) {yes};
+\foreach \a/\b in {controls/controls_note,startup/startup_note,start/start_note,
+  before_solve/try_note,extra_check/check_note,finish/finish_note}
+  \draw[link] (\a.east) -- (\b.west);
+\node[align=flush left,text width=15.9cm,font=\fontsize{8.5}{10}\selectfont] at (7.15,-19.95)
+  {\textcolor{mesaStep}{Blue}: step callbacks; \textcolor{mesaSurface}{teal}: ejecta and surface BCs;
+   \textcolor{mesaPhysics}{ochre}: physics hooks.};
+\end{tikzpicture}
+% Page 2: actual module order and selected calls, not lexical nesting.
+\begin{tikzpicture}
+\node[font=\bfseries\fontsize{11}{13}\selectfont] at (9,.9)
+  {\StructureTitle};
+\node at (3.35,.15) {\textit{Order in \rtn{src/run_star_extras.f90}}};
+\node at (12.9,.15) {\textit{Selected calls from \rtn{extras_start_step}}};
+\draw[line width=.6pt] (0,-.2) -- (6.7,-.2);
+\draw[line width=.6pt] (7.7,-.2) -- (18.1,-.2);
+\node[anchor=north west,align=left,inner sep=0pt] at (0,-.55) {
+  \begin{tabular}{@{}l@{}}
+  State indices and control definitions\\
+  \stepcall{extras_controls}\\
+  \stepcall{extras_startup}\\[8pt]
+  \textit{Step callbacks}\\[3pt]
+  \stepcall{extras_start_step}\\
+  \stepcall{my_before_struct_burn_mix}\\
+  \stepcall{extras_check_model}\\
+  \stepcall{extras_finish_step}\\
+  \stepcall{extras_after_evolve}\\[8pt]
+  \textit{History and profile callbacks}\\[3pt]
+  \rtn{how_many_extra_history_columns}\\
+  \rtn{data_for_extra_history_columns}\\
+  \rtn{how_many_extra_profile_columns}\\
+  \rtn{data_for_extra_profile_columns}\\[8pt]
+  \textit{Action wrappers}\\[3pt]
+  \ejectacall{remove_surface_ejecta}\\
+  \ejectacall{relax_after_pulse}\\[8pt]
+  \textit{Ejecta queries and surface BC helpers}\\[3pt]
+  \ejectacall{find_ejecta_mass_cut_boundary}\\
+  \ejectacall{find_surface_ejecta}\\
+  \ejectacall{estimate_surface_face_temperature}\\
+  \ejectacall{apply_saved_surface_BC}\\
+  \ejectacall{disable_saved_surface_BC}\\
+  \ejectacall{set_T_tau_BC}\\[8pt]
+  \textit{Physics hooks and internal wind routines}\\[3pt]
+  \physicscall{brott_wind}\\
+  \quad \physicscall{eval_Vink_wind}\\
+  \quad \physicscall{eval_Nieuwenhuijzen_wind}\\
+  \quad \physicscall{eval_Hamann_wind}\\
+  \physicscall{my_adjust_mdot}\\
+  \physicscall{my_other_kap_get}\\
+  \physicscall{my_other_eval_fp_ft}\\
+  \physicscall{re_from_rpsi_factor}\\
+  \rtn{null_binary_controls}
+  \end{tabular}
+};
+% A call tree: arrows indicate invocation, not unconditional execution.
+\node[anchor=west,inner sep=0pt] (calls) at (8.2,-.75)
+  {\stepcall{extras_start_step}};
+\node[anchor=west,inner sep=0pt] (find) at (9,-1.7)
+  {\ejectacall{find_surface_ejecta} \textit{(direct mode)}};
+\node[anchor=west,inner sep=0pt] (preflight) at (9.9,-2.4)
+  {\ejectacall{estimate_surface_face_temperature}};
+\node[anchor=west,inner sep=0pt] (remove) at (9,-3.5)
+  {\ejectacall{remove_surface_ejecta} \textit{(eligible cells)}};
+\node[anchor=west,inner sep=0pt] (native_cut) at (9.9,-4.2)
+  {\rtn{star_remove_surface_at_cell_k}};
+\node[anchor=west,inner sep=0pt] (postflight) at (9.9,-4.9)
+  {\ejectacall{estimate_surface_face_temperature}};
+\node[anchor=west,inner sep=0pt] (cut_bc) at (9.9,-5.6)
+  {\ejectacall{apply_saved_surface_BC}};
+\node[anchor=west,inner sep=0pt] (boundary) at (9,-6.8)
+  {\ejectacall{find_ejecta_mass_cut_boundary}};
+\node[anchor=west,inner sep=0pt] (relax) at (9,-7.95)
+  {\ejectacall{relax_after_pulse} \textit{(criteria met)}};
+\node[anchor=west,inner sep=0pt] (disable) at (9.9,-8.7)
+  {\ejectacall{disable_saved_surface_BC}};
+\node[anchor=west,inner sep=0pt] (tau) at (10.8,-9.4)
+  {\ejectacall{set_T_tau_BC} \textit{(if saved BC active)}};
+\node[anchor=west,inner sep=0pt] (relax_before) at (9.9,-10.15)
+  {\stepcall{my_before_struct_burn_mix}};
+\node[anchor=west,inner sep=0pt] (native_relax) at (9.9,-10.9)
+  {\rtn{star_relax_to_star_cut}};
+\node[anchor=west,inner sep=0pt] (final_before) at (9,-12.2)
+  {\stepcall{my_before_struct_burn_mix} \textit{(normal final path)}};
+\node[anchor=west,inner sep=0pt] (normal_bc) at (9.9,-12.95)
+  {\ejectacall{apply_saved_surface_BC}};
+\draw[line width=.45pt] ([xshift=2mm]calls.south west) -- (8.4,-12.2);
+\foreach \name/\y in {find/-1.7,remove/-3.5,boundary/-6.8,relax/-7.95,final_before/-12.2}
+  \draw[arrow] (8.4,\y) -- ([xshift=-1mm]\name.west);
+\draw[line width=.45pt] ([xshift=2mm]find.south west) -- (9.2,-2.4);
+\draw[arrow] (9.2,-2.4) -- ([xshift=-1mm]preflight.west);
+\draw[line width=.45pt] ([xshift=2mm]remove.south west) -- (9.2,-5.6);
+\foreach \name/\y in {native_cut/-4.2,postflight/-4.9,cut_bc/-5.6}
+  \draw[arrow] (9.2,\y) -- ([xshift=-1mm]\name.west);
+\draw[line width=.45pt] ([xshift=2mm]relax.south west) -- (9.2,-10.9);
+\foreach \name/\y in {disable/-8.7,relax_before/-10.15,native_relax/-10.9}
+  \draw[arrow] (9.2,\y) -- ([xshift=-1mm]\name.west);
+\draw[line width=.45pt] ([xshift=2mm]disable.south west) -- (10.1,-9.4);
+\draw[arrow] (10.1,-9.4) -- ([xshift=-1mm]tau.west);
+\draw[line width=.45pt] ([xshift=2mm]final_before.south west) -- (9.2,-12.95);
+\draw[arrow] (9.2,-12.95) -- ([xshift=-1mm]normal_bc.west);
+\end{tikzpicture}
+\end{document}

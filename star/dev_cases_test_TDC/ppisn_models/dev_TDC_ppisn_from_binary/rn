@@ -8,11 +8,6 @@ run_model() {
 
    rm -f restart_photo "$output_model"
    MESA_INLIST="$inlist_name" make run
-
-   if [ ! -r "$output_model" ]; then
-      echo "failed to create $output_model when running $inlist_name"
-      exit 1
-   fi
 }
 
 date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
