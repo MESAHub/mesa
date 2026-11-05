@@ -27,6 +27,7 @@
       use mtx_lib, only: block_multiply_xa
       use utils_lib, only: is_bad
       use solver_support
+      use profiler, only: prof_push, prof_pop
 
       implicit none
 
@@ -715,7 +716,9 @@
             integer, intent(out) :: ierr
             call prepare_solver_matrix(nvar, xder, ierr)
             if (ierr /= 0) return
+            call prof_push('eval_equations')
             call eval_equations(s, nvar, ierr)
+            call prof_pop()
             if (ierr /= 0) return
             call s% other_after_solver_setmatrix(s% id, ierr)
          end subroutine do_equations
@@ -1024,6 +1027,7 @@
                !$OMP END PARALLEL DO SIMD
             end if
 
+            call prof_push('linear_solve')
             select case (trim(s% hydro_matrix_solver))
             case ('bcyclic')
                call factor_bcyclic_mtx(ierr)
@@ -1035,6 +1039,7 @@
                   trim(s% hydro_matrix_solver)
                ierr = -1
             end select
+            call prof_pop()
 
             if (s% use_DGESVX_in_bcyclic) then
                !$OMP PARALLEL DO SIMD

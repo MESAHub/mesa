@@ -6,6 +6,7 @@ MODULE_NAME := utils
 SRCS := public/utils_def.f90 \
 	public/utils_lib.f90 \
 	public/namelist.f90 \
+	public/profiler.f90 \
 	private/utils_c_system.c \
 	private/utils_dict.f90 \
 	private/utils_idict.f90 \
@@ -32,7 +33,7 @@ CHECK_RESULTS_GOLDEN := test/test_output
 
 # Install
 
-MODULES := utils_def.mod utils_lib.mod utils_namelist.mod
+MODULES := utils_def.mod utils_lib.mod utils_namelist.mod profiler.mod
 INSTALL_INCLUDES := formats
 
 include $(MAKE_DIR)/Makefile

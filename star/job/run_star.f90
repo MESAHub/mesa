@@ -26,6 +26,7 @@
          use run_star_support, only: run1_star
          use run_star_extras, only: extras_controls
          use star_lib, only: starlib_shutdown
+         use profiler, only: prof_push, prof_pop, prof_report
          character (len=*) :: inlist_fname_arg
          optional inlist_fname_arg
          logical, parameter :: &
@@ -34,6 +35,7 @@
             restart_okay = .true.
          integer :: id, ierr
          logical :: restart
+         call prof_push('star')
          call run1_star( &
             do_alloc_star, &
             do_free_star, &
@@ -42,6 +44,8 @@
             extras_controls, &
             ierr, &
             inlist_fname_arg)
+         call prof_pop()
+         call prof_report()
          call starlib_shutdown
       end subroutine do_run_star
 

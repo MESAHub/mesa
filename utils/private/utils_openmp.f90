@@ -25,6 +25,7 @@
       public :: eval_OMP_GET_THREAD_NUM
       public :: eval_OMP_GET_MAX_THREADS
       public :: eval_OMP_SET_NUM_THREADS
+      public :: eval_OMP_IN_PARALLEL
 
       integer :: omp_max_threads = -1
 
@@ -47,5 +48,10 @@
          integer, intent(in) :: threads
          call OMP_SET_NUM_THREADS(threads)
       end subroutine eval_OMP_SET_NUM_THREADS
+
+      logical function eval_OMP_IN_PARALLEL()
+         use omp_lib, only: OMP_IN_PARALLEL
+         eval_OMP_IN_PARALLEL = OMP_IN_PARALLEL()
+      end function eval_OMP_IN_PARALLEL
 
       end module utils_openmp

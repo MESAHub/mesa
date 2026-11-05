@@ -23,6 +23,7 @@
       use const_def, only: dp, i8, pi, ln10, boltz_sigma, clight, standard_cgrav, two_thirds, four_thirds, lsun, rsun, no_mixing
       use chem_def, only: chem_isos
       use utils_lib, only: mesa_error, is_bad
+      use profiler, only: prof_push, prof_pop
 
       implicit none
 
@@ -611,7 +612,9 @@
                end if
             end if
 
+            call prof_push('mlt')
             call set_mlt_vars(s, nzlo, nzhi, ierr)
+            call prof_pop()
             if (failed('set_mlt_vars')) return
             if (dbg) write(*,*) 'call check_for_redo_MLT'
 

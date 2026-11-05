@@ -30,6 +30,7 @@
       use net_def
       use net_lib
       use other_extras
+      use profiler, only: prof_push, prof_pop
 
       implicit none
 
@@ -96,10 +97,12 @@
          11 format(a35, f20.10)
 
          restart_filename = 'restart_photo'
+         call prof_push('startup')
          call start_run1_star( &
             do_alloc_star, do_free_star, okay_to_restart, &
             id, restart, restart_filename, pgstar_ok, dbg, &
             extras_controls, ierr, inlist_fname_arg)
+         call prof_pop()
          if (failed('do_before_evolve_loop',ierr)) return
 
          call star_ptr(id, s, ierr)
@@ -108,14 +111,20 @@
          continue_evolve_loop = .true.
 
          if (dbg) write(*,*) 'start evolve_loop'
+         call prof_push('evolve')
          evolve_loop: do while(continue_evolve_loop)  ! evolve one step per loop
 
             continue_evolve_loop = do_evolve_one_step(s, dbg, ierr)
-            if (failed('do_evolve_one_step',ierr)) return
+            if (failed('do_evolve_one_step',ierr)) then
+               call prof_pop()
+               return
+            end if
 
          end do evolve_loop
-
+         call prof_pop()
+         call prof_push('after_evolve')
          call after_evolve_loop(s% id, do_free_star, ierr)
+         call prof_pop()
          if (failed('after_evolve_loop',ierr)) return
 
       end subroutine run1_star
@@ -188,7 +197,9 @@
          id = s% id
          continue_evolve_loop = .true.
 
+         call prof_push('before_step_loop')
          call before_step_loop(s% id, ierr)
+         call prof_pop()
          if (failed('before_step_loop',ierr)) return
 
          result = s% extras_start_step(id)
@@ -207,10 +218,16 @@
                exit step_loop
             end if
 
+            call prof_push('star_evolve_step')
             result = star_evolve_step(id, first_try)
+            call prof_pop()
+            call prof_push('check_model')
             if (result == keep_going) result = star_check_model(id)
             if (result == keep_going) result = s% extras_check_model(id)
+            call prof_pop()
+            call prof_push('pick_next_timestep')
             if (result == keep_going) result = star_pick_next_timestep(id)
+            call prof_pop()
             if (result == keep_going) exit step_loop
 
             model_number = get_model_number(id, ierr)
@@ -221,12 +238,14 @@
                   'retry reason ' // trim(result_reason_str(s% result_reason))
             end if
 
+            call prof_push('prepare_redo_retry')
             if (result == redo) then
                result = star_prepare_to_redo(id)
             end if
             if (result == retry) then
                result = star_prepare_to_retry(id)
             end if
+            call prof_pop()
             if (result == terminate) then
                continue_evolve_loop = .false.
                exit step_loop
@@ -238,8 +257,10 @@
          ! once we get here, the only options are keep_going or terminate.
          ! redo or retry must be done inside the step_loop
 
+         call prof_push('after_step_loop')
          call after_step_loop(s% id, s% inlist_fname, &
              dbg, result, ierr)
+         call prof_pop()
          if (failed('after_step_loop',ierr)) return
 
          if (result /= keep_going) then
@@ -260,7 +281,9 @@
             return
          end if
 
+         call prof_push('do_saves')
          call do_saves(id, ierr)
+         call prof_pop()
          if (failed('do_saves',ierr)) return
 
          if (s% doing_timing) then

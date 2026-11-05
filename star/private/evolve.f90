@@ -25,6 +25,8 @@
       use star_utils
       use auto_diff_support
 
+      use profiler, only: prof_push, prof_pop
+
       implicit none
 
       private
@@ -375,7 +377,9 @@
 
          if (first_try) then  ! i.e., not a redo or retry
             s% have_new_generation = .false.
+            call prof_push('prepare_for_new_step')
             do_step_part1 = prepare_for_new_step(s)
+            call prof_pop()
             if (do_step_part1 /= keep_going) then
                if (s% report_ierr) &
                   write(*,*) 'do_step_part1: prepare_for_new_step'
@@ -406,7 +410,9 @@
             return
          end if
 
+         call prof_push('call_start_of_step_info')
          call set_start_of_step_info(s, 'after prepare_for_new_try', ierr)  ! does set_vars_if_needed
+         call prof_pop()
          if (failed('set_start_of_step_info')) return
 
          if (.not. s% have_new_cz_bdy_info) then
@@ -561,6 +567,7 @@
 
          call setup_for_implicit_mdot_loop
 
+      call prof_push('implicit_mdot_loop')
       implicit_mdot_loop: do
 
             dt = s% dt
@@ -573,28 +580,44 @@
                if (s% R_center < 0d0) then
                   write(*,2) 's% R_center', s% model_number, s% R_center
                   do_step_part2 = retry
+                  call prof_pop()
                   return
                end if
             end if
 
             call set_vars_if_needed(s, dt, 'start of implicit_mdot_loop', ierr)
-            if (failed('set_vars_if_needed start of implicit_mdot_loop')) return
+            if (failed('set_vars_if_needed start of implicit_mdot_loop')) then
+               call prof_pop()
+               return
+            end if
 
             if (s% RSP_flag) then
 
                call set_cgrav(s, ierr)
-               if (failed('set_cgrav')) return
+               if (failed('set_cgrav')) then
+                  call prof_pop()
+                  return
+               end if
 
             else
 
                call do_adjust_mass(s, s% species, ierr)
-               if (failed('do_adjust_mass')) return
+               if (failed('do_adjust_mass')) then
+                  call prof_pop()
+                  return
+               end if
                s% star_mdot = s% mstar_dot/(Msun/secyer)      ! dm/dt in msolar per year
                call set_vars_if_needed(s, dt, 'after do_adjust_mass', ierr)
-               if (failed('set_vars_if_needed after do_adjust_mass')) return
+               if (failed('set_vars_if_needed after do_adjust_mass')) then
+                  call prof_pop()
+                  return
+               end if
 
                call calculate_eps_mdot(s, dt, ierr)
-               if (failed('calculate_eps_mdot')) return
+               if (failed('calculate_eps_mdot')) then
+                  call prof_pop()
+                  return
+               end if
 
                if (s% mstar_dot /= 0d0) then
                   s% energy_change_from_do_adjust_mass_and_calculate_eps_mdot = &
@@ -604,16 +627,25 @@
                end if
 
                call set_vars_if_needed(s, dt, 'after calculate_eps_mdot', ierr)
-               if (failed('set_vars_if_needed after calculate_eps_mdot')) return
+               if (failed('set_vars_if_needed after calculate_eps_mdot')) then
+                  call prof_pop()
+                  return
+               end if
 
                if (s% do_conv_premix) then
                   do k=1,s% nz
                      s% eps_pre_mix(k) = s% energy(k)
                   end do
                   call do_conv_premix(s, ierr)
-                  if (failed('do_conv_premix')) return
+                  if (failed('do_conv_premix')) then
+                     call prof_pop()
+                     return
+                  end if
                   call set_vars_if_needed(s, dt, 'after do_conv_premix', ierr)
-                  if (failed('set_vars_if_needed after do_conv_premix')) return
+                  if (failed('set_vars_if_needed after do_conv_premix')) then
+                     call prof_pop()
+                     return
+                  end if
                   do k=1,s% nz  ! for use by energy equation
                      s% eps_pre_mix(k) = (s% eps_pre_mix(k) - s% energy(k)) / dt
                   end do
@@ -621,10 +653,16 @@
 
                if(s% do_phase_separation) then
                   call do_phase_separation(s, dt, ierr)
-                  if (failed('do_phase_separation')) return
+                  if (failed('do_phase_separation')) then
+                     call prof_pop()
+                     return
+                  end if
 
                   call set_vars_if_needed(s, dt, 'after phase separation', ierr)
-                  if (failed('set_vars_if_needed after phase separation')) return
+                  if (failed('set_vars_if_needed after phase separation')) then
+                     call prof_pop()
+                     return
+                  end if
                else
                   s% crystal_core_boundary_mass = -1d0
                end if
@@ -633,9 +671,15 @@
 
                if (s% do_element_diffusion) then
                   call do_element_diffusion(s, dt, ierr)
-                  if (failed('do_element_diffusion')) return
+                  if (failed('do_element_diffusion')) then
+                     call prof_pop()
+                     return
+                  end if
                   call set_vars_if_needed(s, dt, 'after element diffusion', ierr)
-                  if (failed('set_vars_if_needed after element diffusion')) return
+                  if (failed('set_vars_if_needed after element diffusion')) then
+                     call prof_pop()
+                     return
+                  end if
                   call finish_element_diffusion(s,dt)  ! calculates eps_diffusion from energy changes
                   if (.false.) then
                      write(*,1) 'dt*dm*eps_diffusion/total_energy_old', &
@@ -647,28 +691,52 @@
 
             if (s% rotation_flag .and. s% premix_omega .and. .not. s% j_rot_flag) then
                do_step_part2 = do_solve_omega_mix(s, 0.5d0*dt)
-               if (do_step_part2 /= keep_going) return
+               if (do_step_part2 /= keep_going) then
+                  call prof_pop()
+                  return
+               end if
                call set_rotation_info(s, .false., ierr)
-               if (failed('set_rotation_info')) return
+               if (failed('set_rotation_info')) then
+                  call prof_pop()
+                  return
+               end if
                call set_vars_if_needed(s, dt, 'after do_solve_omega_mix', ierr)
-               if (failed('after do_solve_omega_mix')) return
+               if (failed('after do_solve_omega_mix')) then
+                  call prof_pop()
+                  return
+               end if
             end if
 
             if (s% use_other_pressure) then
                call s% other_pressure(s% id, ierr)
-               if (failed('other_pressure returned ierr')) return
+               if (failed('other_pressure returned ierr')) then
+                  call prof_pop()
+                  return
+               end if
             end if
             call set_vars_if_needed(s, dt, 'after other_pressure', ierr)
-            if (failed('set_vars_if_needed after other_pressure')) return
+            if (failed('set_vars_if_needed after other_pressure')) then
+               call prof_pop()
+               return
+            end if
 
             call check_for_extra_heat(s, ierr)
-            if (failed('check_for_extra_heat')) return
+            if (failed('check_for_extra_heat')) then
+               call prof_pop()
+               return
+            end if
             call set_vars_if_needed(s, dt, 'after check_for_extra_heat', ierr)
-            if (failed('set_vars_if_needed after check_for_extra_heat')) return
+            if (failed('set_vars_if_needed after check_for_extra_heat')) then
+               call prof_pop()
+               return
+            end if
 
             if (.not. s% have_new_cz_bdy_info) then
                call set_cz_bdy_mass(s, ierr)
-               if (failed('set_cz_bdy_mass')) return
+               if (failed('set_cz_bdy_mass')) then
+                  call prof_pop()
+                  return
+               end if
             end if
 
             skip_global_corr_coeff_limit = (first_try .or. &
@@ -677,18 +745,23 @@
             s% doing_struct_burn_mix = .true.
             do_step_part2 = do_struct_burn_mix(s, skip_global_corr_coeff_limit)
             s% doing_struct_burn_mix = .false.
-            if (do_step_part2 /= keep_going) return
+            if (do_step_part2 /= keep_going) then
+               call prof_pop()
+               return
+            end if
             ! when reach here, have taken the step successfully
             ! but might not satisfy the implicit mdot requirements.
 
             mdot_action = select_mdot_action(ierr)
-            if (failed('select_mdot_action')) return
-            if (do_step_part2 /= keep_going) return
+            if (failed('select_mdot_action') .or. do_step_part2 /= keep_going) then
+               call prof_pop()
+               return
+            end if
             if (mdot_action == exit_loop) exit implicit_mdot_loop
             if (s% trace_evolve) write(*,*) 'cycle implicit_mdot_loop'
 
          end do implicit_mdot_loop
-
+         call prof_pop()
          s% solver_iter = 0  ! to indicate that no longer doing solver iterations
 
          if (.not. s% RSP_flag) then
