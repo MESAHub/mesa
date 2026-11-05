@@ -48,8 +48,6 @@
 
       x_integer_ctrl(1) = 0 ! part number
 
-      use_Ledoux_criterion = .false.
-
 ! wind
       cool_wind_full_on_T = 9.99d9
       hot_wind_full_on_T = 1d10
