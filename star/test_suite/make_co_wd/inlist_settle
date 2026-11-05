@@ -46,7 +46,6 @@
       ! Now that settling onto WD track, set min_dq appropriate for WDs
       min_dq = 1d-18
       min_dq_for_split = 1d-18
-      max_surface_cell_dq = 3d-18
 
 ! convection
       okay_to_reduce_gradT_excess = .true.
