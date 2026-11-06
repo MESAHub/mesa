@@ -178,7 +178,6 @@
          !common envelope controls
          CE_alpha, &
          CE_alpha_th, &
-         CE_alpha_core, &
          CE_mass_loss_rate_high, &
          CE_mass_loss_rate_low, &
          CE_rel_rlo_for_detachment, &
@@ -204,6 +203,8 @@
          use_other_rlo_mdot, &
          use_other_check_implicit_rlo, &
          use_other_implicit_function_to_solve, &
+         use_other_e2, &
+         use_other_pgbinary_plots, &
          use_other_tsync, &
          use_other_sync_spin_to_orbit, &
          use_other_mdot_edd, &
@@ -244,12 +245,19 @@
 
          call set_default_binary_controls
          call read_binary_controls(b, inlist, ierr)
+         if (ierr /= 0) return
+
+         if (b% extra_binary_terminal_iounit /= 0) then
+            close(b% extra_binary_terminal_iounit)
+            b% extra_binary_terminal_iounit = 0
+         end if
 
          ! open additional file for binary output
          if (len_trim(b% extra_binary_terminal_output_file) /= 0) then
             open(newunit=b% extra_binary_terminal_iounit, file=trim(b% extra_binary_terminal_output_file), &
                      action='write', status='replace',iostat=ierr)
             if (ierr /= 0) then
+               b% extra_binary_terminal_iounit = 0
                write(*,*) 'failed to open ' // trim(b% extra_binary_terminal_output_file)
                return
             end if
@@ -458,7 +466,6 @@
          !common envelope controls
          b% CE_alpha = CE_alpha
          b% CE_alpha_th = CE_alpha_th
-         b% CE_alpha_core = CE_alpha_core
          b% CE_mass_loss_rate_high = CE_mass_loss_rate_high
          b% CE_mass_loss_rate_low = CE_mass_loss_rate_low
          b% CE_rel_rlo_for_detachment = CE_rel_rlo_for_detachment
@@ -484,6 +491,8 @@
          b% use_other_rlo_mdot = use_other_rlo_mdot
          b% use_other_check_implicit_rlo = use_other_check_implicit_rlo
          b% use_other_implicit_function_to_solve = use_other_implicit_function_to_solve
+         b% use_other_e2 = use_other_e2
+         b% use_other_pgbinary_plots = use_other_pgbinary_plots
          b% use_other_tsync = use_other_tsync
          b% use_other_sync_spin_to_orbit = use_other_sync_spin_to_orbit
          b% use_other_mdot_edd = use_other_mdot_edd
@@ -543,10 +552,15 @@
          ! timestep controls
          time_delta_coeff = b% time_delta_coeff
          fm = b% fm
+         fm_hard = b% fm_hard
          fa = b% fa
+         fa_hard = b% fa_hard
          fr = b% fr
+         fr_hard = b% fr_hard
          fj = b% fj
+         fj_hard = b% fj_hard
          fe = b% fe
+         fe_hard = b% fe_hard
          fm_limit = b% fm_limit
          fr_limit = b% fr_limit
          fe_limit = b% fe_limit
@@ -661,7 +675,6 @@
          !common envelope controls
          CE_alpha = b% CE_alpha
          CE_alpha_th = b% CE_alpha_th
-         CE_alpha_core = b% CE_alpha_core
          CE_mass_loss_rate_high = b% CE_mass_loss_rate_high
          CE_mass_loss_rate_low = b% CE_mass_loss_rate_low
          CE_rel_rlo_for_detachment = b% CE_rel_rlo_for_detachment
@@ -670,6 +683,10 @@
          CE_xa_diff_to_terminate = b% CE_xa_diff_to_terminate
          CE_terminate_when_core_overflows = b% CE_terminate_when_core_overflows
          CE_min_period_in_minutes = b% CE_min_period_in_minutes
+         CE_energy_factor_HII_toHI = b% CE_energy_factor_HII_toHI
+         CE_energy_factor_HeII_toHeI = b% CE_energy_factor_HeII_toHeI
+         CE_energy_factor_HeIII_toHeII = b% CE_energy_factor_HeIII_toHeII
+         CE_energy_factor_H2 = b% CE_energy_factor_H2
          CE_fixed_lambda = b% CE_fixed_lambda
 
          ! miscellaneous controls
@@ -683,6 +700,8 @@
          use_other_rlo_mdot = b% use_other_rlo_mdot
          use_other_check_implicit_rlo = b% use_other_check_implicit_rlo
          use_other_implicit_function_to_solve = b% use_other_implicit_function_to_solve
+         use_other_e2 = b% use_other_e2
+         use_other_pgbinary_plots = b% use_other_pgbinary_plots
          use_other_tsync = b% use_other_tsync
          use_other_sync_spin_to_orbit = b% use_other_sync_spin_to_orbit
          use_other_mdot_edd = b% use_other_mdot_edd

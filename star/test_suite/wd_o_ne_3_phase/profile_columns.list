@@ -165,7 +165,6 @@
    !logfree_e ! log10(free_e), free_e is mean number of free electrons per nucleon
    chiRho ! dlnP_dlnRho at constant T
    chiT ! dlnP_dlnT at constant Rho
-  ! chiX
 
    csound ! sound speed
    !log_csound
@@ -433,6 +432,10 @@
    !mlt_Pturb
    !alpha_mlt
 
+   !effective_mixing_speed ! effective speed from total D_mix (cm/sec)
+   !eff_mix_speed ! same as effective_mixing_speed
+   !log_effective_mixing_speed ! log10(effective_mixing_speed)
+   !log_eff_mix_speed ! same as log_effective_mixing_speed
    !conv_vel ! convection velocity (cm/sec)
    !log_conv_vel ! log10 convection velocity (cm/sec)
 

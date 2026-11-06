@@ -184,14 +184,7 @@
             ! zsh > 0 delays onset of artificial viscosity
             ! can eliminate most/all interior dissipation while still providing for extreme cases.
             ! using this parameter the dependence of limiting amplitude on cq is very weak.
-         ! for Tscharnuter & Winkler form of artificial viscosity
-         RSP_Qvisc_linear = 0d0
-         RSP_Qvisc_quadratic = 0d0
-            ! as described in section 4.2 of mesa3, 2015.
-            ! RSP_Qvisc_linear is analogous to shock_spread_linear
-            ! RSP_Qvisc_quadratic is analogous to shock_spread_quadratic
-            ! if switch to this form, set RSP_cq = 0 to shut off the Neumann & Richtmyer form.
-            ! note that this form also uses RSP_zsh to delay onset of artificial viscosity
+
 
          ! surface pressure.  provides outer boundary condition for momentum equation.
          RSP_use_Prad_for_Psurf = .false.
@@ -205,7 +198,6 @@
 
          ! solver controls
          RSP_tol_max_corr = 1d-8
-         RSP_tol_max_resid = 1d-6
          !RSP_max_iters_per_step = 100
          RSP_max_retries_per_step = 8
          RSP_report_undercorrections = .false.
@@ -251,7 +243,6 @@
          !RSP_initial_model_outer_log_tau = -1d99 ! -2d0
          !RSP_initial_model_inner_log_tau = -1d99 ! 8d0
 
-         !RSP_Qvisc_linear_static = 0d0
 
          ! rad hydro - not ready
          !RSP_use_diffusion_limit = .true.

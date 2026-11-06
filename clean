@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 function check_okay {
 	if [ $? -ne 0 ]
 	then
@@ -12,13 +14,23 @@ function check_okay {
 echo "removing some data to force reinstall"
 rm -rf data/atm_data
 rm -rf data/eosDT_data
+rm -rf data/eosFreeEOS_data
+rm -rf data/eosCMS_data
+rm -rf data/eosPC_support_data
 rm -rf data/kap_data
 rm -rf data/ionization_data
 rm -rf data/chem_data
-rm -rf data/colors_data/filters data/colors_data/stellar_models data/colors_data/.extraction_complete
+rm -rf data/colors_data
 rm -rf data/rates_data/cache
 
 rm -rf data/rates_data/cache/*
+
+# Refresh generated development stamps without removing shipped release stamps.
+if [ -e .git ] &&
+   [ "$(git rev-parse --show-toplevel 2>/dev/null)" = "$(pwd -P)" ] &&
+   [ -n "$(git ls-files --others -- data/version_number 2>/dev/null)" ]; then
+   rm -f data/version_number
+fi
 
 echo "finished clean"
 echo

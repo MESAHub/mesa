@@ -94,7 +94,7 @@
   Grid1_file_dir = 'png'
   Grid1_file_prefix = 'grid1'
   Grid1_file_interval = 5 ! output when mod(model_number,Grid1_file_interval)==0
-  Grid1_file_width = 16 ! negative means use same value as for window
+  Grid1_file_width = 27 ! negative means use same value as for window
   Grid1_file_aspect_ratio = -1 ! negative means use same value as for window
 
 

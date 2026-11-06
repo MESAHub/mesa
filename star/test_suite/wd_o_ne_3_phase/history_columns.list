@@ -79,7 +79,6 @@
       log_abs_mdot ! log10(abs(star_mdot)) (in msolar per year)
 
    !## imposed surface conditions
-      !Tsurf_factor
       !tau_factor
       !tau_surface
 
@@ -293,16 +292,6 @@
 
       !c_log_eps_burn cno
       !c_log_eps_burn tri_alpha
-
-      ! center d_eps_nuc_dlnd for reaction categories
-
-      !c_d_eps_dlnd cno
-      !c_d_eps_dlnd tri_alpha
-
-      ! center d_eps_nuc_dlnT for reaction categories
-
-      !c_d_eps_dlnT cno
-      !c_d_eps_dlnT tri_alpha
 
    !## regions of strong nuclear burning
 
@@ -868,7 +857,6 @@
       !e_thermal ! sum over all zones of Cp*T*dm
 
    !## eos
-     ! crystal_core_boundary_mass
       !logQ_max ! logQ = logRho - 2*logT + 12
       !logQ_min
       !gamma1_min

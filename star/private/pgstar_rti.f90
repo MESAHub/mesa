@@ -20,7 +20,7 @@
       module pgstar_rti
 
       use star_private_def
-      use const_def, only: dp
+      use const_def, only: dp, Msun
       use pgstar_support
       use star_pgstar
 
@@ -45,8 +45,6 @@
             s% pg% rti_xleft, s% pg% rti_xright, &
             s% pg% rti_ybot, s% pg% rti_ytop, .false., &
             s% pg% rti_title, s% pg% rti_txt_scale, ierr)
-         if (ierr /= 0) return
-
          call pgebuf()
 
       end subroutine rti_Plot
@@ -65,9 +63,8 @@
          character (len=*), intent(in) :: title
          integer, intent(out) :: ierr
 
-         integer :: i, ii, n, step_min, step_max
-         real :: xmin, xmax, ymin_L_axis, ymax_L_axis, &
-            ymin_mass_axis, ymax_mass_axis, dx
+         integer :: i, n, step_min, step_max
+         real :: xmin, xmax, ymin_mass_axis, ymax_mass_axis
          real, allocatable, dimension(:) :: xvec, star_mass, star_M_center, log_xmstar, &
             he_core_mass, &
             c_core_mass, &
@@ -85,7 +82,7 @@
 
          integer :: ix,k
          real :: xleft,xright,now
-         real, save :: dxmin = -1.d0
+         real, parameter :: dxmin = -1
 
          include 'formats'
 
@@ -103,7 +100,6 @@
 
          n = count_hist_points(s, step_min, step_max)
          if (n <= 1) return
-         step_min = max(step_min, step_max-n+1)
 
          call integer_dict_lookup(s% history_names_dict, s% pg% rti_xaxis_name, ix, ierr)
          if (ierr /= 0) ix = -1
@@ -113,6 +109,7 @@
                trim(s% pg% rti_xaxis_name) // ' in rti data'
             write(*,'(A)')
             ierr = -1
+            return
          end if
 
          allocate(xvec(n), &
@@ -158,15 +155,12 @@
 
          if (s% pg% rti_xaxis_log) then
             do k=1,n
-               xvec(k) = log10(max(1e-50,abs(xvec(k))))
+               xvec(k) = real(log10(max(1d-50,abs(dble(xvec(k))))))
             end do
          end if
 
-         if(s% pg% rti_xmin<-100d0) s% pg% rti_xmin=xvec(1)
-         if(s% pg% rti_xmax<-100d0) s% pg% rti_xmax=xvec(n)
-
-         xmin=max(s% pg% rti_xmin,xvec(1))
-         xmax=min(s% pg% rti_xmax,xvec(n))
+         xmin = s% pg% rti_xmin
+         xmax = s% pg% rti_xmax
 
          call set_xleft_xright( &
             n, xvec, xmin, xmax, s% pg% rti_xmargin, &
@@ -177,7 +171,10 @@
             write(*,*) 'failed to find star_mass in history data'
             ierr = -1
          end if
-         if (ierr /= 0) return
+         if (ierr /= 0) then
+            call dealloc
+            return
+         end if
 
          have_log_xmstar = get1_yvec('log_xmstar', log_xmstar)
          if (have_log_xmstar) then
@@ -199,12 +196,15 @@
          call pgsave
          call pgsch(txt_scale)
 
-         dx = (xmax - xmin)/250.0
-
          call init_rti_plot
          call setup_mass_yaxis
          call plot_total_mass_line
          call plot_rti_data
+         if (ierr /= 0) then
+            call pgunsa
+            call dealloc
+            return
+         end if
          call plot_mass_lines
 
          call show_annotations(s, &
@@ -257,6 +257,7 @@
 
 
          subroutine setup_mass_yaxis
+            use pgstar_colors, only: clr_Foreground
             real :: dy, ymin, ymax
             include 'formats'
             ymax = s% pg% rti_mass_max
@@ -310,7 +311,7 @@
             end if
             call show_title_pgstar(s, title)
 
-            call show_pgstar_decorator(s% pg%id, s% pg% rti_use_decorator, &
+            call show_pgstar_decorator(id, s% pg% rti_use_decorator, &
                s% pg% rti_pgstar_decorator, 0, ierr)
 
          end subroutine finish_rti_plot
@@ -327,7 +328,7 @@
             use history_specs, only: rti_offset
             type (pgstar_hist_node), pointer :: pg
             integer :: i_rti_type_first, i_rti_type_last
-            integer :: k, cnt, num_specs, step
+            integer :: k, cnt, num_specs, step, j
 
             include 'formats'
 
@@ -340,16 +341,17 @@
                end if
             end do
             if (i_rti_type_first == 0) then
-               write(*,*) 'i_rti_type_first == 0'
+               write(*,*) "please add 'rti_regions <num>' to your history_columns.list for the rti plot"
+               ierr = -1
                return
             end if
 
-            i_rti_type_last = 0
+            i_rti_type_last = i_rti_type_first
             cnt = 1
             do k=i_rti_type_first+1, num_specs
-               i_rti_type_last = k-1
                cnt = cnt+1
                if (s% history_column_spec(k) /= rti_offset + cnt) exit
+               i_rti_type_last = k
             end do
 
             call pgsave
@@ -358,15 +360,19 @@
                write(*,*) '.not. associated(s% pg% pgstar_hist)'
             end if
             pg => s% pg% pgstar_hist
+            j = n
 
             do
                if (.not. associated(pg)) exit
                step = pg% step
                if (step < step_min) exit
-               if (step <= step_max .and. mod(step, s% pg% rti_interval) == 0) then
-                  call draw_rti_for_step( &
-                     pg, step, i_rti_type_first, i_rti_type_last, real(xvec(step-step_min+1)), &
-                     star_mass(step-step_min+1), star_M_center(step-step_min+1))
+               if (step <= step_max) then
+                  if (j < 1) exit
+                  if (mod(step, max(1, s% pg% rti_interval)) == 0) then
+                     call draw_rti_for_step( &
+                        pg, i_rti_type_first, i_rti_type_last, xvec(j), star_mass(j), star_M_center(j))
+                  end if
+                  j = j-1
                end if
                pg => pg% next
             end do
@@ -376,17 +382,17 @@
 
 
          subroutine draw_rti_for_step( &
-               pg, step, i_rti_type_first, i_rti_type_last, xval, mass, mass_center)
+               pg, i_rti_type_first, i_rti_type_last, xval, mass, mass_center)
             use pgstar_colors
             type (pgstar_hist_node), pointer :: pg
-            integer, intent(in) :: step, i_rti_type_first, i_rti_type_last
+            integer, intent(in) :: i_rti_type_first, i_rti_type_last
             real, intent(in) :: xval, mass, mass_center
             real :: qbot, qtop, mbot, mtop, xmass
             integer :: k, rti_type
             include 'formats'
             qbot = 0
             xmass = mass - mass_center
-            do k = i_rti_type_first, i_rti_type_last, 2
+            do k = i_rti_type_first, i_rti_type_last-1, 2
                rti_type = int(pg% vals(k))
                if (rti_type < 0) exit
                qtop = pg% vals(k+1)
@@ -395,7 +401,8 @@
                   mtop = mass_center + xmass*qtop
                   call draw1(xval, mbot, mtop, clr_Blue)
                end if
-              qbot = qtop
+               qbot = qtop
+               if (qbot >= 1) exit
             end do
          end subroutine draw_rti_for_step
 
@@ -418,7 +425,6 @@
 
          subroutine plot_mass_lines
             use pgstar_colors
-            integer :: i
 
             include 'formats'
 
