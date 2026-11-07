@@ -242,7 +242,7 @@
 
 
          subroutine dealloc
-            deallocate(iwork, work, rpar, ipar, ipar_burn_const_P_decsol, rpar_burn_const_P_decsol)
+            deallocate(v, iwork, work, rpar, ipar, ipar_burn_const_P_decsol, rpar_burn_const_P_decsol)
          end subroutine dealloc
 
 
