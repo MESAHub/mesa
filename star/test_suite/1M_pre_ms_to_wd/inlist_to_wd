@@ -37,6 +37,10 @@
       energy_eqn_option = 'eps_grav'
       use_gold2_tolerances = .true.
 
+      ! Now that settling onto WD track, set min_dq appropriate for WDs
+      min_dq = 1d-18
+      min_dq_for_split = 1d-18
+
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
       trace_history_value_name(2) = 'log_rel_run_E_err'
