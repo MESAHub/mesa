@@ -92,8 +92,6 @@
          real(dp) ::   a_1, da_1dd, a_2,da_2dd   !< ion sphere radii
          real(dp) ::   a_av, da_avdd       !< average ion sphere radii
          real(dp) ::   a_e        !< electron sphere radius
-         real(dp) ::   a_b        !< bohr radius
-         real(dp) ::   rs         !< ion sphere radius normalised to bohr radius
          !real(dp) ::   m1, m2     !< ion masses
          !real(dp) ::   n1, n2     !< number density of ions of types 1 and 2
          real(dp) ::   ntot, dntotdd       !< total number density of these ions
@@ -146,11 +144,6 @@
          da_avdd = 0.5d0 * (da_1dd + da_2dd)
 
          z1z2 = z1 * z2
-
-         ! bohr radius and normalised ion sphere radius
-
-         a_b = rbohr/z1z2/ntot
-         rs  = a_av / a_b
 
          ! plasma frequency and temperature (chugunov 2007 eq 2)
 
