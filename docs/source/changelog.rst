@@ -73,6 +73,9 @@ conserving total angular momentum. See
 Bug Fixes
 ---------
 
+Corrected terms in the Bremsstrahlung routines of the ``neu`` module including the Fermi temperature and its derivative.
+See `gh-1103 <https://github.com/MESAHub/mesa/pull/1103>`_.
+
 Fixed an issue where the `find0_quadratic` subroutine provided by the `num` module could accidentally divide by 0 when the points used for the quadratic interpolant did not bracket a root.
 
 Fixed ``switch_to_radiative`` zeroing saved ``mlt_vc`` during TDC photo
