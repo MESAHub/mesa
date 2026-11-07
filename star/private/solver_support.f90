@@ -1474,6 +1474,14 @@
             end do
          end if
 
+         if (ierr /= 0) return
+         ! Keep the solver increments consistent with the corrected abundances.
+         do j=1,species
+            if (s% xa(j,k) == s% xa_start(j,k) + s% solver_dx(s% nvar_hydro+j,k)) cycle
+            s% solver_dx(s% nvar_hydro+j,k) = s% xa(j,k) - s% xa_start(j,k)
+            s% xa_sub_xa_start(j,k) = s% solver_dx(s% nvar_hydro+j,k)
+         end do
+
       end subroutine check1_chem
 
 
