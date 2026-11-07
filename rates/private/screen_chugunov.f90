@@ -21,7 +21,7 @@
 
    module screening_chugunov
       use math_lib
-      use const_def, only: dp, amu, hbar, kerg, four_thirds, pi, pi2, pi4, qe, rbohr
+      use const_def, only: dp, amu, hbar, kerg, four_thirds, pi, pi2, pi4, qe
       use rates_def, only: screen_info
       use math_def
 
