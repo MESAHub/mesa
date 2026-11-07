@@ -745,6 +745,8 @@
 
       subroutine do_block_multiply_xa(nvar, nz, lblk1, dblk1, ublk1, x1, b1)
          !  calculates b = x*A
+         !  with lblk(:,:,k) coupling row k to column k-1 and ublk(:,:,k) coupling row k to column k+1,
+         !  b(k) = x(k)*dblk(k) + x(k-1)*ublk(k-1) + x(k+1)*lblk(k+1)
          integer, intent(in) :: nvar, nz
          real(dp), dimension(:), intent(in), pointer :: lblk1, dblk1, ublk1  ! =(nvar,nvar,nz)
          real(dp), intent(in), pointer :: x1(:)  ! =(nvar,nz)
@@ -760,15 +762,15 @@
             p2(1:nvar) => x1(shift+1:shift+nvar)
             p3(1:nvar) => b1(shift+1:shift+nvar)
             call do_multiply_xa(nvar,p1,p2,p3)
-            if (k > 1) then
-               p1(1:nvar2) => ublk1(shift2+1:shift2+nvar2)
-               p2(1:nvar) => x1(shift+1:shift+nvar)
+            if (k > 1) then  ! row k-1 couples to column k through ublk(k-1)
+               p1(1:nvar2) => ublk1(shift2-nvar2+1:shift2)
+               p2(1:nvar) => x1(shift-nvar+1:shift)
                p3(1:nvar) => b1(shift+1:shift+nvar)
                p4(1:nvar) => b1(shift+1:shift+nvar)
                call do_multiply_xa_plus_c(nvar,p1,p2,p3,p4)
             end if
-            if (k < nz) then
-               p1(1:nvar2) => lblk1(shift2+1:shift2+nvar2)
+            if (k < nz) then  ! row k+1 couples to column k through lblk(k+1)
+               p1(1:nvar2) => lblk1(shift2+nvar2+1:shift2+2*nvar2)
                p2(1:nvar) => x1(shift+1+nvar:shift+2*nvar)
                p3(1:nvar) => b1(shift+1:shift+nvar)
                p4(1:nvar) => b1(shift+1:shift+nvar)
