@@ -384,9 +384,7 @@
          max_zone = 0
          max_var = 0
          num_terms = 0
-         num_xa_terms = 0
          sum_corr = 0
-         sum_xa_corr = 0
          max_correction = 0
          max_abs_correction = 0
          x_limit = s% correction_xa_limit
@@ -394,6 +392,9 @@
          found_bad_num = .false.
          report = s% report_ierr
          cell_loop: do k = 1, nz
+            ! Average composition corrections within each cell.
+            num_xa_terms = 0
+            sum_xa_corr = 0
             max_abs_corr_for_k = 0
             max_abs_xa_corr_for_k = 0
 
