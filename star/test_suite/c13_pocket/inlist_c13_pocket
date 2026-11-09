@@ -21,7 +21,7 @@
       new_cumulative_energy_error = 0d0
 
 ! display on-screen plots
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
 
 / !end of star_job namelist
 

@@ -207,6 +207,21 @@ use ``superad_reduction_Gamma_inv_scale`` instead of
 Jermyn et al. (2023, equation 64). Results change only when the two scales
 differ.
 
+The ``colors`` module now checks Hermite-interpolated spectra for unphysical
+fluxes, sets negligible negative undershoots to zero, and falls back to
+trilinear interpolation when necessary. Interpolation also handles atmosphere
+grid boundaries and axes with only one tabulated value more robustly.
+Filter transmission is now zero outside the tabulated passband, preventing
+spurious contributions to synthetic magnitudes and photometric zero-points.
+Bolometric magnitudes now include the bolometric flux zero point, correcting
+their absolute scale independently of the Vega, AB, or ST bandpass system.
+
+The ``colors`` history columns now use the photospheric ``Teff``, ``photosphere_logg``
+and ``photosphere_r`` instead of the outermost-cell ``T(1)``, ``log10(grav(1))`` and
+``R(1)``, so synthetic magnitudes change slightly.
+
+Fixed an issue where the `find0_quadratic` subroutine provided by the `num` module could accidentally divide by 0 when the points used for the quadratic interpolant did not bracket a root.
+
 Fixed ``switch_to_radiative`` zeroing saved ``mlt_vc`` during TDC photo
 restarts and preparation for a new step. Mixing cleanup now preserves
 the velocity until it has been copied to ``mlt_vc_old``.
