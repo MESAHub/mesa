@@ -722,7 +722,23 @@
       integer, parameter :: p_flux_limit_R = p_lum_rad_div_L_Edd_sub_fourPrad_div_PchiT + 1
       integer, parameter :: p_flux_limit_lambda = p_flux_limit_R + 1
 
-      integer, parameter :: p_col_id_max = p_flux_limit_lambda
+      integer, parameter :: p_eff_mix_speed = p_flux_limit_lambda + 1
+      integer, parameter :: p_effective_mixing_speed = p_eff_mix_speed + 1
+      integer, parameter :: p_log_eff_mix_speed = p_effective_mixing_speed + 1
+      integer, parameter :: p_log_effective_mixing_speed = p_log_eff_mix_speed + 1
+      integer, parameter :: p_eff_mix_speed_div_csound = p_log_effective_mixing_speed + 1
+      integer, parameter :: p_effective_mixing_speed_div_csound = p_eff_mix_speed_div_csound + 1
+      integer, parameter :: p_eff_mix_speed_div_mlt_vc = p_effective_mixing_speed_div_csound + 1
+      integer, parameter :: p_effective_mixing_speed_div_mlt_vc = p_eff_mix_speed_div_mlt_vc + 1
+      integer, parameter :: p_dt_times_eff_mix_speed_div_mixing_length = p_effective_mixing_speed_div_mlt_vc + 1
+      integer, parameter :: p_dt_times_effective_mixing_speed_div_mixing_length = &
+         p_dt_times_eff_mix_speed_div_mixing_length + 1
+      integer, parameter :: p_log_dt_times_eff_mix_speed_div_mixing_length = &
+         p_dt_times_effective_mixing_speed_div_mixing_length + 1
+      integer, parameter :: p_log_dt_times_effective_mixing_speed_div_mixing_length = &
+         p_log_dt_times_eff_mix_speed_div_mixing_length + 1
+
+      integer, parameter :: p_col_id_max = p_log_dt_times_effective_mixing_speed_div_mixing_length
 
       character (len=maxlen_profile_column_name) :: profile_column_name(p_col_id_max)
       type (integer_dict), pointer :: profile_column_names_dict
@@ -1201,6 +1217,21 @@
          profile_column_name(p_log_conv_vel) = 'log_conv_vel'
          profile_column_name(p_conv_vel_div_csound) = 'conv_vel_div_csound'
          profile_column_name(p_conv_vel_div_L_vel) = 'conv_vel_div_L_vel'
+         profile_column_name(p_eff_mix_speed) = 'eff_mix_speed'
+         profile_column_name(p_effective_mixing_speed) = 'effective_mixing_speed'
+         profile_column_name(p_log_eff_mix_speed) = 'log_eff_mix_speed'
+         profile_column_name(p_log_effective_mixing_speed) = 'log_effective_mixing_speed'
+         profile_column_name(p_eff_mix_speed_div_csound) = 'eff_mix_speed_div_csound'
+         profile_column_name(p_effective_mixing_speed_div_csound) = 'effective_mixing_speed_div_csound'
+         profile_column_name(p_eff_mix_speed_div_mlt_vc) = 'eff_mix_speed_div_mlt_vc'
+         profile_column_name(p_effective_mixing_speed_div_mlt_vc) = 'effective_mixing_speed_div_mlt_vc'
+         profile_column_name(p_dt_times_eff_mix_speed_div_mixing_length) = 'dt_times_eff_mix_speed_div_mixing_length'
+         profile_column_name(p_dt_times_effective_mixing_speed_div_mixing_length) = &
+            'dt_times_effective_mixing_speed_div_mixing_length'
+         profile_column_name(p_log_dt_times_eff_mix_speed_div_mixing_length) = &
+            'log_dt_times_eff_mix_speed_div_mixing_length'
+         profile_column_name(p_log_dt_times_effective_mixing_speed_div_mixing_length) = &
+            'log_dt_times_effective_mixing_speed_div_mixing_length'
 
          profile_column_name(p_mix_type) = 'mix_type'
          profile_column_name(p_mixing_type) = 'mixing_type'

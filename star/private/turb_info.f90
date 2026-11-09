@@ -400,7 +400,7 @@
          s% mlt_mixing_length(k) = 0
          s% mlt_D(k) = 0
          s% mlt_cdc(k) = 0d0
-         s% mlt_vc(k) = 0
+         if (s% okay_to_set_mlt_vc) s% mlt_vc(k) = 0
          s% gradT_ad(k) = s% gradr_ad(k)
          s% gradT(k) = s% gradT_ad(k)%val
       end subroutine switch_to_radiative
