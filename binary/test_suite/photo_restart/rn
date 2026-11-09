@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# read restart inlist pointing to new output and more digits for photos
+new_inlist=inlist_main_ref
+
+if [ ! -f "$new_inlist" ]; then
+    echo "missing $new_inlist"
+    exit 1
+fi
+
+cp "$new_inlist" inlist
+
+rm -f .restart
+make run | tee reference_output.txt

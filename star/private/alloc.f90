@@ -1436,6 +1436,18 @@
             if (failed('prev_mesh_nu_ST_start')) exit
 
             if (s% fill_arrays_with_NaNs) s% need_to_setvars = .true.
+
+            if ((s% rotation_flag .eqv. .false.) .and. &
+               ((action == do_allocate .or. &
+                 action == do_reallocate .or. &
+                 action == do_copy_pointers_and_resize))) then
+               ! if non-rotating set to zero unused arrays saved in photos
+               s% j_rot(:) = 0.0d0
+               s% omega(:) = 0.0d0
+               s% D_ST_start(:) = 0d0
+               s% nu_ST_start(:) = 0d0
+            end if
+
             return
          end do
          ierr = -1

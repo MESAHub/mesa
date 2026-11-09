@@ -27,7 +27,7 @@ module run_binary_support
    use binary_private_def
    use binary_ctrls_io, only : do_one_binary_setup
    use binary_do_one_utils
-   use binary_ce
+   ! use binary_ce
    use binary_photos
 
    implicit none
@@ -183,10 +183,10 @@ contains
       b% other_edot_tidal => null_other_edot_tidal
       b% other_edot_enhance => null_other_edot_enhance
       b% other_extra_edot => null_other_extra_edot
-      b% other_CE_init => null_other_CE_init
-      b% other_CE_rlo_mdot => null_other_CE_rlo_mdot
-      b% other_CE_binary_evolve_step => null_other_CE_binary_evolve_step
-      b% other_CE_binary_finish_step => null_other_CE_binary_finish_step
+      ! b% other_CE_init => null_other_CE_init
+      ! b% other_CE_rlo_mdot => null_other_CE_rlo_mdot
+      ! b% other_CE_binary_evolve_step => null_other_CE_binary_evolve_step
+      ! b% other_CE_binary_finish_step => null_other_CE_binary_finish_step
       b% other_e2 => null_other_e2
       b% other_pgbinary_plots_info => null_other_pgbinary_plots_info
       b% other_tidal_deformation_switch_function => null_other_tidal_deformation_switch_function
@@ -300,7 +300,10 @@ contains
       call binary_private_def_init
       call binary_history_column_names_init(ierr)
       call set_binary_history_columns(b, b% job% binary_history_columns_file, .true., ierr)
-
+      if (.not. doing_restart) then
+         call do_get_data_for_binary_history_columns(b, ierr)
+         if (failed('do_get_data_for_binary_history_columns', ierr)) return
+      end if
       ! setup pgbinary
       if (.not. doing_restart) then
          call start_new_run_for_pgbinary(b, ierr)
@@ -350,9 +353,9 @@ contains
       if (ierr /= 0) return
 
       ! setup things for common envelope in case of a restart
-      if (doing_restart .and. b% CE_flag .and. b% CE_init) then
-         call ce_init(b, doing_restart, ierr)
-      end if
+      ! if (doing_restart .and. b% CE_flag .and. b% CE_init) then
+      !    call ce_init(b, doing_restart, ierr)
+      ! end if
 
       evolve_loop : do while(continue_evolve_loop)  ! evolve one step per loop
 
@@ -386,10 +389,10 @@ contains
          b% donor_started_implicit_wind = .false.
          b% num_tries = 0
 
-         if (b% CE_flag .and. .not. b% CE_init) then
-            call ce_init(b, .false., ierr)
-            write(*, *) "CE flag is on!!"
-         end if
+         ! if (b% CE_flag .and. .not. b% CE_init) then
+         !    call ce_init(b, .false., ierr)
+         !    write(*, *) "CE flag is on!!"
+         ! end if
 
          step_loop : do  ! may need to repeat this loop
 
@@ -414,7 +417,7 @@ contains
             ! that can produce inconsistent output.
             b% step_mtransfer_rate = b% mtransfer_rate
 
-            if (.not. b% CE_flag) then
+            ! if (.not. b% CE_flag) then
                ! if donor reaches implicit wind limit during mass transfer, set was_in_implicit_wind_limit = .true.
                ! so that further iterations of the implicit wind do not start far off from the required mdot.
                ! system will likely detach suddenly, so set change_factor to double its maximum
@@ -422,7 +425,7 @@ contains
                   b% s_donor% was_in_implicit_wind_limit = .true.
                   b% change_factor = 2 * b% max_change_factor
                end if
-            end if
+            ! end if
 
             do l = 1, num_stars
 
@@ -495,9 +498,9 @@ contains
                      cycle
 
                   ! set accretion composition
-                  if (.not. b% CE_flag) then
+                  ! if (.not. b% CE_flag) then
                      if (i == 2) call set_accretion_composition(b, j)
-                  end if
+                  ! end if
 
                   result = worst_result(result, &
                      star_evolve_step_part2(id, first_try))
@@ -508,11 +511,11 @@ contains
             ! do not evolve binary step on failure, its unnecessary and some variables are not properly
             ! set when the newton solver fails.
             if (result == keep_going) then
-               if (.not. b% CE_flag) then
+               ! if (.not. b% CE_flag) then
                   result = worst_result(result, binary_evolve_step(b))
-               else
-                  result = worst_result(result, CE_binary_evolve_step(b))
-               end if
+               ! else
+               !    result = worst_result(result, CE_binary_evolve_step(b))
+               ! end if
             end if
 
             if (result == keep_going) then
@@ -655,9 +658,9 @@ contains
          result = worst_result(result, partial_result)
 
          if(result == keep_going) result = binary_finish_step(b)
-         if (b% CE_flag .and. b% CE_init .and. result == keep_going) then
-            result = worst_result(result, CE_binary_finish_step(b))
-         end if
+         ! if (b% CE_flag .and. b% CE_init .and. result == keep_going) then
+         !    result = worst_result(result, CE_binary_finish_step(b))
+         ! end if
 
          if (result == keep_going) then
             ! write terminal info
