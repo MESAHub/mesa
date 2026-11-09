@@ -188,7 +188,7 @@
          real(dp), intent(out) :: equ_norm, equ_max
          integer, intent(out) :: k_max, j_max, ierr
 
-         integer :: j, k, num_terms, n, nz, nvar_hydro, nvar_chem, skip_eqn1, skip_eqn2, skip_eqn3
+         integer :: j, k, num_terms, n, nz, nvar_hydro, skip_eqn1, skip_eqn2, skip_eqn3
          real(dp) :: sumequ, absq
 
          logical :: dbg
@@ -205,7 +205,6 @@
          dbg = s% solver_check_everything
 
          nvar_hydro = min(nvar, s% nvar_hydro)
-         nvar_chem = s% nvar_chem
 
          nz = s% nz
          n = nz
@@ -217,6 +216,8 @@
          if (s% convergence_ignore_equL_residuals) skip_eqn1 = s% i_equL
          if (s% convergence_ignore_alpha_RTI_residuals) skip_eqn2 = s% i_dalpha_RTI_dt
          if (s% do_burn .or. s% do_mix) then
+            ! Count each equation once. The loop over all variables replaced the
+            ! structural sum, so a separate composition pass would count those rows twice.
             num_terms = num_terms + nvar*nz
             if (skip_eqn1 > 0) num_terms = num_terms - nz
             if (skip_eqn2 > 0) num_terms = num_terms - nz
@@ -270,21 +271,6 @@
                end do
             end do
          end if
-         if (s% do_burn .or. s% do_mix) then
-            num_terms = num_terms + nvar_chem*nz
-            do k = 1, nz
-               do j = nvar_hydro+1, nvar
-                  absq = abs(s% equ(j,k)*s% residual_weight(j,k))
-                  sumequ = sumequ + absq
-                  if (absq > equ_max) then
-                     equ_max = absq
-                     j_max = j
-                     k_max = k
-                  end if
-               end do
-            end do
-         end if
-
          equ_norm = sumequ/num_terms
          if (dbg) write(*,4) trim(s% nameofequ(j_max)) // ' sizequ equ_max norm', &
             k_max, s% solver_iter, s% model_number, equ_max, equ_norm
