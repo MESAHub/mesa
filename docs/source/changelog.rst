@@ -82,8 +82,9 @@ spurious contributions to synthetic magnitudes and photometric zero-points.
 Bolometric magnitudes now include the bolometric flux zero point, correcting
 their absolute scale independently of the Vega, AB, or ST bandpass system.
 
-The ``colors`` module now read Teff, photosphere logg and photosphere radius :
-``call data_for_colors_history_columns(s% Teff, s% photosphere_logg, s% photosphere_r * Rsun, ...``
+The ``colors`` history columns now use the photospheric ``Teff``, ``photosphere_logg``
+and ``photosphere_r`` instead of the outermost-cell ``T(1)``, ``log10(grav(1))`` and
+``R(1)``, so synthetic magnitudes change slightly.
 
 Fixed an issue where the `find0_quadratic` subroutine provided by the `num` module could accidentally divide by 0 when the points used for the quadratic interpolant did not bracket a root.
 
