@@ -48,9 +48,9 @@
 / ! end of star_job namelist
 
 &eos      
+      mass_fraction_limit_for_skye = 1d-8
       use_Skye = .true.
       use_PC = .false.
-      mass_fraction_limit_for_Skye = 1d-5
 / ! end of eos namelist
 
 &kap      
@@ -303,30 +303,24 @@
 ! solver
 
       ! damped newton and structure only
-       scale_max_correction = 0.1d0
-       ignore_species_in_max_correction = .true.
+       scale_max_correction = 1d0 !0.1d0
+       !ignore_species_in_max_correction = .true.
 
       ! might help to turn off gold2 in 8-10 Msun degenerate cores
       ! for O-Ne flames.
-      use_gold2_tolerances = .true. 
-      gold2_tol_max_residual2 = 5d-7
-      gold2_tol_max_residual3 = 5d-4
+      use_gold2_tolerances = .false.
 
+      fix_d_eos_dxa_partials = .true.
 
       use_gold_tolerances = .true.
-      gold_tol_max_residual2 = 5d-4
-      !gold_tol_max_residual3 = 1d-4 ! Default in controls is 1d-5
       tol_correction_high_T_limit = 1d9 ! Switch to lower tol at high temp for large Mass
-      solver_iters_timestep_limit = 20
       gold_solver_iters_timestep_limit = 20
-      iter_for_resid_tol2 = 10
 
       max_abs_rel_run_E_err = 1d-2
 
-      energy_eqn_option = 'dedt'
       max_tries_for_implicit_wind = 0 ! Recommend 10 for a production run     
 
-      convergence_ignore_equL_residuals = .true. 
+      convergence_ignore_equL_residuals = .false.
       make_gradr_sticky_in_solver_iters = .true.
       xa_scale = 1d-5
       iter_for_resid_tol2 = 10
@@ -346,7 +340,7 @@
       ! 4d9 has been well tested with the approx21 network
       ! lower to 2.5d9 or worst case 1d9 for large networks to help with
       ! numerical stability and speed, see MESA VI (Jermyn 2023) 
-      op_split_burn = .true.
+      op_split_burn = .false.
       op_split_burn_min_T = 4d9 
       burn_steps_limit = 150
       burn_steps_hard_limit = 250

@@ -506,10 +506,8 @@
          if (s% mix_factor == 0d0 .and. s% dxdt_nuc_factor == 0d0) return
 
          do i=1, max_dx_limit_ctrls  ! go over all potential species + XYZ
-            if (s% dX_limit(i) >= 1 .and. &      ! as soon as all of these are >= 1
-                s% dX_hard_limit(i) >= 1 .and. &  ! we'd have nothing to do
-                s% dX_div_X_limit(i) >= 1 .and. &
-                s% dX_div_X_hard_limit(i) >= 1) then
+            if (s% dX_limit_min_X(i) > 1d0 .and. &
+                s% dX_div_X_limit_min_X(i) > 1d0) then
                cycle  ! go to next
             end if
 

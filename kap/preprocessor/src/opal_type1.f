@@ -489,8 +489,8 @@
              end if
            end if
          end do
-         if (kmin <= 0) return
-         if ((iadvance == 0) .and. (k1 <= kmin) .and. (slt <= alt(kmin))) then
+         if ((iadvance == 0) .and. (kmin <= 0)) return
+         if ((iadvance == 0) .and. (k1 <= kmin) .and. (slt <= alt(max(1,kmin)))) then
             k1=kmin
             if ((xz(1,mzz,kmin,l1+1) < 9.) .and. ((slr+.01) > alr(l1+1))) then
                l1=l1+1

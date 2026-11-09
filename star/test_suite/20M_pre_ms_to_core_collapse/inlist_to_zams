@@ -56,7 +56,6 @@
 ! mesh
 
 ! solver
-      solver_iters_timestep_limit = 20
 
 ! output
       num_trace_history_values = 2

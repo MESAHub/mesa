@@ -370,7 +370,7 @@
           end if
         end if
       end do
-      if ((iadvance == 0) .and. (k1 <= kmin) .and. (slt <= alt(kmin))) then
+      if ((iadvance == 0) .and. (k1 <= kmin) .and. (slt <= alt(max(1,kmin)))) then
       k1=kmin
       if ((co(1,1,1,kmin,l1+1) < 9.) .and. ((slr+.01) > alr(l1+1))) then
       l1=l1+1
