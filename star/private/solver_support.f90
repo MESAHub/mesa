@@ -1215,6 +1215,10 @@
                   end if
                   if (report) write(*,2) 'bad num w', k, s% w(k)
                end if
+               ! Keep the solver increment consistent with the corrected w.
+               if (s% w(k) /= x(i_w)) then
+                  s% solver_dx(i_w,k) = s% w(k) - xh_start(i_w,k)
+               end if
                s% Hp_face(k) = x(i_Hp)
                if (is_bad_num(s% Hp_face(k))) then
                   s% retry_message = 'bad num for Hp_face'
@@ -1267,9 +1271,10 @@
                   if (report) write(*,2) 'bad num alpha_RTI', k, s% alpha_RTI(k)
                   ierr = -1
                end if
-               if (s% alpha_RTI(k) < 0d0) then
-                  s% alpha_RTI(k) = 0d0
-                  x(i_alpha_RTI) = 0d0
+               ! Use the clipped alpha_RTI in both the solver and time increments.
+               if (s% alpha_RTI(k) /= x(i_alpha_RTI)) then
+                  s% solver_dx(i_alpha_RTI,k) = s% alpha_RTI(k) - xh_start(i_alpha_RTI,k)
+                  s% dxh_alpha_RTI(k) = s% solver_dx(i_alpha_RTI,k)
                end if
             end if
 
@@ -1289,6 +1294,10 @@
                   end if
                   if (report) write(*,2) 'bad num w_div_w_crit_roche', k, s% w_div_w_crit_roche(k)
                   ierr = -1
+               end if
+               ! Keep the solver increment consistent with the clipped rotation fraction.
+               if (s% w_div_w_crit_roche(k) /= x(i_w_div_wc)) then
+                  s% solver_dx(i_w_div_wc,k) = s% w_div_w_crit_roche(k) - xh_start(i_w_div_wc,k)
                end if
             end if
 
