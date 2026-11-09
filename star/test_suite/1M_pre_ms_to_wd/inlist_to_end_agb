@@ -14,7 +14,7 @@
       change_D_omega_flag = .true.
       new_D_omega_flag = .true.
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -35,7 +35,7 @@
 
       envelope_mass_limit = 1d-2 ! Msun
 
-      energy_eqn_option = 'eps_grav'
+      energy_eqn_option = 'dedt'
       use_gold2_tolerances = .true.
 
       num_trace_history_values = 2
