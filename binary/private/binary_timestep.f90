@@ -66,6 +66,13 @@
          else
             dt_why_str(Tlim_binary) = binary_dt_why_str(b% dt_why_reason)
          end if
+         if (b% have_to_reduce_timestep_due_to_j) then
+            ! lower timesteps after retries due to large changes in angular momentum
+            dt_min = dt_min * b% dt_reduction_factor_for_j
+
+            b% have_to_reduce_timestep_due_to_j = .false.
+         end if
+
          do l = 1, num_stars
             if (l == 1 .and. b% point_mass_i == 1) then
                i = 2
@@ -83,16 +90,7 @@
             end if
          end do
 
-         if (b% have_to_reduce_timestep_due_to_j) then
-            ! lower timesteps after retries due to large changes in angular momentum
-            if (b% point_mass_i /= 1) then
-               b% s1% dt = b% s1% dt*b% dt_reduction_factor_for_j
-            end if
-            if (b% point_mass_i /= 2) then
-               b% s2% dt = b% s2% dt*b% dt_reduction_factor_for_j
-            end if
-            b% have_to_reduce_timestep_due_to_j = .false.
-         end if
+         b% dt = dt_min ! Set the binary dt to the minimum of the timesteps
 
       end subroutine set_star_timesteps
 
