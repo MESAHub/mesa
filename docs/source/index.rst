@@ -66,10 +66,14 @@ Modules for Experiments in Stellar Astrophysics
       :class-card: quickstart
 
 
-.. image:: assets/demo.gif
-    :alt: MESA demo
-    :align: center
-    :width: 480px
+.. raw:: html
+
+   <div style="text-align: center;">
+     <video width="480" controls autoplay loop muted playsinline>
+       <source src="./demo_12Msun.mp4" type="video/mp4">
+       Your browser does not support the video tag.
+     </video>
+   </div>
 
 
 .. toctree::
