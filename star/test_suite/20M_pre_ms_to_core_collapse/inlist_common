@@ -307,7 +307,7 @@
       ! for O-Ne flames.
       use_gold2_tolerances = .false.
 
-      fix_d_eos_dxa_partials = .true.
+      fix_d_eos_dxa_partials = .false.
 
       use_gold_tolerances = .true.
       tol_correction_high_T_limit = 1d9 ! Switch to lower tol at high temp for large Mass

@@ -23,6 +23,7 @@
       dX_limit_min_X(1) = 1d-2
       dX_limit(1) = 0.1
       dX_div_X_limit_min_X(1) = 5d-4
+      dX_div_X_limit(1) = 10d0 ! tighten this to 0.7d0 for production to resolve the pockets well
 
 ! overshooting
 ! first match will be applied
