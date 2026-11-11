@@ -80,6 +80,9 @@
       atm_T_tau_relation = 'Eddington'
       atm_T_tau_opacity = 'iterated'
 
+      min_dq = 1d-16
+      min_dq_for_split = 1d-16
+
       accrete_same_as_surface = .true.
 
       mass_change = 1d-9 ! rate of accretion (Msun/year)

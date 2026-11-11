@@ -78,6 +78,8 @@
 
       max_center_cell_dq = 1d-6
       max_surface_cell_dq = 1d-8
+      min_dq = 1d-16
+      min_dq_for_split = 1d-16
 
       min_timestep_limit = 1d-12
 

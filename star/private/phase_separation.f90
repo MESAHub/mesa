@@ -112,7 +112,9 @@
 
             ! core boundary needs to be padded by a minimal amount (less than a zone worth of mass)
             ! to account for loss of precision during remeshing.
-            pad = s% min_dq * s% m(1) * 0.5d0
+            ! (Floor at dq=1d-14 in case smaller zones are allowed. Those much smaller zones will be at surface,
+            !  so they won't be relevant for phase separation in the core.)
+            pad = max(1d-14,s% min_dq * 0.5d0) * s% m(1)
             do k = s%nz,1,-1
                if(s% m(k) > s% crystal_core_boundary_mass + pad) then
                   kstart = k

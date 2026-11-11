@@ -5725,6 +5725,10 @@
       ! ~~~~~~
 
       ! Min size for cell as fraction of total mass.
+      ! Note that the default is appropriate for main sequence stars,
+      ! but resolution needed near the photosphere scales as R^2,
+      ! so for white dwarfs this needs to be min_dq~1d-18.
+      ! When changing min_dq, also consider adjusting min_dq_for_split to be comparable.
 
       ! ::
 
@@ -5851,7 +5855,9 @@
       ! min_surface_cell_dq
       ! ~~~~~~~~~~~~~~~~~~~
 
-      ! Largest allowed dq at surface.
+      ! Largest and smallest allowed dq at surface.
+      ! max_surface_cell_dq must be larger than min_dq, and should be larger than min_dq_for_split
+      ! as well so that nearby zones can adjust to comparable resolution if necessary.
 
       ! ::
 
