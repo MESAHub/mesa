@@ -73,6 +73,21 @@ conserving total angular momentum. See
 Bug Fixes
 ---------
 
+The ``colors`` module now checks Hermite-interpolated spectra for unphysical
+fluxes, sets negligible negative undershoots to zero, and falls back to
+trilinear interpolation when necessary. Interpolation also handles atmosphere
+grid boundaries and axes with only one tabulated value more robustly.
+Filter transmission is now zero outside the tabulated passband, preventing
+spurious contributions to synthetic magnitudes and photometric zero-points.
+Bolometric magnitudes now include the bolometric flux zero point, correcting
+their absolute scale independently of the Vega, AB, or ST bandpass system.
+
+The ``colors`` history columns now use the photospheric ``Teff``, ``photosphere_logg``
+and ``photosphere_r`` instead of the outermost-cell ``T(1)``, ``log10(grav(1))`` and
+``R(1)``, so synthetic magnitudes change slightly.
+
+Fixed an issue where the `find0_quadratic` subroutine provided by the `num` module could accidentally divide by 0 when the points used for the quadratic interpolant did not bracket a root.
+
 Incomplete split burns now trigger a stellar retry when they reach
 ``burn_steps_hard_limit``.
 
@@ -115,6 +130,17 @@ Fixed the hydrodynamic drag energy term so that it is only included when
 entry <drag_energy_u_flag_bug>`.
 
 Important bug fix for ``r26.4.1`` identified by Emily Sandford and Louis Siebenaler: the ``lowT_Freedman11`` opacity option used ``[M/H]`` labels as the metal mass fraction when interpolating in ``Z``, resulting in incorrect opacities. We recommend users who use these low-temperature opacities, such as in planet models, update to the latest MESA version or employ the fixes in :ref:`the known bugs entry <freedman_lowt_z_bug>` and `gh-993 <https://github.com/MESAHub/mesa/pull/993>`_.
+
+Fixed spurious :math:`\log_{10}\kappa = 0` values in Type 1 OPAL/OP opacity
+tables. The preprocessor uses fitting and smoothing routines adapted from
+`Seaton (1993) <https://ui.adsabs.harvard.edu/abs/1993MNRAS.265L..25S/abstract>`_.
+A conditional error in its interpolation branch for missing data affects
+MESA ``r26.4.1`` and all earlier versions. Other codes in the field may also
+be affected if they adopt these same preprocessing routines. We have corrected
+the preprocessor and regenerated the tables. We recommend users update to
+the latest version of MESA or apply the fix described in
+:ref:`the known bugs entry <opal_op_type1_preprocessor_bug>` and
+`gh-1111 <https://github.com/MESAHub/mesa/pull/1111>`_.
 
 The plasmon neutrino cooling rate used a hardcoded prefactor calculated with a Weinberg angle of 0.2319, while all other neutrino cooling processes used calculated prefactors taking the Weinberg angle as input, with default value 0.22290. Thus, modifying the value of the Weinberg angle resulted in changes to neutrino cooling processes except for the plasmon neutrinos. This affects all previous MESA versions, and was found and fixed by user Garv Chauhan, see :ref:`the known bugs entry <plasmon_weinberg_angle_bug>` and `gh-998 <https://github.com/MESAHub/mesa/pull/998>`_. Plasmon neutrinos now use the same Weinberg angle as all other processes and changing its value will affect the corresponding cooling rate. Changes to the plasmon neutrino prefactor for MESA's default Weinberg angle result in small numerical differences for stars where plasmon neutrino cooling is significant.
 
