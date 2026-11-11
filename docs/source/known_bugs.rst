@@ -118,7 +118,8 @@ Any tables generated through the same faulty code path can contain these
 values, including tables used elsewhere in the field.
 
 This is fixed after ``r26.4.1``. The fix updates both the preprocessor and
-the distributed tables. To apply the source fix in
+the distributed tables. See `gh-1111 <https://github.com/MESAHub/mesa/pull/1111>`_.
+To apply the source fix in
 ``kap/preprocessor/src/opal_type1.f``,
 change the early return to
 ``if ((iadvance == 0) .and. (kmin <= 0)) return`` and use
