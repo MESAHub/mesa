@@ -29,7 +29,7 @@
       show_retry_counts_when_terminate = .true.
       show_timestep_limit_counts_when_terminate = .true.
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -173,6 +173,8 @@
 
       energy_eqn_option = 'dedt'
       max_tries_for_implicit_wind = 0
+      fix_d_eos_dxa_partials = .false.
+      scale_max_correction = 1d0
 
       convergence_ignore_equL_residuals = .true.
       make_gradr_sticky_in_solver_iters = .true.
@@ -190,7 +192,7 @@
       Tcenter_min_for_sig_min_factor_full_on = 3.2d9
       Tcenter_max_for_sig_min_factor_full_off = 2.8d9
 
-      op_split_burn = .true.
+      op_split_burn = .false.
       op_split_burn_min_T = 1d9
       burn_steps_limit = 150
       burn_steps_hard_limit = 250

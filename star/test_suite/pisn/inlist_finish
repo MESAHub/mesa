@@ -144,7 +144,6 @@
 
       Grid1_file_flag = .true.
       Grid1_file_dir = 'png'
-      Grid1_file_prefix = 'cc_'
       Grid1_file_interval = 10     ! output when mod(model_number,Grid1_file_interval)==0
 
       !History_Panels2_xaxis_name = 'star_age'
@@ -192,9 +191,9 @@
       Text_Summary1_name(2,3) = 'ejecta_M'
 
 
-      TRho_Profile_xmin = 2.0
+      !TRho_Profile_xmin = 2.0
       !TRho_Profile_xmax = 7.5
-      TRho_Profile_ymin = 8.3
+      !TRho_Profile_ymin = 8.3
       !TRho_Profile_ymax = 9.2
 
 
