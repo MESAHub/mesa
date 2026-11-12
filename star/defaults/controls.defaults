@@ -9859,11 +9859,13 @@
       ! ~~~~~~~~~~~~~~
 
       ! If max ``dX_div_X`` is greater than this,
-      ! reduce the next timestep by ``dX_limit/max_dX``.
+      ! reduce the next timestep by ``dX_div_X_limit/max_dX_div_X``.
+      ! Values greater than 1 allow decreases larger than the end-of-step abundance,
+      ! which is the denominator of ``dX_div_X``.
 
       ! ::
 
-    dX_div_X_limit(1) = 0.9d0
+    dX_div_X_limit(1) = 10d0
     dX_div_X_limit(2) = 0.9d0
     dX_div_X_limit(3:) = 1d99
 
@@ -10316,7 +10318,7 @@
 
       ! ``L_He_burn`` = integrated power at surface from triple alpha (in Lsun units)
 
-      ! values for ``lgL_He`` are ``log10(max(1, L_He_burn))``
+      ! values for ``lgL_He`` are ``log10(L_He_burn)`` for positive luminosities.
 
 
       ! delta_lgL_He_limit
@@ -10347,7 +10349,7 @@
 
       ! ::
 
-    lgL_He_burn_min = 2.5d0
+    lgL_He_burn_min = -0.5d0
 
 
       ! lgL_He_drop_factor
@@ -10367,7 +10369,7 @@
 
       ! ::
 
-    lgL_He_burn_relative_limit = 3
+    lgL_He_burn_relative_limit = 5d0
 
       ! ``L_z_burn`` = integrated power at surface from nuclear burning other than H, He, or C (in Lsun units)
       ! excluding photodistintegrations

@@ -16,7 +16,7 @@
       change_D_omega_flag = .true.
       new_D_omega_flag = .true.
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -40,10 +40,11 @@
       xa_central_lower_limit_species(1) = 'he4'
       xa_central_lower_limit(1) = 0.0001
 
-      energy_eqn_option = 'eps_grav'
+      energy_eqn_option = 'dedt'
       use_gold2_tolerances = .true.
       
-      convergence_ignore_equL_residuals = .true.
+      make_gradr_sticky_in_solver_iters = .true.
+      !convergence_ignore_equL_residuals = .true.
 
       num_trace_history_values = 2
       trace_history_value_name(1) = 'rel_E_err'
@@ -65,7 +66,9 @@
       D_ST_factor = 1
       
       varcontrol_target = 1d-3
-      delta_lgL_He_limit = 0.01d0
+      delta_lgL_He_limit = 1d-2 !0.01d0
+      lgL_He_burn_min = -0.5d0
+      lgL_He_burn_relative_limit = 5d0
      
       cool_wind_full_on_T = 9.99d9
       hot_wind_full_on_T = 1d10 

@@ -1276,6 +1276,7 @@
          else ! not using hydro (u_flag = .false.)
             s% max_timestep = 1d99
             call star_read_controls(id, 'inlist_hydro_off', ierr)
+            if (.not. in_inlist_pulses) s% use_momentum_outer_BC = .false.
          end if
 
          !ignore L_nuc limit if L_phot is too high or if we just did a relax

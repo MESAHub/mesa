@@ -188,7 +188,7 @@
          real(dp), intent(out) :: equ_norm, equ_max
          integer, intent(out) :: k_max, j_max, ierr
 
-         integer :: j, k, num_terms, n, nz, nvar_hydro, nvar_chem, skip_eqn1, skip_eqn2, skip_eqn3
+         integer :: j, k, num_terms, n, nz, nvar_hydro, skip_eqn1, skip_eqn2, skip_eqn3
          real(dp) :: sumequ, absq
 
          logical :: dbg
@@ -205,7 +205,6 @@
          dbg = s% solver_check_everything
 
          nvar_hydro = min(nvar, s% nvar_hydro)
-         nvar_chem = s% nvar_chem
 
          nz = s% nz
          n = nz
@@ -217,6 +216,8 @@
          if (s% convergence_ignore_equL_residuals) skip_eqn1 = s% i_equL
          if (s% convergence_ignore_alpha_RTI_residuals) skip_eqn2 = s% i_dalpha_RTI_dt
          if (s% do_burn .or. s% do_mix) then
+            ! Count each equation once. The loop over all variables replaced the
+            ! structural sum, so a separate composition pass would count those rows twice.
             num_terms = num_terms + nvar*nz
             if (skip_eqn1 > 0) num_terms = num_terms - nz
             if (skip_eqn2 > 0) num_terms = num_terms - nz
@@ -270,21 +271,6 @@
                end do
             end do
          end if
-         if (s% do_burn .or. s% do_mix) then
-            num_terms = num_terms + nvar_chem*nz
-            do k = 1, nz
-               do j = nvar_hydro+1, nvar
-                  absq = abs(s% equ(j,k)*s% residual_weight(j,k))
-                  sumequ = sumequ + absq
-                  if (absq > equ_max) then
-                     equ_max = absq
-                     j_max = j
-                     k_max = k
-                  end if
-               end do
-            end do
-         end if
-
          equ_norm = sumequ/num_terms
          if (dbg) write(*,4) trim(s% nameofequ(j_max)) // ' sizequ equ_max norm', &
             k_max, s% solver_iter, s% model_number, equ_max, equ_norm
@@ -384,9 +370,7 @@
          max_zone = 0
          max_var = 0
          num_terms = 0
-         num_xa_terms = 0
          sum_corr = 0
-         sum_xa_corr = 0
          max_correction = 0
          max_abs_correction = 0
          x_limit = s% correction_xa_limit
@@ -394,6 +378,9 @@
          found_bad_num = .false.
          report = s% report_ierr
          cell_loop: do k = 1, nz
+            ! Average composition corrections within each cell.
+            num_xa_terms = 0
+            sum_xa_corr = 0
             max_abs_corr_for_k = 0
             max_abs_xa_corr_for_k = 0
 
@@ -1215,6 +1202,10 @@
                   end if
                   if (report) write(*,2) 'bad num w', k, s% w(k)
                end if
+               ! Keep the solver increment consistent with the corrected w.
+               if (s% w(k) /= x(i_w)) then
+                  s% solver_dx(i_w,k) = s% w(k) - xh_start(i_w,k)
+               end if
                s% Hp_face(k) = x(i_Hp)
                if (is_bad_num(s% Hp_face(k))) then
                   s% retry_message = 'bad num for Hp_face'
@@ -1267,9 +1258,10 @@
                   if (report) write(*,2) 'bad num alpha_RTI', k, s% alpha_RTI(k)
                   ierr = -1
                end if
-               if (s% alpha_RTI(k) < 0d0) then
-                  s% alpha_RTI(k) = 0d0
-                  x(i_alpha_RTI) = 0d0
+               ! Use the clipped alpha_RTI in both the solver and time increments.
+               if (s% alpha_RTI(k) /= x(i_alpha_RTI)) then
+                  s% solver_dx(i_alpha_RTI,k) = s% alpha_RTI(k) - xh_start(i_alpha_RTI,k)
+                  s% dxh_alpha_RTI(k) = s% solver_dx(i_alpha_RTI,k)
                end if
             end if
 
@@ -1289,6 +1281,10 @@
                   end if
                   if (report) write(*,2) 'bad num w_div_w_crit_roche', k, s% w_div_w_crit_roche(k)
                   ierr = -1
+               end if
+               ! Keep the solver increment consistent with the clipped rotation fraction.
+               if (s% w_div_w_crit_roche(k) /= x(i_w_div_wc)) then
+                  s% solver_dx(i_w_div_wc,k) = s% w_div_w_crit_roche(k) - xh_start(i_w_div_wc,k)
                end if
             end if
 
@@ -1473,6 +1469,14 @@
                if (s% xa(j,k) < s% xa_clip_limit) s% xa(j,k) = 0d0
             end do
          end if
+
+         if (ierr /= 0) return
+         ! Keep the solver increments consistent with the corrected abundances.
+         do j=1,species
+            if (s% xa(j,k) == s% xa_start(j,k) + s% solver_dx(s% nvar_hydro+j,k)) cycle
+            s% solver_dx(s% nvar_hydro+j,k) = s% xa(j,k) - s% xa_start(j,k)
+            s% xa_sub_xa_start(j,k) = s% solver_dx(s% nvar_hydro+j,k)
+         end do
 
       end subroutine check1_chem
 
