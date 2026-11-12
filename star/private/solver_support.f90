@@ -1529,6 +1529,7 @@
             vol00 = volp1 + cell_vol
             s% lnR(k) = log(vol00/four_thirds_pi)/3
             dx(s% i_lnR,k) = s% lnR(k) - xh_start(s% i_lnR,k)
+            s% dxh_lnR(k) = dx(s% i_lnR,k)
          end do
          call edit_dlnR_dt_above_k_below_just_added(s, xh_start)
       end subroutine edit_lnR
