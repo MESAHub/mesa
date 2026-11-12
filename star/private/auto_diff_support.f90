@@ -285,37 +285,6 @@
          end if
       end function wrap_d_p1
 
-      function wrap_d_m1_start(s, k) result(d_m1)
-         type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: d_m1
-         integer, intent(in) :: k
-         d_m1 = 0d0
-         if (k > 1) then
-            d_m1 % val = s%rho_start(k-1)
-            d_m1 % d1Array(i_lnd_m1) = s%rho_start(k-1)
-         end if
-      end function wrap_d_m1_start
-
-      function wrap_d_00_start(s, k) result(d_00)
-         type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: d_00
-         integer, intent(in) :: k
-         d_00 = 0d0
-         d_00 % val = s%rho_start(k)
-         d_00 % d1Array(i_lnd_00) = s%rho_start(k)
-      end function wrap_d_00_start
-
-      function wrap_d_p1_start(s, k) result(d_p1)
-         type (star_info), pointer :: s
-         type(auto_diff_real_star_order1) :: d_p1
-         integer, intent(in) :: k
-         d_p1 = 0d0
-         if (k < s%nz) then
-            d_p1 % val = s%rho_start(k+1)
-            d_p1 % d1Array(i_lnd_p1) = s%rho_start(k+1)
-         end if
-      end function wrap_d_p1_start
-
       function wrap_lnd_m1(s, k) result(lnd_m1)
          type (star_info), pointer :: s
          type(auto_diff_real_star_order1) :: lnd_m1
