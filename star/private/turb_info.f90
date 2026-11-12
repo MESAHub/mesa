@@ -307,6 +307,7 @@
             gradT_ad = gradr_ad
             s% gradT_ad(k) = gradT_ad
             s% gradT(k) = s% gradT_ad(k)%val
+            s% gradT_sub_grada(k) = s% gradT(k) - s% grada_face(k)
 
             Y_face_ad = gradT_ad - grada_face_ad
             s% Y_face_ad(k) = Y_face_ad
