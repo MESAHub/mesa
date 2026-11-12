@@ -107,6 +107,10 @@ contains
           call prepare_kap(s, ierr)
           if (ierr /= 0) return
        end if
+       if (.not. skip_kap .and. s% op_mono_method == 'mombarg') then
+          call kap_mombarg_cache_alloc(s% nz, ierr)
+          if (ierr /= 0) return
+       end if
        if (.not. skip_kap .and. s% op_mono_method == 'mombarg' .and. &
             s% high_logT_op_mono_full_on - s% low_logT_op_mono_full_on > 0  ) then
           fk = 0
