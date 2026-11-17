@@ -376,7 +376,7 @@ module skye
          ! Ideal electron-positron thermodynamics (s, e, p)
          ! Derivatives are handled by HELM code, so we don't pass *in* any auto_diff types (just get them as return values).
          call compute_ideal_ele(temp%val, den%val, din%val, logtemp%val, logden%val, zbar, ytot1, ye, ht, &
-                               F_ele, etaele, xnefer, ierr)
+                               F_ele, etaele, ierr)
 
          xnefer = compute_xne(den, ytot1, zbar)
 
