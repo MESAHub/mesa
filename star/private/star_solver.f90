@@ -771,17 +771,16 @@
             dbg_adjust = .false.
             err_msg = ''
 
-            ! Failed trials restore these even when the line search is skipped.
-            do k=1,nz
-               do i=1,nvar
-                  dxsave(i,k) = s% solver_dx(i,k)
-                  ddxsave(i,k) = ddx(i,k)
-               end do
-            end do
             skip_eval_f = (min_corr_coeff_in == 1)
             if (skip_eval_f) then
                f = 0
             else
+               do k=1,nz
+                  do i=1,nvar
+                     dxsave(i,k) = s% solver_dx(i,k)
+                     ddxsave(i,k) = ddx(i,k)
+                  end do
+               end do
                f = eval_f(nvar,nz,equ)
                if (is_bad_num(f)) then
                   ierr = -1
@@ -944,6 +943,8 @@
 
             end do search_loop
 
+            ! Restore corrections only if they were saved for the line search.
+            if (skip_eval_f) return
             do k=1,nz
                do i=1,nvar
                   s% solver_dx(i,k) = dxsave(i,k)
