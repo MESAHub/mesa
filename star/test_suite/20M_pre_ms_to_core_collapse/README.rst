@@ -7,8 +7,7 @@
 .. tags:: star, massive-star, pre-main-sequence, full-evolution, core-collapse, carbon-burning, silicon-burning
 
 This test suite evolves a solar metalicity 20 |MSun| model from the pre-ms to core collapse.
-For bit for bit convergence, we recommendedd to run by using the ./run_all script instead of restarting from models,
-see https://github.com/MESAHub/mesa/issues/610.
+The model evolves fully implicitly and does not rely on operator split burning.
 
 This test_suite has been tested up to 80 solar masses, up to solar metallicity, with mass loss, and produces reasonable HR-tracks.
 Note that for higher masses at solar metallicity, some combination of Pextra_factor, mass-loss, and/or superadiabatic convection reduction (e.g. mlt++)

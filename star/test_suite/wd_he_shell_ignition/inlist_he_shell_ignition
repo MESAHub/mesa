@@ -100,7 +100,7 @@
 
       delta_lgL_He_limit = 0.02 ! limit for magnitude of change in lgL_He
       delta_lgL_He_hard_limit = 0.5
-      lgL_He_burn_min = -6 ! ignore changes in lgL_He if value is less than this
+      lgL_He_burn_min = -0.5d0 ! ignore changes in lgL_He if value is less than this
 
       delta_lgL_limit = 0.02
       delta_lgL_hard_limit = 0.15

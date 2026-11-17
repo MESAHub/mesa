@@ -10,7 +10,7 @@
       save_model_filename = 'final.mod'
       required_termination_code_string = 'log_L_lower_limit'
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -34,7 +34,7 @@
       ! remove this if want to allow them.
       eps_nuc_factor = 0d0
 
-      energy_eqn_option = 'eps_grav'
+      energy_eqn_option = 'dedt'
       use_gold2_tolerances = .true.
 
       num_trace_history_values = 2
@@ -67,7 +67,7 @@
 
       delta_lgL_He_limit = 0.025 ! limit for magnitude of change in lgL_He
       delta_lgL_He_hard_limit = 1
-      lgL_He_burn_min = 2.5 ! ignore changes in lgL_He if value is less than this
+      lgL_He_burn_min = -0.5d0 ! ignore changes in lgL_He if value is less than this
 
       log_L_lower_limit = -1
 

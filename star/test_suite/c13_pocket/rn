@@ -21,11 +21,11 @@ else
 fi
 
 if [ -n "$MESA_SKIP_OPTIONAL" ]; then
-    echo "Skipping 3DUP evolution to lgL=3.79 using saved model"
-    cp standard_lgL_3.79.mod lgL_3.79.mod
+    echo "Skipping pulse positioning using saved model"
+    cp standard_he_shell_ignition.mod he_shell_ignition.mod
 else
-    do_one inlist_to_lgL_3.79_header lgL_3.79.mod LOGS_to_lgL_3.79
-    cp lgL_3.79.mod standard_lgL_3.79.mod
+    do_one inlist_to_he_shell_ignition_header he_shell_ignition.mod LOGS_to_he_shell_ignition
+    cp he_shell_ignition.mod standard_he_shell_ignition.mod
 fi
 
 do_one inlist_c13_pocket_header final.mod LOGS_c13_pocket
