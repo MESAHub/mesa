@@ -99,10 +99,12 @@ module star_pgstar
    integer, parameter :: i_R_L = i_L_Teff + 1
    integer, parameter :: i_R_Teff = i_R_L + 1
    integer, parameter :: i_logL_Teff = i_R_Teff + 1
-   integer, parameter :: i_HR = i_logL_Teff + 1
+   integer, parameter :: i_logL_R = i_logL_Teff + 1
+   integer, parameter :: i_logL_v = i_logL_R + 1
+   integer, parameter :: i_HR = i_logL_v + 1
    integer, parameter :: i_TRho = i_HR + 1
    integer, parameter :: i_TmaxRho = i_TRho + 1
-   integer, parameter :: i_Dynamo = i_TRho + 1
+   integer, parameter :: i_Dynamo = i_TmaxRho + 1
    integer, parameter :: i_Mixing = i_Dynamo + 1
    integer, parameter :: i_rti = i_Mixing + 1
    integer, parameter :: i_Kipp = i_rti + 1
@@ -176,7 +178,11 @@ module star_pgstar
    integer, parameter :: i_Grid7 = i_Grid6 + 1
    integer, parameter :: i_Grid8 = i_Grid7 + 1
    integer, parameter :: i_Grid9 = i_Grid8 + 1
-   integer, parameter :: i_Other = i_Grid9 + 1
+
+   integer, parameter :: i_Max_eq_resid = i_Grid9 + 1
+   integer, parameter :: i_Kipp_residuals = i_Max_eq_resid + 1
+
+   integer, parameter :: i_Other = i_Kipp_residuals + 1
 
    integer, parameter :: num_pgstar_plots = i_Other + max_num_Other_plots
 

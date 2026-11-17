@@ -68,6 +68,7 @@
 ! solver controls
       ignore_too_large_correction = .true.
       convergence_ignore_equL_residuals = .true.
+      make_gradr_sticky_in_solver_iters = .true.
       ! max_resid_jump_limit = 1d9
       relax_max_number_retries = 3000
 
@@ -136,8 +137,6 @@
       ! solver debugging
       !solver_check_everything = .true.
 
-      !solver_epsder_struct = 1d-6
-      !solver_epsder_chem = 1d-6
 
       !report_solver_dt_info = .true.
       !report_dX_nuc_drop_dt_limits = .true.

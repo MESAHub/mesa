@@ -64,6 +64,7 @@
       public :: interp_val_to_pt
       public :: get_log_concentration
       public :: get_lconv
+      public :: get_effective_mixing_speed
       public :: get_ladv
       public :: get_lrad_div_ledd
       public :: get_lrad
@@ -2082,6 +2083,18 @@
       end function get_Lrad
 
 
+      real(dp) function get_effective_mixing_speed(s,k) result(v_mix)
+         type (star_info), pointer :: s
+         integer, intent(in) :: k
+         real(dp) :: lambda
+
+         v_mix = 0d0
+         if (k == 1) return  ! retain the zero surface value used for plotting
+         lambda = s% alpha_mlt(k)*s% scale_height(k)
+         if (lambda > 0d0) v_mix = 3d0*s% D_mix(k)/lambda
+      end function get_effective_mixing_speed
+
+
       real(dp) function get_Lconv(s,k)
          type (star_info), pointer :: s
          integer, intent(in) :: k
@@ -3808,17 +3821,16 @@
          rho_face = alfa*s% rho(k) + beta*s% rho(k-1)
       end function get_rho_face_val
 
-      function get_rho_start_face(s,k) result(rho_face)
+      real(dp) function get_rho_start_face(s,k) result(rho_face)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_star_order1) :: rho_face
          real(dp) :: alfa, beta
          if (k == 1) then
-            rho_face = wrap_d_00_start(s,k)
+            rho_face = s% rho_start(k)
             return
          end if
          call get_face_weights(s, k, alfa, beta)
-         rho_face = alfa*wrap_d_00_start(s,k) + beta*wrap_d_m1_start(s,k)
+         rho_face = alfa*s% rho_start(k) + beta*s% rho_start(k-1)
       end function get_rho_start_face
 
       function get_T_face(s,k) result(T_face)

@@ -97,14 +97,14 @@ Zbase = 0.004d0
 
    x_logical_ctrl(7) = .true. ! doing pulses
    x_integer_ctrl(7) = -1 ! 3 ! which period to check (<= 0 means don't check any)
-   x_ctrl(7) = 12d0 ! expected period (in days) 
+   x_ctrl(7) = -1d0 ! expected period in days; <= 0 uses the dynamical time until a period is measured
    x_ctrl(8) = -1 ! min_deltaR_for_periods (Rsun)
    x_ctrl(9) = 1d0 ! KE_growth_avg_abs_frac_new ! for averaging growth rates across steps.
    x_ctrl(10) = 0.1 ! min_period_div_target
 
 
    ! new rsp style meshing, thanks to Bill P.
-   x_logical_ctrl(23) = .false. ! .true. = Remesh for TDC
+   remesh_for_TDC_pulsations_when_load = .false.
    TDC_hydro_use_mass_interp_face_values = .false.
    TDC_hydro_nz = 150 
    TDC_hydro_nz_outer = 40 
@@ -183,14 +183,16 @@ Zbase = 0.004d0
    steps_before_use_TDC = 0
    MLT_option = 'TDC'
    include_mlt_corr_to_TDC = .false. ! true K. 1986 model, no mlt limiting
-   use_face_reconstruction = .true. ! reconstruct the MLT/TDC face state
    TDC_include_eturb_in_energy_equation = .true.
-   use_rsp_form_of_scale_height = .true.
    mixing_length_alpha = 1.5d0
    TDC_alpha_M = 0.25d0
    use_ledoux_criterion = .true.
-   alt_scale_height_flag = .false. ! ignore eggleton, not compatible with rsp_form_of_Hp
    TDC_num_innermost_cells_forced_nonturbulent = 2 ! for envelope models only.
+
+! hydro solver
+   use_TDC_Y_face_seeded_newton = .true.
+   use_face_reconstruction = .true.
+   hydro_matrix_solver = 'banded'
 
 ! controls for shock capturing, relaxed for pulsations
    ! main purpose is to force radiative in shock face

@@ -2,7 +2,7 @@
 
 ! begin with saved model
       load_saved_model = .true.
-      load_model_filename = 'lgL_3.79.mod'
+      load_model_filename = 'he_shell_ignition.mod'
 
 ! save a model and profile at the end of the run
       save_model_when_terminate = .true.
@@ -21,7 +21,7 @@
       new_cumulative_energy_error = 0d0
 
 ! display on-screen plots
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
 
 / !end of star_job namelist
 

@@ -34,13 +34,6 @@
       ! extra files (Maybe overkill with so few inlist parameters)
          read_extra_binary_job_inlist, extra_binary_job_inlist_name, &
          evolve_both_stars, &
-         relax_primary_to_th_eq, &
-         log_Lnuc_div_L_for_relax_primary_to_th_eq, &
-         min_age_for_relax_primary_to_th_eq, &
-         max_steps_for_relax_primary_to_th_eq, &
-         no_history_during_relax_primary_to_th_eq, &
-         reset_age_for_relax_primary_to_th_eq, &
-         tsync_for_relax_primary_to_th_eq, &
          change_ignore_rlof_flag, &
          change_initial_ignore_rlof_flag, &
          new_ignore_rlof_flag, &
@@ -118,13 +111,6 @@
          b% job% inlist_names(:) = inlist_names(:)
 
          b% job% evolve_both_stars = evolve_both_stars
-         b% job% relax_primary_to_th_eq = relax_primary_to_th_eq
-         b% job% log_Lnuc_div_L_for_relax_primary_to_th_eq = log_Lnuc_div_L_for_relax_primary_to_th_eq
-         b% job% min_age_for_relax_primary_to_th_eq = min_age_for_relax_primary_to_th_eq
-         b% job% max_steps_for_relax_primary_to_th_eq = max_steps_for_relax_primary_to_th_eq
-         b% job% no_history_during_relax_primary_to_th_eq = no_history_during_relax_primary_to_th_eq
-         b% job% reset_age_for_relax_primary_to_th_eq = reset_age_for_relax_primary_to_th_eq
-         b% job% tsync_for_relax_primary_to_th_eq = tsync_for_relax_primary_to_th_eq
 
          b% job% change_ignore_rlof_flag = change_ignore_rlof_flag
          b% job% change_initial_ignore_rlof_flag = change_initial_ignore_rlof_flag
@@ -171,13 +157,6 @@
 
          evolve_both_stars = b% job% evolve_both_stars
          evolve_both_stars = b% job% evolve_both_stars
-         relax_primary_to_th_eq = b% job% relax_primary_to_th_eq
-         log_Lnuc_div_L_for_relax_primary_to_th_eq = b% job% log_Lnuc_div_L_for_relax_primary_to_th_eq
-         min_age_for_relax_primary_to_th_eq = b% job% min_age_for_relax_primary_to_th_eq
-         max_steps_for_relax_primary_to_th_eq = b% job% max_steps_for_relax_primary_to_th_eq
-         no_history_during_relax_primary_to_th_eq = b% job% no_history_during_relax_primary_to_th_eq
-         reset_age_for_relax_primary_to_th_eq = b% job% reset_age_for_relax_primary_to_th_eq
-         tsync_for_relax_primary_to_th_eq = b% job% tsync_for_relax_primary_to_th_eq
 
          change_ignore_rlof_flag = b% job% change_ignore_rlof_flag
          change_initial_ignore_rlof_flag = b% job% change_initial_ignore_rlof_flag

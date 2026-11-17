@@ -690,17 +690,6 @@
 
     gyre_data_schema = 101
 
-      ! max_num_gyre_points
-      ! ~~~~~~~~~~~~~~~~~~~
-
-      ! limit gyre output files to at most this number of points
-      ! only used when > 1
-
-      ! ::
-
-    max_num_gyre_points = -1
-
-
       ! fgong_zero_A_inside_r
       ! ~~~~~~~~~~~~~~~~~~~~~
 
@@ -710,50 +699,6 @@
       ! ::
 
     fgong_zero_A_inside_r = 0d0
-
-
-      ! trace_mass_location
-      ! ~~~~~~~~~~~~~~~~~~~
-
-      ! location for ``trace_mass_radius``, ``trace_mass_logT``, etc. (Msun units)
-
-      ! ::
-
-    trace_mass_location = 0
-
-
-      ! min_tau_for_max_abs_v_location
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! controls choice of location in model for ``max_abs_v`` history info.
-      ! can use this to exclude locations too close to surface.
-      ! ignore if <= 0
-
-      ! ::
-
-    min_tau_for_max_abs_v_location = 0
-
-
-      ! min_q_for_inner_mach1_location
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! controls choice of location in model for innermost mach 1 history info.
-      ! can use this to exclude locations too close to center.
-
-      ! ::
-
-    min_q_for_inner_mach1_location = 0
-
-
-      ! max_q_for_outer_mach1_location
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! controls choice of location in model for outermost mach 1 history info.
-      ! can use this to exclude locations too close to surface.
-
-      ! ::
-
-    max_q_for_outer_mach1_location = 1
 
 
       ! burn_min1
@@ -779,52 +724,6 @@
       ! ::
 
     burn_min2 = 1000
-
-
-      ! width_for_limit_conv_vel
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! look this number of cells on either side of boundary to see if
-      ! any boundary k in that range has s% csound(k) < s% v(k) <= s% csound(k-1)
-      ! i.e. transition from subsonic to supersonic as go inward
-      ! if find any such transition then don't allow increase in convection velocity.
-      ! this implies no change from radiative to convective.
-      ! the purpose of this is to prevent convective energy transport
-      ! from moving energy from behind a shock to in front of the shock.
-
-      ! ::
-
-    width_for_limit_conv_vel = 3
-
-
-      ! max_q_for_limit_conv_vel
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! for q(k) <= this, don't allow conv_vel to grow
-
-      ! ::
-
-    max_q_for_limit_conv_vel = -1
-
-
-      ! max_r_in_cm_for_limit_conv_vel
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! for r(k) <= this, don't allow conv_vel to grow
-
-      ! ::
-
-    max_r_in_cm_for_limit_conv_vel = -1
-
-
-      ! max_mass_in_gm_for_limit_conv_vel
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! for m(k) <= this, don't allow conv_vel to grow
-
-      ! ::
-
-    max_mass_in_gm_for_limit_conv_vel = -1
 
 
       ! center_avg_value_dq
@@ -1070,20 +969,6 @@
 
     log_center_temp_upper_limit = 11d0
     log_center_temp_lower_limit = -1d99
-
-
-      ! surface_accel_div_grav_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! This is used when do not have a velocity variable.
-      ! The acceleration ratio is ``abs(accel)/grav`` at surface,
-      ! where accel is ``(rdot-rdot_old)/dt`` and grav is ``G*m/r^2``.
-      ! Stop if the ratio becomes larger than this limit.
-      ! Ignored if <= 0.
-
-      ! ::
-
-    surface_accel_div_grav_limit = -1
 
 
       ! log_max_temp_upper_limit
@@ -2099,16 +1984,6 @@
     shock_mass_upper_limit = -1
 
 
-      ! mach1_mass_upper_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~
-
-      ! stop when outer location of mach 1 is > this.  <= 0 means no limit.
-
-      ! ::
-
-    mach1_mass_upper_limit = -1
-
-
       ! delta_Pg_lower_limit
       ! ~~~~~~~~~~~~~~~~~~~~
 
@@ -2285,9 +2160,15 @@
       ! mlt_Pturb_factor
       ! ~~~~~~~~~~~~~~~~
 
-      ! For MESA's momentum equation, include MLT turbulent pressure at face k = mlt_Pturb_factor*(1/3d0)*0.5*(rho(k) + rho(k-1))*mlt_vc(k)**2/3
-      ! MLT turbulent pressure for cell k = avg of values at faces. For TDC, mlt_Pturb_factor = 2d0
-      ! corresponds to TDC_alpha_Pt = 1d0, where Pt = (2/3)*rho(k)*(mlt_vc(k)/sqrt(2/3))**2
+      ! The MLT turbulent pressure is ``P_turb = mlt_Pturb_factor*rho*mlt_vc**2/3``.
+      ! In the momentum equation, MESA uses the stored convective speed ``mlt_vc_old``
+      ! at each face to calculate the turbulent pressure difference across that face.
+      !
+      ! In TDC, ``mlt_vc = sqrt(2/3)*w``, where ``w**2 = e_t`` is the specific
+      ! turbulent kinetic energy. The pressure used for TDC pressure work is
+      ! ``P_turb = TDC_alpha_Pt*(2/3)*rho*w**2 = TDC_alpha_Pt*rho*mlt_vc**2``.
+      ! For the same density and convective speed, ``mlt_Pturb_factor = 3d0``
+      ! gives the same pressure as ``TDC_alpha_Pt = 1d0``.
 
       ! this replaces conv_dP_term_factor.   also see extra_pressure vector and other_pressure routine
 
@@ -2331,7 +2212,11 @@
       ! ~~~~~~~~~~~
       ! + ``TDC_alpha_D``  : The turbulent viscous damping parameter which determines the saturation of TDC. Increasing this decreases convection speeds. This control is analogous to RSP_alfad, and previously called alpha_TDC_DAMP.
       ! + ``TDC_alpha_R``  : The radiative damping parameter which determines the saturation of TDC. Increasing this decreases convection speeds. This control is analogous to RSP_gammar, and previously called alpha_TDC_DAMPR.
-      ! + ``TDC_alpha_Pt`` : The prefactor on the term accounting for work done against turbulent pressure (P_turb * dV/dt). Physically this should be unity. Turbulent pressure effects on the momentum equations are set by ``mlt_Pturb_factor``. Together, These controls are analogous to RSP_alfap, and previously called alpha_TDC_PtdVdt.
+      ! + ``TDC_alpha_Pt`` multiplies the turbulent pressure in the TDC work term
+      !   ``P_turb*dV/dt``. A value of ``1d0`` uses the standard pressure
+      !   ``P_turb = (2/3)*rho*e_t``.
+      !   Use ``mlt_Pturb_factor`` to set the turbulent pressure contribution to the momentum equation.
+      !   This control was previously called ``alpha_TDC_PtdVdt``.
       ! + ``TDC_alpha_M``  : The prefactor on the term accounting for eddy viscous dissipation. This control is analogous to RSP_alfam.
       ! + ``TDC_alpha_C``  : The prefactor on the convective flux. This control is analogous to RSP_alfac.
       ! + ``TDC_alpha_S``  : The prefactor on the convective source term, S . This control is analogous to RSP_alfas.
@@ -3197,6 +3082,8 @@
       ! Standard values are the ones for which static version of the Kuhfuss
       ! model reduces to standard MLT. See Table 1 in `Smolec & Moskalik (2008)`_
       ! for standard values and the description of the parameters.
+      ! RSP uses ``P_turb = RSP_alfap*(2/3)*rho*e_t`` in both the momentum and
+      ! turbulent energy equations.
 
       ! .. _Smolec & Moskalik (2008): https://ui.adsabs.harvard.edu/abs/2008AcA....58..193S
 
@@ -3353,18 +3240,9 @@
       ! zsh > 0 delays onset of artificial viscosity
       ! can eliminate most/all interior dissipation while still providing for extreme cases.
       ! using this parameter the dependence of limiting amplitude on cq is very weak.
-      ! for Tscharnuter & Winkler form of artificial viscosity
 
-      ! ::
-
-    RSP_Qvisc_linear = 0d0
-    RSP_Qvisc_quadratic = 0d0
-
-      ! as described in section 4.2 of mesa3, 2015.
-      ! RSP_Qvisc_linear is analogous to shock_spread_linear
-      ! RSP_Qvisc_quadratic is analogous to shock_spread_quadratic
-      ! if switch to this form, set RSP_cq = 0 to shut off the Neumann & Richtmyer form.
-      ! note that this form also uses RSP_zsh to delay onset of artificial viscosity
+      ! The Qvisc form of artificial viscosity in Section 4.2 of |MESA III| is no longer available.
+      ! RSP uses Pvsc, controlled by ``RSP_cq`` and ``RSP_zsh``.
 
       ! surface pressure.  Provides outer boundary condition for momentum equation.
 
@@ -3388,7 +3266,6 @@
       ! ::
 
     RSP_tol_max_corr = 1d-8
-    RSP_tol_max_resid = 1d-6
     RSP_max_iters_per_try = 100
     RSP_max_retries_per_step = 50
     RSP_report_undercorrections = .false.
@@ -3448,10 +3325,6 @@
       ! ::
 
     use_RSP_new_start_scheme = .false.
-
-      ! ::
-
-    RSP_Qvisc_linear_static = 0d0
 
       ! ::
 
@@ -3834,7 +3707,7 @@
 
       !     f = 1  when logT <= D_mix_rotation_max_logT_full_on = full_on
       !       = 0  when logT >= D_mix_rotation_min_logT_full_off = full_off
-      !       = (log(T)-full_on)/(full_off-full_on) else
+      !       = (full_off-log(T))/(full_off-full_on) else
 
       ! note that for regions with brunt N^2 < 0, we set Richardson number to 1
       ! which is > Ri_critical and therefore turns off DSI and SSI
@@ -4233,27 +4106,6 @@
     D_mix_rotation_min_logT_full_off = 9.5d0
 
 
-      ! D_mix_rotation_min_tau_full_off
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Drop rotational components of ``D_mix`` for locations where tau <= this.
-      ! For numerical stability, turn off rotational part of ``D_mix`` at very low tau.
-
-      ! ::
-
-    D_mix_rotation_min_tau_full_off = 0d0
-
-      ! D_mix_rotation_min_tau_full_on
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! Use rotational components of ``D_mix`` for locations where tau >= this.
-      ! For numerical stability, turn off rotational part of ``D_mix`` at very low tau.
-
-      ! ::
-
-    D_mix_rotation_min_tau_full_on = 0d0
-
-
       ! D_omega_mixing_rate
       ! ~~~~~~~~~~~~~~~~~~~
       ! D_omega_mixing_across_convection_boundary
@@ -4349,7 +4201,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~
 
       ! If have selected ``'table'`` for ``atm_option``, fallback to using
-      ! this if the args are off the table. Possible choices are ``'T_tau'``
+      ! this if the args are off the table. The fallback uses the attachment
+      ! optical depth of the selected table. Possible choices are ``'T_tau'``
       ! or blank (in which case the code will halt when it encounters an off-table
       ! arg)
 
@@ -6527,37 +6380,60 @@
       ! ~~~~~~~~~~~~
       ! TDC_hydro_nz_outer
       ! ~~~~~~~~~~~~~~~~~~
+      ! TDC_hydro_nz_inner
+      ! ~~~~~~~~~~~~~~~~~~
+      ! TDC_hydro_nz_T_gradient
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~
       ! TDC_hydro_T_anchor
       ! ~~~~~~~~~~~~~~~~~~
       ! TDC_hydro_dq_1_factor
       ! ~~~~~~~~~~~~~~~~~~~~~
       ! TDC_hydro_use_mass_interp_face_values
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! remesh_for_TDC_pulsations_when_load
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! remesh_for_TDC_pulsations_log_core_zoning
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! If calling the public ``remesh_for_TDC_pulsations`` function, the model will be rezoned below ``TDC_hydro_T_anchor`` with logarithmic
-      ! spacing in mass. If .false., remeshing scheme will do a bisection root find such
-      ! that each zone increases in mass inward following a power law, similar to RSP's static model builder.
+      ! If ``remesh_for_TDC_pulsations_log_core_zoning`` is true, the model is rezoned below
+      ! ``TDC_hydro_T_anchor`` with logarithmic spacing in mass. If false, each cell increases
+      ! in mass inward following a power law, similar to the RSP static model builder.
 
       ! The total number of zones is set by ``TDC_hydro_nz``, with constant spacing in mass between the surface and
-      ! ``TDC_hydro_T_anchor``, and increasing spacing in mass between the anchor and the inner boundary condition.
+      ! ``TDC_hydro_T_anchor``. The selected core zoning is used between the anchor and the inner boundary condition.
       ! The number of zones in between the anchor and the surface is set by ``TDC_hydro_nz_outer``, and the number of
       ! zones in the interior is set by ``TDC_hydro_nz`` - ``TDC_hydro_nz_outer``.
       ! The ``TDC_hydro_dq_1_factor`` sets the dq of the surface cell to this multiple of the cell beneath it, k = 2.
 
+      ! For power-law core zoning, ``TDC_hydro_nz_inner`` reserves this many zones next to the inner boundary.
+      ! Their cell masses decrease geometrically inward to ``max_center_cell_dq``. Set this to zero to use a
+      ! single inward-increasing power law. Increase ``TDC_hydro_nz`` by the same amount to add inner zones
+      ! without removing zones from the middle of an existing mesh. This control has no effect with logarithmic
+      ! core zoning.
+
+      ! ``TDC_hydro_nz_T_gradient`` adds this many zones below ``TDC_hydro_T_anchor`` according to the variation
+      ! in ``logT``. These zones enhance the selected mass-based core zoning rather than replacing it. Increase
+      ! ``TDC_hydro_nz`` by the same amount to retain all zones in the underlying mass grid. Set this to zero to
+      ! leave the mass grid unchanged.
+
       ! ``TDC_hydro_use_mass_interp_face_values`` determines whether quantities are averaged to faces using simple average or
       ! mass weighted averaging.
 
-      ! This remeshing scheme works well for most Cepheid envelopes, but it is not designed for AGB stars with deep convective envelopes.
+      ! Use ``TDC_hydro_nz_inner`` and ``TDC_hydro_nz_T_gradient`` to resolve the inner boundary
+      ! and steep temperature gradients in AGB envelopes with deep convective regions.
+
+      ! If ``remesh_for_TDC_pulsations_when_load`` is true, a model loaded from a ``.mod`` file
+      ! is remeshed before the first step. This is not applied to photo restarts.
 
       ! ::
 
+    remesh_for_TDC_pulsations_when_load = .false.
     remesh_for_TDC_pulsations_log_core_zoning = .false.
     TDC_hydro_use_mass_interp_face_values = .false.
 
     TDC_hydro_nz = 150
     TDC_hydro_nz_outer = 40
+    TDC_hydro_nz_inner = 0
+    TDC_hydro_nz_T_gradient = 0
     TDC_hydro_T_anchor = 11d3
     TDC_hydro_dq_1_factor = 2d0
 
@@ -7550,6 +7426,9 @@
       !   phase diagram of `Blouin & Daligault (2021a) <https://ui.adsabs.harvard.edu/abs/2021PhRvE.103d3204B>`_.
       ! + ``'ONe'`` : oxygen-neon phase separation using the two-component
       !   phase diagram of `Blouin & Daligault (2021b) <https://ui.adsabs.harvard.edu/abs/2021ApJ...919...87B>`_.
+      ! + ``'3c'`` : three-component phase separation option dynamically selects dominant three components out
+      !   of C/O/Ne/Na/Mg and applies three-component PS procedure based on
+      !   `Castro-Tapia & Cumming (2025) <https://ui.adsabs.harvard.edu/abs/2025ApJ...991...64C>`_.
 
       ! ::
 
@@ -7565,6 +7444,20 @@
       ! ::
 
     do_phase_separation_heating = .true.
+
+      ! smooth_phase_separation_heating
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! if true, redistribute all heating associated with phase
+      ! separation evenly throughout the inner half of the white dwarf.
+      ! This is a somewhat arbitrary choice to broadly distribute the
+      ! correct amount of net heating through the WD interior where
+      ! heat conduction is efficent anyway, preventing unphysical localized
+      ! heating spikes near the crystallization boundary at small time steps.
+
+      ! ::
+
+    smooth_phase_separation_heating = .true.
 
       ! phase_separation_mixing_use_brunt
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -8729,29 +8622,6 @@
     tol_max_correction_extreme_T = 8d-1
 
 
-      ! tol_bad_max_correction
-      ! ~~~~~~~~~~~~~~~~~~~~~~
-
-      ! if ``max_correction > tol_max_correction`` and no more iterations allowed,
-      ! then still accept the solution if ``max_correction <= tol_bad_max_correction``.
-      ! but if ``max_correction > tol_bad_max_correction``, then reject the solution.
-
-      ! ::
-
-    tol_bad_max_correction = 0d0
-
-
-      ! bad_max_correction_series_limit
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! If have this many steps in a row with ``max_correction > tol_max_correction``,
-      ! then do a retry with a smaller timestep.
-
-      ! ::
-
-    bad_max_correction_series_limit = 2
-
-
       ! relax_use_gold_tolerances
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -8853,6 +8723,15 @@
     min_X_for_conv_timescale = 0d0
     max_q_for_conv_timescale = 1d0
     min_q_for_conv_timescale = 0d0
+
+      ! ``tau_QHSE_yrs`` is the maximum of ``abs(delta_v)/(G*m_grav/r^2)``
+      ! over this q range, converted from seconds to years.
+      ! ``delta_v`` is the change in face velocity since the start of the step.
+      ! The maximum is calculated only when requested by history.
+      ! The profile ``tau_qhse`` uses seconds. No selected cells gives zero.
+
+      ! ::
+
     max_q_for_QHSE_timescale = 1d0
     min_q_for_QHSE_timescale = 0d0
 
@@ -9152,8 +9031,6 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! ignore_species_in_max_correction
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! num_times_solver_reuse_mtx
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! see star/private/star_solver for info about these
 
@@ -9168,7 +9045,6 @@
     tiny_corr_factor = 2
     ignore_min_corr_coeff_for_scale_max_correction = .false.
     ignore_species_in_max_correction = .false.
-    num_times_solver_reuse_mtx = 0
 
 
       ! min_xa_hard_limit
@@ -9424,7 +9300,6 @@
 
       ! Pvsc is artificial pressure to push back against compression
       ! this is the form of artificial viscosity used in RSP
-      ! if using this, do not set use_artificial_viscosity true.
 
       ! artificial viscosity controls
       ! for the equations see: Appendix C in
@@ -9447,7 +9322,8 @@
       ! use_artificial_viscosity
       ! ~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! use_artificial_viscosity has been replaced by use_Pvsc_art_visc.
+      ! The Qvisc form of artificial viscosity in Section 4.2 of |MESA III| is no longer available.
+      ! For ``v_flag`` models, use ``use_Pvsc_art_visc`` with ``Pvsc_cq`` and ``Pvsc_zsh``.
 
 ! split burn
 ! ==========
@@ -9983,11 +9859,13 @@
       ! ~~~~~~~~~~~~~~
 
       ! If max ``dX_div_X`` is greater than this,
-      ! reduce the next timestep by ``dX_limit/max_dX``.
+      ! reduce the next timestep by ``dX_div_X_limit/max_dX_div_X``.
+      ! Values greater than 1 allow decreases larger than the end-of-step abundance,
+      ! which is the denominator of ``dX_div_X``.
 
       ! ::
 
-    dX_div_X_limit(1) = 0.9d0
+    dX_div_X_limit(1) = 10d0
     dX_div_X_limit(2) = 0.9d0
     dX_div_X_limit(3:) = 1d99
 
@@ -10440,7 +10318,7 @@
 
       ! ``L_He_burn`` = integrated power at surface from triple alpha (in Lsun units)
 
-      ! values for ``lgL_He`` are ``log10(max(1, L_He_burn))``
+      ! values for ``lgL_He`` are ``log10(L_He_burn)`` for positive luminosities.
 
 
       ! delta_lgL_He_limit
@@ -10471,7 +10349,7 @@
 
       ! ::
 
-    lgL_He_burn_min = 2.5d0
+    lgL_He_burn_min = -0.5d0
 
 
       ! lgL_He_drop_factor
@@ -10491,7 +10369,7 @@
 
       ! ::
 
-    lgL_He_burn_relative_limit = 3
+    lgL_He_burn_relative_limit = 5d0
 
       ! ``L_z_burn`` = integrated power at surface from nuclear burning other than H, He, or C (in Lsun units)
       ! excluding photodistintegrations
@@ -11531,11 +11409,7 @@
 
       ! ::
 
-    solver_numerical_jacobian = .false.
-    solver_jacobian_nzlo = 1
-    solver_jacobian_nzhi = -1
     solver_check_everything = .false.
-    solver_inspect_soln_flag = .false.
     solver_test_partials_dx_0 = -1d0
     solver_test_partials_k = -1
     solver_test_partials_k_low = -1
@@ -11552,8 +11426,6 @@
     solver_test_partials_call_number = -1
     solver_test_partials_iter_number = -1
     solver_test_partials_write_eos_call_info = .false.
-    solver_epsder_struct = 1d-5
-    solver_epsder_chem = 1d-5
 
     energy_conservation_dump_model_number = -1
 
@@ -11664,16 +11536,6 @@
     warn_when_large_virial_thm_rel_err = 1d-2
 
 
-      ! warn_when_get_a_bad_eos_result
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-      ! message includes the text "WARNING eos:"
-
-      ! ::
-
-    warn_when_get_a_bad_eos_result = .true.
-
-
       ! relax_dY
       ! ~~~~~~~~
 
@@ -11718,17 +11580,6 @@
       ! ::
 
     set_rho_to_dm_div_dV = .true.
-
-
-      ! steps_before_start_stress_test
-      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! stress_test_relax
-      ! ~~~~~~~~~~~~~~~~~
-
-      ! ::
-
-    steps_before_start_stress_test = 0
-    stress_test_relax = .false.
 
 
       ! use_other_{hook}

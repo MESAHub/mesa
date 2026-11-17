@@ -688,7 +688,7 @@ module skye
                dabar_dxa, F_ideal_ion_dxa)
 
             if (use_ion_offsets) then
-               call compute_ion_offset_partials(species, xa, chem_id, doffset_dxa)
+               call compute_ion_offset_partials(species, chem_id, doffset_dxa)
                do j = 1, species
                   F_ideal_ion_dxa(j) = F_ideal_ion_dxa(j) + doffset_dxa(j)
                end do

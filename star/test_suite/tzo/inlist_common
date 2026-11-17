@@ -172,11 +172,8 @@
 
    !solver_dump_jacobian_call_number = 33
    !solver_dump_jacobian_iter_number = 11
-   !solver_numerical_jacobian = .true.
    !solver_save_numjac_plot_data = .true.
 
-   !solver_epsder_struct = 1d-6
-   !solver_epsder_chem = 1d-6
 
    !fill_arrays_with_NaNs = .true.
 

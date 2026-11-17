@@ -1273,8 +1273,6 @@
                !s% v_drag_factor = 1d0
                !s% v_drag = 2d9
                !s% v_drag_factor = 1d0
-               s% D_mix_rotation_min_tau_full_off = 1d0
-               s% D_mix_rotation_min_tau_full_on = 10d0
                write(*,*) 'u_flag is on, pulse has begun'
                if (.not. s% lxtra(lx_using_bb_bcs)) then
                   s% max_timestep = max_dt_during_pulse
@@ -1290,9 +1288,6 @@
                end do
                if (k > 1) then
                  s% max_q_for_convection_with_hydro_on = s% q(k)
-                 !if (s% tau(k)> 10d0) then
-                 !s% D_mix_rotation_min_tau_full_off = s% tau(k)
-                 !end if
                end if
             else
                write (*,*) 'u_flag is on, Pulse has not begun.'

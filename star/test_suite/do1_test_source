@@ -33,7 +33,7 @@ do_one 16M_predictive_mix "termination code: xa_central_lower_limit" "tams.mod" 
 do_one accreted_material_j "star_mass_max_limit" "final.mod" auto
 do_one adjust_net "finished with expected number of species" "final.mod" auto
 do_one carbon_kh "stop because log_center_density >= log_center_density_upper_limit" "final.mod" auto
-do_one check_pulse_atm "all values are within tolerance" "final.mod" skip
+do_one check_pulse_atm "all values are within tolerance" "final.mod" auto
 do_one check_redo "stop because have dropped below central lower limit for h1" "final.mod" auto
 do_one conductive_flame "all values are within tolerance" "final.mod" auto
 do_one conserve_angular_momentum "stop because he_core_mass >= he_core_mass_limit" "final.mod" auto
@@ -96,6 +96,7 @@ do_one wd_cool_0.6M "stop because log_center_temperature <= log_center_temp_lowe
 do_one wd_diffusion "passed test for electric field in the core" "final.mod" auto
 do_one wd_he_shell_ignition "stop because power_he_burn >= power_he_burn_upper_limit" "final.mod" auto
 do_one wd_nova_burst "have finished burst" "final.mod" auto
+do_one wd_o_ne_3_phase "stop because log_center_temperature <= log_center_temp_lower_limit" "final.mod" auto
 do_one wd_stable_h_burn "stop because star_mass >= star_mass_max_limit" "final.mod" auto
 do_one high_rot_darkening "termination code: xa_central_lower_limit" "final.mod" auto
 

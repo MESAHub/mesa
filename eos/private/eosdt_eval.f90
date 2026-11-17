@@ -1624,7 +1624,7 @@
          subroutine set_alfa_and_partials  ! alfa = fraction other
             logical, parameter :: dbg = .false.
 
-            real(dp) :: base_alfa, zden, zfactor
+            real(dp) :: zden, zfactor
 
             include 'formats'
 
@@ -1679,14 +1679,13 @@
             end if
 
             if (Z > Z_no_HELM .and. Z < Z_all_HELM .and. alfa < 1d0) then
-               ! reduce alfa to reduce the HELM fraction
-               base_alfa = alfa
+               ! Increase alfa with Z to fade OPAL/SCVH into the next EOS.
                zden = Z_all_HELM - Z_no_HELM
                zfactor = (Z - Z_no_HELM)/zden
-               alfa = base_alfa*zfactor
-               d_alfa_dlogRho = d_alfa_dlogRho*zfactor
-               d_alfa_dlogT = d_alfa_dlogT*zfactor
-               if (present(d_alfa_dZ)) d_alfa_dZ = base_alfa/zden
+               if (present(d_alfa_dZ)) d_alfa_dZ = (1d0 - alfa)/zden
+               alfa = zfactor + (1d0 - zfactor)*alfa
+               d_alfa_dlogRho = (1d0 - zfactor)*d_alfa_dlogRho
+               d_alfa_dlogT = (1d0 - zfactor)*d_alfa_dlogT
             end if
 
          end subroutine set_alfa_and_partials

@@ -13,7 +13,7 @@
       create_initial_model = .true.
       radius_in_cm_for_create_initial_model = 13982200000.d0 ! in cm
       mass_in_gm_for_create_initial_model = 1.8389d30 ! in grams
-      initial_model_relax_num_steps = 0
+      initial_model_relax_num_steps = 300
 	
       set_initial_age = .true.
       initial_age = 0.d0 ! in years

@@ -118,7 +118,7 @@ contains
          gradr_in, grada, scale_height, mixing_length_alpha, &
          mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
       use chem_def, only: ih1
-      use const_def, only: ln10
+      use const_def, only: ln10, convective_mixing
       use starspots, only: starspot_tweak_gradr
       type (star_info), pointer :: s
       integer, intent(in) :: k
@@ -133,10 +133,10 @@ contains
          gradT, Y_face, mlt_vc, D, Gamma
       integer, intent(out) :: ierr
 
-      real(dp) :: cgrav, m, XH1, P_theta, L_theta
+      real(dp) :: cgrav, m, XH1, P_theta, L_theta, rho_start
       integer :: iso
       type(auto_diff_real_star_order1) :: gradr, r, L, T, P, opacity, rho, dV, &
-         chiRho, chiT, Cp, rho_start, energy
+         chiRho, chiT, Cp, energy
       include 'formats'
       ierr = 0
 
@@ -177,7 +177,7 @@ contains
       opacity = opacity_in
       rho = rho_in
       rho_start = get_rho_start_face(s,k)
-      dV = 1d0/rho - 1d0/rho_start ! both variables are face wrapped.
+      dV = 1d0/rho - 1d0/rho_start ! rho_start is fixed during the Newton solve.
       chiRho = chiRho_in
       chiT = chiT_in
       Cp = Cp_in
@@ -203,6 +203,10 @@ contains
             s% alpha_semiconvection, s% thermohaline_coeff, &
             mixing_type, gradT, Y_face, mlt_vc, D, Gamma, energy, ierr)
       end if
+      if (ierr /= 0) return
+
+      ! Do not use diffusion velocities as MLT/TDC turbulent velocity.
+      if (mixing_type /= convective_mixing) mlt_vc = 0d0
 
    end subroutine do1_mlt_eval
 

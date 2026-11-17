@@ -15,7 +15,7 @@
       new_D_omega_flag = .true.
       
 
-      !pgstar_flag = .true.
+      pgstar_flag = .true.
 
 / ! end of star_job namelist
 
@@ -37,7 +37,6 @@
       xa_central_lower_limit_species(1) = 'h1'
       xa_central_lower_limit(1) = 0.0001
 
-      energy_eqn_option = 'dedt'
       use_gold2_tolerances = .true.
 
       num_trace_history_values = 2

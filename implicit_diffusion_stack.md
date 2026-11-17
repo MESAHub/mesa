@@ -1,6 +1,6 @@
 # Stack implicit diffusion on EOS composition partials
 
-## Scope and status
+## October 2026 scope and status
 
 Requested on 2026-10-13: back up `EbF/implicit_diffusion`, then place only
 the diffusion changes on `EbF/eos_partials`. Preserve the EOS optimizations.
@@ -418,3 +418,25 @@ The branches retain the fixed diagnostic and identical EOS implementation.
 The diffusion source and configuration patches remain unchanged. This
 publication record is a documentation-only follow-up to the code tips above.
 No MESA compilation or model execution was performed.
+
+## Sync with MESA main on 2026-11-16
+
+MESA main at `438b1d717` was merged into `EbF/eos_partials` in
+`f7bbc57d9`. That EOS tip was then merged into `EbF/implicit_diffusion`.
+The diffusion branch has the same `eos/` tree as the updated EOS branch.
+
+- `get_opal_scvh_alfa_and_partials` keeps the upstream high-metallicity
+  blend. Its selector slope is `(1 - alfa_base)/(Z_all_HELM - Z_no_HELM)`
+  within the fade, and `Do_Blend` continues to hold the weights fixed
+  for exported composition partials.
+- `compute_ion_offset` keeps the upstream specific energy offset
+  `sum(X_i * I_i / A_i) * ev2erg / amu`. The matching partial in
+  `compute_ion_offset_partials` is `I_i / A_i * ev2erg / amu` for ions
+  in the table.
+- The diffusion work inlist keeps its 2.5-solar-mass pre-main-sequence
+  setup and PGSTAR layout. The retry count uses `num_retries`, and the
+  thermohaline plot uses `effective_mixing_speed` for its original
+  diffusion-based diagnostic.
+
+Standalone finite differences checked the EOS selector and ion offset
+slopes. No MESA compilation or model execution was performed.

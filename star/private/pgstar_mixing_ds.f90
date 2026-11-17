@@ -86,17 +86,14 @@
          integer, intent(out) :: ierr
          call MixDs_plot(s, device_id, &
             s% pg% Mixing_win_flag, s% pg% Mixing_file_flag, &
-            s% pg% do_Mixing_win, s% pg% do_Mixing_file, &
-            s% pg% id_Mixing_win, s% pg% id_Mixing_file, s% pg% Mixing_file_interval, &
+            s% pg% Mixing_file_interval, &
             s% pg% Mixing_file_dir, s% pg% Mixing_file_prefix, &
             s% pg% show_Mixing_annotation1, s% pg% show_Mixing_annotation2, &
             s% pg% show_Mixing_annotation3, &
             xaxis_name, xmin, xmax, xaxis_reversed, &
             ymin, ymax, s% pg% Mixing_dymin, &
             s% pg% Mixing_win_width, s% pg% Mixing_win_aspect_ratio, &
-            s% pg% prev_Mixing_win_width, s% pg% prev_Mixing_win_ratio, &
             s% pg% Mixing_file_width, s% pg% Mixing_file_aspect_ratio, &
-            s% pg% prev_Mixing_file_width, s% pg% prev_Mixing_file_ratio, &
             winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, &
             panel_flag, xaxis_numeric_labels_flag, ierr)
       end subroutine do_Mixing_panel
@@ -105,16 +102,13 @@
 
       subroutine MixDs_plot(s, device_id, &
             MixDs_win_flag, MixDs_file_flag, &
-            do_MixDs_win, do_MixDs_file, &
-            id_MixDs_win, id_MixDs_file, MixDs_file_interval, &
+            MixDs_file_interval, &
             MixDs_file_dir, MixDs_file_prefix, &
             show_MixDs_annotation1, show_MixDs_annotation2, show_MixDs_annotation3, &
             MixDs_xaxis_name, MixDs_xmin, MixDs_xmax, MixDs_xaxis_reversed, &
             MixDs_ymin, MixDs_ymax, MixDs_dymin, &
             MixDs_win_width, MixDs_win_aspect_ratio, &
-            prev_MixDs_win_width, prev_MixDs_win_ratio, &
             MixDs_file_width, MixDs_file_aspect_ratio, &
-            prev_MixDs_file_width, prev_MixDs_file_ratio, &
             winxmin, winxmax, winymin, winymax, subplot, title, txt_scale, &
             panel_flag, xaxis_numeric_labels_flag, ierr)
 
@@ -123,8 +117,7 @@
          type (star_info), pointer :: s
          integer, intent(in) :: device_id
          logical, intent(in) :: MixDs_win_flag, MixDs_file_flag
-         logical, intent(in) :: do_MixDs_win, do_MixDs_file
-         integer, intent(in) :: id_MixDs_win, id_MixDs_file, MixDs_file_interval
+         integer, intent(in) :: MixDs_file_interval
          character (len=strlen), intent(in) :: MixDs_file_dir, MixDs_file_prefix
          logical, intent(in) :: show_MixDs_annotation1, show_MixDs_annotation2, show_MixDs_annotation3
          character (len=*), intent(in) :: MixDs_xaxis_name, title
@@ -132,9 +125,7 @@
             MixDs_xmin, MixDs_xmax, &
             MixDs_ymin, MixDs_ymax, MixDs_dymin, &
             MixDs_win_width, MixDs_win_aspect_ratio, &
-            prev_MixDs_win_width, prev_MixDs_win_ratio, &
-            MixDs_file_width, MixDs_file_aspect_ratio, &
-            prev_MixDs_file_width, prev_MixDs_file_ratio
+            MixDs_file_width, MixDs_file_aspect_ratio
          real, intent(in) :: winxmin, winxmax, winymin, winymax, txt_scale
          logical, intent(in) :: subplot, &
             MixDs_xaxis_reversed, panel_flag, xaxis_numeric_labels_flag

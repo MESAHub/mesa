@@ -53,7 +53,7 @@ def smooth_opac(table_path: Path):
     output_name = output_file_dir / table_path.name
     with output_name.open("w") as output:
         # write header
-        output.writelines(header)
+        output.write("\n".join(header) + "\n")
 
         # write log R header
         index = " ".join((f"{logr: 8.2f}" for logr in rarr))

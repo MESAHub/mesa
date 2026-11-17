@@ -870,7 +870,7 @@
 
                ! reduce alam and try again
                if (first_time) then
-                  tmplam = -slope/(2*(f-fold-slope))
+                  tmplam = -slope*alam*alam/(2*(f-fold-alam*slope))
                   first_time = .false.
                   if (dbg_adjust) then
                      write(*,5) 'slope', k, iter, s% solver_iter, &
@@ -879,8 +879,8 @@
                         s% model_number, f
                      write(*,5) 'fold', k, iter, s% solver_iter, &
                         s% model_number, fold
-                     write(*,5) '2*(f-fold-slope)', k, iter, s% solver_iter, &
-                        s% model_number, 2*(f-fold-slope)
+                     write(*,5) '2*(f-fold-alam*slope)', k, iter, s% solver_iter, &
+                        s% model_number, 2*(f-fold-alam*slope)
                   end if
                else  ! have two prior f values to work with
                   rhs1 = f - fold - alam*slope
@@ -943,6 +943,8 @@
 
             end do search_loop
 
+            ! Restore corrections only if they were saved for the line search.
+            if (skip_eval_f) return
             do k=1,nz
                do i=1,nvar
                   s% solver_dx(i,k) = dxsave(i,k)
@@ -1957,6 +1959,7 @@
                if (associated(band1)) call fill_with_NaNs(band1)
             end if
 
+            ddx = 0d0
             dxsave(1:nvar,1:nz) => dxsave1(1:neq)
             ddxsave(1:nvar,1:nz) => ddxsave1(1:neq)
             B(1:nvar,1:nz) => B1(1:neq)

@@ -807,7 +807,8 @@ contains
        if (op_err /= 0) call mesa_error(__FILE__,__LINE__,'non-zero op_err')
 
        D(k) = s%mlt_D(k)
-       vc(k) = s%mlt_vc(k)
+       ! The stored mlt_vc can be frozen before the start-of-step copy.
+       vc(k) = s%mlt_vc_ad(k)%val
 
        grada(k) = s%grada_face(k)
        gradr(k) = s%gradr(k)

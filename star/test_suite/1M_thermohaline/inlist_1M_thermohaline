@@ -103,7 +103,6 @@ num_cells_for_smooth_brunt_B = 0
          ! Tighten the following controls to reduce the number of retries.
          dX_limit_species(1) = 'Z'
          dX_div_X_limit_min_X(1) = 3d-4
-         dX_div_X_limit(1) = 3d-2
 
          MLT_option = 'Cox'
         
@@ -204,8 +203,6 @@ num_cells_for_smooth_brunt_B = 0
       ! solver debugging
       !solver_check_everything = .true.
       
-      !solver_epsder_struct = 1d-6
-      !solver_epsder_chem = 1d-6
       
       !report_solver_dt_info = .true.
       !report_dX_nuc_drop_dt_limits = .true.
@@ -397,7 +394,7 @@ Profile_Panels1_title = ''
 Profile_Panels1_txt_scale = 0.7
 Profile_Panels1_num_panels = 4
 
-Profile_Panels1_yaxis_name(1) = 'conv_vel'
+Profile_Panels1_yaxis_name(1) = 'effective_mixing_speed'
 !Profile_Panels1_dymin(1) = 0.14
 Profile_Panels1_other_yaxis_name(1) = 'lum_conv'!'lum_conv'
 !Profile_Panels1_other_dymin(1) = 0.14
