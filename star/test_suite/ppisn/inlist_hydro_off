@@ -8,7 +8,7 @@
    use_other_wind = .true.
 
    !use_dPrad_dm_form_of_T_gradient_eqn = .true.
-   use_momentum_outer_BC = .false.
+   use_momentum_outer_BC = .true. ! turned off until pulses in the rse
    use_split_merge_amr = .false.
 
    max_mdot_redo_cnt = 200

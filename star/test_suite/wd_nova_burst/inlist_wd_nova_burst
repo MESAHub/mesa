@@ -107,7 +107,7 @@
    lgL_H_burn_min = -0.5 ! ignore changes in lgL_H if value is less than this
 
    delta_lgL_He_limit = 0.25 ! limit for magnitude of change in lgL_He
-   lgL_He_burn_min = 2.5 ! ignore changes in lgL_He if value is less than this
+   lgL_He_burn_min = -0.5d0 ! ignore changes in lgL_He if value is less than this
 
    delta_lgRho_limit = 1 ! limit for magnitude of max change in log10 density at any point
    delta_lgRho_hard_limit = -1

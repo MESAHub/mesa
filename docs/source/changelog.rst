@@ -167,6 +167,25 @@ Other Changes
 
 `mesa/binary` now no longer copies the binary history columns into the star history by default. Set `append_to_star_history = .true.` to reenable this feature. All binary history data is still saved to `history_name` defined in section `&binary_controls`.
 
+Improvements and bug fixes in MESA's Newton solver allow it to converge with
+larger timesteps. The default for ``dX_div_X_limit(1)`` has been changed from
+0.9 to 10, allowing larger relative changes in hydrogen abundance at moving
+burning fronts. The helium luminosity timestep limit acts earlier to resolve
+the onset of flashes. The default for ``lgL_He_burn_min`` has been changed
+from 2.5 to -0.5, and the default for ``lgL_He_burn_relative_limit`` from 3 to 5.
+See `gh-1112 <https://github.com/MESAHub/mesa/pull/1112>`_.
+
+Test Suite
+----------
+
+- In ``1M_pre_ms_to_wd``, a run with ``dX_div_X_limit(1) = 50d0`` on the red
+  giant branch reaches the onset of the core helium flash in an order
+  of magnitude fewer timesteps. See `gh-1112 <https://github.com/MESAHub/mesa/pull/1112>`_.
+- ``20M_pre_ms_to_core_collapse`` uses fully implicit burning through core collapse.
+- ``c13_pocket`` counts pulses with third dredge up and starts the pocket
+  calculation at helium shell ignition after an interpulse. The thermal pulse
+  cycle completes in half as many timesteps as in previous MESA versions.
+
 
 Changes in r26.4.1
 ===================
