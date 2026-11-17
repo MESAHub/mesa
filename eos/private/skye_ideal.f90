@@ -512,24 +512,6 @@ module skye_ideal
         detadttz = din * ytot1 * detaddtt
         detaddtz = din * ytot1 * detadddt
 
-!..look in the number density table only once
-        fi(1)  = ht% xf(iat,jat)
-        fi(2)  = ht% xf(iat+1,jat)
-        fi(3)  = ht% xf(iat,jat+1)
-        fi(4)  = ht% xf(iat+1,jat+1)
-        fi(5)  = ht% xft(iat,jat)
-        fi(6)  = ht% xft(iat+1,jat)
-        fi(7)  = ht% xft(iat,jat+1)
-        fi(8)  = ht% xft(iat+1,jat+1)
-        fi(9)  = ht% xfd(iat,jat)
-        fi(10) = ht% xfd(iat+1,jat)
-        fi(11) = ht% xfd(iat,jat+1)
-        fi(12) = ht% xfd(iat+1,jat+1)
-        fi(13) = ht% xfdt(iat,jat)
-        fi(14) = ht% xfdt(iat+1,jat)
-        fi(15) = ht% xfdt(iat,jat+1)
-        fi(16) = ht% xfdt(iat+1,jat+1)
-
 
       ! Pack quantities into auto_diff types
 
