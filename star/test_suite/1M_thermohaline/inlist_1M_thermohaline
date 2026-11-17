@@ -17,7 +17,7 @@
       change_rotation_flag = .false.  ! rotation off until near zams
       new_surface_rotation_v = 10
       num_steps_to_relax_rotation = 20
-      near_zams_relax_initial_surface_rotation_v = .true.
+      near_zams_relax_initial_surface_rotation_v = .false.
 
 
       change_D_omega_flag = .true.
@@ -37,12 +37,12 @@
       pgstar_flag = .true.
 
 
-implicit_diffusion_flag = .false.
+implicit_diffusion_flag = .true.
 implicit_diffusion_include_dsig_dxa = .true.
 implicit_diffusion_use_brunt_gauss_path = .false.
 implicit_diffusion_include_dsig_structure = .false.
 
-implicit_diffusion_use_brunt_finite_difference_value = .false.
+implicit_diffusion_use_brunt_finite_difference_value = .true.
 ! In the MESA II notation, false uses an Eq. (6)-style standard Ledoux partial sum,
 ! while true uses the Eq. (8)-style New Ledoux finite difference.
 
@@ -65,12 +65,13 @@ implicit_diffusion_debug_thermohaline_k = 0
 
 &controls
          
-include_eos_composition_partials = .false.
+include_eos_composition_partials = .true.
 ! essential to lower dq for implicit diffusion, need for convective boundaries
 !min_dq_for_xa_convective = 1d-12
 !min_dq_for_xa = 1d-12
 
-convergence_ignore_equL_residuals = .true.
+convergence_ignore_equL_residuals = .false.
+make_gradr_sticky_in_solver_iters = .true.
 !tol_max_correction = 1d-2 ! need bigger corrections for implicit diffusion?
 
 
@@ -101,8 +102,8 @@ num_cells_for_smooth_brunt_B = 0
          varcontrol_target = 1d-4
 
          ! Tighten the following controls to reduce the number of retries.
-         dX_limit_species(1) = 'Z'
-         dX_div_X_limit_min_X(1) = 3d-4
+         !dX_limit_species(1) = 'Z'
+         !dX_div_X_limit_min_X(1) = 3d-4
 
          MLT_option = 'Cox'
         
@@ -422,7 +423,7 @@ Profile_Panels1_other_dymin(4) = 0.14
 
 ! x-axis limits and properties
 Profile_Panels1_xaxis_name = 'mass'
-Profile_Panels1_xmin = 0.2!-101d0
+Profile_Panels1_xmin = 0d0 !0.2!-101d0
 Profile_Panels1_xmax = 0.3d0 !-101d0!9d0 !-101d0 !8.1
 Profile_Panels1_xaxis_reversed = .false.
 
