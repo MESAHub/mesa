@@ -755,6 +755,7 @@
 
             integer :: i, k, iter
             logical :: first_time
+            logical, allocatable :: radiative_start(:)
             real(dp) :: a1, alam, alam2, a2, disc, f2, &
                rhs1, rhs2, tmplam, fold, min_corr_coeff
             real(dp) :: f_target
@@ -794,6 +795,11 @@
                   return
                end if
             end if
+            if (.not. skip_eval_f .and. s% solver_iter > 3) then
+               if (s% make_gradr_sticky_in_solver_iters .or. &
+                     s% min_logT_for_make_gradr_sticky_in_solver_iters < 1d20) &
+                  radiative_start = s% fixed_gradr_for_rest_of_solver_iters(1:nz)
+            end if
             fold = f
             min_corr_coeff = min(min_corr_coeff_in, max_corr_coeff)  ! make sure min <= max
             alam = max_corr_coeff
@@ -811,6 +817,9 @@
 
          search_loop: do iter = 1, 1000
 
+               ! A new candidate starts from the radiative flags of the last retained iterate.
+               if (iter > 1 .and. allocated(radiative_start)) &
+                  s% fixed_gradr_for_rest_of_solver_iters(1:nz) = radiative_start
                coeff = max(min_corr_coeff, alam)
                s% solver_adjust_iter = iter
 
@@ -951,6 +960,7 @@
                   ddx(i,k) = ddxsave(i,k)
                end do
             end do
+            if (allocated(radiative_start)) s% fixed_gradr_for_rest_of_solver_iters(1:nz) = radiative_start
 
          end subroutine adjust_correction
 
