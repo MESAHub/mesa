@@ -1413,7 +1413,7 @@
             Tc, full_off, full_on, qbot, qtop, f1, f, alfa
          real(dp) :: dD_dB, dsig_factor, sig_before
          real(dp), dimension(:), pointer :: sig
-         type(auto_diff_real_star_order1) :: rho_face_ad, r_ad, f_ad
+         type(auto_diff_real_star_order1) :: rho_face_ad, r_ad, f_ad, D_ad
          logical :: do_implicit_diffusion, do_implicit_dsig_structure, do_implicit_dsig_dxa
 
          include 'formats'
@@ -1459,13 +1459,15 @@
             dmavg = xmstar*(dq00+dqm1)/2
             sig(k) = cdcterm/dmavg
             if (do_implicit_dsig_structure) then
-               ! Value uses total D_mix; derivatives come only from implicit Dmix.
+               ! The geometry multiplies total D_mix, with Dmix_explicit fixed.
+               D_ad = s% Dmix_implicit(k)
+               D_ad% val = D
                rho_face_ad = get_rho_face(s,k)
                r_ad = wrap_r_00(s,k)
                f_ad = pi4*pow2(r_ad)*rho_face_ad
                f_ad = f_ad*f_ad
                s% sig_implicit_ad(k) = &
-                  s% mix_factor*s% Dmix_implicit(k)*f_ad/dmavg
+                  s% mix_factor*D_ad*f_ad/dmavg
                s% sig_implicit_ad(k)%val = sig(k)
             end if
             if (do_implicit_dsig_dxa) then

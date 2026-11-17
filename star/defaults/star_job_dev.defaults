@@ -113,9 +113,10 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! if ``implicit_diffusion_include_dsig_structure`` is true, include the
-      ! structure-Jacobian terms from the dependence of the implicit diffusion
-      ! coefficient on the current MLT/TDC state.  This is the main nonlinear
-      ! implicit-Dmix coupling.  It can be turned off to diagnose convergence
+      ! structure-Jacobian terms from the current MLT/TDC state and the face
+      ! geometry.  The geometry multiplies the total diffusion coefficient,
+      ! with the explicit part of that coefficient held fixed.
+      ! It can be turned off to diagnose convergence
       ! problems while leaving the fixed-coefficient composition solve implicit.
       ! It is off by default while the nonlinear coefficient coupling is being
       ! validated.
@@ -146,12 +147,11 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
       ! if ``implicit_diffusion_use_brunt_finite_difference_value`` is true,
-      ! the implicit Brunt path uses the same finite two-composition EOS
-      ! pressure difference as the ordinary Brunt path for the stored Brunt
-      ! value.  The implicit derivatives still use the linearized face/path
-      ! EOS pressure-composition partials.  If false, the stored value also
-      ! uses the linearized EOS partial contraction.  It is false by default
-      ! while the EOS-partial Brunt value is being tested.  In the MESA II
+      ! the implicit Brunt path uses the finite two-composition EOS pressure
+      ! difference and differentiates it using EOS partials at both endpoints.
+      ! If false, use the linearized EOS partial contraction for the value
+      ! and hold the pressure-composition partials fixed in the Jacobian.
+      ! It is false by default.  In the MESA II
       ! notation, false uses an Eq. (6)-style standard Ledoux partial sum,
       ! while true uses the Eq. (8)-style New Ledoux finite difference.
 
@@ -166,7 +166,8 @@
       ! if ``implicit_diffusion_use_brunt_gauss_path`` is true, evaluate the
       ! implicit Brunt pressure-composition derivative coefficient by a
       ! two-point Gauss path average in composition. This costs two extra
-      ! row-scoped face EOS calls per face and is off by default.
+      ! row-scoped face EOS calls per face and is off by default. Ignored when
+      ! ``implicit_diffusion_use_brunt_finite_difference_value`` is true.
 
       ! ::
 

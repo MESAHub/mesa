@@ -42,7 +42,7 @@
          integer, intent(out) :: ierr
 
          integer :: k, nz, op_err
-         real(dp), allocatable, dimension(:) :: T_face, rho_face, xa_face, xa_path, chiX_face
+         real(dp), allocatable, dimension(:) :: T_face, rho_face, xa_face, xa_path, dcomp_m1, dcomp_00
          real(dp), allocatable, dimension(:,:) :: d_eos_dxa
 
          include 'formats'
@@ -72,18 +72,18 @@
          call get_face_values(s, s% rho, rho_face, ierr)
          if (ierr /= 0) return
 
-!$OMP PARALLEL PRIVATE(k,op_err,xa_face,xa_path,chiX_face,d_eos_dxa)
-         allocate(xa_face(s% species), xa_path(s% species), chiX_face(s% species), &
+!$OMP PARALLEL PRIVATE(k,op_err,xa_face,xa_path,dcomp_m1,dcomp_00,d_eos_dxa)
+         allocate(xa_face(s% species), xa_path(s% species), dcomp_m1(s% species), dcomp_00(s% species), &
             d_eos_dxa(num_eos_basic_results,s% species))
 !$OMP DO SCHEDULE(dynamic,2)
          do k = nzlo, nzhi
             op_err = 0
             call get_implicit_brunt_B( &
-               s, k, T_face(k), rho_face(k), xa_face, xa_path, chiX_face, d_eos_dxa, op_err)
+               s, k, T_face(k), rho_face(k), xa_face, xa_path, dcomp_m1, dcomp_00, d_eos_dxa, op_err)
             if (op_err /= 0) ierr = op_err
          end do
 !$OMP END DO
-         deallocate(xa_face, xa_path, chiX_face, d_eos_dxa)
+         deallocate(xa_face, xa_path, dcomp_m1, dcomp_00, d_eos_dxa)
 !$OMP END PARALLEL
          if (ierr /= 0) return
 
@@ -138,36 +138,36 @@
 
 
       subroutine get_implicit_brunt_B( &
-            s, k, T_face, rho_face, xa_face, xa_path, chiX_face, d_eos_dxa, ierr)
+            s, k, T_face, rho_face, xa_face, xa_path, dcomp_m1, dcomp_00, d_eos_dxa, ierr)
          use eos_def, only: num_eos_basic_results, i_lnPgas, i_chiRho, i_chiT
          use eos_support, only: get_eos_brunt_dxa_with_moments
          use chem_lib, only: basic_composition_info
          use chem_def, only: chem_isos
-         use star_utils, only: get_ChiRho_face, get_ChiT_face
+         use star_utils, only: get_ChiRho_face, get_ChiT_face, get_rho_face, get_T_face, get_Peos_face
 
          type (star_info), pointer :: s
          integer, intent(in) :: k
          real(dp), intent(in) :: T_face, rho_face
-         real(dp), intent(inout) :: xa_face(:), xa_path(:), chiX_face(:)
+         real(dp), intent(inout) :: xa_face(:), xa_path(:), dcomp_m1(:), dcomp_00(:)
          real(dp), intent(inout) :: d_eos_dxa(:,:)
          integer, intent(out) :: ierr
 
          integer :: j, species
          real(dp) :: alfa, beta, logRho_face, logT_face, Prad_face, Pgas_face, &
-            Peos_face, delta_lnP, dlnP_dm, Ppoint, dlnP_composition, &
-            dlnP_composition_val, delta_lnMbar, lnP1, lnP2
+            Peos_face, delta_lnP, dlnP_dm, Ppoint, dlnP_composition, delta_lnMbar
          real(dp) :: lambda, Pgas_path, Peos_path, chiX_path
          real(dp) :: delta_lnP_val, chiT_val, brunt_B_val, &
             ddelta_lnP_m1, ddelta_lnP_00, dchiT_m1, dchiT_00, &
-            dcomp_m1, dcomp_00, dmass_corr_m1, dmass_corr_00
+            dmass_corr_m1, dmass_corr_00
          real(dp) :: aion, wion, dlnmc_m1, dlnmc_00
          real(dp) :: X_tmp, Y_tmp, Z_tmp, abar_tmp, zbar_tmp, z2bar_tmp
          real(dp) :: z53bar_tmp, ye_tmp, mass_correction_tmp, sumx_tmp
          real(dp), dimension(num_eos_basic_results) :: &
             res, d_eos_dlnd, d_eos_dlnT
          type(auto_diff_real_star_order1) :: &
-            brunt_B_ad, delta_lnP_ad, chiRho_ad, chiT_ad, dlnP_composition_ad
-         logical :: used_hydro_delta_lnP
+            brunt_B_ad, delta_lnP_ad, chiRho_ad, chiT_ad, dlnP_composition_ad, &
+            lnd_face_ad, lnT_face_ad, lnP_m1, lnP_00, Ppoint_ad, r_ad
+         logical :: use_finite_difference, used_hydro_delta_lnP
          real(dp), parameter :: gauss_offset = 0.28867513459481288225d0
          real(dp), parameter :: gauss_weight = 0.5d0
 
@@ -195,17 +195,18 @@
          end if
 
          dlnP_composition = 0d0
-         dlnP_composition_val = 0d0
-         chiX_face(1:species) = 0d0
-         if (s% job% implicit_diffusion_use_brunt_finite_difference_value) then
-            call eval_lnPeos(s% xa(1:species,k), lnP1)
+         dcomp_00(1:species) = 0d0
+         use_finite_difference = s% job% implicit_diffusion_use_brunt_finite_difference_value
+         if (use_finite_difference) then
+            lnd_face_ad = log(get_rho_face(s,k))
+            lnT_face_ad = log(get_T_face(s,k))
+            call eval_lnPeos(s% xa(1:species,k), lnP_00, dcomp_00)
             if (ierr /= 0) return
-            call eval_lnPeos(s% xa(1:species,k-1), lnP2)
+            call eval_lnPeos(s% xa(1:species,k-1), lnP_m1, dcomp_m1)
             if (ierr /= 0) return
-            dlnP_composition_val = lnP1 - lnP2
-         end if
-
-         if (s% job% implicit_diffusion_use_brunt_gauss_path) then
+            dlnP_composition_ad = lnP_00 - lnP_m1
+            dcomp_m1(1:species) = -dcomp_m1(1:species)
+         else if (s% job% implicit_diffusion_use_brunt_gauss_path) then
             lambda = 0.5d0 - gauss_offset
             xa_path(1:species) = (1d0 - lambda)*s% xa(1:species,k-1) + &
                lambda*s% xa(1:species,k)
@@ -224,7 +225,7 @@
             Peos_path = Prad_face + Pgas_path
             do j = 1, species
                chiX_path = (Pgas_path/Peos_path)*d_eos_dxa(i_lnPgas,j)
-               chiX_face(j) = chiX_face(j) + gauss_weight*chiX_path
+               dcomp_00(j) = dcomp_00(j) + gauss_weight*chiX_path
                dlnP_composition = dlnP_composition + gauss_weight*chiX_path* &
                   (s% xa(j,k) - s% xa(j,k-1))
             end do
@@ -247,7 +248,7 @@
             Peos_path = Prad_face + Pgas_path
             do j = 1, species
                chiX_path = (Pgas_path/Peos_path)*d_eos_dxa(i_lnPgas,j)
-               chiX_face(j) = chiX_face(j) + gauss_weight*chiX_path
+               dcomp_00(j) = dcomp_00(j) + gauss_weight*chiX_path
                dlnP_composition = dlnP_composition + gauss_weight*chiX_path* &
                   (s% xa(j,k) - s% xa(j,k-1))
             end do
@@ -266,14 +267,18 @@
             res, d_eos_dlnd, d_eos_dlnT, d_eos_dxa, ierr)
          if (ierr /= 0) return
 
-         Pgas_face = exp(res(i_lnPgas))
-         Peos_face = Prad_face + Pgas_face
-         if (.not. s% job% implicit_diffusion_use_brunt_gauss_path) then
-            do j = 1, species
-               chiX_face(j) = (Pgas_face/Peos_face)*d_eos_dxa(i_lnPgas,j)
-               dlnP_composition = dlnP_composition + chiX_face(j)* &
-                  (s% xa(j,k) - s% xa(j,k-1))
-            end do
+         if (.not. use_finite_difference) then
+            if (.not. s% job% implicit_diffusion_use_brunt_gauss_path) then
+               Pgas_face = exp(res(i_lnPgas))
+               Peos_face = Prad_face + Pgas_face
+               do j = 1, species
+                  dcomp_00(j) = (Pgas_face/Peos_face)*d_eos_dxa(i_lnPgas,j)
+                  dlnP_composition = dlnP_composition + dcomp_00(j)*(s% xa(j,k) - s% xa(j,k-1))
+               end do
+            end if
+            ! Hold the face/path pressure partials fixed for the contraction.
+            dcomp_m1(1:species) = -dcomp_00(1:species)
+            dlnP_composition_ad = dlnP_composition
          end if
 
          used_hydro_delta_lnP = .false.
@@ -281,24 +286,36 @@
          delta_lnP = delta_lnP_ad% val
          if (delta_lnP > -1d-50) then
             used_hydro_delta_lnP = .true.
-            alfa = s% dq(k-1)/(s% dq(k-1) + s% dq(k))
-            Ppoint = alfa*s% Peos(k) + (1d0-alfa)*s% Peos(k-1)
+            Ppoint = alfa*s% Peos(k) + beta*s% Peos(k-1)
             dlnP_dm = -s% cgrav(k)*s% m(k)/(pi4*s% r(k)*s% r(k)*s% r(k)*s% r(k)*Ppoint)
             delta_lnP = dlnP_dm*s% dm_bar(k)
             delta_lnP_ad = delta_lnP
+            if (use_finite_difference) then
+               Ppoint_ad = get_Peos_face(s,k)
+               r_ad = wrap_r_00(s,k)
+               delta_lnP_ad% d1Array = -delta_lnP*(4d0*r_ad% d1Array/r_ad% val + Ppoint_ad% d1Array/Ppoint)
+            end if
          end if
 
-         chiT_ad = get_ChiT_face(s,k)
-         chiT_ad% val = res(i_chiT)
-         if (.not. s% job% implicit_diffusion_use_brunt_finite_difference_value) &
-            dlnP_composition_val = dlnP_composition
-         dlnP_composition_ad = dlnP_composition
-         dlnP_composition_ad% val = dlnP_composition_val
+         if (use_finite_difference) then
+            chiT_ad = res(i_chiT)
+            chiT_ad% d1Array = d_eos_dlnd(i_chiT)*lnd_face_ad% d1Array + &
+               d_eos_dlnT(i_chiT)*lnT_face_ad% d1Array
+         else
+            chiT_ad = get_ChiT_face(s,k)
+            chiT_ad% val = res(i_chiT)
+         end if
          brunt_B_ad = dlnP_composition_ad/(delta_lnP_ad*chiT_ad)
 
          if (s% use_mass_corrections) then
-            chiRho_ad = get_ChiRho_face(s,k)
-            chiRho_ad% val = res(i_chiRho)
+            if (use_finite_difference) then
+               chiRho_ad = res(i_chiRho)
+               chiRho_ad% d1Array = d_eos_dlnd(i_chiRho)*lnd_face_ad% d1Array + &
+                  d_eos_dlnT(i_chiRho)*lnT_face_ad% d1Array
+            else
+               chiRho_ad = get_ChiRho_face(s,k)
+               chiRho_ad% val = res(i_chiRho)
+            end if
             delta_lnMbar = log(s% mass_correction(k-1)) - log(s% mass_correction(k))
             brunt_B_ad = brunt_B_ad - &
                chiRho_ad*delta_lnMbar/(delta_lnP_ad*chiT_ad)
@@ -311,16 +328,17 @@
          brunt_B_val = brunt_B_ad% val
 
          if (s% job% implicit_diffusion_include_dsig_dxa) then
-            ! Keep face EOS coefficients fixed in this Jacobian; differentiating
-            ! them would require second composition derivatives from the EOS.
             do j = 1, species
-               dcomp_m1 = -chiX_face(j)
-               dcomp_00 = chiX_face(j)
                dchiT_m1 = beta*d_eos_dxa(i_chiT,j)
                dchiT_00 = alfa*d_eos_dxa(i_chiT,j)
                if (used_hydro_delta_lnP) then
-                  ddelta_lnP_m1 = 0d0
-                  ddelta_lnP_00 = 0d0
+                  if (use_finite_difference) then
+                     ddelta_lnP_m1 = -delta_lnP_val*beta*s% Peos(k-1)/Ppoint*s% dlnPeos_dxa_for_partials(j,k-1)
+                     ddelta_lnP_00 = -delta_lnP_val*alfa*s% Peos(k)/Ppoint*s% dlnPeos_dxa_for_partials(j,k)
+                  else
+                     ddelta_lnP_m1 = 0d0
+                     ddelta_lnP_00 = 0d0
+                  end if
                else
                   ddelta_lnP_m1 = s% dlnPeos_dxa_for_partials(j,k-1)
                   ddelta_lnP_00 = -s% dlnPeos_dxa_for_partials(j,k)
@@ -340,10 +358,10 @@
                      chiRho_ad% val*dlnmc_00
                end if
                s% d_brunt_B_dxa_m1(j,k) = &
-                  (dcomp_m1 - dmass_corr_m1)/(delta_lnP_val*chiT_val) - &
+                  (dcomp_m1(j) - dmass_corr_m1)/(delta_lnP_val*chiT_val) - &
                   brunt_B_val*(ddelta_lnP_m1/delta_lnP_val + dchiT_m1/chiT_val)
                s% d_brunt_B_dxa_00(j,k) = &
-                  (dcomp_00 - dmass_corr_00)/(delta_lnP_val*chiT_val) - &
+                  (dcomp_00(j) - dmass_corr_00)/(delta_lnP_val*chiT_val) - &
                   brunt_B_val*(ddelta_lnP_00/delta_lnP_val + dchiT_00/chiT_val)
             end do
          end if
@@ -360,23 +378,30 @@
 
          contains
 
-         subroutine eval_lnPeos(xa, lnPeos)
+         subroutine eval_lnPeos(xa, lnPeos, dlnPeos_dxa)
             real(dp), intent(in) :: xa(:)
-            real(dp), intent(out) :: lnPeos
+            type(auto_diff_real_star_order1), intent(out) :: lnPeos
+            real(dp), intent(out) :: dlnPeos_dxa(:)
+            real(dp) :: Pgas, Peos
 
             call basic_composition_info( &
                species, s% chem_id, xa, X_tmp, Y_tmp, Z_tmp, &
                abar_tmp, zbar_tmp, z2bar_tmp, z53bar_tmp, ye_tmp, &
                mass_correction_tmp, sumx_tmp)
-            ! Match the ordinary Brunt value from the finite pressure
-            ! difference while keeping the implicit derivatives linearized.
+            ! Evaluate the pressure and its partials at the same endpoint.
             call get_eos_brunt_dxa_with_moments( &
                s, 0, xa, rho_face, logRho_face, T_face, logT_face, .false., &
                X_tmp, Z_tmp, abar_tmp, zbar_tmp, z2bar_tmp, z53bar_tmp, ye_tmp, &
                mass_correction_tmp, sumx_tmp, &
                res, d_eos_dlnd, d_eos_dlnT, d_eos_dxa, ierr)
             if (ierr /= 0) return
-            lnPeos = log(Prad_face + exp(res(i_lnPgas)))
+            Pgas = exp(res(i_lnPgas))
+            Peos = Prad_face + Pgas
+            lnPeos = log(Peos)
+            ! Convert the gas pressure rows to derivatives of total pressure.
+            lnPeos% d1Array = (Pgas*d_eos_dlnd(i_lnPgas)/Peos)*lnd_face_ad% d1Array + &
+               ((Pgas*d_eos_dlnT(i_lnPgas) + 4d0*Prad_face)/Peos)*lnT_face_ad% d1Array
+            dlnPeos_dxa(1:species) = (Pgas/Peos)*d_eos_dxa(i_lnPgas,1:species)
          end subroutine eval_lnPeos
 
       end subroutine get_implicit_brunt_B
