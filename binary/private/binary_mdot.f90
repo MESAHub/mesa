@@ -26,7 +26,8 @@
       use star_def
       use binary_def
       use binary_wind
-      use binary_ce
+      use const_def
+      ! use binary_ce
       use utils_lib, only: mesa_error
 
       implicit none
@@ -110,7 +111,8 @@
                end if
                detached = .true.
             end if
-         else if (b% mdot_scheme == "contact" .and. .not. b% use_other_rlo_mdot .and. .not. b% CE_flag) then
+         else if (b% mdot_scheme == "contact" .and. .not. b% use_other_rlo_mdot &! .and. .not. b% CE_flag
+            ) then
             if (b% point_mass_i /= 0) then
                new_mdot = 0d0
                write(*,*) "WARNING: contact scheme requires evolve_both_stars=.true."
@@ -146,14 +148,15 @@
                use_sum = .true.
             end if
          else
-            if (b% CE_flag) then
-               call CE_rlo_mdot(b% binary_id, explicit_mdot, ierr)
-               if (ierr /= 0) then
-                  write(*,*) 'failed in CE_rlo_mdot'
-                  check_implicit_rlo = retry
-                  return
-               end if
-            else if (.not. b% use_other_rlo_mdot) then
+            ! if (b% CE_flag) then
+            !    call CE_rlo_mdot(b% binary_id, explicit_mdot, ierr)
+            !    if (ierr /= 0) then
+            !       write(*,*) 'failed in CE_rlo_mdot'
+            !       check_implicit_rlo = retry
+            !       return
+            !    end if
+            ! else
+               if (.not. b% use_other_rlo_mdot) then
                call rlo_mdot(b% binary_id, explicit_mdot, ierr)
                if (ierr /= 0) then
                   write(*,*) 'failed in rlo_mdot'
@@ -550,7 +553,7 @@
             b% mdot_wind_transfer(b% a_i)
 
          ! Set mdot for the accretor
-         if (b% point_mass_i == 0 .and. .not. b% CE_flag) then
+         if (b% point_mass_i == 0) then
             ! do not repeat if using the implicit wind
             if (.not. (b% num_tries >0 .and. b% s_accretor% was_in_implicit_wind_limit)) then
                b% accretion_mode = 0
@@ -574,7 +577,7 @@
 
             b% accretion_luminosity = 0d0  !only set for point mass
 
-         else if (.not. b% CE_flag) then
+         else
             ! accretor is a point mass
             if (.not. b% model_twins_flag) then
                !combine wind and RLOF mass transfer
@@ -591,18 +594,65 @@
                   b% component_mdot(b% a_i) = (1 - b% mdot_edd_eta) * b% component_mdot(b% a_i)
                end if
             end if
-         else
-            !doing CE, just be sure to set mdot for a point mass to zero
-            b % accretion_luminosity = 0d0
-            if (b% point_mass_i /= 0) then
-               b% component_mdot(b% a_i) = 0d0
-            end if
          end if
+
+         ! Set mdot for the accretor
+         ! if (b% point_mass_i == 0 & ! .and. .not. b% CE_flag
+         !    ) then
+         !    ! do not repeat if using the implicit wind
+         !    if (.not. (b% num_tries >0 .and. b% s_accretor% was_in_implicit_wind_limit)) then
+         !       b% accretion_mode = 0
+         !       b% acc_am_div_kep_am = 0.0d0
+         !       b% s_accretor% mstar_dot = b% s_accretor% mstar_dot - &
+         !          b% mtransfer_rate*b% fixed_xfer_fraction - b% mdot_wind_transfer(b% d_i)
+
+         !       !set angular momentum accretion as described in A.3.3 of de Mink et al. 2013
+         !       if (b% do_j_accretion) then
+         !          if (.not. b% use_other_accreted_material_j) then
+         !             call eval_accreted_material_j(b% binary_id, ierr)
+         !          else
+         !             call b% other_accreted_material_j(b% binary_id, ierr)
+         !          end if
+         !          if (ierr /= 0) then
+         !             write(*,*) 'error in accreted_material_j'
+         !             return
+         !          end if
+         !       end if
+         !    end if
+
+         !    b% accretion_luminosity = 0d0  !only set for point mass
+
+         ! ! else if (.not. b% CE_flag) then
+         !    ! accretor is a point mass
+         !    if (.not. b% model_twins_flag) then
+         !       !combine wind and RLOF mass transfer
+         !       actual_mtransfer_rate = b% mtransfer_rate*b% fixed_xfer_fraction+b% mdot_wind_transfer(b% d_i)  !defined negative
+         !       b% component_mdot(b% a_i) = -actual_mtransfer_rate
+         !       ! restrict accretion to the Eddington limit
+         !       if (b% limit_retention_by_mdot_edd .and. b% component_mdot(b% a_i) > b% mdot_edd) then
+         !          b% component_mdot(b% a_i) = b% mdot_edd  ! remove all accretion above the edd limit
+         !       end if
+         !       b% accretion_luminosity = &
+         !          b% mdot_edd_eta*b% component_mdot(b% a_i)*clight*clight
+         !       ! remove rest mass radiated away
+         !       if (b% use_radiation_corrected_transfer_rate) then
+         !          b% component_mdot(b% a_i) = (1 - b% mdot_edd_eta) * b% component_mdot(b% a_i)
+         !       end if
+         !    end if
+         ! ! else
+         ! !    !doing CE, just be sure to set mdot for a point mass to zero
+         ! !    ! b % accretion_luminosity = 0d0
+         ! !    ! if (b% point_mass_i /= 0) then
+         ! !    !    b% component_mdot(b% a_i) = 0d0
+         ! !    ! end if
+         ! ! end if
 
          ! mdot_system_transfer is mass lost from the vicinity of each star
          ! due to inefficient rlof mass transfer, mdot_system_cct is mass lost
          ! from a circumbinary coplanar toroid.
-         if (b% mtransfer_rate+b% mdot_wind_transfer(b% d_i) >= 0 .or. b% CE_flag) then
+         if (b% mtransfer_rate+b% mdot_wind_transfer(b% d_i) >= 0 &
+            ! .or. b% CE_flag
+            ) then
             b% mdot_system_transfer(b% d_i) = 0d0
             b% mdot_system_transfer(b% a_i) = 0d0
             b% mdot_system_cct = 0d0

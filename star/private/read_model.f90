@@ -81,7 +81,7 @@
          type (star_info), pointer :: s
          logical, intent(in) :: restart
          integer, intent(out) :: ierr
-         integer :: k, nz
+         integer :: k, nz, num_setvars_saved
          include 'formats'
          ierr = 0
          nz = s% nz
@@ -162,7 +162,9 @@
          end if
 
          s% doing_finish_load_model = .true.
+         num_setvars_saved = s% num_setvars
          call set_vars(s, s% dt, ierr)
+         if (restart) s% num_setvars = num_setvars_saved ! do not count setvar for photo restart
          if (ierr == 0 .and. s% RSP2_flag) call set_RSP2_vars(s,ierr)
          if (ierr == 0 .and. s% TDC_alpha_M > 0 &
                .and. s% MLT_option == 'TDC' &

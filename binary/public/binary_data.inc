@@ -26,23 +26,23 @@ real(dp) :: &
       min_binary_separation
 
 logical :: &
-      using_jdot_mb(2), using_jdot_mb_old(2), &
-      CE_flag, CE_flag_old, & ! true during a CE phase
-      CE_init, CE_init_old    ! true if variables for CE have been initiated
+      using_jdot_mb(2), using_jdot_mb_old(2) !, &
+!       CE_flag, CE_flag_old, & ! true during a CE phase
+!       CE_init, CE_init_old    ! true if variables for CE have been initiated
 
-integer :: &
-      CE_num1, CE_num1_old, & !count the number of times each star has undergone a CE
-      CE_num2, CE_num2_old
+! integer :: &
+!       CE_num1, CE_num1_old, & !count the number of times each star has undergone a CE
+!       CE_num2, CE_num2_old
 
-real(dp) :: &
-      CE_lambda1, CE_lambda1_old, & ! lambda value, updated through a CE ejection, zero before CE.
-      CE_lambda2, CE_lambda2_old, &
-      CE_Ebind1, CE_Ebind1_old, & !same as lambda for binding energy of ejected layers
-      CE_Ebind2, CE_Ebind2_old
+! real(dp) :: &
+!       CE_lambda1, CE_lambda1_old, & ! lambda value, updated through a CE ejection, zero before CE.
+!       CE_lambda2, CE_lambda2_old, &
+!       CE_Ebind1, CE_Ebind1_old, & !same as lambda for binding energy of ejected layers
+!       CE_Ebind2, CE_Ebind2_old
 
-! during CE, this counts how much time the star has been detached
-real(dp) :: &
-      CE_years_detached, CE_years_detached_old
+! ! during CE, this counts how much time the star has been detached
+! real(dp) :: &
+!       CE_years_detached, CE_years_detached_old
 
 integer :: generations ! 1 means no old values, 2 means have old
 
@@ -71,17 +71,17 @@ logical :: have_star_1, have_star_2
 real(dp) :: eq_initial_bh_mass
 
 ! Stored Parameters for common envelope evolution
-integer :: CE_nz ! number of points in model at CE onset
-real(dp) :: CE_initial_radius ! radius (in cm) at the onset of CE
-real(dp) :: CE_initial_separation ! separation (in cm) at the onset of CE
-real(dp) :: CE_initial_Mdonor ! donor mass (in grams) at the onset of CE
-real(dp) :: CE_initial_Maccretor ! accretor mass (in grams) at the onset of CE
-real(dp) :: CE_initial_age ! age (in seconds) at the onset of CE
-real(dp) :: CE_initial_model_number ! binary model_number at the onset of CE
-! values for binary are stored as well, they need not match the ones of the star
-! undergoing CE
-real(dp) :: CE_b_initial_age ! binary age (in seconds) at the onset of CE
-real(dp) :: CE_b_initial_model_number ! binary model_number at the onset of CE
+! integer :: CE_nz ! number of points in model at CE onset
+! real(dp) :: CE_initial_radius ! radius (in cm) at the onset of CE
+! real(dp) :: CE_initial_separation ! separation (in cm) at the onset of CE
+! real(dp) :: CE_initial_Mdonor ! donor mass (in grams) at the onset of CE
+! real(dp) :: CE_initial_Maccretor ! accretor mass (in grams) at the onset of CE
+! real(dp) :: CE_initial_age ! age (in seconds) at the onset of CE
+! real(dp) :: CE_initial_model_number ! binary model_number at the onset of CE
+! ! values for binary are stored as well, they need not match the ones of the star
+! ! undergoing CE
+! real(dp) :: CE_b_initial_age ! binary age (in seconds) at the onset of CE
+! real(dp) :: CE_b_initial_model_number ! binary model_number at the onset of CE
 
 ! more extras -- for run_binary_extras applications with state.
 ! if your extra state info is all held in the following variables,
@@ -183,8 +183,8 @@ logical :: ignore_hard_limits_this_step
 
 ! Work Parameters for common envelope evolution
 ! arrays used to interpolate properties from the star at the onset of CE
-real(dp), pointer :: CE_m(:), CE_entropy(:)
-real(dp), pointer :: CE_U_in(:), CE_U_out(:), CE_Omega_in(:), CE_Omega_out(:)
+! real(dp), pointer :: CE_m(:), CE_entropy(:)
+! real(dp), pointer :: CE_U_in(:), CE_U_out(:), CE_Omega_in(:), CE_Omega_out(:)
 !! values computed at each step during CE
 !real(dp) :: CE_Ebind ! binding energy of removed layers (in ergs)
 !real(dp) :: CE_delta_Ecore ! change in binding energy of internal layers (in ergs)

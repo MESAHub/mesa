@@ -162,7 +162,10 @@ a subdirectory with the same name.
 It should be emphasized that the photos are not intended for long-term
 storage of models. In particular, when you update to a new version of
 MESA star, you should expect your existing photo files to become
-obsolete.
+obsolete. If you re-run a model (even with the same setup and
+machine), the photos produced the second time will not be bit-to-bit
+identical, even if they guarantee bit-to-bit reproducibility of the
+numerical results.
 
 If you scroll back in the terminal output from the run, you should find
 a line that looks like (the number may differ slightly between
@@ -347,4 +350,3 @@ summary of these options.
 You can browse through the .defaults files to familiarize yourself with
 what's available. It can be easy to be overwhelmed by the shear number
 of options. That's where the test_suite comes in handy.
-
