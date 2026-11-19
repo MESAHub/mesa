@@ -73,6 +73,9 @@ conserving total angular momentum. See
 Bug Fixes
 ---------
 
+Fixed a regex parsing issue in `shmesa change` that prevented controls like
+`x_ctrl(1)` from being parsed correctly.
+
 The ``colors`` module now checks Hermite-interpolated spectra for unphysical
 fluxes, sets negligible negative undershoots to zero, and falls back to
 trilinear interpolation when necessary. Interpolation also handles atmosphere
