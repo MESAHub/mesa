@@ -25,6 +25,7 @@ SRCS_CHECK := test/src/bari_beam.f90 \
               test/src/bari_chemakzo.f90 \
               test/src/bari_medakzo.f90 \
               test/src/bari_vdpol.f90 \
+              test/src/test_accurate_sum.f90 \
               test/src/test_beam.f90 \
               test/src/test_bobyqa.f90 \
               test/src/test_brent.f90 \

@@ -18,6 +18,7 @@ program test_num
    use test_simplex
 
    use test_integrate
+   use test_accurate_sum
 
    use const_def
    use const_lib, only: const_init
@@ -173,5 +174,7 @@ program test_num
 
    write (*, *) 'call test_integrate routines'
    call run_test_integrate()
+
+   call run_test_accurate_sum()
 
 end program test_num
