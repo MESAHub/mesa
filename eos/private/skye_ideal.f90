@@ -83,7 +83,7 @@ module skye_ideal
    end function compute_xne
 
    subroutine compute_ideal_ele(temp_in, den_in, din_in, logtemp_in, logden_in, &
-                                zbar, ytot1, ye, ht, F, adr_etaele, adr_xnefer, ierr)
+                                zbar, ytot1, ye, ht, F, adr_etaele, ierr)
       use helm_polynomials
       use eos_def
       real(dp), intent(in) :: temp_in, den_in, din_in, logtemp_in, logden_in, zbar, ytot1, ye
@@ -164,23 +164,6 @@ module skye_ideal
       real(dp) :: dsposdtt,dsposdta,dsposdtz,dsposdaa
       real(dp) :: dsposdaz,dsposdzz
 
-      real(dp) :: xne
-      real(dp) :: dxnedd,dxnedt,dxneda,dxnedz
-      real(dp) :: dxneddd,dxneddt,dxnedda,dxneddz
-      real(dp) :: dxnedtt,dxnedta,dxnedtz,dxnedaa
-      real(dp) :: dxnedaz,dxnedzz
-
-      real(dp) :: xnefer,dxneferdd,dxneferdt,dxneferda,dxneferdz
-      real(dp) :: dxneferddd,dxneferddt,dxneferdda,dxneferddz
-      real(dp) :: dxneferdtt,dxneferdta,dxneferdtz,dxneferdaa
-      real(dp) :: dxneferdaz,dxneferdzz
-      real(dp) :: xnpfer,dxnpferdd,dxnpferdt,dxnpferda,dxnpferdz
-      real(dp) :: dxnpferddd,dxnpferddt,dxnpferdda,dxnpferddz
-      real(dp) :: dxnpferdtt,dxnpferdta,dxnpferdtz,dxnpferdaa
-      real(dp) :: dxnpferdaz,dxnpferdzz
-      real(dp) :: dxneferdddd, dxneferdddt, dxneferddtt, dxneferdttt
-      real(dp) :: dxneferddda, dxneferdtta, dxneferddta
-      real(dp) :: dxneferdddz, dxneferdttz, dxneferddtz
       real(dp) :: detaddda, detadtta, detaddta
       real(dp) :: detadddz, detadttz, detaddtz
 
@@ -189,10 +172,13 @@ module skye_ideal
                        df_ttt, df_dtt, df_ddt, df_ddd
       real(dp) :: etaele,detadd,detadt
       real(dp) :: detaddd,detaddt,detadtt
-      type(auto_diff_real_2var_order3), intent(out) :: adr_etaele, adr_xnefer, F
+      type(auto_diff_real_2var_order3), intent(out) :: adr_etaele, F
 
       integer, intent(out) :: ierr
 
+      ! ierr is not currently used, but we'll set it for consistency
+      ! and keep it for future error throwing
+      ierr = 0
 
       temp = temp_in
       logtemp = logtemp_in
@@ -529,105 +515,6 @@ module skye_ideal
         detadttz = din * ytot1 * detaddtt
         detaddtz = din * ytot1 * detadddt
 
-!..look in the number density table only once
-        fi(1)  = ht% xf(iat,jat)
-        fi(2)  = ht% xf(iat+1,jat)
-        fi(3)  = ht% xf(iat,jat+1)
-        fi(4)  = ht% xf(iat+1,jat+1)
-        fi(5)  = ht% xft(iat,jat)
-        fi(6)  = ht% xft(iat+1,jat)
-        fi(7)  = ht% xft(iat,jat+1)
-        fi(8)  = ht% xft(iat+1,jat+1)
-        fi(9)  = ht% xfd(iat,jat)
-        fi(10) = ht% xfd(iat+1,jat)
-        fi(11) = ht% xfd(iat,jat+1)
-        fi(12) = ht% xfd(iat+1,jat+1)
-        fi(13) = ht% xfdt(iat,jat)
-        fi(14) = ht% xfdt(iat+1,jat)
-        fi(15) = ht% xfdt(iat,jat+1)
-        fi(16) = ht% xfdt(iat+1,jat+1)
-
-!..electron + positron number densities
-       xnefer   = h3(iat,jat,fi, &
-                     si0t,   si1t,   si0mt,   si1mt, &
-                     si0d,   si1d,   si0md,   si1md)
-
-!..first derivatives
-       x        = h3(iat,jat,fi, &
-                     si0t,   si1t,   si0mt,   si1mt, &
-                    dsi0d,  dsi1d,  dsi0md,  dsi1md)
-       x = max(x,1.0d-30)
-       dxnedd   = ye * x
-       dxnedt   = h3(iat,jat,fi, &
-                    dsi0t,  dsi1t,  dsi0mt,  dsi1mt, &
-                     si0d,   si1d,   si0md,   si1md)
-       dxneda = -x * din * ytot1
-       dxnedz =  x * den * ytot1
-
-!..second derivatives
-        y       = h3(iat,jat,fi, &
-                    si0t,   si1t,  si0mt,  si1mt, &
-                    ddsi0d,  ddsi1d,  ddsi0md,  ddsi1md)
-        dxneddd = ye * ye * y
-        z       = h3(iat,jat,fi, &
-                    dsi0t,   dsi1t,   dsi0mt,   dsi1mt, &
-                    dsi0d,  dsi1d,  dsi0md,  dsi1md)
-        dxneddt = ye * z
-        dxnedda = -ye*ytot1*x + ye*y*dinda
-        dxneddz = ytot1*x + ye*y*dindz
-        dxnedtt = h3(iat,jat,fi, &
-                    ddsi0t,   ddsi1t,   ddsi0mt,   ddsi1mt, &
-                    si0d,  si1d,  si0md,  si1md)
-        dxnedta = z * dinda
-        dxnedtz = z * dindz
-        dxnedaa = (y*din + 2.0d0*x)*din*ytot1*ytot1
-        dxnedaz = -(y*dindz*din + x*den*ytot1)*ytot1
-        dxnedzz = y*dindz*den*ytot1
-
-!..third derivatives
-        y       = h3(iat,jat,fi, &
-                    si0t,   si1t,  si0mt,  si1mt, &
-                    dddsi0d,  dddsi1d,  dddsi0md,  dddsi1md)
-        dxneferdddd = ye * ye * ye * y  ! Actual interpolation variable is ye * rho, so we multiply by ye to get d/d(density)
-                                    !  ! d/drho^3
-
-        dxneferdttt = h3(iat,jat,fi, &
-                    dddsi0t,   dddsi1t,  dddsi0mt,  dddsi1mt, &
-                    si0d,  si1d,  si0md,  si1md)       ! d/dT^3
-
-
-        y       = h3(iat,jat,fi, &
-                    dsi0t,   dsi1t,  dsi0mt,  dsi1mt, &
-                    ddsi0d,  ddsi1d,  ddsi0md,  ddsi1md)
-        dxneferdddt = ye * ye * y  ! d/drho^2 d/dT
-
-        y       = h3(iat,jat,fi, &
-                    ddsi0t,   ddsi1t,  ddsi0mt,  ddsi1mt, &
-                    dsi0d,  dsi1d,  dsi0md,  dsi1md)
-
-        dxneferddtt = ye * y  ! d/drho d/dT^2
-
-
-        ! dg/da = dg/d(din) d(din)/da = dg/d(din) d(ye*rho)/da
-        ! = dg/d(din) d(z rho / a)/da = -(z rho / a^2) dg/d(din)
-        ! = -(z rho / a^2) dg/d(Rho) d(Rho)/d(din)
-        ! = -(z rho / a^2) dg/d(Rho) (1 / ye)
-        ! = -(rho / a) dg/d(Rho) = - ytot1 * rho * dg/d(Rho)
-        ! = -ytot1 * den * dg/d(Rho)
-        dxneferddda = -den * ytot1 * dxneferdddd
-        dxneferdtta = -den * ytot1 * dxneferddtt
-        dxneferddta = -den * ytot1 * dxneferdddt
-
-        ! dg/dz = dg/d(din) d(din)/dz = dg/d(din) d(ye*rho)/dz
-        ! = dg/d(din) d(z rho / a)/dz = (rho / a) dg/d(din)
-        ! = (rho / a) dg/d(Rho) d(Rho)/d(din)
-        ! = (rho / a) dg/d(Rho) (1 / ye)
-        ! = (rho / z) dg/d(Rho)
-        ! = ytot1 * din * dg/d(Rho)
-        dxneferdddz = din * ytot1 * dxneferdddd
-        dxneferdttz = din * ytot1 * dxneferddtt
-        dxneferddtz = din * ytot1 * dxneferdddt
-
 
       ! Pack quantities into auto_diff types
 
@@ -674,34 +561,6 @@ module skye_ideal
 !      adr_etaele%d2val1_d1val4 = detadttz
 !      adr_etaele%d2val2_d1val4 = detadddz
 !      adr_etaele%d1val1_d1val2_d1val4 = detaddtz
-
-      ! Electron density
-      adr_xnefer = xnefer
-
-      adr_xnefer%d1val1 = dxnedt
-      adr_xnefer%d1val2 = dxnedd
-!      adr_xnefer%d1val3 = dxneda ! d/dabar
-!      adr_xnefer%d1val4 = dxnedz ! d/dzbar
-
-      adr_xnefer%d2val1 = dxnedtt
-      adr_xnefer%d2val2 = dxneddd
-      adr_xnefer%d1val1_d1val2 = dxneddt
-!      adr_xnefer%d1val1_d1val3 = dxnedta ! d/dabar
-!      adr_xnefer%d1val1_d1val4 = dxnedtz ! d/dzbar
-!      adr_xnefer%d1val2_d1val3 = dxnedda ! d/dabar
-!      adr_xnefer%d1val2_d1val4 = dxneddz ! d/dzbar
-
-      adr_xnefer%d3val1 = dxneferdttt
-      adr_xnefer%d2val1_d1val2 = dxneferddtt
-      adr_xnefer%d1val1_d2val2 = dxneferdddt
-      adr_xnefer%d3val2 = dxneferdddd
-
-!      adr_xnefer%d2val1_d1val3 = dxneferdtta
-!      adr_xnefer%d2val2_d1val3 = dxneferddda
-!      adr_xnefer%d1val1_d1val2_d1val3 = dxneferddta
-!      adr_xnefer%d2val1_d1val4 = dxneferdttz
-!      adr_xnefer%d2val2_d1val4 = dxneferdddz
-!      adr_xnefer%d1val1_d1val2_d1val4 = dxneferddtz
 
    end subroutine compute_ideal_ele
 
