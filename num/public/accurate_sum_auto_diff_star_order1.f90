@@ -89,9 +89,9 @@ contains
 
       provisional = sum + summand
       if (abs(sum) >= abs(summand)) then
-         compensator = compensator + (sum - provisional) + summand
+         compensator = compensator + ((sum - provisional) + summand)
       else
-         compensator = compensator + (summand - provisional) + sum
+         compensator = compensator + ((summand - provisional) + sum)
       end if
       sum = provisional
 
