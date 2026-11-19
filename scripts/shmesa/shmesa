@@ -2,9 +2,9 @@
 
 #### MESA SHMESA 
 #### Command line utilities for MESA 
-# provides commands such as `shmesa change` and `shmesa grep` 
+# provides commands such as `shmesa change` and `shmesa grep`
 # for usage, execute `shmesa help`
-# add `PATH=$PATH:$MESA_DIR/scripts/shmesa` to your ~/.bashrc 
+# add `PATH=$PATH:$MESA_DIR/scripts/shmesa` to your ~/.bashrc
 
 ( # start a subshell so that the `set` commands are not persistent
 set -Eeo pipefail # exit if any commands fail 
@@ -14,7 +14,7 @@ if [ -z "${MESA_SHMESA_DEBUG}" ]; then
     export MESA_SHMESA_DEBUG=0 # set to 1 for commentary
 fi
 if [ -z "${MESA_SHMESA_BACKUP}" ]; then
-    export MESA_SHMESA_BACKUP=1 # back up modified files before modification (e.g. to inlist.bak) 
+    export MESA_SHMESA_BACKUP=1 # back up modified files before modification (e.g. to inlist.bak)
 fi
 if [ -z "${MESA_SHMESA_TEST}" ]; then
     export MESA_SHMESA_TEST="test_work_shmesa"
@@ -69,17 +69,17 @@ shmesa_work () {
         echo "If no target_name is provided, it will copy the directory to the current location."
         return 0
     fi
-    
+
     local target_dir="."
     if [[ -n $1 ]]; then # check for nonempty arg
         target_dir=$1
     fi
-    
+
     if [[ -d $target_dir ]] && [[ $target_dir != "." ]]; then
         echo "Error: Target directory '$target_dir' already exists."
         return 1
     fi
-    
+
     cp -R "$MESA_DIR/star/work" "$target_dir"
 }
 
@@ -98,20 +98,20 @@ shmesa_change () {
         echo "  shmesa change inlist_project initial_mass 1.3 do_element_diffusion .true."
         return 0
     fi
-    
+
     if [[ -z $1 || -z $2 || -z $3 ]]; then
         echo "Error: Missing arguments."
         return 1
     fi
-    
+
     local filename=$1
     shift
-    
+
     if [[ ! -f "$filename" ]]; then
         echo "Error: '$filename' does not exist or is not a file."
         exit 1
     fi
-    
+
     # Create a backup of the inlist before making any changes
     backup_copy "$filename" "${filename}.bak"
 
@@ -119,17 +119,17 @@ shmesa_change () {
         local param=$1
         local newval=$2
         shift 2
-        
-        local search="^\s*\!*\s*\b${param}\b\s*=.*$"
+
+        local search="^\s*\!*\s*\Q${param}\E\s*=.*$"
         local replace="    $param = $newval"
-        
+
         # Check if the parameter is present in the inlist
         if ! grep -qw "$param" "$filename"; then
             echo "Error: Parameter '$param' not found in the inlist '$filename'."
             backup_restore "$filename"
             return 1
         fi
-        
+
         # Update its value
         perl -i -pe "s/$search/$replace/" "$filename"
     done
@@ -147,27 +147,27 @@ shmesa_defaults () {
         echo "Example: shmesa defaults nu_max delta_nu"
         return 0
     fi
-    
+
     # Copy the files; create backups if they already exist in the current directory
     if [[ -f profile_columns.list ]]; then
         backup_copy profile_columns.list
     else
         cp "$MESA_DIR/star/defaults/profile_columns.list" .
     fi
-    
+
     if [[ -f history_columns.list ]]; then
         backup_copy history_columns.list
     else
         cp "$MESA_DIR/star/defaults/history_columns.list" .
     fi
-    
+
     while [[ -n $1 ]]; do
         local param=$1
         shift
-        
+
         local search="^\s*\!${param}\b(\s*.*)?$"
         local replace="      $param\$1"
-        
+
         if grep -q -w "$param" profile_columns.list; then
             perl -i -pe "s/$search/$replace/g" profile_columns.list
         elif grep -q -w "$param" history_columns.list; then
@@ -187,13 +187,13 @@ shmesa_cp () {
         echo "LOGS, photos, or .mesa_temp_cache"
         return 0
     fi
-    
+
     if [[ -z $1 || -z $2 ]]; then
         echo "Error: Missing arguments."
         echo $usage
         return 1
     fi
-    
+
     # args: ($1) source directory to be copied from
     #       ($2) target directory to be copied to
     local SOURCE=$1
@@ -212,20 +212,20 @@ shmesa_grep () {
         echo $usage
         return 0
     fi
-    
+
     if [[ -z $1 ]]; then
         echo "Error: Missing search term."
         echo $usage
         return 1
     fi
-    
+
     local search_term=$1
     local search_dir=$MESA_DIR
-    
+
     if [[ -n $2 ]]; then
         search_dir=$MESA_DIR/$2
     fi
-    
+
     grep -r --color=always --include \*.f --include \*.f90 --include \*.for \
         "$search_term" "$search_dir"
 }
@@ -237,14 +237,14 @@ shmesa_zip () {
         echo "zips the appropriate files of the specified directory for sharing"
         return 0
     fi
-    
+
     local dir_to_zip='.'
     local zip_name="mesa.zip"
     if [[ ! -z $1 ]]; then
         dir_to_zip=$1
         zip_name="${dir_to_zip}_mesa.zip"
     fi
-    
+
     if [[ ! $(find "$dir_to_zip" -type f -iname "*inlist*") ]]; then
         echo "Warning: No inlist files found in the directory '$dir_to_zip'."
     fi
@@ -314,7 +314,7 @@ shmesa_template () {
     #    echo "Error: "
     #    return 1
     fi
-    #shift # and then copy this block to parse the next one, for example 
+    #shift # and then copy this block to parse the next one, for example
 
     # afterwards, update:
     # 1. shmesa_test 
@@ -325,34 +325,34 @@ shmesa_template () {
 
 ## Test shmesa with different subcommands and arguments
 shmesa_test () {
-    echo 
-    echo 
-    echo 
+    echo
+    echo
+    echo
     echo ">> TESTING SHMESA <<"
-    echo 
-    echo 
-    
-    # store current value of MESA_SHMESA_DEBUG and turn on debugging 
+    echo
+    echo
+
+    # store current value of MESA_SHMESA_DEBUG and turn on debugging
     local temp_value=$MESA_SHMESA_DEBUG
-    if [[ $# -gt 0 ]]; then # decide whether we want debugging 
+    if [[ $# -gt 0 ]]; then # decide whether we want debugging
         MESA_SHMESA_DEBUG=$1
     else
         MESA_SHMESA_DEBUG=1
-    fi 
-    
-    # since we will be calling shmesa, we need it to be in our path 
+    fi
+
+    # since we will be calling shmesa, we need it to be in our path
     export PATH=$PATH:$MESA_DIR/scripts/shmesa
-    
+
     # shmesa [work|change|defaults|cp|grep|zip|version|help]
     rm -rf $MESA_SHMESA_TEST
     rm -rf '$MESA_SHMESA_TEST'_cp
-    
+
     # shmesa work
     run_shmesa_test "work" \
         "(shmesa work $MESA_SHMESA_TEST && \
           cd $MESA_SHMESA_TEST && \
           make)"
-    
+
     # shmesa change 
     run_shmesa_test "change" \
         "(cd $MESA_SHMESA_TEST && \
@@ -362,13 +362,13 @@ shmesa_test () {
                         initial_mass 1.2 \
                         initial_z 0.01 \
                         Zbase 0.01)"
-    
+
     # shmesa defaults
     run_shmesa_test "defaults" \
         "(cd $MESA_SHMESA_TEST && \
           shmesa defaults nu_max delta_nu && \
           shmesa defaults logM)"
-    
+
     # shmesa cp
     run_shmesa_test "cp" \
         "(shmesa cp '$MESA_SHMESA_TEST' '$MESA_SHMESA_TEST'_cp)"
@@ -376,21 +376,21 @@ shmesa_test () {
     # shmesa extras
     run_shmesa_test "extras" \
         "(cd $MESA_SHMESA_TEST && shmesa extras)"
-    
+
     # shmesa zip
     run_shmesa_test "zip" \
         "(shmesa zip '$MESA_SHMESA_TEST')"
-    
+
     # shmesa grep
     run_shmesa_test "grep" \
         "(shmesa grep diffusion_class_representative)"
-    
+
     MESA_SHMESA_DEBUG=$temp_value
     echo "all done!"
 }
 
 
-## Some helper functions used above for debugging and backing up files 
+## Some helper functions used above for debugging and backing up files
 
 debug_print () {
     if [[ -n $MESA_SHMESA_DEBUG && $MESA_SHMESA_DEBUG -ne 0 ]]; then
@@ -428,7 +428,7 @@ shmesa_check_h_flag () {
 run_shmesa_test() {
     local submodule_name=$1
     local test_command=$2
-    
+
     echo
     echo
     echo ">>> test: shmesa $submodule_name"
@@ -493,7 +493,7 @@ case "$subcommand" in
         exit
         ;;
     *)
-        
+
         echo "Invalid subcommand: $subcommand"
         # TODO: "The most similar command is: ..."
         shmesa_help
