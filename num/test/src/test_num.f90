@@ -86,6 +86,7 @@ program test_num
    call test_root_with_brackets
    call test_root2
    call test_root3
+   call test_root_no_brackets
 
    ! explicit solvers
    call test_dopri(.false., show_all)

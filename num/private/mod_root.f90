@@ -251,6 +251,10 @@ contains
 
       end do
 
+      ! if we made it here, we failed.  Reset ierr, since the function
+      ! calls would have set it to 0 if they were successful
+      ierr = -1
+
       !write(*,1) 'exit do_look_for_brackets'
 
    end subroutine do_look_for_brackets
