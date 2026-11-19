@@ -8,6 +8,7 @@
 
       save_model_when_terminate = .true.
       save_model_filename = 'final.mod'
+      required_termination_code_string = 'log_Teff_lower_limit'
 
       !pgstar_flag = .true.
 
@@ -22,9 +23,10 @@
 
 / ! end of kap namelist
 
-&controls      
+&controls
       ! limit max_model_number as part of test_suite
       max_model_number = 2000
+      max_number_retries = 20
       use_gold2_tolerances = .true.
       
       calculate_Brunt_N2 = .true.
@@ -39,7 +41,7 @@
 
       x_integer_ctrl(3) = 1 ! mode l (e.g. 0 for p modes, 1 for g modes)
          ! should match gyre.in mode l
-      x_integer_ctrl(4) = -9 ! order
+      ! x_integer_ctrl(4) = -9 ! order, not currently used
       x_ctrl(1) = 0.22d-2 ! freq ~this (Hz)
       x_ctrl(2) = -1 ! growth < this (days). < 0 means skip this check.
       
@@ -64,7 +66,7 @@
       net_logTcut_lo = 0
       net_logTcut_lim = 0
       
-      energy_eqn_option = 'dedt'
+      energy_eqn_option = 'eps_grav'
        
       ! limit timestep based on E_err
       limit_for_rel_error_in_energy_conservation = 1d-5
@@ -72,10 +74,15 @@
 
       op_split_burn = .false.
 
-      atm_option = 'T_tau'
-      atm_T_tau_relation = 'Eddington'
-      atm_T_tau_opacity = 'fixed'
-      Pextra_factor = 1
+      atm_option = 'table'
+      atm_table = 'WD_tau_25'
+
+      ! atmosphere resolution for WDs needs smaller min_dq than default
+      ! to properly resolve the onset of convection
+      min_dq = 1d-18
+      min_dq_for_split = 1d-18
+      max_surface_cell_dq = 3d-18
+
       
 ! mesh
       !mesh_delta_coeff = 1
