@@ -41,7 +41,7 @@
          allocate(h,stat=ierr)
          if (ierr /= 0) return
 
-         h% imax = imax
+         h% imax  = imax
          h% jmax = jmax
          h% with_coulomb_corrections = .true.
 
@@ -171,7 +171,7 @@
 !..read the normal helmholtz free energy table
        h% logtlo   = 3.0d0
        h% logthi   = 13.0d0
-       h% logdlo   = -12.0d0
+       h% logdlo   = -15.0d0
        h% logdhi   = 15.0d0
 
        h% templo = exp10(h% logtlo)
