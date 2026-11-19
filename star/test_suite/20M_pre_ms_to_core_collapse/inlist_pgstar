@@ -17,7 +17,6 @@ pgstar_show_age = .false.
 
 Grid1_win_flag = .true.
 Grid1_win_width = 12
-Grid1_win_width = 17
 Grid1_win_aspect_ratio = 0.666
 Grid1_win_aspect_ratio = 0.53
 
@@ -356,7 +355,7 @@ Text_Summary1_name(6,1) = 'log_cntr_Rho'
 Text_Summary1_name(6,2) = 'log_LZ'
 Text_Summary1_name(6,3) = 'lg_Lphoto'
 Text_Summary1_name(6,4) = 'Si_cntr'
-Text_Summary1_name(6,5) = 'retries'
+Text_Summary1_name(6,5) = 'num_retries'
 
 
 !------------------------------------------------------------------------------------
