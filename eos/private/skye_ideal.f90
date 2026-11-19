@@ -176,6 +176,9 @@ module skye_ideal
 
       integer, intent(out) :: ierr
 
+      ! ierr is not currently used, but we'll set it for consistency
+      ! and keep it for future error throwing
+      ierr = 0
 
       temp = temp_in
       logtemp = logtemp_in
