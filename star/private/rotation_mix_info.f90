@@ -58,7 +58,7 @@
             csound, rho, T, P, cp, cv, chiRho, abar, zbar, gradT_sub_grada, &
             opacity, kap_cond, gamma1, mu_alt, eps_nuc, enu, L_neu, delta, &
             scale_height, omega, cell_dr, &
-            dRho, dr, dPressure, domega, d_mu, d_j_rot, &
+            dr, &
             dRho_dr, dRho_dr_ad, dr2omega, H_T, &
             domega_dlnR, Hj, dlnR_domega, &
             t_dyn, t_kh, &
@@ -436,7 +436,7 @@
                bracket_term, ri0, alfa, beta, enum1, enu00, &
                rho6, gamma, mu_e, rm23, ctmp, xi2, dynvisc, denom, &
                eps_nucm1, eps_nuc00, scale_height2, dlnRho_dlnP, dlnT_dlnP, &
-               kap, dlnkap_dlnRho, dlnkap_dlnT
+               kap, dlnkap_dlnRho, dlnkap_dlnT, dP_dr, dj_dr
 
             integer :: i, k
 
@@ -462,7 +462,7 @@
                csound(nz), rho(nz), T(nz), P(nz), cp(nz), cv(nz), chiRho(nz), abar(nz), zbar(nz), &
                opacity(nz), kap_cond(nz), gamma1(nz), mu_alt(nz), omega(nz), cell_dr(nz), eps_nuc(nz), enu(nz), L_neu(nz), &
                gradT_sub_grada(nz), delta(nz), scale_height(nz), &
-               dRho(nz), dr(nz), dPressure(nz), domega(nz), d_mu(nz), d_j_rot(nz), &
+               dr(nz), &
                dRho_dr(nz), dRho_dr_ad(nz), dr2omega(nz), H_T(nz), &
                domega_dlnR(nz), Hj(nz), dlnR_domega(nz), t_dyn(nz), t_kh(nz), &
                Ri_mu(nz), Ri_T(nz), ve0(nz), ve_mu(nz), &
@@ -527,50 +527,33 @@
                omega(i) = s% omega(i)
             end do
 
-            ! differences (at cell boundaries)
             do i = 2, nz-1
-               dRho(i) = rho(i-1) - rho(i)
                dr(i) = max(1d0, 0.5D0*(r(i-1) - r(i+1)))
-               dPressure(i) = min(-1d-10, P(i-1) - P(i))
-               d_mu(i) = mu_alt(i-1) - mu_alt(i)
-               d_j_rot(i) = j_rot(i-1) - j_rot(i)
-               domega(i) = 0.5D0*(omega(i-1) - omega(i+1))
             end do
-
-            dRho(1) = 0
-            dRho(nz) = 0
 
             dr(1) = max(1d0,r(1)-r(2))
             dr(nz) = r(nz) - s% R_center
 
-            dPressure(1) = 0
-            dPressure(nz) = 0
-
-            d_mu(1) = 0
-            d_mu(nz) = 0
-
-            d_j_rot(1) = 0
-            d_j_rot(nz) = 0
-
-            domega(1) = 0
-            domega(nz) = 0
-
+            ! radial derivatives at face i: 3-point non-uniform stencil
             do i = 2, nz-1
-               dRho_dr(i) = dRho(i)/dr(i)
-               dRho_dr_ad(i) = rho(i)*dPressure(i)/(P(i)*gamma1(i)*dr(i))
-               dr2omega(i) = 4.5d0*j_rot(i)*d_j_rot(i)/dr(i)  ! d(r^2 omega)^2/dr using i = (2/3)*r^2
-               domega_dlnR(i) = domega(i)*r(i)/dr(i)
+               dRho_dr(i) = ddx_3pt_nonuniform(rho(i-1), rho(i), rho(i+1), r(i-1), r(i), r(i+1))
+               dP_dr = min(-1d-10/dr(i), &
+                  ddx_3pt_nonuniform(P(i-1), P(i), P(i+1), r(i-1), r(i), r(i+1)))
+               dRho_dr_ad(i) = rho(i)*dP_dr/(P(i)*gamma1(i))
+               dj_dr = ddx_3pt_nonuniform(j_rot(i-1), j_rot(i), j_rot(i+1), r(i-1), r(i), r(i+1))
+               dr2omega(i) = 4.5d0*j_rot(i)*dj_dr  ! d(r^2 omega)^2/dr using i = (2/3)*r^2
+               domega_dlnR(i) = r(i)* &
+                  ddx_3pt_nonuniform(omega(i-1), omega(i), omega(i+1), r(i-1), r(i), r(i+1))
                if (gradT(i) > 1d-20) then
                   H_T(i) = scale_height(i)/gradT(i)  ! -dr/dlnT, scale height of temperature
                else
                   H_T(i) = scale_height(i)
                end if
-               if(abs(d_j_rot(i))>0.d0)then
-                  Hj(i) = j_rot(i)*dr(i)/d_j_rot(i)
+               if (dj_dr /= 0d0) then
+                  Hj(i) = j_rot(i)/dj_dr  ! dr/dlnj, scale height of angular momentum
                else
-                  Hj(i) =0d0
+                  Hj(i) = 0d0
                end if
-                  ! dr/dlnj, scale height of angular momentum
             end do
 
             dRho_dr(1) = 0; dRho_dr(nz) = 0
@@ -598,8 +581,8 @@
             dlnR_domega(1) = 0; dlnR_domega(nz) = 0
 
             do k = 2, nz - 1  ! shear
-               s% omega_shear(k) = &
-                  (omega(k-1) - omega(k+1))/(r(k-1) - r(k+1))*(r(k)/omega(k))
+               s% omega_shear(k) = (r(k)/omega(k))* &
+                  ddx_3pt_nonuniform(omega(k-1), omega(k), omega(k+1), r(k-1), r(k), r(k+1))
                s% omega_shear(k) = max(1d-30,min(1d30,abs(s% omega_shear(k))))
             end do
             s% omega_shear(1) = 0
@@ -869,14 +852,7 @@
                      v_ssi(k)=sqrt(visc(k)/R_crit*abs(domega_dlnR(k)))
                   end do
 
-                  H_ssi(kbot) = v_ssi(kbot)*(r(kbot-1) - r(kbot))/ &
-                                 max(1d-99,abs(v_ssi(kbot-1) - v_ssi(kbot)))
-                  do k = kbot-1, ktop+1, -1
-                     H_ssi(k) = v_ssi(k)*dr(k)/ &
-                                 max(1d-99,0.5d0*abs(v_ssi(k+1) - v_ssi(k-1)))
-                  end do
-                  H_ssi(ktop) = v_ssi(ktop)*(r(ktop) - r(ktop+1))/ &
-                                 max(1d-99,abs(v_ssi(ktop) - v_ssi(ktop+1)))
+                  call set_zone_scale_height(v_ssi, r, ktop, kbot, H_ssi)
 
                   do k = ktop, kbot  ! Heger 2000, eqn 34
                      H_ssi(k) = min(H_ssi(k),scale_height(k))
@@ -944,14 +920,7 @@
                   instability_height = r(ktop) - r(kbot)
 
                   ! heger 2000, eqn 39
-                  H_es(kbot) = v_es(kbot)*(r(kbot-1) - r(kbot))/ &
-                              max(1d-99,abs(v_es(kbot-1) - v_es(kbot)))
-                  do k = kbot-1, ktop+1, -1
-                     H_es(k) = v_es(k)*dr(k)/ &
-                              max(1d-99,0.5d0*abs(v_es(k+1) - v_es(k-1)))
-                  end do
-                  H_es(ktop) = v_es(ktop)*(r(ktop) - r(ktop+1))/ &
-                              max(1d-99,abs(v_es(ktop) - v_es(ktop+1)))
+                  call set_zone_scale_height(v_es, r, ktop, kbot, H_es)
 
                   do k = ktop, kbot
                      H_es(k) = min(instability_height, H_es(k), scale_height(k))
@@ -1033,49 +1002,7 @@
                   instability_height = r(ktop) - r(kbot)
 
                   ! heger 2000, eqn 45
-                  if (kbot == 1) then
-                     H_gsf(kbot) = v_gsf(kbot)*(s% R_center - r(kbot))/ &
-                              max(1d-99,abs(v_gsf(kbot)))
-                  else
-                     H_gsf(kbot) = v_gsf(kbot)*(r(kbot-1) - r(kbot))/ &
-                              max(1d-99,abs(v_gsf(kbot-1) - v_gsf(kbot)))
-                  end if
-
-                  if (kbot == -1) then
-                     write(*,2) 'r(kbot)', kbot, r(kbot)
-                     write(*,2) 'r(kbot-1)', kbot-1, r(kbot-1)
-                     write(*,2) 'v_gsf(kbot)', kbot, v_gsf(kbot)
-                     write(*,2) 'v_gsf(kbot-1)', kbot-1, v_gsf(kbot-1)
-                     write(*,2) 'H_gsf(kbot)', kbot, H_gsf(kbot)
-                  end if
-
-                  do k = max(2,kbot-1), min(nz-1,ktop+1), -1
-                     H_gsf(k) = v_gsf(k)*dr(k)/ &
-                              max(1d-99,0.5d0*abs(v_gsf(k+1) - v_gsf(k-1)))
-                     if (k == -1) then
-                        write(*,2) 'dr(k)', k, dr(k)
-                        write(*,2) 'v_gsf(k-1)', k-1, v_gsf(k-1)
-                        write(*,2) 'v_gsf(k)', k, v_gsf(k)
-                        write(*,2) 'v_gsf(k+1)', k+1, v_gsf(k+1)
-                        write(*,2) 'H_gsf(k)', k, H_gsf(k)
-                     end if
-                  end do
-
-                  if (ktop == nz) then
-                     H_gsf(ktop) = v_gsf(ktop)*(r(ktop) - s% R_center)/ &
-                              max(1d-99,abs(v_gsf(ktop)))
-                  else
-                     H_gsf(ktop) = v_gsf(ktop)*(r(ktop) - r(ktop+1))/ &
-                              max(1d-99,abs(v_gsf(ktop) - v_gsf(ktop+1)))
-                  end if
-
-                  if (ktop == -1) then
-                     write(*,2) 'r(ktop)', ktop, r(ktop)
-                     write(*,2) 'r(ktop+1)', ktop+1, r(ktop+1)
-                     write(*,2) 'v_gsf(ktop)', ktop, v_gsf(ktop)
-                     write(*,2) 'v_gsf(ktop+1)', ktop+1, v_gsf(ktop+1)
-                     write(*,2) 'H_gsf(ktop)', ktop, H_gsf(ktop)
-                  end if
+                  call set_zone_scale_height(v_gsf, r, ktop, kbot, H_gsf)
 
                   do k = ktop, kbot
                      H_gsf(k) = min(instability_height, H_gsf(k), scale_height(k))
@@ -1132,6 +1059,33 @@
          if (width <= 0) return
          call weighted_smoothing(v, s% nz, width, preserve_sign, work)
       end subroutine smooth_for_rotation
+
+
+      !> Velocity scale height H = v/|dv/dr| on faces.
+      !! In the interior: centered 3 point stencil
+      !! Ends: one sided 3 pt stencil
+      !! 2 point stencil for minimum size zones.
+      subroutine set_zone_scale_height(v, r, ktop, kbot, H)
+         real(dp), intent(in) :: v(:), r(:)
+         integer, intent(in) :: ktop, kbot
+         real(dp), intent(inout) :: H(:)
+         integer :: k
+         real(dp) :: dv_dr
+         if (kbot - ktop == 1) then
+            dv_dr = (v(ktop) - v(kbot))/(r(ktop) - r(kbot))
+            H(ktop) = v(ktop)/max(1d-99, abs(dv_dr))
+            H(kbot) = v(kbot)/max(1d-99, abs(dv_dr))
+            return
+         end if
+         dv_dr = ddx_3pt_one_sided(v(ktop), v(ktop+1), v(ktop+2), r(ktop), r(ktop+1), r(ktop+2))
+         H(ktop) = v(ktop)/max(1d-99, abs(dv_dr))
+         do k = ktop+1, kbot-1
+            dv_dr = ddx_3pt_nonuniform(v(k-1), v(k), v(k+1), r(k-1), r(k), r(k+1))
+            H(k) = v(k)/max(1d-99, abs(dv_dr))
+         end do
+         dv_dr = ddx_3pt_one_sided(v(kbot), v(kbot-1), v(kbot-2), r(kbot), r(kbot-1), r(kbot-2))
+         H(kbot) = v(kbot)/max(1d-99, abs(dv_dr))
+      end subroutine set_zone_scale_height
 
 
       subroutine set_ST(s, &
@@ -1191,8 +1145,8 @@
             xmagrn = r(k)
             xmag4pd = sqrt(pi4*xmagdn)
 
-            dlnomega_dlnr = &
-               (omega(k-1) - omega(k+1))/(r(k-1) - r(k+1))*(r(k)/omega(k))
+            dlnomega_dlnr = (r(k)/omega(k))* &
+               ddx_3pt_nonuniform(omega(k-1), omega(k), omega(k+1), r(k-1), r(k), r(k+1))
             xmagq = max(1d-30,min(1d30,abs(dlnomega_dlnr)))  ! shear
             xmager2w = xeta/(r(k)*r(k)*abs(omega(k)))
 

@@ -16,6 +16,16 @@
                                                    xmax    1.8500000000000001D+00    1.8500000000000001D+00
                                                    ymax    1.2408333333333335D+01    1.2408300000000001D+01
 
+ call test_ddx_3pt
+ test_ddx_3pt
+                                  centred, x decreasing    7.0000000000000000D+00    7.0000000000000000D+00
+                                  centred, x increasing    7.0000000000000000D+00    7.0000000000000000D+00
+                                      one-sided, x0 = 1    4.0000000000000000D+00    4.0000000000000000D+00
+                                    one-sided, x0 = 2.5    1.3000000000000000D+01    1.3000000000000000D+01
+ elemental, quadratic exact to 1d-10: T
+ centred error ratio in [3,5]: T
+ one-sided error ratio in [3,5]: T
+
  call test_qsort
 
  qsort into increasing order

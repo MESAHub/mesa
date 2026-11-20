@@ -77,6 +77,8 @@ module num_lib
    public :: solver_option
    public :: linear_interp
    public :: two_piece_linear_coeffs
+   public :: ddx_3pt_nonuniform
+   public :: ddx_3pt_one_sided
    public :: simplex_info_str
    public :: simplex_op_code
 
@@ -616,6 +618,27 @@ contains
          ierr = -1
       end if
    end subroutine two_piece_linear_coeffs
+
+   elemental real(dp) function ddx_3pt_nonuniform(f_m1, f_00, f_p1, x_m1, x_00, x_p1) result(df_dx)
+      ! df/dx at x_00 from the 3-point Lagrange stencil on a non-uniform mesh,
+      ! normally with x_00 between x_m1 and x_p1.
+      real(dp), intent(in) :: f_m1, f_00, f_p1, x_m1, x_00, x_p1
+      real(dp) :: h_m, h_p
+      h_m = x_m1 - x_00
+      h_p = x_00 - x_p1
+      df_dx = (h_p*h_p*(f_m1 - f_00) + h_m*h_m*(f_00 - f_p1)) / &
+         (h_m*h_p*(h_m + h_p))
+   end function ddx_3pt_nonuniform
+
+   elemental real(dp) function ddx_3pt_one_sided(f_0, f_1, f_2, x_0, x_1, x_2) result(df_dx)
+      ! df/dx at the end point x_0, using x_0 and the next two points x_1, x_2
+      ! on one side of it.
+      real(dp), intent(in) :: f_0, f_1, f_2, x_0, x_1, x_2
+      real(dp) :: d1, d2
+      d1 = x_1 - x_0
+      d2 = x_2 - x_0
+      df_dx = (d2*d2*(f_1 - f_0) - d1*d1*(f_2 - f_0)) / (d1*d2*(d2 - d1))
+   end function ddx_3pt_one_sided
 
    real(dp) function integrate(func, minx, maxx, args, atol, rtol, max_steps, ierr)
       procedure(integrand) :: func

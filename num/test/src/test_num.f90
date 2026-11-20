@@ -63,6 +63,9 @@ program test_num
    write (*, *) 'call test_find_max_quadratic'
    call test_find_max_quadratic
 
+   write (*, *) 'call test_ddx_3pt'
+   call test_ddx_3pt
+
    write (*, *) 'call test_qsort'
    call test_qsort
 

@@ -531,4 +531,46 @@ contains
       write (*, *)
    end subroutine test_find_max_quadratic
 
+   subroutine test_ddx_3pt
+      ! f = 3x^2 - 2x + 1, f' = 6x - 2.
+      integer, parameter :: n = 41
+      real(dp) :: x(n), fx(n), d(n-2), err, err_c(2), err_o(2), h
+      integer :: i, j, m
+      include 'formats'
+      write (*, *) 'test_ddx_3pt'
+
+      ! centred, decreasing and increasing mesh
+      write (*, 1) 'centred, x decreasing', &
+         ddx_3pt_nonuniform(q(2.5d0), q(1.5d0), q(1d0), 2.5d0, 1.5d0, 1d0), 7d0
+      write (*, 1) 'centred, x increasing', &
+         ddx_3pt_nonuniform(q(1d0), q(1.5d0), q(2.5d0), 1d0, 1.5d0, 2.5d0), 7d0
+
+      ! one-sided, from either end
+      write (*, 1) 'one-sided, x0 = 1', &
+         ddx_3pt_one_sided(q(1d0), q(1.5d0), q(2.5d0), 1d0, 1.5d0, 2.5d0), 4d0
+      write (*, 1) 'one-sided, x0 = 2.5', &
+         ddx_3pt_one_sided(q(2.5d0), q(1.5d0), q(1d0), 2.5d0, 1.5d0, 1d0), 13d0
+
+      ! elemental call on a strongly non-uniform mesh (ratio-2 jumps)
+      x(1) = 0d0
+      do i = 2, n
+         h = 1d-2
+         if (mod(i, 3) == 0) h = 2d-2
+         x(i) = x(i-1) + h
+      end do
+      fx = q(x)
+      d = ddx_3pt_nonuniform(fx(1:n-2), fx(2:n-1), fx(3:n), x(1:n-2), x(2:n-1), x(3:n))
+      err = maxval(abs(d - (6d0*x(2:n-1) - 2d0)))
+      write (*, *) 'elemental, quadratic exact to 1d-10:', err < 1d-10
+      write (*, *)
+
+   contains
+
+      elemental real(dp) function q(xx)
+         real(dp), intent(in) :: xx
+         q = 3d0*xx*xx - 2d0*xx + 1d0
+      end function q
+
+   end subroutine test_ddx_3pt
+
 end module test_support
