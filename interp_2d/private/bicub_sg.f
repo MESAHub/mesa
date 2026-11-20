@@ -19,7 +19,7 @@
 
       module bicub_sg
 
-      !implicit none
+      implicit none
 
       contains
 !        from PSPLINE by Doug McCune (version as of February, 2004)
@@ -975,8 +975,8 @@
 !  xparam**3-xparam, xpi**3-xpi, yparam**3-yparam, ypi**3-ypi ...
 !  and their derivatives as needed.
 
-      integer v,z36th,iadr,i,j
-      real sum,xp,yp,xpi,ypi,xp2,yp2,xpi2,ypi2
+      integer v,iadr,i,j
+      real sum,z36th,xp,yp,xpi,ypi,xp2,yp2,xpi2,ypi2
       real cx,cy,cyd,cxi,cyi,cydi,hx2,hy2,cxd,cxdi
 
       real, parameter :: sixth = 0.166666666666666667

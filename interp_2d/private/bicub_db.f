@@ -21,7 +21,7 @@
 
       use const_def, only: dp
 
-      !implicit none
+      implicit none
 
 
       contains
@@ -180,7 +180,8 @@
 
 !------------------------------------
 
-      real(dp) zxget, zyget
+      real(dp) zxget, zyget, zxtol, zytol
+      integer nxm, nym, ii, jj
       ier=0
 
 !  range check
@@ -365,6 +366,8 @@
 !  local:
 
       integer v                         ! vector element index
+      integer i, j, iaval
+      real(dp) dx, dy
 
 !  OK can now do evaluations
 
@@ -1372,6 +1375,7 @@
      &   fval,ii,jj,xparam,yparam,hx,hxi,hy,hyi,
      &   f1,inf2,ny)
 
+      integer inf2, ny
       integer ict(6)                    ! requested output control
       integer ivec                      ! vector length
       integer ivecd                     ! vector dimension (1st dim of fval)
@@ -1406,8 +1410,10 @@ C---------------
 !  xparam**3-xparam, xpi**3-xpi, yparam**3-yparam, ypi**3-ypi ...
 !  and their derivatives as needed.
 
-      integer v
-      real(dp) sum
+      integer v, i, j, iadr
+      real(dp) sum, z36th
+      real(dp) xp, xpi, xp2, xpi2, yp, ypi, yp2, ypi2
+      real(dp) cx, cxi, cxd, cxdi, cy, cyi, cyd, cydi, hx2, hy2
 
       real(dp), parameter :: sixth = 1.d0/6.d0
 
@@ -1954,6 +1960,7 @@ C---------------
 !  input arguments:
 !  ================
 
+      integer nx, ny, inf2
       real(dp) xget,yget                    ! target of this interpolation
       real(dp) x(nx)                        ! ordered x grid
       real(dp) y(ny)                        ! ordered y grid
@@ -2189,6 +2196,7 @@ C---------------
      &   fval,ii,jj,xparam,yparam,hx,hxi,hy,hyi,
      &   fin,inf2,ny)
 
+      integer inf2, ny
       integer ict(4)                    ! requested output control
       integer ivec                      ! vector length
       integer ivecd                     ! vector dimension (1st dim of fval)
@@ -2234,7 +2242,10 @@ C---------------
 !     bbar(x)=x**3-2*x**2+x  bbar'(x)=3*x**2-4*x+1
 
       real(dp) sum
-      integer v
+      integer v, i, j, iadr
+      real(dp) xp, yp, xpi, ypi, xp2, yp2, xpi2, ypi2
+      real(dp) ax, bx, axbar, bxbar, ay, by, aybar, bybar
+      real(dp) axp, axbarp, bxp, bxbarp, ayp, aybarp, bybarp, byp
 
       do v=1,ivec
          i=ii(v)
