@@ -534,8 +534,8 @@ contains
    subroutine test_ddx_3pt
       ! f = 3x^2 - 2x + 1, f' = 6x - 2.
       integer, parameter :: n = 41
-      real(dp) :: x(n), fx(n), d(n-2), err, err_c(2), err_o(2), h
-      integer :: i, j, m
+      real(dp) :: x(n), fx(n), d(n-2), err, h
+      integer :: i
       include 'formats'
       write (*, *) 'test_ddx_3pt'
 
