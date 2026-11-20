@@ -398,7 +398,7 @@ contains
          ferg_logKs1, num_logRs, f, ier)
 
       if (ier /= 0) then
-         write (*, *) 'interp_evbicub_sg error happened in eval_ferg'
+         write (*, *) 'interp_evbipm_sg error happened in eval_ferg'
          call mesa_error(__FILE__, __LINE__)
       end if
 
