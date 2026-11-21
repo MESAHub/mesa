@@ -48,6 +48,7 @@ contains
 
     logical, parameter :: dbg = .false.
 
+    real(dp) :: mu_comp(s%nz)
     real(dp) :: grad_mu(s%nz)
     logical  :: mask(s%nz)
     integer  :: k
@@ -61,16 +62,23 @@ contains
 
     if (s%add_double_points_to_pulse_data) then
 
-       ! Calculate grad_mu
+       ! Calculate grad_mu from the mean molecular weight of the
+       ! composition alone, assuming full ionization. Using s%mu
+       ! (which includes the free electrons supplied by the EOS)
+       ! would also flag ionization zones, where the composition is
+       ! uniform; double points placed there introduce spurious
+       ! density discontinuities
+
+       mu_comp = s%abar(1:s%nz)/(1d0 + s%zbar(1:s%nz))
 
        grad_mu(1) = 0d0
 
        do k = 2, s%nz-1
-          grad_mu(k) = log(s%mu(k)/s%mu(k-1))/log(s%Peos(k)/s%Peos(k-1))
+          grad_mu(k) = log(mu_comp(k)/mu_comp(k-1))/log(s%Peos(k)/s%Peos(k-1))
        end do
 
        if (include_last_face) then
-          grad_mu(k) = log(s%mu(s%nz)/s%mu(s%nz-1))/log(s%Peos(s%nz)/s%Peos(s%nz-1))
+          grad_mu(k) = log(mu_comp(s%nz)/mu_comp(s%nz-1))/log(s%Peos(s%nz)/s%Peos(s%nz-1))
        else
           grad_mu(k) = 0d0
        end if
