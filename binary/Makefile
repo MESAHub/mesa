@@ -43,7 +43,6 @@ SRCS := \
    other/mod_other_e2.f90 \
    other/mod_other_pgbinary_plots.f90 \
    other/mod_other_tidal_deformation_switch_function.f90 \
-   other/pgbinary_decorator.f90
 
 ifeq ($(WITH_PGSTAR),yes)
 SRCS += \
