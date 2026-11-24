@@ -206,21 +206,17 @@
       end subroutine binarydata_init
 
       subroutine set_donor_star(b)
+         use binary_mdot, only: switch_donor
+
          type (binary_info), pointer :: b
-         logical :: switch_donor
          real(dp) :: mdot_hi_temp
          include 'formats'
 
-         switch_donor = .false.
-
          if (b% keep_donor_fixed .and. b% mdot_scheme /= "contact") return
 
-         if (b% mdot_scheme == "roche_lobe" .and. &
-            abs(b% mtransfer_rate/(Msun/secyer)) < b% mdot_limit_donor_switch .and. &
-            b% rl_relative_gap_old(b% a_i) > b% rl_relative_gap_old(b% d_i)) then
-            switch_donor = .true.
-         else if (b% mtransfer_rate > 0d0) then
-            switch_donor = .true.
+         ! main reason to change donor: the implicit solver requires a "positive" MT rate
+         ! switch donor and flip the signs of the implicit solver values
+         if (b% mtransfer_rate > 0d0) then
             b% mtransfer_rate = - b% mtransfer_rate
             mdot_hi_temp = b% mdot_hi
             b% mdot_hi = - b% mdot_lo
@@ -230,28 +226,25 @@
             end if
             b% have_mdot_lo = .true.
             b% fixed_delta_mdot = b% fixed_delta_mdot / 2.0d0
-         else if (b% mdot_scheme == "contact" .and. &
-            b% rl_relative_gap_old(b% a_i) > b% rl_relative_gap_old(b% d_i) .and. &
-            b% rl_relative_gap_old(b% a_i) < - b% implicit_scheme_tolerance .and. &
-            b% rl_relative_gap_old(b% d_i) < - b% implicit_scheme_tolerance .and. &
-            abs(b% mtransfer_rate/(Msun/secyer)) < b% mdot_limit_donor_switch) then
-            switch_donor = .true.
+
+            call switch_donor(b)
+            return
          end if
 
-         if (switch_donor) then
-            if (b% report_rlo_solver_progress) write(*,*) "switching donor"
-            if (b% d_i == 2) then
-               b% d_i = 1
-               b% a_i = 2
-               b% s_donor => b% s1
-               b% s_accretor => b% s2
-            else
-               b% d_i = 2
-               b% a_i = 1
-               b% s_donor => b% s2
-               b% s_accretor => b% s1
-            end if
+         ! if accretor is bigger than the donor, switch donor, but only when the MT rate is low to avoid erratic switching
+         if ((b% mdot_scheme == "roche_lobe" .and. &
+               abs(b% mtransfer_rate/(Msun/secyer)) < b% mdot_limit_donor_switch .and. &
+               b% rl_relative_gap_old(b% a_i) > b% rl_relative_gap_old(b% d_i)) &
+            .or. &  ! same in the contact scheme with both stars under the RL
+               (b% mdot_scheme == "contact" .and. &
+               b% rl_relative_gap_old(b% a_i) > b% rl_relative_gap_old(b% d_i) .and. &
+               b% rl_relative_gap_old(b% a_i) < - b% implicit_scheme_tolerance .and. &
+               b% rl_relative_gap_old(b% d_i) < - b% implicit_scheme_tolerance .and. &
+               abs(b% mtransfer_rate/(Msun/secyer)) < b% mdot_limit_donor_switch)) then
+
+            call switch_donor(b)
          end if
+
       end subroutine set_donor_star
 
       integer function binary_evolve_step(b)
