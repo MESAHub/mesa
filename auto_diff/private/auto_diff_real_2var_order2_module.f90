@@ -687,10 +687,12 @@ module auto_diff_real_2var_order2_module
       real(dp) :: q2
       real(dp) :: q1
       real(dp) :: q0
+      real(dp) :: x_safe
+      x_safe = max(x%val, 1.E-99_dp)
       q0 = sqrt(x%val*Heaviside(x%val))
-      q1 = 0.5_dp*q0*powm1(x%val)
-      q2 = 2.0_dp*x%val
-      q3 = 0.25_dp*q0*powm1(pow2(x%val))
+      q1 = 0.5_dp*q0*powm1(x_safe)
+      q2 = 2.0_dp*x_safe
+      q3 = 0.25_dp*q0*powm1(pow2(x_safe))
       unary%val = q0
       unary%d1val1 = q1*x%d1val1
       unary%d1val2 = q1*x%d1val2
@@ -805,14 +807,16 @@ module auto_diff_real_2var_order2_module
       type(auto_diff_real_2var_order2) :: unary
       real(dp) :: q1
       real(dp) :: q0
-      q0 = powm1(x%val)
-      q1 = powm1(pow2(x%val))
+      real(dp) :: x_safe
+      x_safe = max(x%val, 1.E-99_dp)
+      q0 = powm1(x_safe)
+      q1 = powm1(pow2(x_safe))
       unary%val = safe_log(x%val)
       unary%d1val1 = q0*x%d1val1
       unary%d1val2 = q0*x%d1val2
-      unary%d2val1 = q1*(x%d2val1*x%val - pow2(x%d1val1))
-      unary%d1val1_d1val2 = q1*(-x%d1val1*x%d1val2 + x%d1val1_d1val2*x%val)
-      unary%d2val2 = q1*(x%d2val2*x%val - pow2(x%d1val2))
+      unary%d2val1 = q1*(x%d2val1*x_safe - pow2(x%d1val1))
+      unary%d1val1_d1val2 = q1*(-x%d1val1*x%d1val2 + x%d1val1_d1val2*x_safe)
+      unary%d2val2 = q1*(x%d2val2*x_safe - pow2(x%d1val2))
    end function safe_log_self
 
    function log10_self(x) result(unary)
@@ -838,15 +842,17 @@ module auto_diff_real_2var_order2_module
       real(dp) :: q2
       real(dp) :: q1
       real(dp) :: q0
+      real(dp) :: x_safe
+      x_safe = max(x%val, 1.E-99_dp)
       q0 = powm1(ln10)
-      q1 = q0*powm1(x%val)
-      q2 = q0*powm1(pow2(x%val))
+      q1 = q0*powm1(x_safe)
+      q2 = q0*powm1(pow2(x_safe))
       unary%val = q0*safe_log(x%val)
       unary%d1val1 = q1*x%d1val1
       unary%d1val2 = q1*x%d1val2
-      unary%d2val1 = q2*(x%d2val1*x%val - pow2(x%d1val1))
-      unary%d1val1_d1val2 = q2*(-x%d1val1*x%d1val2 + x%d1val1_d1val2*x%val)
-      unary%d2val2 = q2*(x%d2val2*x%val - pow2(x%d1val2))
+      unary%d2val1 = q2*(x%d2val1*x_safe - pow2(x%d1val1))
+      unary%d1val1_d1val2 = q2*(-x%d1val1*x%d1val2 + x%d1val1_d1val2*x_safe)
+      unary%d2val2 = q2*(x%d2val2*x_safe - pow2(x%d1val2))
    end function safe_log10_self
 
    function log2_self(x) result(unary)
