@@ -605,31 +605,64 @@
 
 
       subroutine use_xh_to_set_rho_to_dm_div_dV(s, ierr)
+         use const_def, only: qp
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
-         integer :: k, nz, i_lnR, i_lnd
-         real(dp) :: rL, rR, dm, dV, rho
+         integer :: k, i_lnR, i_lnd
+         real(dp) :: dm, lnR, lnd, lnd_new(s% nz)
+         intrinsic :: exp, log
+         real(qp), parameter :: min_log = log(real(tiny(1d0),qp)*epsilon(1d0))
+         real(qp), parameter :: max_log = log(real(huge(1d0),qp))
+         real(qp) :: rL, rR, rL3, dr3, dV, lnR_expected, lnd_target
+         real(qp) :: lnR_spacing, lnRL_spacing, lnd_spacing, dm_rel_spacing, lnR_tol
          include 'formats'
          ierr = 0
+         if (.not. s% set_rho_to_dm_div_dV .or. s% u_flag .or. s% RSP_flag) return
          i_lnR = s% i_lnR
          i_lnd = s% i_lnd
-         if (i_lnd == 0 .or. i_lnR == 0) return
-         nz = s% nz
-         rR = s% R_center
-         do k = nz, 1, -1
-            rL = rR
-            rR = get_r_from_xh(s,k)
+         if (i_lnd <= 0 .or. i_lnR <= 0) return
+         ierr = -1
+         if (is_bad(s% R_center)) return
+         if (s% R_center < 0d0) return
+
+         lnd_new(:) = s% xh(i_lnd,1:s% nz)
+         rL = real(s% R_center,qp)
+         lnRL_spacing = 0.0_qp
+         if (rL > 0.0_qp) lnRL_spacing = real(spacing(s% R_center),qp)/rL
+         do k = s% nz, 1, -1
+            lnR = s% xh(i_lnR,k)
+            lnd = s% xh(i_lnd,k)
             dm = s% dm(k)
-            dV = four_thirds_pi*(rR*rR*rR - rL*rL*rL)
-            rho = dm/dV
-            if (rho <= 0d0) then
-               write(*,3) 'set_rho_to_dm_div_dV: rho <= 0', &
-                  k, nz, rho, dm, dV, rR, rL
-               ierr = -1
-               return
+            if (is_bad(dm) .or. is_bad(lnR) .or. is_bad(lnd)) exit
+            if (dm <= 0d0 .or. lnR < min_log .or. lnR > max_log .or. lnd < min_log .or. lnd > max_log) exit
+            rR = exp(real(lnR,qp))
+            if (real(rR,dp) <= real(rL,dp)) exit
+
+            ! Check the forward density equation in the stored radius coordinate.
+            ! Propagate the precision of the imported inputs through that equation.
+            rL3 = rL*rL*rL
+            dr3 = real(dm,qp)/(real(four_thirds_pi,qp)*exp(real(lnd,qp)))
+            lnR_expected = log(rL3 + dr3)/3.0_qp
+            lnR_spacing = real(spacing(max(1d0,abs(lnR))),qp)
+            lnd_spacing = real(spacing(max(1d0,abs(lnd))),qp)
+            dm_rel_spacing = real(spacing(dm),qp)/real(dm,qp)
+            lnR_tol = lnR_spacing + (rL3*lnRL_spacing + dr3*(lnd_spacing + dm_rel_spacing)/3.0_qp)/(rL3 + dr3)
+
+            if (abs(real(lnR,qp) - lnR_expected) > lnR_tol) then
+               dV = real(four_thirds_pi,qp)*(rR - rL)*(rR*rR + rR*rL + rL*rL)
+               lnd_target = log(real(dm,qp)/dV)
+               if (lnd_target < min_log .or. lnd_target > max_log) exit
+               lnd_new(k) = real(lnd_target,dp)
             end if
-            call store_rho_in_xh(s, k, rho)
+            rL = rR
+            lnRL_spacing = lnR_spacing
          end do
+         if (k /= 0) then
+            write(*,3) 'set_rho_to_dm_div_dV: invalid shell dm, lnR, lnd', k, s% nz, dm, lnR, lnd
+            return
+         end if
+         s% xh(i_lnd,1:s% nz) = lnd_new(:)
+         ierr = 0
       end subroutine use_xh_to_set_rho_to_dm_div_dV
 
 

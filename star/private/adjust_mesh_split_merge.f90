@@ -20,7 +20,7 @@
       module adjust_mesh_split_merge
 
       use star_private_def
-      use const_def, only: dp, ln10, pi4, four_thirds_pi
+      use const_def, only: dp, ln10, pi4
       use chem_def, only: ih1, ihe3, ihe4
       use utils_lib
       use auto_diff_support
@@ -89,10 +89,12 @@
             tau_center, r00
          integer :: iTooBig, iTooSmall, iter, k, species, &
             nz, num_split, num_merge, nz_old
+         logical :: radii_scaled
          include 'formats'
          species = s% species
          nz_old = s% nz
          ierr = 0
+         radii_scaled = .false.
          num_split = 0
          num_merge = 0
          MaxTooSmall = s% split_merge_amr_MaxShort
@@ -128,7 +130,7 @@
                   s% amr_split_merge_has_undergone_remesh(iTooSmall)) exit
             if (s% trace_split_merge_amr) &
                write(*,2) 'emergency_merge', iTooSmall, s% dq(iTooSmall)
-            call do_merge(s, iTooSmall, species, new_xa, ierr)
+            call do_merge(s, iTooSmall, species, new_xa, radii_scaled, ierr)
             if (ierr /= 0) return
             num_merge = num_merge + 1
             if (s% trace_split_merge_amr) then
@@ -143,7 +145,7 @@
                   s% amr_split_merge_has_undergone_remesh(iTooBig)) exit
             if (s% trace_split_merge_amr) &
                write(*,2) 'emergency_split', iTooBig, s% dq(iTooBig)
-            call do_split(s, iTooBig, species, tau_center, grad_xa, new_xa, ierr)
+            call do_split(s, iTooBig, species, tau_center, grad_xa, new_xa, radii_scaled, ierr)
             if (ierr /= 0) return
             num_split = num_split + 1
             if (s% trace_split_merge_amr) then
@@ -155,6 +157,13 @@
          nz = s% nz
          s% q(nz) = s% dq(nz)
          s% m(nz) = s% dm(nz) + s% m_center
+         if (radii_scaled) then
+            ! Recover the temperatures at fixed specific internal energy after all rescalings.
+            do k = 1, nz
+               call set_cell_temperature_for_energy(s, k, species, new_xa, ierr)
+               if (ierr /= 0) return
+            end do
+         end if
          if (s% show_mesh_changes) then
             write(*,*) 'doing mesh_call_number', s% mesh_call_number
             write(*,*) '                nz_old', nz_old
@@ -184,7 +193,7 @@
                   TooSmall, MaxTooSmall, s% dq(iTooSmall)
                call report_energies(s,'before merge TooSmall')
             end if
-            call do_merge(s, iTooSmall, species, new_xa, ierr)
+            call do_merge(s, iTooSmall, species, new_xa, radii_scaled, ierr)
             if (ierr /= 0) return
             num_merge = num_merge + 1
             if (s% trace_split_merge_amr) then
@@ -200,7 +209,7 @@
                   s% nz, s% model_number, TooBig, MaxTooBig, s% dq(iTooBig)
                call report_energies(s,'before split')
             end if
-            call do_split(s, iTooBig, species, tau_center, grad_xa, new_xa, ierr)
+            call do_split(s, iTooBig, species, tau_center, grad_xa, new_xa, radii_scaled, ierr)
             if (ierr /= 0) return
             num_split = num_split + 1
             if (s% trace_split_merge_amr) then
@@ -480,18 +489,18 @@
       end subroutine biggest_smallest
 
 
-      subroutine do_merge(s, i_merge, species, new_xa, ierr)
-         use mesh_adjust, only: set_lnT_for_energy
+      subroutine do_merge(s, i_merge, species, new_xa, radii_scaled, ierr)
          use star_utils, only: set_rmid
          type (star_info), pointer :: s
          integer, intent(in) :: i_merge, species
          real(dp), intent(inout) :: new_xa(species)
+         logical, intent(inout) :: radii_scaled
          integer, intent(out) :: ierr
          logical :: merge_center
          integer :: i, ip, i0, im, q, nz, qi_max, qim_max
          real(dp) :: &
             drR, drL, v, &
-            dm, dm_i, dm_ip, star_PE0, star_PE1, &
+            dm, dm_i, dm_ip, dV, star_PE0, star_PE1, &
             cell_ie, cell_etrb, &
             Esum_i, KE_i, PE_i, IE_i, Etrb_i, &
             Esum_ip, KE_ip, PE_ip, IE_ip, Etrb_ip, &
@@ -591,6 +600,7 @@
          dm_i = s% dm(i)
          dm_ip = s% dm(ip)
          dm = dm_i + dm_ip
+         dV = dm_i/exp(s% xh(s% i_lnd,i)) + dm_ip/exp(s% xh(s% i_lnd,ip))
          s% dm(i) = dm
          s% dq(i) = dm/s% xmstar
 
@@ -682,39 +692,71 @@
             s% xh(s% i_Hp,i) = s% Hp_face(i)
          end if
 
-         ! do this after move cells since need new r(ip) to calc new rho(i).
-         call update_xh_eos_and_kap(s,i,species,new_xa,ierr)
-         if (ierr /= 0) return  ! call mesa_error(__FILE__,__LINE__,'update_xh_eos_and_kap failed in do_merge')
+         call set_density_and_temperature(s, i, dV, species, new_xa, ierr)
+         if (ierr /= 0) return
 
          s% rmid_start(i) = -1
          call set_rmid(s, i, i, ierr)
-         if (ierr /= 0) return  ! call mesa_error(__FILE__,__LINE__,'update_xh_eos_and_kap failed in do_merge')
+         if (ierr /= 0) return
 
          star_PE1 = get_star_PE(s)
-         call revise_star_radius(s, star_PE0, star_PE1)
+         call revise_star_radius(s, star_PE0, star_PE1, radii_scaled, ierr)
 
       end subroutine do_merge
 
 
-      subroutine revise_star_radius(s, star_PE0, star_PE1)
-         use star_utils, only: store_r_in_xh, get_lnR_from_xh
+      subroutine revise_star_radius(s, star_PE0, star_PE1, radii_scaled, ierr)
+         use star_utils, only: set_rmid
          type (star_info), pointer :: s
          real(dp), intent(in) :: star_PE0, star_PE1
+         logical, intent(inout) :: radii_scaled
+         integer, intent(out) :: ierr
          integer :: k
-         real(dp) :: frac
-         include 'formats'
+         real(dp) :: frac, dlnrho, new_R_center, r_inner, r_stored_inner, r_stored, min_lnd, max_lnd
+         real(dp) :: new_lnR(s% nz), new_r(s% nz), new_lnd(s% nz)
+
+         ierr = -1
+         if (is_bad(star_PE0) .or. is_bad(star_PE1)) return
+         ierr = 0
          if (star_PE1 == 0d0 .or. star_PE0 == star_PE1) return
+         ierr = -1
+         if (star_PE0 == 0d0) return
          frac = star_PE1/star_PE0
-         if (s% model_number == -6918) write(*,1) 'frac', frac
-         if (s% model_number == -6918) write(*,1) 'star_PE0', star_PE0
-         if (s% model_number == -6918) write(*,1) 'star_PE1', star_PE1
-         do k=1,s% nz
-            s% r(k) = s% r(k)*frac
-            if (s% model_number == -6918) write(*,2) 's% r(k)', k, s% r(k)
-            call store_r_in_xh(s, k, s% r(k))
-            s% lnR(k) = get_lnR_from_xh(s,k)
+         if (is_bad(frac) .or. frac <= 0d0) return
+         if (frac == 1d0) then
+            ierr = 0
+            return
+         end if
+
+         ! Scaling all faces, including the inner boundary, scales each shell volume by the cube of frac.
+         dlnrho = -3d0*log(frac)
+         new_R_center = s% R_center*frac
+         if (is_bad(new_R_center) .or. new_R_center < 0d0) return
+         min_lnd = log(tiny(1d0))
+         max_lnd = log(huge(1d0))
+         r_inner = new_R_center
+         r_stored_inner = new_R_center
+         do k = s% nz, 1, -1
+            new_r(k) = s% r(k)*frac
+            if (is_bad(new_r(k)) .or. new_r(k) <= r_inner) return
+            new_lnR(k) = log(new_r(k))
+            r_stored = exp(new_lnR(k))
+            if (r_stored <= r_stored_inner) return
+            r_inner = new_r(k)
+            r_stored_inner = r_stored
+            new_lnd(k) = s% xh(s% i_lnd,k) + dlnrho
+            if (is_bad(new_lnd(k)) .or. new_lnd(k) < min_lnd .or. new_lnd(k) >= max_lnd) return
          end do
-         s% r_center = frac*s% r_center
+
+         s% R_center = new_R_center
+         s% xh(s% i_lnR,1:s% nz) = new_lnR
+         s% xh(s% i_lnd,1:s% nz) = new_lnd
+         s% lnR(1:s% nz) = new_lnR
+         s% r(1:s% nz) = new_r
+         s% lnd(1:s% nz) = new_lnd
+         s% rho(1:s% nz) = exp(new_lnd)
+         call set_rmid(s, 1, s% nz, ierr)
+         radii_scaled = .true.
       end subroutine revise_star_radius
 
 
@@ -814,18 +856,19 @@
       end subroutine split1_non_negative
 
 
-      subroutine do_split(s, i_split, species, tau_center, grad_xa, new_xa, ierr)
+      subroutine do_split(s, i_split, species, tau_center, grad_xa, new_xa, radii_scaled, ierr)
          use alloc, only: reallocate_star_info_arrays
-         use star_utils, only: set_rmid, store_r_in_xh
+         use star_utils, only: set_rmid
          type (star_info), pointer :: s
          integer, intent(in) :: i_split, species
          real(dp) :: tau_center, grad_xa(species), new_xa(species)
+         logical, intent(inout) :: radii_scaled
          integer, intent(out) :: ierr
          integer :: i, ip, j, jp, q, nz, nz_old, &
             iR, iC, iL
          real(dp) :: &
             cell_Esum_old, cell_KE_old, cell_PE_old, cell_IE_old, cell_Etrb_old, &
-            rho_RR, rho_iR, rR, rL, dr, dr_old, rC, dV, dVR, dVL, dM, dML, dMR, rho, &
+            rho_RR, rho_iR, rR, rL, dr, dr_old, rC, lnR_C, dV, dVR, dVL, dM, dML, dMR, rho, &
             v, v2, energy, v2_R, energy_R, rho_R, v2_C, energy_C, rho_C, v2_L, energy_L, rho_L, &
             dLeft, dRght, dCntr, grad_rho, grad_energy, grad_v2, &
             sumx, sumxp, new_xaL, new_xaR, star_PE0, star_PE1, &
@@ -893,16 +936,25 @@
             !$omp end critical (adjust_mesh_split_merge_crit1)
          end if
 
+         ierr = -1
          dr = rR - rL
          dr_old = dr
-         rC = 0.5d0*(rR + rL)  ! split at center by radius
+         rC = rL + 0.5d0*dr  ! split at center by radius
+         if (rC <= rL .or. rC >= rR .or. is_bad(rC)) return
+         lnR_C = log(rC)
+         rC = exp(lnR_C)
+         if (rC <= rL .or. rC >= rR) return
 
-         dV = four_thirds_pi*(rR*rR*rR - rL*rL*rL)
-         dVR = four_thirds_pi*(rR*rR*rR - rC*rC*rC)
-         dVL = dV - dVR
-
+         ! Use geometry for the split fraction and retain the donor's local volume.
          dm = s% dm(i)
-         rho = dm/dV
+         rho = exp(s% xh(s% i_lnd,i))
+         if (rho <= 0d0 .or. is_bad(rho)) return
+         dV = dm/rho
+         if (is_bad(dV)) return
+         dVR = dV*((rR-rC)/dr)*((rR*rR + rR*rC + rC*rC)/(rR*rR + rR*rL + rL*rL))
+         dVL = dV - dVR
+         if (min(dVL,dVR) <= 0d0) return
+         ierr = 0
 
          if (s% u_flag) then
             v = s% u(i)
@@ -931,13 +983,13 @@
          end if
 
          energy_R = s% energy(iR)
-         rho_R = s% dm(iR)/get_dV(s,iR)
+         rho_R = exp(s% xh(s% i_lnd,iR))
 
          energy_C = s% energy(iC)
-         rho_C = s% dm(iC)/get_dV(s,iC)
+         rho_C = exp(s% xh(s% i_lnd,iC))
 
          energy_L = s% energy(iL)
-         rho_L = s% dm(iL)/get_dV(s,iL)
+         rho_L = exp(s% xh(s% i_lnd,iL))
 
          ! get gradients before move cell contents
 
@@ -954,7 +1006,7 @@
             grad_rho = 0d0
             use_new_grad_rho = .false.
          else if (.false.) then
-            rho_RR = s% dm(iR-1)/get_dV(s,iR-1)
+            rho_RR = exp(s% xh(s% i_lnd,iR-1))
             grad_rho = 2*(rho_RR - rho_R)/(s% r(iR-1) - s% r(iR+1))
             use_new_grad_rho = .true.
          else
@@ -1049,7 +1101,7 @@
          s% amr_split_merge_has_undergone_remesh(i) = .true.
          s% amr_split_merge_has_undergone_remesh(ip) = .true.
 
-         dM = rho*dV
+         dM = dm
          if (.not. use_new_grad_rho) then  ! do it the old way
 
             rho_L = rho - grad_rho*dr/4
@@ -1287,7 +1339,7 @@
             end if
          end if
 
-         call store_r_in_xh(s, ip, s% r(ip))
+         s% xh(s% i_lnR,ip) = lnR_C
          if (s% u_flag) then
             s% xh(s% i_u,i) = s% u(i)
             s% xh(s% i_u,ip) = s% u(ip)
@@ -1300,64 +1352,62 @@
             s% xh(s% i_alpha_RTI,ip) = s% alpha_RTI(ip)
          end if
 
-         call update_xh_eos_and_kap(s,i,species,new_xa,ierr)
-         if (ierr /= 0) return  ! call mesa_error(__FILE__,__LINE__,'update_xh_eos_and_kap failed in do_split')
+         call set_density_and_temperature(s, i, dVR, species, new_xa, ierr)
+         if (ierr /= 0) return
 
-         call update_xh_eos_and_kap(s,ip,species,new_xa,ierr)
-         if (ierr /= 0) return  ! call mesa_error(__FILE__,__LINE__,'update_xh_eos_and_kap failed in do_split')
+         call set_density_and_temperature(s, ip, dVL, species, new_xa, ierr)
+         if (ierr /= 0) return
 
          s% rmid_start(i) = -1
          s% rmid_start(ip) = -1
          call set_rmid(s, i, ip, ierr)
-         if (ierr /= 0) return  ! call mesa_error(__FILE__,__LINE__,'update_xh_eos_and_kap failed in do_split')
+         if (ierr /= 0) return
 
          star_PE1 = get_star_PE(s)
-         call revise_star_radius(s, star_PE0, star_PE1)
+         call revise_star_radius(s, star_PE0, star_PE1, radii_scaled, ierr)
 
       end subroutine do_split
 
 
-      subroutine update_xh_eos_and_kap(s,i,species,new_xa,ierr)
-         use mesh_adjust, only: set_lnT_for_energy
-         use micro, only: do_kap_for_cell
-         use eos_lib, only: eos_gamma_DE_get_PT
-         use chem_lib, only: basic_composition_info
-         use star_utils, only: store_lnT_in_xh, get_T_and_lnT_from_xh, &
-            store_rho_in_xh, get_rho_and_lnd_from_xh
+      subroutine set_density_and_temperature(s, i, dV, species, new_xa, ierr)
+         use star_utils, only: store_rho_in_xh
          type (star_info), pointer :: s
          integer, intent(in) :: i, species
-         real(dp) :: new_xa(species)
+         real(dp), intent(in) :: dV
+         real(dp), intent(out) :: new_xa(species)
          integer, intent(out) :: ierr
-         real(dp) :: rho, logRho, new_lnT, revised_energy
-         integer :: q
-         include 'formats'
-         ierr = 0
-         rho = s% dm(i)/get_dV(s,i)
+         real(dp) :: rho
+
+         ierr = -1
+         if (is_bad(dV) .or. dV <= 0d0) return
+         rho = s% dm(i)/dV
+         if (is_bad(rho) .or. rho <= 0d0) return
          call store_rho_in_xh(s, i, rho)
+         call set_cell_temperature_for_energy(s, i, species, new_xa, ierr)
+      end subroutine set_density_and_temperature
+
+
+      subroutine set_cell_temperature_for_energy(s, i, species, new_xa, ierr)
+         use mesh_adjust, only: set_lnT_for_energy
+         use star_utils, only: store_lnT_in_xh, get_T_and_lnT_from_xh, get_rho_and_lnd_from_xh
+         type (star_info), pointer :: s
+         integer, intent(in) :: i, species
+         real(dp), intent(out) :: new_xa(species)
+         integer, intent(out) :: ierr
+         real(dp) :: new_lnT, revised_energy
+
+         ierr = -1
+         if (is_bad(s% energy(i)) .or. s% energy(i) <= 0d0) return
          call get_rho_and_lnd_from_xh(s, i, s% rho(i), s% lnd(i))
-         logRho = s% lnd(i)/ln10
-         do q=1,species
-            new_xa(q) = s% xa(q,i)
-         end do
+         new_xa(:) = s% xa(1:species,i)
          call set_lnT_for_energy(s, i, &
             s% net_iso(ih1), s% net_iso(ihe3), s% net_iso(ihe4), &
-            species, new_xa, rho, logRho, s% energy(i), s% lnT(i), &
+            species, new_xa, s% rho(i), s% lnd(i)/ln10, s% energy(i), s% lnT(i), &
             new_lnT, revised_energy, ierr)
          if (ierr /= 0) return
          call store_lnT_in_xh(s, i, new_lnT)
          call get_T_and_lnT_from_xh(s, i, s% T(i), s% lnT(i))
-      end subroutine update_xh_eos_and_kap
-
-
-      real(dp) function get_dV(s,k)
-         type (star_info), pointer :: s
-         integer, intent(in) :: k
-         if (k == s% nz) then
-            get_dV = four_thirds_pi*(s% r(k)*s% r(k)*s% r(k) - s% R_center*s% R_center*s% R_center)
-         else
-            get_dV = four_thirds_pi*(s% r(k)*s% r(k)*s% r(k) - s% r(k+1)*s% r(k+1)*s% r(k+1))
-         end if
-      end function get_dV
+      end subroutine set_cell_temperature_for_energy
 
 
       real(dp) function minmod(a, b, c) result(m)

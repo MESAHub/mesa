@@ -1044,7 +1044,7 @@
             s% extra_heat(k) = 0
          end do
 
-         call finish_load_model(s, restart, ierr)
+         call finish_load_model(s, restart, ierr, reconcile_density=(do_which /= do_load_zams_model))
          if (ierr /= 0) then
             write(*,*) 'failed in finish_load_model'
             return

@@ -66,10 +66,10 @@
 
       contains
 
-      subroutine finish_load_model(s, restart, ierr)
+      subroutine finish_load_model(s, restart, ierr, reconcile_density)
          use hydro_vars, only: set_vars
          use star_utils, only: set_m_and_dm, set_m_grav_and_grav, set_dm_bar, &
-            total_angular_momentum, reset_epsnuc_vectors, set_qs
+            total_angular_momentum, reset_epsnuc_vectors, set_qs, use_xh_to_set_rho_to_dm_div_dV
          use hydro_rotation, only: use_xh_to_update_i_rot_and_j_rot, &
             set_i_rot_from_omega_and_j_rot, use_xh_to_update_i_rot, set_rotation_info
          use hydro_RSP2, only: set_RSP2_vars
@@ -81,6 +81,7 @@
          type (star_info), pointer :: s
          logical, intent(in) :: restart
          integer, intent(out) :: ierr
+         logical, intent(in), optional :: reconcile_density
          integer :: k, nz
          include 'formats'
          ierr = 0
@@ -92,6 +93,12 @@
             return
          end if
          call set_m_and_dm(s)
+         if (present(reconcile_density)) then
+            if (reconcile_density .and. .not. restart) then
+               call use_xh_to_set_rho_to_dm_div_dV(s, ierr)
+               if (ierr /= 0) return
+            end if
+         end if
          call set_m_grav_and_grav(s)
          call set_dm_bar(s, nz, s% dm, s% dm_bar)
 
