@@ -122,7 +122,7 @@
             s% M_center = 0
          end if
 
-         if (s% set_rho_to_dm_div_dV .and. .not. (s% u_flag .or. s% RSP_flag)) then
+         if (s% set_rho_to_dm_div_dV .and. .not. s% RSP_flag) then
             call set_m_and_dm(s)
             call use_xh_to_set_rho_to_dm_div_dV(s, ierr)
             if (ierr /= 0) return

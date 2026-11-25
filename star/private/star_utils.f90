@@ -617,7 +617,7 @@
          real(qp) :: lnR_spacing, lnRL_spacing, lnd_spacing, dm_rel_spacing, lnR_tol
          include 'formats'
          ierr = 0
-         if (.not. s% set_rho_to_dm_div_dV .or. s% u_flag .or. s% RSP_flag) return
+         if (.not. s% set_rho_to_dm_div_dV .or. s% RSP_flag) return
          i_lnR = s% i_lnR
          i_lnd = s% i_lnd
          if (i_lnd <= 0 .or. i_lnR <= 0) return
@@ -754,9 +754,8 @@
          logical :: okay
          include 'formats'
          ierr = 0
-         ! normalize_dqs destroys bit-for-bit read as inverse of write for models.
-         ! ok for create pre ms etc., but not for read model
-         if (s% do_normalize_dqs_as_part_of_set_qs) then
+         ! Restore the saved dq when loading a photo. Normalize on the usual step path.
+         if (s% do_normalize_dqs_as_part_of_set_qs .and. .not. s% doing_load_restart_photo) then
             call normalize_dqs(s, nz, dq, ierr)
             if (ierr /= 0) return
          end if

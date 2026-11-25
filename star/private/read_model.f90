@@ -94,6 +94,7 @@
          end if
          call set_m_and_dm(s)
          if (present(reconcile_density)) then
+            ! A photo already contains the accepted log density in xh.
             if (reconcile_density .and. .not. restart) then
                call use_xh_to_set_rho_to_dm_div_dV(s, ierr)
                if (ierr /= 0) return
