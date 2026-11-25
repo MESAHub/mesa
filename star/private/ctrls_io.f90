@@ -394,7 +394,7 @@
     gold_tol_residual_norm3, gold_tol_max_residual3 , steps_before_use_gold_tolerances, &
     include_rotation_in_total_energy, convergence_ignore_equL_residuals, convergence_ignore_alpha_RTI_residuals, &
     iter_for_resid_tol2, iter_for_resid_tol3, &
-    solver_itermin, solver_itermin_until_reduce_min_corr_coeff, &
+    solver_use_relative_mass_eqn, solver_itermin, solver_itermin_until_reduce_min_corr_coeff, &
     solver_reduced_min_corr_coeff, do_solver_damping_for_neg_xa, &
     scale_max_correction_for_negative_surf_lum, max_frac_for_negative_surf_lum, &
     hydro_mtx_max_allowed_abs_dlogT, hydro_mtx_max_allowed_abs_dlogRho, &
@@ -1933,6 +1933,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  s% iter_for_resid_tol2 = iter_for_resid_tol2
  s% iter_for_resid_tol3 = iter_for_resid_tol3
 
+ s% solver_use_relative_mass_eqn = solver_use_relative_mass_eqn
  s% solver_itermin = solver_itermin
  s% solver_itermin_until_reduce_min_corr_coeff = solver_itermin_until_reduce_min_corr_coeff
  s% solver_reduced_min_corr_coeff = solver_reduced_min_corr_coeff
@@ -3622,6 +3623,7 @@ s% gradT_excess_max_log_tau_full_off = gradT_excess_max_log_tau_full_off
  iter_for_resid_tol2 = s% iter_for_resid_tol2
  iter_for_resid_tol3 = s% iter_for_resid_tol3
 
+ solver_use_relative_mass_eqn = s% solver_use_relative_mass_eqn
  solver_itermin = s% solver_itermin
  solver_itermin_until_reduce_min_corr_coeff = s% solver_itermin_until_reduce_min_corr_coeff
  solver_reduced_min_corr_coeff = s% solver_reduced_min_corr_coeff

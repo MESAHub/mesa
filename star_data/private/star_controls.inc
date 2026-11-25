@@ -951,6 +951,7 @@
 
          integer :: iter_for_resid_tol2, iter_for_resid_tol3
 
+         logical :: solver_use_relative_mass_eqn
          integer :: solver_itermin, solver_itermin_until_reduce_min_corr_coeff
          logical :: do_solver_damping_for_neg_xa
 

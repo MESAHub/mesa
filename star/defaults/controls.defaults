@@ -8982,6 +8982,19 @@
     redo_limit = 100
 
 
+      ! solver_use_relative_mass_eqn
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Evaluate the mass equation using the difference in log radius across a thin shell
+      ! and ``log1p`` of its volume relative to the volume inside its inner face.
+      ! Use the standard form at the inner boundary and when the shell volume exceeds
+      ! the volume inside the inner face.
+
+      ! ::
+
+    solver_use_relative_mass_eqn = .false.
+
+
       ! solver_itermin
       ! ~~~~~~~~~~~~~~
 
