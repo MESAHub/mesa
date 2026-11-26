@@ -2226,7 +2226,7 @@
          if (new_xmstar == s% xmstar .and. new_mstar == s% mstar) return
 
          ! This mass edit keeps the shell volumes and temperature fixed.
-         if (.not. (s% u_flag .or. s% RSP_flag) .and. s% i_lnd > 0) then
+         if (.not. s% RSP_flag .and. s% i_lnd > 0) then
             dlnrho = real(log(real(new_xmstar, qp)/real(s% xmstar, qp)), dp)
             new_lnd = s% xh(s% i_lnd,1:s% nz) + dlnrho
             if (any(is_bad(new_lnd)) .or. maxval(new_lnd) >= log(huge(1d0)) .or. &
