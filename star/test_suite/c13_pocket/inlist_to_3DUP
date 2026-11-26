@@ -10,7 +10,7 @@
       required_termination_code_string = 'third pulse with 3DUP has occurred'
 
 ! display on-screen plots
-      pgstar_flag = .false.
+      pgstar_flag = .true.
 
 / !end of star_job namelist
 
@@ -25,6 +25,7 @@
 &controls
 
 ! see inlist_common and inlist_TP_AGB
+
 
 ! stopping condition
       ! 3rd thermal pulse with 3DUP

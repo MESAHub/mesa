@@ -34,6 +34,8 @@
       integer :: TP_count, TP_with_3DUP
       logical :: in_LHe_peak
       real(dp) :: initial_surface_c12
+      integer, parameter :: lx_interpulse_seen = 1
+      integer, parameter :: ix_dredge_up_count = 1, ix_last_dredge_up_TP = 2
 
       include "test_suite_extras_def.inc"
 
@@ -152,7 +154,10 @@
                age_2TP_with_3DUP = 0
                TP_with_3DUP = 0
                in_LHe_peak = .false.
+               s% ixtra(ix_dredge_up_count) = 0
+               s% ixtra(ix_last_dredge_up_TP) = 0
             case(3)
+               s% lxtra(lx_interpulse_seen) = .false.
             case(4)
                TP_count = 0
                in_LHe_peak = .false.
@@ -388,10 +393,6 @@
                      mcore_1TP = s% he_core_mass
                      age_1TP = s% star_age
                   end if
-                  if ((TP_with_3DUP > 0) .and. (TP_count - TP_with_3DUP == 1)) then
-                     mcore_2TP_with_3DUP = s% he_core_mass
-                     age_2TP_with_3DUP = s% star_age
-                  end if
                end if
             else
                if (s% power_h_burn/s% power_he_burn > 10) in_LHe_peak = .false.  ! pulse over
@@ -402,24 +403,35 @@
                mcore_min_after_TP = min(mcore_min_after_TP, s% he_core_mass)
             end if
 
-            ! mark when significant 3DUP has first occurred
-            if (TP_with_3DUP == 0) then
-               if ((mcore_min_after_TP - mcore_at_TP) < -1d-4) then
+            ! count each pulse once if the He core retreats by more than 1d-4 Msun
+            if (TP_count > s% ixtra(ix_last_dredge_up_TP) .and. mcore_min_after_TP - mcore_at_TP < -1d-4) then
+               s% ixtra(ix_dredge_up_count) = s% ixtra(ix_dredge_up_count) + 1
+               s% ixtra(ix_last_dredge_up_TP) = TP_count
+               if (s% ixtra(ix_dredge_up_count) == 1) then
                   TP_with_3DUP = TP_count
-                  write(*,'(A, I8)')    '>> 3DUP occurred at pulse: ', TP_with_3DUP
+                  write(*,'(A, I8)') '>> 3DUP occurred at pulse: ', TP_with_3DUP
+               else if (s% ixtra(ix_dredge_up_count) == 2) then
+                  mcore_2TP_with_3DUP = mcore_at_TP
+                  age_2TP_with_3DUP = age_at_TP
                end if
             end if
 
-            ! stop after 3rd TP after dredge up starts
-            if (.not. in_LHe_peak) then  ! pulse is over
-               if ((TP_with_3DUP > 0) .and. (TP_count - TP_with_3DUP == 2)) then
-                  termination_code_str(t_xtra1) = 'third pulse with 3DUP has occurred'
-                  s% termination_code = t_xtra1
-                  extras_finish_step = terminate
-               end if
+            ! stop after the third pulse with 3DUP
+            if (.not. in_LHe_peak .and. s% ixtra(ix_dredge_up_count) >= 3) then
+               termination_code_str(t_xtra1) = 'third pulse with 3DUP has occurred'
+               s% termination_code = t_xtra1
+               extras_finish_step = terminate
             end if
 
          case(3)
+
+            ! stop at He-shell ignition after an interpulse
+            if (s% power_he_burn < s% x_ctrl(1)) s% lxtra(lx_interpulse_seen) = .true.
+            if (s% lxtra(lx_interpulse_seen) .and. s% power_he_burn >= s% x_ctrl(2)) then
+               termination_code_str(t_xtra1) = 'He-shell ignition after interpulse'
+               s% termination_code = t_xtra1
+               extras_finish_step = terminate
+            end if
 
          case(4)
 

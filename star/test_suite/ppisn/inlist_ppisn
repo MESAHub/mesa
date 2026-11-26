@@ -137,6 +137,7 @@ mass_fraction_limit_for_Skye = 1d-16
 
    ! The control below is useful when running with burning + convection during pulses.
    make_gradr_sticky_in_solver_iters = .true.
+   convergence_ignore_equL_residuals = .true.
 
    max_abs_du_div_cs_for_convection = 0.03d0
    max_v_div_cs_for_convection = 1d1
@@ -323,7 +324,7 @@ mass_fraction_limit_for_Skye = 1d-16
 
    x_ctrl(14) = 25d0 ! If L_photo is above this limit, then the timestep limit given by x_ctrl(18) is not used for L_photo either
 
-   x_ctrl(15) = 9d0 ! After first pulse, turn on v_flag if riemann hydro is off and logT_center falls below this.
+   x_ctrl(15) = 9d0 ! After first pulse, turn on v_flag if Riemann hydro is off and logT_center exceeds this.
                       ! (logT_for_v_flag)
    x_ctrl(16) = 9d0 ! After first pulse, turn on v_flag if riemann hydro is off and log10(Lneu/Lsun) exceeds this.
                       ! (logLneu_for_v_flag)

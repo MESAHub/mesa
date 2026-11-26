@@ -96,6 +96,38 @@ fixed by user Garv Chauhan in `gh-998 <https://github.com/MESAHub/mesa/pull/998>
 Plasmon neutrinos now use the same Weinberg angle as all other processes, and
 changing its value will affect the corresponding cooling rate. Changes to the plasmon neutrino prefactor for MESA's default Weinberg angle result in small numerical differences for stars where plasmon neutrino cooling is significant.
 
+.. _opal_op_type1_preprocessor_bug:
+
+Kap: OPAL/OP Type 1 opacity table preprocessing
+-----------------------------------------------
+
+The preprocessor uses opacity fitting and smoothing routines adapted from
+`Seaton (1993), MNRAS, 265, L25 <https://ui.adsabs.harvard.edu/abs/1993MNRAS.265L..25S/abstract>`_.
+The error occurs in the interpolation branch for missing data.
+
+The Type 1 OPAL/OP preprocessor could return :math:`\log_{10}\kappa = 0`
+when its interpolation stencil included missing data in the ``X = 0``
+table. It shifted the hydrogen abundance stencil to available data, but
+then treated the unused temperature fallback index ``kmin = 0`` as a
+failure and returned before calculating opacity. The generated tables
+consequently assigned :math:`\kappa = 1\,\mathrm{cm^2\,g^{-1}}` to affected
+points at low temperature and low density.
+
+This affects MESA ``r26.4.1`` and all earlier versions.
+Any tables generated through the same faulty code path can contain these
+values, including tables used elsewhere in the field.
+
+This is fixed after ``r26.4.1``. The fix updates both the preprocessor and
+the distributed tables. See `gh-1111 <https://github.com/MESAHub/mesa/pull/1111>`_.
+To apply the source fix in
+``kap/preprocessor/src/opal_type1.f``,
+change the early return to
+``if ((iadvance == 0) .and. (kmin <= 0)) return`` and use
+``alt(max(1,kmin))`` in the following condition. Regenerate and install the
+opacity tables, then remove the affected opacity caches or use a fresh
+cache directory. A normal MESA installation alone does not regenerate
+these tables.
+
 .. _freedman_lowt_z_bug:
 
 Kap: ``lowT_Freedman11`` used ``[M/H]`` labels as ``Z``
