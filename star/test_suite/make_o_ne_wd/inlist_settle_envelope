@@ -70,6 +70,10 @@ mass_fraction_limit_for_skye = 1d-16
      delta_XSi_cntr_hard_limit = -1
 
 ! mesh
+      ! Now that settling onto WD track, set min_dq appropriate for WDs
+      min_dq = 1d-18
+      min_dq_for_split = 1d-18
+
 ! solver
 
       convergence_ignore_equL_residuals = .true.

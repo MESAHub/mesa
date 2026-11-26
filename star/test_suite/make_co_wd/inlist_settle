@@ -43,6 +43,10 @@
 ! prevent solver struggles in the atmosphere at high luminosity
       Pextra_factor = 3
 
+      ! Now that settling onto WD track, set min_dq appropriate for WDs
+      min_dq = 1d-18
+      min_dq_for_split = 1d-18
+
 ! convection
       okay_to_reduce_gradT_excess = .true.
       gradT_excess_lambda1 = -1 ! turn on full all the time

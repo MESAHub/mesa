@@ -110,6 +110,12 @@
       atm_table =  'DB_WD_tau_25'! 'photosphere' !  
       atm_off_table_option = 'T_tau'
 
+      ! atmosphere resolution for WDs needs smaller min_dq than default
+      ! to properly resolve the onset of convection
+      min_dq = 1d-18
+      min_dq_for_split = 1d-18
+      max_surface_cell_dq = 3d-18
+
 ! mesh
 
       varcontrol_target = 1d-4
