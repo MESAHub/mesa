@@ -38,6 +38,7 @@
 
       energy_eqn_option = 'dedt'
       convergence_ignore_equL_residuals = .true. ! needed during flash
+      set_rho_to_dm_div_dV = .false.
      
       initial_mass = 2
       initial_z = 0.02d0

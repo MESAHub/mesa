@@ -3821,17 +3821,16 @@
          rho_face = alfa*s% rho(k) + beta*s% rho(k-1)
       end function get_rho_face_val
 
-      function get_rho_start_face(s,k) result(rho_face)
+      real(dp) function get_rho_start_face(s,k) result(rho_face)
          type (star_info), pointer :: s
          integer, intent(in) :: k
-         type(auto_diff_real_star_order1) :: rho_face
          real(dp) :: alfa, beta
          if (k == 1) then
-            rho_face = wrap_d_00_start(s,k)
+            rho_face = s% rho_start(k)
             return
          end if
          call get_face_weights(s, k, alfa, beta)
-         rho_face = alfa*wrap_d_00_start(s,k) + beta*wrap_d_m1_start(s,k)
+         rho_face = alfa*s% rho_start(k) + beta*s% rho_start(k-1)
       end function get_rho_start_face
 
       function get_T_face(s,k) result(T_face)

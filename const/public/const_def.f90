@@ -127,6 +127,10 @@ module const_def
    real(dp), parameter :: Teffsun = 5772.0d0  ! solar effective temperature (K), IAU 2015 Resolution B3
    real(dp), parameter :: loggsun = 4.4380676273031332_dp  ! log10(mu_sun/(Rsun*Rsun)), can't call log10 because we don't have math_lib at this point
    real(dp), parameter :: mbolsun = 4.74d0  ! Bolometric magnitude of the Sun, IAU 2015 Resolution B2
+   ! Irradiance corresponding to M_bol = 0 (erg s^-1 cm^-2), IAU 2015 Resolution B2:
+   ! a source with L = Lsun observed from 10 pc has M_bol = mbolsun.
+   real(dp), parameter :: f_bol_zero_point = &
+      Lsun*10.0_dp**(0.4_dp*mbolsun)/(4.0_dp*pi*(10.0_dp*pc)**2)
 
    real(dp), parameter :: m_earth = mu_earth/standard_cgrav  ! earth mass (g)
    real(dp), parameter :: r_earth = 6.3781d8  ! earth equatorial radius (cm)

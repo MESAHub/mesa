@@ -319,7 +319,9 @@
             integer, intent(out) :: ierr
 
             integer, pointer :: rtab(:)
-            real(dp) :: rateII, rateIII, rsum, fII, fIII
+            real(dp) :: rateII, rateIII, rsum, fII, fIII, rate34
+            real(dp) :: d_rateII_dT, d_rateIII_dT, d_rateII_dRho, d_rateIII_dRho
+            real(dp) :: d_fII_dT, d_fII_dRho
 
             include 'formats'
 
@@ -334,16 +336,24 @@
                end if
                if (rtab(ir_be7_wk_li7) /= 0) then
                   rateII  = rate_screened(rtab(ir_be7_wk_li7))
+                  d_rateII_dT = rate_screened_dT(rtab(ir_be7_wk_li7))
+                  d_rateII_dRho = rate_screened_dRho(rtab(ir_be7_wk_li7))
                else if (rtab(irbe7ec_li7_aux) /= 0) then
                   rateII  = rate_screened(rtab(irbe7ec_li7_aux))
+                  d_rateII_dT = rate_screened_dT(rtab(irbe7ec_li7_aux))
+                  d_rateII_dRho = rate_screened_dRho(rtab(irbe7ec_li7_aux))
                else
                   write(*,*) 'need either r_be7_wk_li7 or rbe7ec_li7_aux'
                   call mesa_error(__FILE__,__LINE__,'set_combo_screen_rates')
                end if
                if (rtab(ir_be7_pg_b8) /= 0) then
                   rateIII = y(g% net_iso(ih1)) * rate_screened(rtab(ir_be7_pg_b8))
+                  d_rateIII_dT = y(g% net_iso(ih1)) * rate_screened_dT(rtab(ir_be7_pg_b8))
+                  d_rateIII_dRho = y(g% net_iso(ih1)) * rate_screened_dRho(rtab(ir_be7_pg_b8))
                else if (rtab(irbe7pg_b8_aux) /= 0) then
                   rateIII = y(g% net_iso(ih1)) * rate_screened(rtab(irbe7pg_b8_aux))
+                  d_rateIII_dT = y(g% net_iso(ih1)) * rate_screened_dT(rtab(irbe7pg_b8_aux))
+                  d_rateIII_dRho = y(g% net_iso(ih1)) * rate_screened_dRho(rtab(irbe7pg_b8_aux))
                else
                   write(*,*) 'need either r_be7_pg_b8 or rbe7pg_b8_aux'
                   call mesa_error(__FILE__,__LINE__,'set_combo_screen_rates')
@@ -351,18 +361,24 @@
                rsum = rateII + rateIII
                if (rsum < 1d-50) then
                   fII = 0.5d0
+                  d_fII_dT = 0d0
+                  d_fII_dRho = 0d0
                else
                   fII = rateII / rsum
+                  d_fII_dT = (rateIII*d_rateII_dT - rateII*d_rateIII_dT)/(rsum*rsum)
+                  d_fII_dRho = (rateIII*d_rateII_dRho - rateII*d_rateIII_dRho)/(rsum*rsum)
                end if
                fIII = 1d0 - fII
+               rate34 = rate_screened(rtab(ir34_pp2))
 
+               ! Include the response of the ppII and ppIII branching fractions.
                rate_screened(rtab(ir34_pp2)) = fII*rate_screened(rtab(ir34_pp2))
-               rate_screened_dT(rtab(ir34_pp2)) = fII*rate_screened_dT(rtab(ir34_pp2))
-               rate_screened_dRho(rtab(ir34_pp2)) = fII*rate_screened_dRho(rtab(ir34_pp2))
+               rate_screened_dT(rtab(ir34_pp2)) = fII*rate_screened_dT(rtab(ir34_pp2)) + rate34*d_fII_dT
+               rate_screened_dRho(rtab(ir34_pp2)) = fII*rate_screened_dRho(rtab(ir34_pp2)) + rate34*d_fII_dRho
 
                rate_screened(rtab(ir34_pp3)) = fIII*rate_screened(rtab(ir34_pp3))
-               rate_screened_dT(rtab(ir34_pp3)) = fIII*rate_screened_dT(rtab(ir34_pp3))
-               rate_screened_dRho(rtab(ir34_pp3)) = fIII*rate_screened_dRho(rtab(ir34_pp3))
+               rate_screened_dT(rtab(ir34_pp3)) = fIII*rate_screened_dT(rtab(ir34_pp3)) - rate34*d_fII_dT
+               rate_screened_dRho(rtab(ir34_pp3)) = fIII*rate_screened_dRho(rtab(ir34_pp3)) - rate34*d_fII_dRho
 
             end if
 
