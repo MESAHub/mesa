@@ -73,6 +73,9 @@ conserving total angular momentum. See
 Bug Fixes
 ---------
 
+Corrected terms in the Bremsstrahlung routines of the ``neu`` module including the Fermi temperature and its derivative.
+See `gh-1103 <https://github.com/MESAHub/mesa/pull/1103>`_.
+
 Fixed a regex parsing issue in `shmesa change` that prevented controls like
 `x_ctrl(1)` from being parsed correctly.
 

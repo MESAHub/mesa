@@ -941,11 +941,11 @@
          c02   = 4.59d-5 * p
          dd02  = -0.11d0*4.59d-5*(p/t8% T8)*1.0d-8
 
-         z     = pow(input% den,0.656d0)
+         z     = pow(input% rm,0.656d0)
          dum   = c00*input% rmi  + c01  + c02*z
          dumdt = dd00*input% rmi + dd01 + dd02*z
-         z     = -c00*input% rmi*input% rmi
-         dumdd = z*input% rmdd + 0.656d0*c02*pow(input% den,-0.344d0)
+         z     = -c00*input% rmi*input% rmi + 0.656d0*c02*pow(input% rm,-0.344d0)
+         dumdd = z*input% rmdd
          dumda = z*input% rmda
          dumdz = z*input% rmdz
 
@@ -1207,7 +1207,7 @@
          D = 1.0d0
 
          U = pow(input% den6*input% ye,two_thirds)
-         tfermi = A * (sqrt(U) - D)
+         tfermi = A * (sqrt(B + C * U) - D)
 
          if (input% temp >= tfhi * tfermi) then
 
@@ -1239,7 +1239,7 @@
             beta = 1d0 - alfa
 
 
-            dtfermidu = (1d0/2d0) * A * pow(U,-1d0/2d0)
+            dtfermidu = (1d0/2d0) * A * C * pow(B + C* U,-1d0/2d0)
             dtfracdtfermi = -input% temp/(tfermi * tfermi * dtf )
 
             ! v = den6* ye  = den *10**-6 * ye
