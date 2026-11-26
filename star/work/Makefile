@@ -18,3 +18,5 @@ run: $(OBJ_OUT)
 	@date "+DATE: %Y-%m-%d%nTIME: %H:%M:%S"
 
 .PHONY: run
+
+print-%: ; @echo $* is $($*)
