@@ -108,14 +108,17 @@
                dlambda_dlnT(i) = 0d0
                dlambda_dlnRho(i) = 0d0
             else if (chem_isos% Z(cid) >= weaklib_blend_hi_Z) then
-               lambda(i) = alfa_hi_Z*lambda(i) + beta_hi_Z*weak_lowT_rate(ir)
+               ! lambda(i) currently holds the tabulated weak rate, so
+               ! compute the blended dlambda_dlnT first, before we
+               ! overwrite lamnbda(i) with the blended rate
                dlambda_dlnT(i) = alfa_hi_Z*dlambda_dlnT(i) + &
                     d_alfa_hi_Z_dlnT * (lambda(i) - weak_lowT_rate(ir))
+               lambda(i) = alfa_hi_Z*lambda(i) + beta_hi_Z*weak_lowT_rate(ir)
                dlambda_dlnRho(i) = alfa_hi_Z*dlambda_dlnRho(i)
             else
-               lambda(i) = alfa*lambda(i) + beta*weak_lowT_rate(ir)
                dlambda_dlnT(i) = alfa*dlambda_dlnT(i) + &
                     d_alfa_dlnT * (lambda(i) - weak_lowT_rate(ir))
+               lambda(i) = alfa*lambda(i) + beta*weak_lowT_rate(ir)
                dlambda_dlnRho(i) = alfa*dlambda_dlnRho(i)
             end if
          end do
