@@ -106,6 +106,11 @@ energies now use double-precision literals. See
 :ref:`the known bugs entry <skye_ion_offset_normalization_bug>` and
 `gh-1086 <https://github.com/MESAHub/mesa/issues/1086>`_.
 
+Fixed a missing factor in the second derivative of the liquid electron-ion
+screening free energy in the PC EOS, correcting the screening contribution
+to the density derivative of pressure. See
+`gh-1133 <https://github.com/MESAHub/mesa/pull/1133>`_.
+
 Fixed a typo in the OPLIB hydrogen grid that could cause incorrect opacities or interpolation failures at low hydrogen abundance; see `gh-1078 <https://github.com/MESAHub/mesa/pull/1078>`_.
 
 Fixed a bug in the dPrad/dm temperature equation where rotational mixing could
