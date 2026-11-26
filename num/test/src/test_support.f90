@@ -208,6 +208,45 @@ contains
       write (*, *)
    end subroutine test_root3
 
+   subroutine test_root_no_brackets
+      ! any imax that will fail here (just need to keep it below 31 so
+      ! we don't overflow)
+      integer, parameter :: imax = 3, lipar = 0, lrpar = 0
+      real(dp) :: x1, x3, y1, y3
+      integer :: ierr
+      real(dp), target :: rpar_ary(lrpar)
+      integer, target :: ipar_ary(lipar)
+      real(dp), pointer :: rpar(:)
+      integer, pointer :: ipar(:)
+
+      ipar => ipar_ary
+      rpar => rpar_ary
+
+      ! Function evaluations succeed, but x*x + 1 has no real root.
+      call look_for_brackets(0d0, 1d0, x1, x3, no_root_f, y1, y3, &
+         imax, lrpar, rpar, lipar, ipar, ierr)
+
+      write (*, '(a, i4, a, i4)') &
+         'look_for_brackets no root expected ierr', -1, ' got', ierr
+
+   contains
+
+      real(dp) function no_root_f(x, dfdx, lrpar, rpar, lipar, ipar, ierr)
+         real(dp), intent(in) :: x
+         real(dp), intent(out) :: dfdx
+         integer, intent(in) :: lrpar, lipar
+         real(dp), intent(inout), pointer :: rpar(:)
+         integer, intent(inout), pointer :: ipar(:)
+         integer, intent(out) :: ierr
+
+         ! this has no real roots
+         no_root_f = x*x + 1d0
+         dfdx = 2d0*x
+         ierr = 0
+      end function no_root_f
+
+   end subroutine test_root_no_brackets
+
    subroutine van_der_Pol_derivs(n, x, h, y, f, lrpar, rpar, lipar, ipar, ierr)
       integer, intent(in) :: n, lrpar, lipar
       real(dp), intent(in) :: x, h

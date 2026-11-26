@@ -239,6 +239,7 @@ g_05(x) = exp( x ) - 2x + 1/(100x) - 1/(1000000x^2)
                              first safe_root_with_guess    4.9999999999999362D-01
                             second safe_root_with_guess    5.0000000000003031D-01
 
+look_for_brackets no root expected ierr  -1 got  -1
 
  vdpol
  dopri5

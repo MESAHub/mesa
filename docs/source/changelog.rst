@@ -86,6 +86,9 @@ oscillation frequencies could jump discontinuously. Pulsation models
 with double points may therefore differ from those written by earlier
 versions.
 
+Fixed a regex parsing issue in `shmesa change` that prevented controls like
+`x_ctrl(1)` from being parsed correctly.
+
 The ``colors`` module now checks Hermite-interpolated spectra for unphysical
 fluxes, sets negligible negative undershoots to zero, and falls back to
 trilinear interpolation when necessary. Interpolation also handles atmosphere
@@ -116,6 +119,11 @@ energies now use double-precision literals. See
 :ref:`the known bugs entry <skye_ion_offset_normalization_bug>` and
 `gh-1086 <https://github.com/MESAHub/mesa/issues/1086>`_.
 
+Fixed a missing factor in the second derivative of the liquid electron-ion
+screening free energy in the PC EOS, correcting the screening contribution
+to the density derivative of pressure. See
+`gh-1133 <https://github.com/MESAHub/mesa/pull/1133>`_.
+
 Fixed a typo in the OPLIB hydrogen grid that could cause incorrect opacities or interpolation failures at low hydrogen abundance; see `gh-1078 <https://github.com/MESAHub/mesa/pull/1078>`_.
 
 Fixed a bug in the dPrad/dm temperature equation where rotational mixing could
@@ -136,6 +144,10 @@ Removed duplicate treatment of ``n14(a,g)f18(e+nu)o18`` in networks that
 include both the explicit hot CNO reactions and the corresponding approximate
 reaction. See :ref:`the known bugs entry <duplicate_n14ag_rate_bug>` and
 `gh-1056 <https://github.com/MESAHub/mesa/issues/1056>`_.
+
+Fixed the JINA Reaclib lookup for three-to-one reactions to try the reverse
+one-to-three reaction when the forward rate is missing. See
+`gh-1135 <https://github.com/MESAHub/mesa/pull/1135>`_.
 
 Fixed the hydrodynamic drag energy term so that it is only included when
 ``v_flag = .true.``. Previously, using ``u_flag`` with a nonzero
@@ -172,6 +184,10 @@ The parameter ``report_max_infall_inside_fe_core`` was ignored in versions r25.1
 Fixed the OPAL/SCVH blend in metallicity, which could cause discontinuities
 in the EOS at ``Z = 0.04`` with the default blend limits. See
 :ref:`the known bugs entry <opal_scvh_high_z_blend_bug>`.
+
+Corrected swapped derivatives of the HELM/ideal-gas EOS blend weight with
+respect to log density and log temperature. See
+`gh-1134 <https://github.com/MESAHub/mesa/pull/1134>`_.
 
 .. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ``changelog_template.rst``).
 
