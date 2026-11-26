@@ -747,7 +747,7 @@
       end subroutine get_level6_for_eosdt
 
       subroutine get_HELM_alfa( &
-            rq, logRho, logT, alfa, d_alfa_dlogT, d_alfa_dlogRho, ierr)
+            rq, logRho, logT, alfa, d_alfa_dlogRho, d_alfa_dlogT, ierr)
          use const_def, only: dp
          use eos_blend
          use auto_diff
