@@ -127,6 +127,10 @@ include both the explicit hot CNO reactions and the corresponding approximate
 reaction. See :ref:`the known bugs entry <duplicate_n14ag_rate_bug>` and
 `gh-1056 <https://github.com/MESAHub/mesa/issues/1056>`_.
 
+Fixed the JINA Reaclib lookup for three-to-one reactions to try the reverse
+one-to-three reaction when the forward rate is missing. See
+`gh-1135 <https://github.com/MESAHub/mesa/pull/1135>`_.
+
 Fixed the hydrodynamic drag energy term so that it is only included when
 ``v_flag = .true.``. Previously, using ``u_flag`` with a nonzero
 ``drag_coefficient`` could inject spurious energy. See :ref:`the known bugs
