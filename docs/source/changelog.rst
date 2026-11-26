@@ -167,6 +167,10 @@ Fixed the OPAL/SCVH blend in metallicity, which could cause discontinuities
 in the EOS at ``Z = 0.04`` with the default blend limits. See
 :ref:`the known bugs entry <opal_scvh_high_z_blend_bug>`.
 
+Corrected swapped derivatives of the HELM/ideal-gas EOS blend weight with
+respect to log density and log temperature. See
+`gh-1134 <https://github.com/MESAHub/mesa/pull/1134>`_.
+
 .. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ``changelog_template.rst``).
 
 Other Changes
