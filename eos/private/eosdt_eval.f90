@@ -2499,13 +2499,18 @@
                call mesa_error(__FILE__,__LINE__,'do_safe_get_Rho_T')
             end if
 
+            ! which_other is the quantity we know, and other_value is
+            ! the value of that quantity we are trying to match.
+            ! we want f = 0, which we get via Newton iteration
+            ! with x = log_10(T) or log_10(rho)
+
             if (which_other == -1) then  ! other_value is egas
                erad = crad*pow4(T)/rho
                egas = energy - erad
                f = egas - other_value
                if (doing_Rho) then
                   derad_dlnRho = -erad
-                  dfdx = energy*d_dlnRho_c_T(i_lnE)*ln10 - derad_dlnRho
+                  dfdx = (energy*d_dlnRho_c_T(i_lnE) - derad_dlnRho) * ln10
                else
                   derad_dlnT = 4d0*erad
                   degas_dlnT = energy*d_dlnT_c_Rho(i_lnE) - derad_dlnT
@@ -2513,13 +2518,15 @@
                end if
             else if (which_other == 0) then  ! other_value is log10P
                f = log10(Pgas + Prad) - other_value
+               ! note: since both the f and x are in terms of log_10,
+               ! the conversion factors ln10 cancel.
                if (doing_Rho) then
                   dPgas_dlnRho = Pgas*d_dlnRho_c_T(i_lnPgas)
-                  dfdx = dPgas_dlnRho/(Pgas + Prad)*ln10
+                  dfdx = dPgas_dlnRho/(Pgas + Prad)
                else
                   dPgas_dlnT = Pgas*d_dlnT_c_Rho(i_lnPgas)
                   dPrad_dlnT = 4d0*Prad
-                  dfdx = (dPgas_dlnT + dPrad_dlnT)/(Pgas + Prad)*ln10
+                  dfdx = (dPgas_dlnT + dPrad_dlnT)/(Pgas + Prad)
                end if
             else
                f = res(which_other) - other_value
