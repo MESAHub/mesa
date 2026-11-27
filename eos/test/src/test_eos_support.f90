@@ -252,6 +252,7 @@ contains
          othertol = 1d-12
 
 1        format(a30, 1pe24.16)
+2        format(a30, i8)
 
          if (.not. quietly) then
             write (*, '(A)')
@@ -351,7 +352,7 @@ contains
             Pgas = exp(res(i_lnPgas))
             logP = log10(Prad + Pgas)
             write (*, 1) '     got logP', logP
-            write (*, *) '     eos calls', eos_calls
+            write (*, 2) '     eos calls', eos_calls
             write (*, '(A)')
          end if
 
