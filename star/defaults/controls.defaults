@@ -626,7 +626,10 @@
       ! threshold_grad_mu_for_double_point
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! threshold in grad_mu = dln(mu)/dln(P) for a double point to be written
+      ! threshold in grad_mu = dln(mu)/dln(P) for a double point to be written. Here
+      ! mu is the mean molecular weight of the composition alone (``abar/(1 + zbar)``,
+      ! i.e. assuming full ionization), so that ionization zones do not trigger double
+      ! points
 
       ! ::
 

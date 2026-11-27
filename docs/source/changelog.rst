@@ -73,6 +73,19 @@ conserving total angular momentum. See
 Bug Fixes
 ---------
 
+When ``add_double_points_to_pulse_data`` is enabled, the composition
+gradient used to place double points (see
+:ref:`reference/controls:threshold_grad_mu_for_double_point`) is now
+evaluated from the mean molecular weight of the composition alone,
+``abar/(1 + zbar)``, rather than from ``mu`` (which includes the free
+electrons supplied by the EOS). Previously, partial ionization zones
+could trigger double points where the composition is uniform,
+introducing spurious density discontinuities into exported pulsation
+models; as faces crossed the threshold from one model to the next,
+oscillation frequencies could jump discontinuously. Pulsation models
+with double points may therefore differ from those written by earlier
+versions.
+
 Fixed a regex parsing issue in `shmesa change` that prevented controls like
 `x_ctrl(1)` from being parsed correctly.
 
