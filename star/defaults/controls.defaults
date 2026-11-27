@@ -8880,9 +8880,9 @@
       ! do_normalize_dqs_as_part_of_set_qs
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      ! normalize_dqs destroys bit-for-bit read as inverse of write for models.
-      ! ok for create pre ms etc., but not for read model
-      ! create_pre_ms calls normalize_dqs even if this flag is false.
+      ! Normalize dq when setting q. Photo loading preserves the saved dq.
+      ! Normalizing a saved text model can change its stored dq.
+      ! Creating a pre-main-sequence model always normalizes dq.
 
       ! ::
 
@@ -8983,6 +8983,19 @@
       ! ::
 
     redo_limit = 100
+
+
+      ! solver_use_relative_mass_eqn
+      ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+      ! Evaluate the mass equation using the difference in log radius across a thin shell
+      ! and ``log1p`` of its volume relative to the volume inside its inner face.
+      ! Use the standard form at the inner boundary and when the shell volume exceeds
+      ! the volume inside the inner face.
+
+      ! ::
+
+    solver_use_relative_mass_eqn = .false.
 
 
       ! solver_itermin
@@ -11579,6 +11592,24 @@
 
       ! set_rho_to_dm_div_dV
       ! ~~~~~~~~~~~~~~~~~~~~
+
+      ! Reconcile density with the shell masses and radii of a newly built
+      ! model, a saved text model, or a ZAMS model. Keep the stored density
+      ! when it satisfies the mass equation to within the precision of the inputs.
+      ! Predict the outer log radius from the inner face radius, cell mass,
+      ! and density. Set density to ``dm/dV`` from the face radii only if the
+      ! predicted and stored outer log radii differ beyond the rounding tolerance.
+      ! Temperature and composition are fixed during this adjustment. The EOS
+      ! then supplies the internal energy of the starting model.
+      ! This applies to hydrostatic models and both hydrodynamic velocity
+      ! formulations. RSP uses its own setup.
+      !
+      ! Photo restarts restore the accepted density. Both restarted and
+      ! uninterrupted evolution carry that density into the next step.
+      ! The same check then runs before any remeshing on each new step.
+      ! If density changes, the EOS is evaluated with the new density.
+      ! RSP bypasses the check.
+      ! Mass and mesh edits during evolution update their own state.
 
       ! ::
 

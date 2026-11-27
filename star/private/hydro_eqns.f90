@@ -567,10 +567,15 @@
          r_p1 = wrap_r_p1(s,k)
          rp13 = pow3(r_p1)
 
-         lnR_expected = log(rp13 + dr3)/3d0
          lnR_actual = wrap_lnR_00(s,k)
-
-         resid_ad = lnR_actual - lnR_expected
+         if (s% solver_use_relative_mass_eqn .and. k < s% nz .and. &
+               dr3%val > 0d0 .and. rp13%val >= dr3%val) then
+            ! Subtract the face logs before subtracting their predicted difference.
+            resid_ad = (lnR_actual - wrap_lnR_p1(s,k)) - log1p(dr3/rp13)/3d0
+         else
+            lnR_expected = log(rp13 + dr3)/3d0
+            resid_ad = lnR_actual - lnR_expected
+         end if
          s% equ(s% i_dlnd_dt, k) = resid_ad%val
 
          if (test_partials) then

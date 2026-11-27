@@ -21,7 +21,7 @@
 
       use star_private_def
       use utils_lib, only: is_bad
-      use const_def, only: dp, msun, secyer, ln10, four_thirds_pi
+      use const_def, only: dp, qp, msun, secyer, ln10, four_thirds_pi
       use num_def
 
       implicit none
@@ -1062,7 +1062,6 @@
          do_edit_lnR = do_lnR .and. (.not. s% doing_check_partials)
          if (do_edit_lnR) call edit_lnR(s, xh_start, s% solver_dx)
          do k=1,nz
-            if (do_edit_lnR) s% r(k) = exp(s% lnR(k))
             call set_rv_info(s,k)
             ! note: m_grav is held constant during solver iterations
             s% grav(k) = s% cgrav(k)*s% m_grav(k)/(s% r(k)*s% r(k))
@@ -1320,7 +1319,6 @@
 
             if (do_lnd) then
                s% lnd(k) = x(i_lnd)
-               s% rho(k) = exp(s% lnd(k))
                s% dxh_lnd(k) = s% solver_dx(i_lnd,k)
                if (s% lnd(k) < ln10*s% hydro_mtx_min_allowed_logRho) then
                   write(s% retry_message, *) 'logRho < hydro_mtx_min_allowed_logRho', k
@@ -1356,6 +1354,8 @@
                   ierr = -1
                   return
                end if
+               ! Use the same absolute density as unpack_xh after accepting the step.
+               s% rho(k) = exp(s% lnd(k))
                if (is_bad_num(s% rho(k))) then
                   write(s% retry_message, *) 'bad num for rho', k
                   if (s% stop_for_bad_nums) then
@@ -1522,18 +1522,24 @@
          type (star_info), pointer :: s
          real(dp), dimension(:, :) :: xh_start
          real(dp), dimension(:, :) :: dx
-         real(dp) :: vol00, volp1, cell_vol
-         integer :: k, nz
-         include 'formats'
-         vol00 = four_thirds_pi*s% R_center*s% R_center*s% R_center
-         nz = s% nz
-         do k=nz, 1, -1
-            volp1 = vol00
-            cell_vol = s% dm(k)/s% rho(k)
-            vol00 = volp1 + cell_vol
-            s% lnR(k) = log(vol00/four_thirds_pi)/3
-            dx(s% i_lnR,k) = s% lnR(k) - xh_start(s% i_lnR,k)
-            s% dxh_lnR(k) = dx(s% i_lnR,k)
+         real(qp) :: r_center, vol, lnR_trial
+         real(dp) :: lnR_ref, dlnR
+         integer :: k, i_lnR
+
+         i_lnR = s% i_lnR
+         r_center = real(s% R_center, qp)
+         vol = real(four_thirds_pi, qp)*r_center*r_center*r_center
+         do k=s% nz, 1, -1
+            vol = vol + real(s% dm(k), qp)/real(s% rho(k), qp)
+            lnR_trial = log(vol/real(four_thirds_pi, qp))/3._qp
+            lnR_ref = xh_start(i_lnR,k)
+            ! Form the projected correction before rounding the absolute log radius.
+            dlnR = real(lnR_trial - real(lnR_ref, qp), dp)
+            dx(i_lnR,k) = dlnR
+            s% dxh_lnR(k) = dx(i_lnR,k)
+            s% lnR(k) = lnR_ref + dlnR
+            ! The absolute radius must agree with the packed log radius on unpacking.
+            s% r(k) = exp(s% lnR(k))
          end do
          call edit_dlnR_dt_above_k_below_just_added(s, xh_start)
       end subroutine edit_lnR

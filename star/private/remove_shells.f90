@@ -20,7 +20,7 @@
       module remove_shells
 
       use star_private_def
-      use const_def, only: dp, pi4, ln10, boltz_sigma, avo, kerg, msun
+      use const_def, only: dp, qp, pi4, ln10, boltz_sigma, avo, kerg, msun
       use utils_lib
 
       implicit none
@@ -638,11 +638,10 @@
       subroutine do_remove_center(id, k, ierr)
          use read_model, only: finish_load_model
          use alloc, only: prune_star_info_arrays
-         use star_utils, only: normalize_dqs, set_qs
          integer, intent(in) :: id, k
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
-         real(dp) :: old_xmstar, new_xmstar
+         real(dp) :: new_xmstar
          logical :: restart
          integer :: kk
          include 'formats'
@@ -652,9 +651,13 @@
             return
          end if
          if (k <= 1 .or. k > s% nz) return
-         old_xmstar = s% xmstar
-         s% M_center = s% m(k)
-         new_xmstar = s% m(1) - s% M_center
+         ! Use the masses of the retained shells rather than subtracting enclosed masses.
+         new_xmstar = real(sum(real(s% dm(1:k-1), qp)), dp)
+         if (is_bad(new_xmstar) .or. new_xmstar <= 0d0 .or. new_xmstar > s% mstar) then
+            ierr = -1
+            return
+         end if
+         s% M_center = s% mstar - new_xmstar
          s% xmstar = new_xmstar
          s% R_center = s% r(k)
          if (s% job% remove_center_adjust_L_center) s% L_center = s% L(k)
@@ -679,15 +682,6 @@
          do kk=1,k-1
             s% dq(kk) = s% dm(kk)/new_xmstar
          end do
-         if (.not. s% do_normalize_dqs_as_part_of_set_qs) then
-            call normalize_dqs(s, s% nz, s% dq, ierr)
-            if (ierr /= 0) then
-               if (s% report_ierr) write(*,*) 'normalize_dqs failed in do_remove_center'
-               return
-            end if
-         end if
-         call set_qs(s, s% nz, s% q, s% dq, ierr)
-         if (ierr /= 0) return
          s% generations = 1  ! memory leak, but hopefully not necessary to fix
             ! assuming remove center is a rare operation
          call prune_star_info_arrays(s, ierr)
@@ -1002,7 +996,7 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s, c, prv
          type (star_info), target :: copy_info
-         real(dp) :: tau_surf_new, tau_factor_new, Lmid, Rmid, T, P
+         real(dp) :: tau_surf_new, tau_factor_new, Lmid, Rmid, T, P, new_xmstar
          integer :: k, k_old, nz, nz_old, skip
 
          logical, parameter :: dbg = .false., restart = .false.
@@ -1039,6 +1033,12 @@
 
          if (dbg) write(*,2) 'do remove surface skip', skip
          if (skip < 1 .or. skip >= nz_old) return
+
+         new_xmstar = real(sum(real(s% dm(surface_k:nz_old), qp)), dp)
+         if (is_bad(new_xmstar) .or. new_xmstar <= 0d0) then
+            ierr = -1
+            return
+         end if
 
          tau_surf_new = tau_eff(s,1+skip)
          tau_factor_new = s% tau_factor*tau_surf_new/s% tau(1)
@@ -1084,15 +1084,14 @@
          if (dbg) write(*,2) 'prv% dm(nz_old)/Msun', nz_old, prv% dm(nz_old)/Msun
          if (dbg) write(*,2) 'prv% m(nz_old)/msun', nz_old, prv% m(nz_old)/Msun
 
-         s% mstar = prv% m(1 + skip)
-         s% xmstar = s% mstar - prv% M_center
+         s% xmstar = new_xmstar
+         s% mstar = s% M_center + new_xmstar
          s% q(1) = 1d0
          do k = 1, nz
             k_old = k + skip
             s% dq(k) = prv% dm(k_old)/s% xmstar
             if (k > 1) s% q(k) = s% q(k-1) - s% dq(k-1)
          end do
-         s% dq(nz) = s% q(nz)
          do k = 1, nz
             s% dm(k) = s% dq(k)*s% xmstar
             s% m(k) = s% q(k)*s% xmstar + s% M_center

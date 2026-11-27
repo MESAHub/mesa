@@ -66,6 +66,7 @@
          use alloc, only: allocate_star_info_arrays
          use utils_lib, only: is_bad
          use relax, only: do_relax_mass
+         use star_utils, only: set_m_and_dm, use_xh_to_set_rho_to_dm_div_dV
          type (star_info), pointer :: s
          character (len=*) :: zams_filename
          integer, intent(out) :: ierr
@@ -119,6 +120,15 @@
             s% mstar = s% initial_mass*Msun
             s% xmstar = s% mstar
             s% M_center = 0
+         end if
+
+         if (s% set_rho_to_dm_div_dV .and. .not. s% RSP_flag) then
+            call set_m_and_dm(s)
+            call use_xh_to_set_rho_to_dm_div_dV(s, ierr)
+            if (ierr /= 0) return
+         end if
+
+         if (.not. in_range) then
             s% dt_next = 1d2*secyer
             call do_relax_mass(s% id, init_mass, lg_max_abs_mdot, ierr)
             if (ierr /= 0) return

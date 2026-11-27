@@ -19,13 +19,12 @@
 
       module mesh_adjust
 
-      use const_def, only: dp, ln10, one_third, four_thirds_pi
+      use const_def, only: dp, qp, ln10, one_third, four_thirds_pi
       use star_private_def
       use chem_def
       use interp_1d_def, only: pm_work_size
       use utils_lib
-      use star_utils, only: get_r_from_xh, store_r_in_xh, store_rho_in_xh, &
-         get_lnT_from_xh, store_lnT_in_xh, store_lnd_in_xh
+      use star_utils, only: get_r_from_xh, store_rho_in_xh, get_lnT_from_xh, store_lnT_in_xh
 
       implicit none
 
@@ -44,10 +43,10 @@
 
       subroutine do_mesh_adjust( &
             s, nz, nz_old, xh_old, xa_old, &
-            energy_old, eta_old, lnd_old, lnPgas_old, &
+            energy_old, eta_old, &
             j_rot_old, i_rot_old, omega_old, D_omega_old, &
             mlt_vc_old, lnT_old, w_old, specific_PE_old, specific_KE_old, &
-            old_m, old_r, old_rho, dPdr_dRhodr_info_old, D_mix_old, &
+            old_rho, dPdr_dRhodr_info_old, D_mix_old, &
             cell_type, comes_from, dq_old, xq_old, xh, xa, dq, xq, ierr)
          use chem_lib, only: basic_composition_info
          use interp_1d_def
@@ -59,9 +58,9 @@
          integer, dimension(:) :: cell_type, comes_from
          real(dp), dimension(:), pointer :: &
             dq_old, xq_old, dq, xq, energy_old, eta_old, &
-            lnd_old, lnPgas_old, mlt_vc_old, lnT_old, w_old, &
+            mlt_vc_old, lnT_old, w_old, &
             specific_PE_old, specific_KE_old, &
-            old_m, old_r, old_rho, dPdr_dRhodr_info_old, &
+            old_rho, dPdr_dRhodr_info_old, &
             j_rot_old, omega_old, D_omega_old, D_mix_old
          type(auto_diff_real_star_order1), dimension(:), pointer :: i_rot_old
          real(dp), dimension(:,:), pointer :: xh_old, xa_old
@@ -74,8 +73,8 @@
          integer :: k, j, op_err, nzlo, nzhi, nzlo_old, nzhi_old, species
          real(dp), pointer :: work(:)
          real(dp), dimension(:), allocatable :: &
-            dqbar, dqbar_old, new_r, Vol_new, xq_old_plus1, &
-            xout_old, xout_new, xq_new, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7, &
+            dqbar, dqbar_old, xq_old_plus1, &
+            xout_old, xout_new, xq_new, tmp1, tmp2, &
             energy_new, density_new
          real(dp), dimension(:,:), allocatable :: xa_c0, xa_c1, xa_c2
 
@@ -189,11 +188,8 @@
 
          if (dbg) write(*,*) 'call do_lnR_and_lnd'
          call do_lnR_and_lnd( &
-            s, nz, nz_old, nzlo, nzhi, cell_type, comes_from, &
-            xh, xh_old, xmstar, lnd_old, lnPgas_old, &
-            dqbar, dqbar_old, old_r, old_m, old_rho, &
-            dq, dq_old, xq, xq_old_plus1, density_new, work, &
-            tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7, ierr)
+            s, nz, nz_old, cell_type, comes_from, xh, xh_old, xmstar, &
+            old_rho, dq, dq_old, density_new, ierr)
          if (failed('do_lnR_and_lnd')) return
 
          if (s% v_flag) then  ! calculate new v to conserve kinetic energy
@@ -441,9 +437,9 @@
             sz = max(nz, nz_old) + 1
             call do_work_arrays(.true.,ierr)
             allocate( &
-               dqbar(sz), dqbar_old(sz), new_r(sz), Vol_new(sz), xq_old_plus1(sz), &
+               dqbar(sz), dqbar_old(sz), xq_old_plus1(sz), &
                xout_old(sz), xout_new(sz), xq_new(sz), energy_new(sz), density_new(sz), &
-               tmp1(sz), tmp2(sz), tmp3(sz), tmp4(sz), tmp5(sz), tmp6(sz), tmp7(sz), &
+               tmp1(sz), tmp2(sz), &
                xa_c0(sz,species), xa_c1(sz,species), xa_c2(sz,species))
          end subroutine do_alloc
 
@@ -973,240 +969,147 @@
 
 
       subroutine do_lnR_and_lnd( &
-            s, nz, nz_old, nzlo, nzhi, cell_type, comes_from, &
-            xh, xh_old, xmstar, lnd_old, lnPgas_old, &
-            dqbar, dqbar_old, old_r, old_m, old_rho, &
-            dq, dq_old, xq, xq_old_plus1, density_new, work, &
-            Vol_old_plus1, Vol_new, new_r, Vol_init, &
-            interp_Vol_new, interp_xq, density_init, ierr)
-         use interp_1d_def
-         use interp_1d_lib
-         use num_lib
+            s, nz, nz_old, cell_type, comes_from, xh, xh_old, xmstar, &
+            old_rho, dq, dq_old, density_new, ierr)
          type (star_info), pointer :: s
-         integer, intent(in) :: nz, nz_old, nzlo, nzhi, comes_from(:)
-         integer :: cell_type(:)
-         real(dp), dimension(:,:), pointer :: xh, xh_old
-         real(dp), intent(in) :: xmstar
-         real(dp), dimension(:), pointer :: work
-         real(dp), dimension(:) :: &
-            lnd_old, lnPgas_old, dqbar, dqbar_old, old_r, old_m, old_rho, &
-            xq, dq, dq_old, xq_old_plus1, density_new, &
-            Vol_old_plus1, Vol_new, new_r, Vol_init, &
-            interp_Vol_new, interp_xq, density_init
+         integer, intent(in) :: nz, nz_old, comes_from(:)
+         integer, intent(inout) :: cell_type(:)
+         real(dp), intent(in) :: xh_old(:,:), xmstar, old_rho(:), dq(:), dq_old(:)
+         real(dp), pointer, intent(inout) :: xh(:,:)
+         real(dp), intent(out) :: density_new(:)
          integer, intent(out) :: ierr
 
-         integer :: k, from_k, n, interp_lo, interp_hi, interp_n
-         real(dp) :: Vol_min, Vol_max, cell_Vol, Vol_center, Vm1, V00, Vp1
+         integer :: k, old_k, first, first_old, last_old
+         real(dp) :: nu(1,nz_old), c0(nz_old), c1(nz_old), c2(nz_old), rho_scale, r, r_inner
+         real(qp) :: cell_vol(nz), enclosed_vol, dq_tol
+         real(qp), parameter :: C = real(four_thirds_pi, qp)
+         logical :: changed
+         intrinsic :: log
 
-         logical, parameter :: dbg = .false., trace_PE_residual = .false.
+         ierr = -1
+         if (xmstar <= 0d0 .or. is_bad(xmstar)) return
+         if (any(is_bad(old_rho(1:nz_old)) .or. old_rho(1:nz_old) <= 0d0)) return
+         if (any(is_bad(dq_old(1:nz_old)) .or. dq_old(1:nz_old) <= 0d0)) return
+         if (any(is_bad(dq(1:nz)) .or. dq(1:nz) <= 0d0)) return
 
-         include 'formats'
-
-         ! NOTE: for interpolating volume, need to add point at center
-
-         ierr = 0
-
-         interp_lo = max(1, nzlo-1)
-         interp_hi = min(nz, nzhi+1)
-         interp_n = interp_hi - interp_lo + 1
-
-         do k=1,nz_old
-            Vol_old_plus1(k) = four_thirds_pi*old_r(k)*old_r(k)*old_r(k)
-         end do
-         Vol_center = four_thirds_pi*s% R_center*s% R_center*s% R_center
-         Vol_old_plus1(nz_old+1) = Vol_center
-
-         ! testing -- check for Vol_old_plus1 strictly decreasing
-         do k = 2, nz_old+1
-            if (Vol_old_plus1(k) >= Vol_old_plus1(k-1)) then
-               ierr = -1
-               if (.not. dbg) return
-               write(*,3) 'bad old vol', k, nz_old
-               write(*,1) 'Vol_old_plus1(k)', Vol_old_plus1(k)
-               write(*,1) 'Vol_old_plus1(k-1)', Vol_old_plus1(k-1)
-               write(*,'(A)')
-               call mesa_error(__FILE__,__LINE__,'debug: mesh adjust: do_lnR_and_lnd')
-            end if
+         rho_scale = minval(old_rho(1:nz_old))
+         nu(1,:) = rho_scale/old_rho(1:nz_old)
+         do k = 1, nz_old
+            call get1_lpp(k, 1, nz_old, 1, dq_old, nu, .true., c0, c1, c2)
          end do
 
-         ! testing -- check for q strictly decreasing
-         do k = 2, nz
-            if (xq(k) <= xq(k-1)) then
-               ierr = -1
-               if (.not. dbg) return
-
-               write(*,3) 'bad xq', k, nz, xq(k), xq(k-1)
-               call mesa_error(__FILE__,__LINE__,'debug: mesh adjust: do_lnR_and_lnd')
-            end if
+         ! An unchanged cell identifies two shared mass faces. Remap each
+         ! changed interval between such faces with its own mass origin.
+         dq_tol = real(nz+nz_old+2, qp)*epsilon(1d0)
+         first = 1
+         first_old = 1
+         do k = 1, nz
+            if (cell_type(k) /= unchanged_type) cycle
+            old_k = comes_from(k)
+            ierr = -1
+            if (old_k < first_old .or. old_k > nz_old) return
+            if (abs(real(dq(k), qp)-real(dq_old(old_k), qp)) > dq_tol) return
+            last_old = old_k - 1
+            call remap_cell_volumes(k-1, last_old)
+            if (ierr /= 0) return
+            cell_vol(k) = real(dq_old(old_k), qp)/real(old_rho(old_k), qp)
+            if (dq(k) /= dq_old(old_k)) cell_type(k) = revised_type
+            first = k + 1
+            first_old = old_k + 1
          end do
+         call remap_cell_volumes(nz, nz_old)
+         if (ierr /= 0) return
 
-         do k=1,interp_n
-            interp_xq(k) = xq(interp_lo+k-1)
-         end do
+         ierr = -1
+         if (s% R_center < 0d0 .or. is_bad(s% R_center)) return
+         changed = any(cell_type(1:nz) /= unchanged_type)
+         enclosed_vol = C*real(s% R_center, qp)*real(s% R_center, qp)*real(s% R_center, qp)
+         r_inner = s% R_center
 
-         call interpolate_vector( &
-               nz_old+1, xq_old_plus1, interp_n, interp_xq, Vol_old_plus1, &
-               interp_Vol_new, interp_pm, nwork, work, 'mesh_adjust do_lnR_and_lnd', ierr)
-         if (ierr /= 0) then
-            if (.not. dbg) return
-            write(*,*) 'failed in interpolate_vector'
-            call mesa_error(__FILE__,__LINE__,'debug: mesh_adjust')
-         end if
-
-         do k=1,interp_n
-            Vol_new(interp_lo+k-1) = interp_Vol_new(k)
-         end do
-
-         if (Vol_new(interp_lo+1) >= Vol_new(interp_lo)) then
-            Vol_new(interp_lo+1) = (Vol_new(interp_lo) + Vol_new(interp_lo+2))/2
-            if (dbg) write(*,2) 'fix Vol_new at lo+1', interp_lo+1, Vol_new(interp_lo+1)
-            if (Vol_new(interp_lo+1) >= Vol_new(interp_lo)) then
-               ierr = -1
-               if (.not. dbg) return
-               write(*,*) '(Vol_new(interp_lo+1) >= Vol_new(interp_lo))'
-               call mesa_error(__FILE__,__LINE__,'debug: mesh_adjust')
-            end if
-         end if
-
-         do k = interp_lo+1, interp_hi-1
-            if (Vol_new(k+1) >= Vol_new(k) .or. Vol_new(k) >= Vol_new(k-1)) then
-               if (dbg) write(*,2) 'fix interpolated Vol_new', &
-                  k, Vol_new(k+1), Vol_new(k), Vol_new(k-1)
-               Vol_min = minval(Vol_new(k-1:k+1))
-               Vol_max = maxval(Vol_new(k-1:k+1))
-               if (Vol_min == Vol_max .or. is_bad(Vol_min) .or. is_bad(Vol_max)) then
-                  ierr = -1
-                  if (s% stop_for_bad_nums) then
-                     write(*,2) 'Vol_min', k, Vol_min
-                     write(*,2) 'Vol_max', k, Vol_max
-                     call mesa_error(__FILE__,__LINE__,'mesh_adjust')
-                  end if
-                  if (.not. dbg) return
-                  write(*,1) 'Vol_min', Vol_min
-                  write(*,1) 'Vol_max', Vol_max
-                  call mesa_error(__FILE__,__LINE__,'debug: mesh_adjust')
-               end if
-               Vm1 = Vol_new(k-1)
-               V00 = Vol_new(k)
-               Vp1 = Vol_new(k+1)
-               Vol_new(k-1) = Vol_max
-               Vol_new(k) = (Vol_max + Vol_min)/2
-               Vol_new(k+1) = Vol_min
-               if (dbg) write(*,2) 'new Vol_new',  &
-                  k, Vol_new(k+1), Vol_new(k), Vol_new(k-1)
-               if (Vol_new(k+1) >= Vol_new(k) .or. Vol_new(k) >= Vol_new(k-1)) then
-                  ierr = -1
-                  if (.not. dbg) return
-                  write(*,1) 'Vol_new(k-1)', Vol_new(k-1)
-                  write(*,1) 'Vol_new(k)', Vol_new(k)
-                  write(*,1) 'Vol_new(k+1)', Vol_new(k+1)
-                  call mesa_error(__FILE__,__LINE__,'debug: do_lnR_and_lnd in mesh adjust: interpolation gave non-pos volume')
-               end if
-            end if
-         end do
-
-         call set1_new_r(nzlo)
-         do k = nzlo, min(nzhi,nz-1)
-            if (ierr /= 0) cycle
-
-            call set1_new_r(k+1)
-
+         do k = nz, 1, -1
+            old_k = comes_from(k)
             if (cell_type(k) == unchanged_type) then
-               call store_lnd_in_xh(s, k, lnd_old(comes_from(k)), xh)
-               density_new(k) = old_rho(comes_from(k))
-               cycle
-            end if
-
-            if (new_r(k) <= new_r(k+1)) then
-               if (dbg) then
-                  write(*,*) 'do_lnR_and_lnd: (new_r(k) <= new_r(k+1))'
-                  stop
-               end if
-               ierr = -1; cycle
-            end if
-
-            cell_Vol = Vol_new(k)-Vol_new(k+1)
-            if (cell_Vol <= 0) then
-               if (dbg) then
-                  write(*,2) 'do_lnR_and_lnd: cell_Vol <= 0', k
-               end if
-               ierr = -1; cycle
-            end if
-            if (dq(k) <= 0) then
-               if (dbg) then
-                  write(*,2) 'do_lnR_and_lnd: dq(k) <= 0', k
-               end if
-               ierr = -1; cycle
-            end if
-            density_new(k) = xmstar*dq(k)/cell_Vol
-            call store_rho_in_xh(s, k, density_new(k), xh)
-
-         end do
-
-         if (ierr /= 0) then
-            if (.not. dbg) return
-            call mesa_error(__FILE__,__LINE__,'debug: failed in mesh adjust do_lnR_and_lnd')
-         end if
-
-         n = nzlo - 1
-         if (n > 0) then
-            do k=1,n
-               new_r(k) = old_r(k)
-               density_new(k) = old_rho(k)
-               Vol_new(k) = four_thirds_pi*new_r(k)*new_r(k)*new_r(k)
-            end do
-         end if
-
-         if (nzhi < nz) then
-            n = nz - nzhi - 1  ! nz-n = nzhi+1
-            do k=0,n
-               new_r(nz-k) = old_r(nz_old-k)
-               density_new(nz-k) = old_rho(nz_old-k)
-               Vol_new(nz-k) = four_thirds_pi*new_r(nz-k)*new_r(nz-k)*new_r(nz-k)
-            end do
-         else  ! nzhi == nz
-            density_new(nz) = xmstar*dq(nz)/(Vol_new(nz) - Vol_center)
-            new_r(nz) = pow(Vol_new(nz)/four_thirds_pi, one_third)
-
-            if (dbg) then
-               write(*,2) 'old_rho(nz_old)', nz_old, old_rho(nz_old)
-               write(*,2) 'density_new(nz)', nz, density_new(nz)
-            end if
-
-         end if
-
-         do k=1,nz
-            Vol_init(k) = Vol_new(k)
-            density_init(k) = density_new(k)
-         end do
-
-         do k=1,nz
-            from_k = comes_from(k)
-            if (new_r(k) == old_r(from_k)) then
-               xh(s%i_lnR,k) = xh_old(s%i_lnR,from_k)
+               density_new(k) = old_rho(old_k)
+               xh(s% i_lnd,k) = xh_old(s% i_lnd,old_k)
             else
-               call store_r_in_xh(s,k,new_r(k),xh)
+               density_new(k) = real(real(dq(k), qp)/cell_vol(k), dp)
+               if (density_new(k) <= 0d0 .or. is_bad(density_new(k))) return
+               call store_rho_in_xh(s, k, density_new(k), xh)
+               density_new(k) = exp(xh(s% i_lnd,k))
             end if
-            if (density_new(k) == old_rho(from_k)) then
-               xh(s%i_lnd,k) = xh_old(s%i_lnd,from_k)
+            if (changed) then
+               enclosed_vol = enclosed_vol + real(xmstar, qp)*cell_vol(k)
+               xh(s% i_lnR,k) = real(log(enclosed_vol/C)/3, dp)
             else
-               call store_rho_in_xh(s,k,density_new(k),xh)
+               xh(s% i_lnR,k) = xh_old(s% i_lnR,old_k)
             end if
+            if (is_bad(xh(s% i_lnR,k))) return
+            r = exp(xh(s% i_lnR,k))
+            if (r <= r_inner .or. is_bad(r)) return
+            r_inner = r
          end do
-
+         ierr = 0
 
          contains
 
-         subroutine set1_new_r(k)
-            integer, intent(in) :: k
-            include 'formats'
-            if (cell_type(k) == unchanged_type) then
-               new_r(k) = old_r(comes_from(k))
-            else
-               new_r(k) = pow(Vol_new(k)/four_thirds_pi, one_third)
-            end if
-         end subroutine set1_new_r
+         subroutine remap_cell_volumes(last, last_old)
+            integer, intent(in) :: last, last_old
+            integer :: j, i
+            real(qp) :: old_span, new_span, scale, outer, inner, &
+               old_outer, old_inner, old_width, pos, edge, width, mid, mean
 
+            ierr = -1
+            if (first > last .or. first_old > last_old) then
+               if (first == last+1 .and. first_old == last_old+1) ierr = 0
+               return
+            end if
+
+            old_span = sum(real(dq_old(first_old:last_old), qp))
+            new_span = sum(real(dq(first:last), qp))
+            ! The two mesh faces match. Account for roundoff in the
+            ! mesh planner's dq when locating overlaps between these faces.
+            if (abs(old_span-new_span) > dq_tol) return
+            scale = old_span/new_span
+
+            i = first_old
+            old_outer = 0
+            old_width = real(dq_old(i), qp)
+            old_inner = old_width
+            inner = 0
+            do j = first, last
+               outer = inner
+               inner = outer + scale*real(dq(j), qp)
+               if (j == last) inner = old_span
+               if (inner <= outer) return
+               pos = outer
+               cell_vol(j) = 0
+               do while (pos < inner)
+                  if (pos >= old_inner) then
+                     if (i == last_old) return
+                     i = i + 1
+                     old_outer = old_inner
+                     old_width = real(dq_old(i), qp)
+                     old_inner = old_outer + old_width
+                     if (i == last_old) old_inner = old_span
+                  end if
+                  edge = min(inner,old_inner)
+                  width = edge - pos
+                  if (width <= 0) return
+                  mean = 1._qp/real(old_rho(i), qp)
+                  if (pos /= old_outer .or. edge /= old_inner) then
+                     ! The basis uses q increasing outwards. Center the
+                     ! curvature term so each donor integral is dq/rho.
+                     mid = (old_width-width)/2 - (pos-old_outer)
+                     mean = mean + (real(c1(i), qp)*mid + real(c2(i), qp)/2* &
+                        (mid*mid + (width-old_width)*(width+old_width)/12))/real(rho_scale, qp)
+                  end if
+                  if (mean <= 0 .or. is_bad_quad(mean)) return
+                  cell_vol(j) = cell_vol(j) + width*mean
+                  pos = edge
+               end do
+            end do
+            ierr = 0
+         end subroutine remap_cell_volumes
 
       end subroutine do_lnR_and_lnd
 
@@ -1379,7 +1282,7 @@
          cell_dq = dq(k)
 
          if (cell_type(k) == revised_type) then
-            avg_lnT = get_lnT_from_xh(s, k, xh_old)
+            avg_lnT = get_lnT_from_xh(s, k_old, xh_old)
          else  ! find average lnT between xq_outer and xq_inner
             call get_old_value_integral( &
                k, k_old, nz_old, xq_old, dq_old, xq_outer, cell_dq, &

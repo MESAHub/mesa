@@ -94,14 +94,18 @@
 
 
       integer function extras_start_step(id)
+         use utils_lib, only: is_bad
          integer, intent(in) :: id
          integer :: ierr
          type (star_info), pointer :: s
-         real(dp) :: l_center, m_center
+         real(dp) :: l_center, m_center, new_m_center, new_xmstar, dlnrho
+         real(dp), allocatable :: new_lnd(:)
+         intrinsic :: log
+
+         extras_start_step = terminate
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         extras_start_step = 0
 
          select case(inlist_part)
 
@@ -118,14 +122,29 @@
             ! eddington limited accretion
             m_center = eta_medd * l_center / (clight*clight)
 
-            s% m_center = s% m_center + m_center * s% dt
-            s% xmstar = s% mstar - s% M_center
+            new_m_center = s% M_center + m_center*s% dt
+            new_xmstar = s% mstar - new_m_center
+            if (is_bad(new_xmstar) .or. is_bad(s% xmstar)) return
+            if (min(new_xmstar, s% xmstar) <= 0d0) return
 
+            ! Accretion scales the shell masses at fixed volume and temperature.
+            if (new_xmstar /= s% xmstar) then
+               if (s% i_lnd <= 0) return
+               dlnrho = real(log(real(new_xmstar, qp)/real(s% xmstar, qp)), dp)
+               new_lnd = s% xh(s% i_lnd,1:s% nz) + dlnrho
+               if (any(is_bad(new_lnd)) .or. maxval(new_lnd) >= log(huge(1d0)) .or. &
+                     minval(new_lnd) <= log(tiny(1d0))) return
+               s% xh(s% i_lnd,1:s% nz) = new_lnd
+            end if
+
+            s% M_center = new_m_center
+            s% xmstar = new_xmstar
             s% L_center = eta_ledd * l_center
+            s% need_to_setvars = .true.
 
          end select
 
-
+         extras_start_step = keep_going
       end function extras_start_step
 
 

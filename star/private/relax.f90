@@ -20,7 +20,7 @@
       module relax
 
       use star_private_def
-      use const_def, only: dp, msun, rsun, secyer, one_third, four_thirds_pi
+      use const_def, only: dp, qp, msun, rsun, secyer, one_third, four_thirds_pi
       use utils_lib
 
       implicit none
@@ -143,9 +143,7 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
          if (abs(new_mass - s% star_mass) < 1d-12*new_mass) then
-            s% star_mass = new_mass
-            s% mstar = new_mass*Msun
-            s% xmstar = s% mstar - s% M_center
+            call scale_mass_at_fixed_radius(s, new_mass*Msun, ierr)
             return
          end if
          write(*,'(A)')
@@ -191,9 +189,7 @@
          s% cool_wind_RGB_scheme = cool_wind_RGB_scheme
          s% varcontrol_target = varcontrol_target
          s% eps_mdot_factor = eps_mdot_factor
-         s% star_mass = new_mass
-         s% mstar = new_mass*Msun
-         s% xmstar = s% mstar - s% M_center
+         if (ierr == 0) call scale_mass_at_fixed_radius(s, new_mass*Msun, ierr)
 
          call error_check('relax mass',ierr)
 
@@ -229,7 +225,7 @@
          integer, intent(in) :: id, lipar, lrpar
          integer, intent(inout), pointer :: ipar(:)  ! (lipar)
          real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
-         integer :: ramp
+         integer :: ramp, ierr
          real(dp) :: &
             new_mass, old_mass, mdot, max_abs_mdot, abs_diff, lg_max_abs_mdot
 
@@ -278,14 +274,15 @@
 
          if (abs_diff < 1d-4*new_mass .or. abs(mdot) < 1d-50) then
             s% mass_change = 0
-            s% star_mass = new_mass
-            s% mstar = new_mass*Msun
-            s% xmstar = s% mstar - s% M_center
-            s% mass_change = 0
+            relax_mass_check_model = terminate
+            call scale_mass_at_fixed_radius(s, new_mass, ierr)
+            if (ierr /= 0) then
+               s% result_reason = nonzero_ierr
+               return
+            end if
             write(*,1) 's% tau_base =', s% tau_base
             write(*,1) 's% tau_factor =', s% tau_factor
             write(*,1) 'atm_option = ' // trim(s% atm_option)
-            relax_mass_check_model = terminate
             s% termination_code = t_relax_finished_okay
             return
          end if
@@ -1985,10 +1982,12 @@
          current_core_mass = s% M_center/Msun
          if (abs(new_core_mass - current_core_mass) <= 1d-12*new_core_mass) then
             call do1_relax_core(s, new_core_mass, core_avg_rho, core_avg_eps, ierr)
+            relax_core_check_model = terminate
             if (ierr /= 0) then
                write(*,*) 'failed in do1_relax_core'
+               s% result_reason = nonzero_ierr
+               return
             end if
-            relax_core_check_model = terminate
             s% termination_code = t_relax_finished_okay
             return
          end if
@@ -2030,6 +2029,8 @@
          if (ierr /= 0) then
             write(*,*) 'failed in do1_relax_core'
             relax_core_check_model = terminate
+            s% result_reason = nonzero_ierr
+            return
          end if
 
          if (.true.) then
@@ -2056,10 +2057,8 @@
          real(dp) :: next_M_center, next_R_center, next_L_center
          ierr = 0
          next_M_center = next*Msun
-         s% M_center = next_M_center
-         s% xmstar = s% mstar - s% M_center
-         next_R_center = pow(s% M_center/(core_avg_rho*four_thirds_pi),one_third)
-         call do1_relax_R_center(s, next_R_center, ierr)
+         next_R_center = pow(next_M_center/(core_avg_rho*four_thirds_pi),one_third)
+         call do1_relax_R_center(s, next_R_center, ierr, next_M_center)
          if (ierr /= 0) return
          next_L_center = s% M_center*core_avg_eps
          call do1_relax_L_center(s, next_L_center, ierr)
@@ -2092,9 +2091,7 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
          if (abs(new_mass - s% star_mass) <= 1d-12*new_mass) then
-            s% star_mass = new_mass
-            s% mstar = new_mass*Msun
-            s% xmstar = s% mstar - s% M_center
+            call scale_mass_at_fixed_radius(s, new_mass*Msun, ierr)
             return
          end if
          write(*,'(A)')
@@ -2122,11 +2119,9 @@
                relax_mass_scale_adjust_model, relax_mass_scale_check_model, null_finish_model, &
                .true., lipar, ipar, lrpar, rpar, ierr)
          s% max_model_number = max_model_number
-         s% star_mass = new_mass
-         s% mstar = new_mass*Msun
-         s% xmstar = s% mstar - s% M_center
          s% eps_mdot_factor = eps_mdot_factor
          s% max_years_for_timestep = max_years_for_timestep
+         if (ierr == 0) call scale_mass_at_fixed_radius(s, new_mass*Msun, ierr)
 
          call error_check('relax mass scale',ierr)
       end subroutine do_relax_mass_scale
@@ -2162,6 +2157,7 @@
          real(dp), intent(inout), pointer :: rpar(:)  ! (lrpar)
          real(dp) :: new_mass, dlgm_per_step, next
          real(dp) :: relax_mass_scale_dt, change_mass_years_for_dt
+         integer :: ierr
          logical, parameter :: dbg = .false.
 
          include 'formats'
@@ -2181,11 +2177,13 @@
          end if
 
          if (abs(s% star_mass-new_mass) < 1d-12*new_mass) then
-            s% star_mass = new_mass
-            s% mstar = new_mass*Msun
-            s% xmstar = s% mstar - s% M_center
-            s% termination_code = t_relax_finished_okay
             relax_mass_scale_check_model = terminate
+            call scale_mass_at_fixed_radius(s, new_mass*Msun, ierr)
+            if (ierr /= 0) then
+               s% result_reason = nonzero_ierr
+               return
+            end if
+            s% termination_code = t_relax_finished_okay
             return
          end if
 
@@ -2203,11 +2201,50 @@
 
          if (dbg) write(*,1) 'next', next, log10(next)
 
-         s% star_mass = next
-         s% mstar = next*Msun
-         s% xmstar = s% mstar - s% M_center
+         call scale_mass_at_fixed_radius(s, next*Msun, ierr)
+         if (ierr /= 0) then
+            s% result_reason = nonzero_ierr
+            relax_mass_scale_check_model = terminate
+         end if
 
       end function relax_mass_scale_check_model
+
+
+      subroutine scale_mass_at_fixed_radius(s, new_mstar, ierr)
+         use star_utils, only: set_m_and_dm, set_dm_bar
+         type (star_info), pointer :: s
+         real(dp), intent(in) :: new_mstar  ! g
+         integer, intent(out) :: ierr
+         real(dp) :: new_xmstar, dlnrho, new_lnd(s% nz)
+         intrinsic :: log
+
+         ierr = -1
+         new_xmstar = new_mstar - s% M_center
+         if (is_bad(new_xmstar) .or. is_bad(s% xmstar)) return
+         if (min(new_xmstar, s% xmstar) <= 0d0) return
+         ierr = 0
+         if (new_xmstar == s% xmstar .and. new_mstar == s% mstar) return
+
+         ! This mass edit keeps the shell volumes and temperature fixed.
+         if (.not. s% RSP_flag .and. s% i_lnd > 0) then
+            dlnrho = real(log(real(new_xmstar, qp)/real(s% xmstar, qp)), dp)
+            new_lnd = s% xh(s% i_lnd,1:s% nz) + dlnrho
+            if (any(is_bad(new_lnd)) .or. maxval(new_lnd) >= log(huge(1d0)) .or. &
+                  minval(new_lnd) <= log(tiny(1d0))) then
+               ierr = -1
+               return
+            end if
+            s% xh(s% i_lnd,1:s% nz) = new_lnd
+            s% lnd(1:s% nz) = new_lnd
+            s% rho(1:s% nz) = exp(new_lnd)
+         end if
+         s% star_mass = new_mstar/Msun
+         s% mstar = new_mstar
+         s% xmstar = new_xmstar
+         call set_m_and_dm(s)
+         call set_dm_bar(s, s% nz, s% dm, s% dm_bar)
+         s% need_to_setvars = .true.
+      end subroutine scale_mass_at_fixed_radius
 
 
       subroutine do_relax_M_center(id, new_mass, dlgm_per_step, relax_M_center_dt, ierr)
@@ -2234,9 +2271,7 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
          if (abs(new_mass - s% star_mass) <= 1d-6) then
-            s% star_mass = new_mass
-            s% mstar = new_mass*Msun
-            s% xmstar = s% mstar - s% M_center
+            call set_new_mass_for_relax_M_center(s, new_mass, ierr)
             return
          end if
          write(*,'(A)')
@@ -2349,7 +2384,7 @@
 
 
       subroutine set_new_mass_for_relax_M_center(s, new_mass, ierr)
-         use star_utils, only: set_qs
+         use star_utils, only: set_m_and_dm
          type (star_info), pointer :: s
          real(dp), intent(in) :: new_mass  ! Msun
          integer, intent(out) :: ierr
@@ -2358,6 +2393,8 @@
          s% star_mass = new_mass
          s% mstar = new_mass*Msun
          s% M_center = s% mstar - s% xmstar
+         call set_m_and_dm(s)
+         s% need_to_setvars = .true.
       end subroutine set_new_mass_for_relax_M_center
 
 
@@ -2385,7 +2422,7 @@
          call get_star_ptr(id, s, ierr)
          if (ierr /= 0) return
          if (abs(new_R_center - s% R_center) <= 1d-6) then
-            s% R_center = new_R_center
+            call do1_relax_R_center(s, new_R_center, ierr)
             return
          end if
          write(*,'(A)')
@@ -2456,10 +2493,12 @@
 
          if (abs(s% R_center - new_R_center) < 1d-15) then
             call do1_relax_R_center(s, new_R_center, ierr)
+            relax_R_center_check_model = terminate
             if (ierr /= 0) then
                write(*,*) 'failed in relax_R_center'
+               s% result_reason = nonzero_ierr
+               return
             end if
-            relax_R_center_check_model = terminate
             s% termination_code = t_relax_finished_okay
             return
          end if
@@ -2482,31 +2521,63 @@
          if (ierr /= 0) then
             write(*,*) 'failed in relax_R_center'
             relax_R_center_check_model = terminate
+            s% result_reason = nonzero_ierr
          end if
 
       end function relax_R_center_check_model
 
 
-      subroutine do1_relax_R_center(s, new_Rcenter, ierr)
-         ! adjust all lnR's to keep same density for each cell as 1st guess for next model
-         use star_utils, only: set_qs, store_lnR_in_xh
+      subroutine do1_relax_R_center(s, new_Rcenter, ierr, new_Mcenter)
+         ! Keep cell density when constructing the next model at a new inner boundary.
+         use star_utils, only: set_m_and_dm, set_dm_bar
          type (star_info), pointer :: s
          real(dp), intent(in) :: new_Rcenter  ! cm
          integer, intent(out) :: ierr
-         real(dp) :: dm, rho, dr3, rp13
+         real(dp), intent(in), optional :: new_Mcenter  ! g
+         real(dp) :: xmstar, r_inner, new_lnR(s% nz), new_r(s% nz), lnd
+         real(qp) :: rp13, dr3
          integer :: k
-         include 'formats'
-         ierr = 0
-         s% R_center = new_Rcenter
-         ! adjust lnR's
-         rp13 = s% R_center*s% R_center*s% R_center
+         intrinsic :: exp, log
+
+         ierr = -1
+         if (is_bad(new_Rcenter) .or. new_Rcenter < 0d0) return
+         if (s% i_lnR <= 0 .or. s% i_lnd <= 0) return
+         xmstar = s% xmstar
+         if (present(new_Mcenter)) xmstar = s% mstar - new_Mcenter
+         if (is_bad(xmstar) .or. xmstar <= 0d0) return
+         if (any(is_bad(s% dq(1:s% nz))) .or. any(s% dq(1:s% nz) <= 0d0)) return
+
+         if (.not. present(new_Mcenter) .and. new_Rcenter == s% R_center) then
+            ierr = 0
+            return
+         end if
+
+         r_inner = new_Rcenter
+         rp13 = real(new_Rcenter, qp)*real(new_Rcenter, qp)*real(new_Rcenter, qp)
          do k = s% nz, 1, -1
-            dm = s% dm(k)
-            rho = s% rho(k)
-            dr3 = dm/(rho*four_thirds_pi)  ! dm/rho is cell volume
-            call store_lnR_in_xh(s, k, log(rp13 + dr3)*one_third)
+            lnd = s% xh(s% i_lnd,k)
+            if (is_bad(lnd) .or. lnd >= log(huge(1d0)) .or. lnd <= log(tiny(1d0))) return
+            dr3 = real(s% dq(k), qp)*real(xmstar, qp)*exp(-real(lnd, qp))/real(four_thirds_pi, qp)
             rp13 = rp13 + dr3
+            new_lnR(k) = real(log(rp13)/3, dp)
+            if (new_lnR(k) <= log(tiny(1d0)) .or. new_lnR(k) >= log(huge(1d0))) return
+            new_r(k) = exp(new_lnR(k))
+            if (new_r(k) <= r_inner) return
+            r_inner = new_r(k)
          end do
+
+         s% R_center = new_Rcenter
+         if (present(new_Mcenter)) then
+            s% M_center = new_Mcenter
+            s% xmstar = xmstar
+            call set_m_and_dm(s)
+            call set_dm_bar(s, s% nz, s% dm, s% dm_bar)
+         end if
+         s% xh(s% i_lnR,1:s% nz) = new_lnR
+         s% lnR(1:s% nz) = new_lnR
+         s% r(1:s% nz) = new_r
+         s% need_to_setvars = .true.
+         ierr = 0
       end subroutine do1_relax_R_center
 
 
