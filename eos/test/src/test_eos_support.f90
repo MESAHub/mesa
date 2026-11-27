@@ -351,6 +351,7 @@ contains
             Pgas = exp(res(i_lnPgas))
             logP = log10(Prad + Pgas)
             write (*, 1) '     got logP', logP
+            write (*, *) '     eos calls', eos_calls
             write (*, '(A)')
          end if
 
