@@ -1,6 +1,7 @@
          
          logical :: compare_TDC_to_MLT 
          logical :: use_TDC_Y_face_seeded_newton
+         logical :: solver_damping_on_retry
          character(32) :: hydro_matrix_solver
 
          logical :: TDC_adjust_mass_fallback_to_mlt

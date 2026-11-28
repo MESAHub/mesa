@@ -9034,6 +9034,8 @@
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       ! ignore_species_in_max_correction
       ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! solver_use_T_reference
+      ! ~~~~~~~~~~~~~~~~~~~~~~
 
       ! see star/private/star_solver for info about these
 
@@ -9048,6 +9050,13 @@
     tiny_corr_factor = 2
     ignore_min_corr_coeff_for_scale_max_correction = .false.
     ignore_species_in_max_correction = .false.
+
+      ! During solver iterations, calculate the trial temperature from the
+      ! temperature at the start of the solver call and the logarithmic
+      ! temperature correction. This avoids losing small corrections when
+      ! adding them to the absolute value of lnT.
+
+    solver_use_T_reference = .true.
 
 
       ! min_xa_hard_limit

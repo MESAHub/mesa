@@ -310,6 +310,8 @@
       fix_d_eos_dxa_partials = .false.
 
       use_gold_tolerances = .true.
+      solver_use_T_reference = .true.
+      solver_damping_on_retry = .false.
       tol_correction_high_T_limit = 1d9 ! Switch to lower tol at high temp for large Mass
       gold_solver_iters_timestep_limit = 20
 
