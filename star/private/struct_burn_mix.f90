@@ -104,11 +104,8 @@
             end do
             if (s% trace_evolve) write(*,*) 'call do_burn'
             do_struct_burn_mix = do_burn(s, dt)
-            if (do_struct_burn_mix /= keep_going) then
-               write(*,2) 'failed in do_burn', s% model_number
-               call mesa_error(__FILE__,__LINE__,'do_struct_burn_mix')
-               return
-            end if
+            if (do_struct_burn_mix /= keep_going) return
+            do_struct_burn_mix = retry
             call set_vars_if_needed(s, s% dt, 'after do_burn', ierr)
             if (ierr /= 0) return
             do k=1,s% nz
@@ -268,9 +265,12 @@
       subroutine save_start_values(s, ierr)
          use hydro_rsp2, only: set_etrb_start_vars
          use star_utils, only: eval_total_energy_integrals, set_luminosity_by_category, get_Peos_face_val
+         use reconstructed_face_support, only: get_reconstructed_face_eos_kap_ad
          type (star_info), pointer :: s
          integer, intent(out) :: ierr
          integer :: k, j
+         type(auto_diff_real_star_order1) :: &
+            T_face_ad, rho_face_ad, P_face_ad, Cp_face_ad, ChiRho_face_ad, ChiT_face_ad, grada_face_ad, opacity_face_ad
          include 'formats'
          ierr = 0
 
@@ -298,6 +298,18 @@
             s% lnPeos_start(k) = s% lnPeos(k)
             s% Peos_start(k) = s% Peos(k)
             s% Peos_face_start(k) = get_Peos_face_val(s,k)
+            if (s% use_face_reconstruction) then
+               if (s% reconstructed_face_state_valid(k)) then
+                  s% reconstructed_P_face_start(k) = s% reconstructed_P_face_ad(k)%val
+               else
+                  call get_reconstructed_face_eos_kap_ad( &
+                     s, k, T_face_ad, rho_face_ad, P_face_ad, Cp_face_ad, ChiRho_face_ad, ChiT_face_ad, grada_face_ad, opacity_face_ad, ierr)
+                  if (ierr /= 0) return
+                  s% reconstructed_P_face_start(k) = P_face_ad%val
+               end if
+            else
+               s% reconstructed_P_face_start(k) = s% Peos_face_start(k)
+            end if
             s% lnPgas_start(k) = s% lnPgas(k)
             s% energy_start(k) = s% energy(k)
             s% lnR_start(k) = s% lnR(k)
@@ -812,8 +824,8 @@
          real(dp), intent(in) :: dt
 
          integer :: &
-            k_bad, ierr, max_num_iters_k, nz, op_err, &
-            k, num_iters, species, max_num_iters_used, &
+            k_bad, ierr, nz, op_err, &
+            k, num_iters, species, &
             screening_mode, kmin
          integer(i8) :: time0
          real(dp) :: total, avg_epsnuc, min_T_for_const_density_solver
@@ -843,8 +855,6 @@
 
          if (dt <= 0d0) return
 
-         max_num_iters_used = 0
-         max_num_iters_k = 0
          k_bad = 0
 
          screening_mode = get_screening_mode(s,ierr)
@@ -880,7 +890,9 @@
 
 !$OMP PARALLEL DO PRIVATE(k,op_err,num_iters,avg_epsnuc) SCHEDULE(dynamic,2)
          do k = kmin, nz
-            if (k_bad /= 0) cycle
+!$OMP ATOMIC READ
+            op_err = k_bad
+            if (op_err /= 0) cycle
             if (s% T_start(k) < s% op_split_burn_min_T) then
                ! We get here if we have an off center ignition,
                ! the arrays wont have been initialised earlier as they stop at the
@@ -896,24 +908,20 @@
                screening_mode, &
                dt, num_iters, avg_epsnuc, burn_dbg, op_err)
             if (op_err /= 0) then
-               ierr = -1
+!$OMP ATOMIC WRITE
                k_bad = k
                cycle
             end if
             call do_eos_for_cell(s,k,op_err)
             if (op_err /= 0) then
                write(*,2) 'do_burn failed in do_eos_for_cell', k
-               ierr = -1
+!$OMP ATOMIC WRITE
                k_bad = k
                cycle
             end if
             !write(*,3) 'num_iters', k, num_iters
             s% burn_num_iters(k) = num_iters
             s% burn_avg_epsnuc(k) = avg_epsnuc
-            if (num_iters > max_num_iters_used) then
-               max_num_iters_used = num_iters
-               max_num_iters_k = k
-            end if
          end do
 !$OMP END PARALLEL DO
 
@@ -922,33 +930,20 @@
          if (s% doing_timing) &
             call update_time(s, time0, total, s% time_solve_burn)
 
-         if (ierr /= 0) then
+         if (k_bad /= 0) then
             if (s% report_ierr) write(*,2) 'do_burn failed', k_bad
-            return
-            call mesa_error(__FILE__,__LINE__,'do_burn')
-
-
             do_burn = retry
+            s% result_reason = nonzero_ierr
+            s% retry_message = 'split burn failed'
+            s% retry_message_k = k_bad
             if (trace .or. s% report_ierr) then
                write(*,*) 'do_burn ierr'
             end if
-            call restore
             return
          end if
 
          if (dbg) write(*,2) 'done do_burn'
 
-
-         contains
-
-         subroutine restore
-            integer :: j, k
-            do k = 1, nz
-               do j=1,species
-                  s% xa(j,k) = s% xa_start(j,k)
-               end do
-            end do
-         end subroutine restore
 
       end function do_burn
 
@@ -1211,5 +1206,3 @@
 
 
       end module struct_burn_mix
-
-

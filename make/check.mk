@@ -12,7 +12,11 @@ CHECK_FILTER_PROG ?= grep -Ev "^(write)|(create rate data for)|( read )|( write 
 ifneq ($(OBJS_CHECK),)
   $(CHECK_RESULTS) : $(CHECKER) | $(CHECK_RESULT_DIR)/.
 	cd test; ../$(CHECKER) | $(CHECK_FILTER_PROG) > ../$(CHECK_RESULTS)
-	$(CHECK_DIFF_PROG) $(CHECK_RESULTS) $(CHECK_RESULTS_GOLDEN)
+	@echo '$(CHECK_DIFF_PROG) $(CHECK_RESULTS) $(CHECK_RESULTS_GOLDEN)'; $(CHECK_DIFF_PROG) $(CHECK_RESULTS) $(CHECK_RESULTS_GOLDEN) || \
+	  (export EC=$$?; \
+	  cp $(CHECK_RESULTS) $(CHECK_RESULTS).fail; \
+	  echo "Testing $(MODULE_NAME) failed, test output can be found in `perl -e "use Cwd; use File::Spec; print Cwd::realpath('$(CHECK_RESULTS).fail')"`"; \
+	  exit $$EC)
 
   check: $(CHECK_RESULTS)
 else

@@ -299,7 +299,7 @@ Text_Summary1_name(6,1) = 'log_cntr_Rho'
 Text_Summary1_name(6,2) = 'log_LZ'
 Text_Summary1_name(6,3) = 'lg_Lphoto'
 Text_Summary1_name(6,4) = 'Si_cntr'
-Text_Summary1_name(6,5) = 'retries'
+Text_Summary1_name(6,5) = 'num_retries'
 
 
 !------------------------------------------------------------------------------------

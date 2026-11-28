@@ -98,6 +98,7 @@ SRCS := \
    private/init_model.f90 \
    private/ionization_potentials.f90 \
    private/kap_support.f90 \
+   private/reconstructed_face_support.f90 \
    private/magnetic_diffusion.f90 \
    private/mass_utils.f90 \
    private/mesh_adjust.f90 \
@@ -172,6 +173,7 @@ SRCS += \
    private/pgstar_support.f90 \
    private/pgstar_hist_track.f90 \
    private/pgstar_kipp.f90 \
+   private/pgstar_rti.f90 \
    private/pgstar_dpg_dnu.f90 \
    private/pgstar_trho.f90 \
    private/pgstar_tmaxrho.f90 \
@@ -202,6 +204,8 @@ SRCS += \
    private/pgstar_profile_panels.f90 \
    private/pgstar_grid.f90 \
    private/pgstar_network.f90 \
+   private/pgstar_equation_residuals.f90 \
+   private/pgstar_kipp_residuals.f90 \
    other/sample_pgstar_plot.f90 \
    private/pgstar_full.f90
 EXTERNAL_DEPENDS_ON := pgplot
@@ -237,11 +241,13 @@ MODULES += pgstar_abundance.mod \
            pgstar_decorator.mod \
            pgstar_dpg_dnu.mod \
            pgstar_dynamo.mod \
+           pgstar_equation_residuals.mod \
            pgstar_grid.mod \
            pgstar_history_panels.mod \
            pgstar_hist_track.mod \
            pgstar_hr.mod \
            pgstar_kipp.mod \
+           pgstar_kipp_residuals.mod \
            pgstar_logg_logt.mod \
            pgstar_logg_teff.mod \
            pgstar_logl_r.mod \
@@ -258,6 +264,7 @@ MODULES += pgstar_abundance.mod \
            pgstar_profile_panels.mod \
            pgstar_r_l.mod \
            pgstar_r_teff.mod \
+           pgstar_rti.mod \
            pgstar_summary_burn.mod \
            pgstar_summary_history.mod \
            pgstar_summary.mod \

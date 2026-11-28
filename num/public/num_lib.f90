@@ -550,6 +550,11 @@ contains
       b = sqrt(s2)
       a = xx3**2*(yy1 - yy2) + xx1**2*(yy2 - yy3) + xx2**2*(-yy1 + yy3)
       denom = 2*(xx3*(yy1 - yy2) + xx1*(yy2 - yy3) + xx2*(-yy1 + yy3))
+      ! Guard against an unlikely, but unfortunate, division by 0.
+      if (denom == 0) then
+         ierr = -1
+         return
+      end if
       x = (a + b)/denom
       if (x > max(xx1, xx2, xx3)) x = (a - b)/denom
       if (x < min(xx1, xx2, xx3) .or. x > max(xx1, xx2, xx3)) ierr = -1

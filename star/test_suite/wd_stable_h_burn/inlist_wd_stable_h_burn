@@ -105,7 +105,7 @@
 
       delta_lgL_He_limit = 0.025 ! limit for magnitude of change in lgL_He
       delta_lgL_He_hard_limit = 1
-      lgL_He_burn_min = 2.5 ! ignore changes in lgL_He if value is less than this
+      lgL_He_burn_min = -0.5d0 ! ignore changes in lgL_He if value is less than this
 
       delta_lgT_limit = 0.5  ! limit for magnitude of max change in log10 temperature at any point
       delta_lgT_hard_limit = 1

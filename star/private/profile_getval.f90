@@ -279,7 +279,7 @@
             d_dlnR00, d_dlnRp1, d_dv00, d_dvp1
          integer :: j, nz, ionization_k, klo, khi, i, ii, ierr
          real(dp) :: f, lgT, full_on, full_off, am_nu_factor
-         logical :: rsp_or_w
+         logical :: rsp_or_w, reconstructed_face_state_active
          include 'formats'
 
          if (s% rotation_flag) then
@@ -291,7 +291,7 @@
             else if (lgT >= full_off) then
                f = 0d0
             else                   ! lgT > full_on and < full_off
-               f = (lgT - full_on) / (full_off - full_on)
+               f = (full_off - lgT) / (full_off - full_on)
             end if
             am_nu_factor = f*s% am_nu_factor
          else
@@ -304,6 +304,7 @@
 
          int_flag = .false.
          rsp_or_w = s% RSP_flag .or. s% RSP2_flag
+         reconstructed_face_state_active = s% use_face_reconstruction
 
          if (c > extra_offset) then
             i = c - extra_offset
@@ -1383,20 +1384,48 @@
                int_flag = .true.
 
             case (p_conv_vel_div_mlt_vc)
-               if (s% mlt_vc(k) > 0d0) val = s% conv_vel(k)/s% mlt_vc(k)
+               if (.not. s% RSP_flag) then
+                  if (s% mlt_vc(k) > 0d0) val = s% conv_vel(k)/s% mlt_vc(k)
+               end if
+            case (p_eff_mix_speed_div_mlt_vc, p_effective_mixing_speed_div_mlt_vc)
+               if (.not. s% RSP_flag) then
+                  if (s% mlt_vc(k) > 0d0) val = get_effective_mixing_speed(s,k)/s% mlt_vc(k)
+               end if
 
             case (p_conv_vel)
                val = s% conv_vel(k)
+            case (p_eff_mix_speed, p_effective_mixing_speed)
+               val = get_effective_mixing_speed(s,k)
             case (p_dt_times_conv_vel_div_mixing_length)
-               val = s% dt*s% conv_vel(k)/s% mlt_mixing_length(k)
+               if (.not. s% RSP_flag .and. s% mixing_length_alpha > 0d0) then
+                  if (s% mlt_mixing_length(k) > 0d0) &
+                     val = s% dt*s% conv_vel(k)/s% mlt_mixing_length(k)
+               end if
+            case (p_dt_times_eff_mix_speed_div_mixing_length, p_dt_times_effective_mixing_speed_div_mixing_length)
+               if (.not. s% RSP_flag .and. s% mixing_length_alpha > 0d0) then
+                  if (s% mlt_mixing_length(k) > 0d0) &
+                     val = s% dt*get_effective_mixing_speed(s,k)/s% mlt_mixing_length(k)
+               end if
             case (p_log_dt_times_conv_vel_div_mixing_length)
-               val = safe_log10(s% dt*s% conv_vel(k)/s% mlt_mixing_length(k))
+               if (.not. s% RSP_flag .and. s% mixing_length_alpha > 0d0) then
+                  if (s% mlt_mixing_length(k) > 0d0) &
+                     val = safe_log10(s% dt*s% conv_vel(k)/s% mlt_mixing_length(k))
+               end if
+            case (p_log_dt_times_eff_mix_speed_div_mixing_length, p_log_dt_times_effective_mixing_speed_div_mixing_length)
+               if (.not. s% RSP_flag .and. s% mixing_length_alpha > 0d0) then
+                  if (s% mlt_mixing_length(k) > 0d0) &
+                     val = safe_log10(s% dt*get_effective_mixing_speed(s,k)/s% mlt_mixing_length(k))
+               end if
             case (p_log_conv_vel)
                val = safe_log10(s% conv_vel(k))
+            case (p_log_eff_mix_speed, p_log_effective_mixing_speed)
+               val = safe_log10(get_effective_mixing_speed(s,k))
             case (p_conv_vel_div_L_vel)
                val = s% conv_vel(k)/max(1d0,get_L_vel(k))
             case (p_conv_vel_div_csound)
                val = s% conv_vel(k)/s% csound_face(k)
+            case (p_eff_mix_speed_div_csound, p_effective_mixing_speed_div_csound)
+               val = get_effective_mixing_speed(s,k)/s% csound_face(k)
             case (p_dvc_dt_TDC_div_g)
                val = s%dvc_dt_TDC(k) / s%grav(k)
             case (p_mix_type)
@@ -1684,9 +1713,9 @@
             case (p_log_mlt_Gamma)
                val = safe_log10(s% mlt_Gamma(k))
             case (p_log_mlt_vc)
-               val = safe_log10(s% mlt_vc(k))
+               if (.not. s% RSP_flag) val = safe_log10(s% mlt_vc(k))
             case (p_mlt_vc)
-               val = s% mlt_vc(k)
+               if (.not. s% RSP_flag) val = s% mlt_vc(k)
             case (p_mlt_D)
                val = s% mlt_D(k)
             case (p_mlt_gradT)
@@ -1919,6 +1948,26 @@
                if (rsp_or_w) val = s% Lt(k)
             case(p_Lt_div_L)
                if (rsp_or_w) val = s% Lt(k)/s% L(k)
+            case(p_reconstructed_T_face)
+               if (reconstructed_face_state_active .and. s% reconstructed_face_state_valid(k)) val = s% reconstructed_T_face_ad(k)% val
+            case(p_reconstructed_rho_face)
+               if (reconstructed_face_state_active .and. s% reconstructed_face_state_valid(k)) val = s% reconstructed_rho_face_ad(k)% val
+            case(p_reconstructed_P_face)
+               if (reconstructed_face_state_active .and. s% reconstructed_face_state_valid(k)) val = s% reconstructed_P_face_ad(k)% val
+            case(p_reconstructed_Cp_face)
+               if (reconstructed_face_state_active .and. s% reconstructed_face_state_valid(k)) val = s% reconstructed_Cp_face_ad(k)% val
+            case(p_reconstructed_ChiRho_face)
+               if (reconstructed_face_state_active .and. s% reconstructed_face_state_valid(k)) val = s% reconstructed_ChiRho_face_ad(k)% val
+            case(p_reconstructed_ChiT_face)
+               if (reconstructed_face_state_active .and. s% reconstructed_face_state_valid(k)) val = s% reconstructed_ChiT_face_ad(k)% val
+            case(p_reconstructed_grada_face)
+               if (reconstructed_face_state_active .and. s% reconstructed_face_state_valid(k)) val = s% reconstructed_grada_face_ad(k)% val
+            case(p_reconstructed_opacity_face)
+               if (reconstructed_face_state_active .and. s% reconstructed_face_state_valid(k)) val = s% reconstructed_opacity_face_ad(k)% val
+            case(p_reconstructed_scale_height_face)
+               if (reconstructed_face_state_active .and. s% reconstructed_face_state_valid(k)) val = s% reconstructed_scale_height_face_ad(k)% val
+            case(p_reconstructed_gradr_face)
+               if (reconstructed_face_state_active .and. s% reconstructed_face_state_valid(k)) val = s% reconstructed_gradr_face_ad(k)% val
 
 
             case(p_rsp_Et)

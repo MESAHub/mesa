@@ -10,7 +10,8 @@
       change_initial_net = .true.
       new_net_name = 'approx21_cr60_plus_co56.net'
 
-
+      set_initial_dt = .true.
+      years_for_initial_dt = 1d-5
 
 / ! end of star_job namelist
 
@@ -65,7 +66,7 @@
       photo_interval = 50
       !profile_interval = 1
       !history_interval = 1
-      terminal_interval = 10
+      terminal_interval = 1
 
       x_integer_ctrl(1) = 6 ! inlist_part
 

@@ -43,7 +43,6 @@ one or more of the following MESA Responsible Persons (MRPs):
 
 -  Rich Townsend (rhtownsend@wisc.edu)
 -  Bill Wolf (wolfwm@uwec.edu)
--  Meridith Joyce (meridith.joyce@gmail.com)
 -  Jared Goldberg (goldstar@msu.edu)
 
 All reports will be reviewed and investigated and will result in a

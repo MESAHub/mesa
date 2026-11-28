@@ -24,8 +24,8 @@ module tdc_hydro
    use utils_lib, only: is_bad
    use auto_diff
    use auto_diff_support
-   use accurate_sum_auto_diff_star_order1
    use star_utils
+   use reconstructed_face_support, only: get_reconstructed_scale_height_ad
 
    implicit none
 
@@ -55,10 +55,17 @@ contains
          return
       end if
 
-      !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
+      !$OMP PARALLEL DO PRIVATE(k,op_err,x) SCHEDULE(dynamic,2)
       do k = 1, s%nz
-         ! Hp_face(k) <= 0 means it needs to be set.  e.g., after read file
-         if (s%Hp_face(k) <= 0) then
+         if (s%use_face_reconstruction) then
+            x = get_TDC_Hp_face(s, k, op_err)
+            if (op_err /= 0) then
+               !$OMP ATOMIC WRITE
+               ierr = op_err
+            else if (s%Hp_face(k) <= 0d0) then
+               s%Hp_face(k) = x%val
+            end if
+         else if (s%Hp_face(k) <= 0d0) then
             ! this scale height for face is already calculated in TDC
             s%Hp_face(k) = get_scale_height_face_val(s, k) ! because this is called before s% scale_height(k) is updated in mlt_vars.
          end if
@@ -68,18 +75,27 @@ contains
          if (s%report_ierr) write (*, 2) 'failed in set_viscosity_vars_TDC loop 1', s%model_number
          return
       end if
-      !$OMP PARALLEL DO PRIVATE(k,op_err) SCHEDULE(dynamic,2)
+      !$OMP PARALLEL DO PRIVATE(k,op_err,x) SCHEDULE(dynamic,2)
       do k = 1, s%nz
          x = compute_Chi_div_w_face(s, k, op_err) ! Sets Chi_face
-         if (op_err /= 0) ierr = op_err
+         if (op_err /= 0) then
+            !$OMP ATOMIC WRITE
+            ierr = op_err
+         end if
          x = compute_tdc_Eq_div_w_face(s, k, op_err) ! Sets Eq_face
-         if (op_err /= 0) ierr = op_err
+         if (op_err /= 0) then
+            !$OMP ATOMIC WRITE
+            ierr = op_err
+         end if
          if (s% v_flag) then
             x = compute_tdc_Uq_face(s, k, op_err)
          else if (s% u_flag) then
             x = compute_tdc_Uq_dm_cell(s, k, op_err)
          end if
-         if (op_err /= 0) ierr = op_err
+         if (op_err /= 0) then
+            !$OMP ATOMIC WRITE
+            ierr = op_err
+         end if
       end do
       !$OMP END PARALLEL DO
       if (ierr /= 0) then
@@ -104,14 +120,33 @@ contains
    end subroutine get_TDC_alfa_beta_face_weights
 
 
-   function wrap_Hp_cell(s, k) result(Hp_cell)  ! cm , different than rsp2
+   function get_TDC_Hp_face(s, k, ierr) result(Hp_face)
       type(star_info), pointer :: s
       integer, intent(in) :: k
+      integer, intent(out) :: ierr
+      type(auto_diff_real_star_order1) :: Hp_face
+
+      ierr = 0
+      if (s%use_face_reconstruction) then
+         call get_reconstructed_scale_height_ad(s, k, Hp_face, ierr)
+      else
+         Hp_face = get_scale_height_face(s, k)
+      end if
+   end function get_TDC_Hp_face
+
+
+   function wrap_Hp_cell(s, k, ierr) result(Hp_cell)  ! cm , different than rsp2
+      type(star_info), pointer :: s
+      integer, intent(in) :: k
+      integer, intent(out) :: ierr
       type(auto_diff_real_star_order1) :: Hp1, Hp0, Hp_cell
-      Hp0 = get_scale_height_face(s,k)
+      ierr = 0
+      Hp0 = get_TDC_Hp_face(s, k, ierr)
+      if (ierr /= 0) return
       Hp1 = 0d0
       if (k+1 < s%nz) then
-         Hp1 = shift_p1(get_scale_height_face(s,k+1))
+         Hp1 = shift_p1(get_TDC_Hp_face(s, k+1, ierr))
+         if (ierr /= 0) return
       end if
       Hp_cell = 0.5d0*(Hp0 + Hp1)
       !0.5d0*(wrap_Hp_00(s, k) + wrap_Hp_p1(s, k))
@@ -127,7 +162,8 @@ contains
       include 'formats'
       ierr = 0
 
-      Hp_cell = wrap_Hp_cell(s, k)
+      Hp_cell = wrap_Hp_cell(s, k, ierr)
+      if (ierr /= 0) return
       return ! below is skipped, for now.
 
       d_00 = wrap_d_00(s, k)
@@ -176,12 +212,7 @@ contains
       else
          Hp_cell = Hp_cell_for_Chi(s, k, ierr)
          if (ierr /= 0) return
-         if (s%TDC_use_density_form_for_eddy_viscosity) then
-            ! new density derivative term
-            d_v_div_r = compute_rho_form_of_d_v_div_r(s, k, ierr)
-         else
-            d_v_div_r = compute_d_v_div_r(s, k, ierr)
-         end if
+         d_v_div_r = compute_d_v_div_r(s, k, ierr)
          if (ierr /= 0) return
 
          ! don't need to check if mlt_vc > 0 here.
@@ -256,14 +287,9 @@ contains
       k > s%nz - s% TDC_num_innermost_cells_forced_nonturbulent) then
       Chi_face = 0d0
    else
-      Hp_face = get_scale_height_face(s,k) !Hp_cell_for_Chi(s, k, ierr)
+      Hp_face = get_TDC_Hp_face(s, k, ierr)
       if (ierr /= 0) return
-      if (s%TDC_use_density_form_for_eddy_viscosity) then
-         ! new density derivative form
-         d_v_div_r = compute_rho_form_of_d_v_div_r_face(s, k, ierr)
-      else
-         d_v_div_r = compute_d_v_div_r_face(s, k, ierr)
-      end if
+      d_v_div_r = compute_d_v_div_r_face(s, k, ierr)
       if (ierr /= 0) return
 
       if (k >= 2) then
@@ -325,12 +351,7 @@ contains
       Chi_face = compute_Chi_div_w_face(s,k,ierr)
       if (ierr /= 0) return
 
-      if (s%TDC_use_density_form_for_eddy_viscosity) then
-         ! new density derivative term
-         d_v_div_r = compute_rho_form_of_d_v_div_r_face_opt_time_center(s, k, ierr)
-      else
-         d_v_div_r = compute_d_v_div_r_opt_time_center_face(s, k, ierr)
-      end if
+      d_v_div_r = compute_d_v_div_r_opt_time_center_face(s, k, ierr)
 
       if (k >= 2) then
          dmbar = 0.5d0*(s% dm(k) + s% dm(k-1))
@@ -370,8 +391,8 @@ contains
       else
          r_00 = wrap_opt_time_center_r_00(s, k)
 
-         ! which do we adopt?
-         Chi_00 = compute_Chi_cell(s, k, ierr)  ! s% Chi_ad(k) XXX
+         Chi_00 = compute_Chi_cell(s, k, ierr)
+         if (ierr /= 0) return
 
          if (k > 1) then
             Chi_m1 = shift_m1(compute_Chi_cell(s, k-1, ierr))
@@ -487,93 +508,6 @@ contains
       if (r_p1%val == 0d0) r_p1 = 1d0
       d_v_div_r = v_00/r_00 - v_p1/r_p1  ! units s^-1
    end function compute_d_v_div_r_opt_time_center
-
-   function compute_rho_form_of_d_v_div_r(s, k, ierr) result(d_v_div_r) ! used in Chi_cell
-      type(star_info), pointer :: s
-      integer, intent(in)  :: k
-      integer, intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: d_v_div_r, v_00, v_p1
-      type(auto_diff_real_star_order1) :: r_cell, rho_cell, v_cell, dlnrho_dt
-      real(dp) :: dm_cell
-      ierr = 0
-
-      r_cell = 0.5d0*(wrap_r_00(s, k) + wrap_r_p1(s, k))
-      rho_cell = wrap_d_00(s, k)
-      if (s% u_flag) then
-         v_cell = wrap_u_00(s,k)
-      else ! v flag
-         v_cell = 0.5d0*(wrap_v_00(s, k) + wrap_v_p1(s, k))
-      end if
-      v_00 = wrap_opt_time_center_v_00(s, k)
-      v_p1 = wrap_opt_time_center_v_p1(s, k)
-      dlnrho_dt = wrap_dxh_lnd(s, k)/s%dt    ! (∂/∂t)lnρ
-      dm_cell = s%dm(k)                     ! cell mass
-
-      ! density form
-      d_v_div_r = -dm_cell/(4d0*pi*rho_cell)*(dlnrho_dt/pow3(r_cell) + 3d0*v_cell/pow4(r_cell))
-
-      ! dm_cell*(1/r * du/dm - U/4/pi/rho/r^4), more sensitive to geometry
-      !d_v_div_r = ((v_00 - v_p1) - dm_cell*v_cell/(4d0*pi*rho_cell*pow3(r_cell)))/r_cell
-
-   end function compute_rho_form_of_d_v_div_r
-
-   function compute_rho_form_of_d_v_div_r_face(s, k, ierr) result(d_v_div_r)
-      type(star_info), pointer :: s
-      integer, intent(in)  :: k
-      integer, intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: d_v_div_r
-      type(auto_diff_real_star_order1) :: r_face, rho_face, v_face, dlnrho_dt
-      real(dp) :: dm_bar, alfa, beta
-      ierr = 0
-
-      r_face = wrap_r_00(s, k)
-      rho_face = get_rho_face(s, k)
-      v_face = wrap_v_00(s, k)   ! face-centered velocity
-      if (k >= 2) then
-         dm_bar = 0.5d0*(s% dm(k) + s% dm(k-1))
-         call get_TDC_alfa_beta_face_weights(s, k, alfa, beta)
-         dlnrho_dt = (alfa*wrap_dxh_lnd(s, k) + beta*shift_m1(wrap_dxh_lnd(s, k-1)))/s%dt    ! (∂/∂t)lnρ
-      else
-         dm_bar = 0.5d0*s% dm(k)
-         dlnrho_dt = 0.5d0*wrap_dxh_lnd(s, k)/s%dt    ! (∂/∂t)lnρ
-      end if
-
-      ! density form
-      d_v_div_r = -dm_bar/(4d0*pi*rho_face)*(dlnrho_dt/pow3(r_face) + 3d0*v_face/pow4(r_face))
-
-      ! dm_bar*(1/r * du/dm - U/4/pi/rho/r^4), more sensitive to geometry
-      !d_v_div_r = ((wrap_u_m1(s,k) - wrap_u_00(s,k)) - dm_bar*v_face/(4d0*pi*rho_face*pow3(r_face)))/r_face
-
-   end function compute_rho_form_of_d_v_div_r_face
-
-   function compute_rho_form_of_d_v_div_r_face_opt_time_center(s, k, ierr) result(d_v_div_r) ! s^-1
-      type(star_info), pointer :: s
-      integer, intent(in)  :: k
-      integer, intent(out) :: ierr
-      type(auto_diff_real_star_order1) :: d_v_div_r
-      type(auto_diff_real_star_order1) :: r_face, rho_face, v_face, dlnrho_dt
-      real(dp) :: dm_bar, alfa, beta
-      ierr = 0
-
-      r_face = wrap_opt_time_center_r_00(s, k)
-      rho_face = get_rho_face(s, k)
-      v_face = wrap_opt_time_center_v_00(s, k)   ! face-centered velocity
-      if (k >= 2) then
-         dm_bar = 0.5d0*(s% dm(k) + s% dm(k-1))
-         call get_TDC_alfa_beta_face_weights(s, k, alfa, beta)
-         dlnrho_dt = (alfa*wrap_dxh_lnd(s, k) + beta*shift_m1(wrap_dxh_lnd(s, k-1)))/s%dt    ! (∂/∂t)lnρ
-      else
-         dm_bar = 0.5d0*s% dm(k)
-         dlnrho_dt = 0.5d0*wrap_dxh_lnd(s, k)/s%dt    ! (∂/∂t)lnρ
-      end if
-
-      ! density form
-      d_v_div_r = -dm_bar/(4d0*pi*rho_face)*(dlnrho_dt/pow3(r_face) + 3d0*v_face/pow4(r_face))
-
-      ! dm_bar*(1/r * du/dm - U/4/pi/rho/r^4), more sensitive to geometry
-      !d_v_div_r = ((wrap_opt_time_center_u_m1(s,k) - wrap_opt_time_center_u_00(s,k)) - dm_bar*v_face/(4d0*pi*rho_face*pow3(r_face)))/r_face
-
-   end function compute_rho_form_of_d_v_div_r_face_opt_time_center
 
    function compute_d_v_div_r_face(s, k, ierr) result(d_v_div_r)  ! s^-1
       type(star_info), pointer :: s

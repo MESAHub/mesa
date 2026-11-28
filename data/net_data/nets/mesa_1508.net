@@ -4,12 +4,12 @@ add_isos_and_reactions(
    he  3  4 !
    li  6  9 ! lithium
    be7
-   be  9 10 ! berylium
+   be  9 10 ! beryllium
     b  8 14 ! boron
     c 11 17 ! carbon
     n 12 20 ! nitrogen
     o 14 22 ! oxygen
-    f 17 22 ! flourine
+    f 17 22 ! fluorine
    ne 17 29 ! neon
    na 19 32 ! sodium
    mg 20 37 ! magnesium

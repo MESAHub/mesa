@@ -547,8 +547,13 @@
 
          if (.not. s% rotation_flag) return
 
-         call set_i_rot(s, skip_w_div_w_crit_roche)
-         call set_omega(s, 'set_rotation_info')
+         ! Keep the photo's omega and the inertia reconstructed in finish_load_model.
+         ! The photo's j_rot/omega includes the tidal correction to i_rot.
+         ! Recalculating i_rot here would use the single-star inertia.
+         if (.not. s% doing_load_restart_photo) then
+            call set_i_rot(s, skip_w_div_w_crit_roche)
+            call set_omega(s, 'set_rotation_info')
+         end if
 
 !$OMP PARALLEL DO PRIVATE(k, fp_single, ft_single, fp_tidal, ft_tidal, ierr) SCHEDULE(dynamic,2)
          do k=1, s% nz

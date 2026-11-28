@@ -131,9 +131,6 @@
       real(dp) :: remove_surface_by_v_surf_div_v_escape, remove_initial_surface_by_v_surf_div_v_escape
       real(dp) :: remove_surface_by_v_surf_div_cs, remove_initial_surface_by_v_surf_div_cs
 
-      real(dp) :: zero_initial_inner_v_by_mass_Msun, &
-         zero_inner_v_by_mass_Msun
-
       logical :: report_mass_not_fe56
 
       logical :: relax_dxdt_nuc_factor, relax_initial_dxdt_nuc_factor
@@ -185,8 +182,6 @@
          new_am_nu_rot_flag, use_D_omega_for_am_nu_rot
       real(dp) :: center_ye_limit_for_v_flag
       logical :: change_u_flag, change_initial_u_flag, new_u_flag
-      logical :: change_reconstruction_flag, change_initial_reconstruction_flag, &
-         new_reconstruction_flag
 
       logical :: change_rotation_flag, change_initial_rotation_flag, new_rotation_flag
 

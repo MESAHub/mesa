@@ -22,7 +22,7 @@
       new_cumulative_energy_error = 0d0
 
       set_initial_dt = .true.
-      seconds_for_initial_dt = 1d-8
+      seconds_for_initial_dt = 1d-4
 
       set_initial_model_number = .true.
       initial_model_number = 0
@@ -170,8 +170,6 @@
       ! solver debugging
       !solver_check_everything = .true.
 
-      !solver_epsder_struct = 1d-6
-      !solver_epsder_chem = 1d-6
 
       !report_solver_dt_info = .true.
       !report_dX_nuc_drop_dt_limits = .true.

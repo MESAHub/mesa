@@ -186,7 +186,7 @@ needs fixes to simply push a new release, and flag the current release as not wo
 Add new release version to readthedocs
 --------------------------------------
 
-First gain access to the readthedocs account (that is currently accessible by Rich, Evan, Joey, Earl, and Meridith). Then:
+First gain access to the readthedocs account (that is currently accessible by Rich, Evan, Earl, and Ebraheem). Then:
 
 - Go to the ``Versions`` page
 - Find the release tag (not the branch) and ``Activate`` it

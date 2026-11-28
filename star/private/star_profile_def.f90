@@ -599,7 +599,18 @@
       integer, parameter :: p_Lt = p_Lc_div_L + 1
       integer, parameter :: p_Lt_div_L = p_Lt + 1
 
-      integer, parameter :: p_rsp_log_erad = p_Lt_div_L + 1
+      integer, parameter :: p_reconstructed_T_face = p_Lt_div_L + 1
+      integer, parameter :: p_reconstructed_rho_face = p_reconstructed_T_face + 1
+      integer, parameter :: p_reconstructed_P_face = p_reconstructed_rho_face + 1
+      integer, parameter :: p_reconstructed_Cp_face = p_reconstructed_P_face + 1
+      integer, parameter :: p_reconstructed_ChiRho_face = p_reconstructed_Cp_face + 1
+      integer, parameter :: p_reconstructed_ChiT_face = p_reconstructed_ChiRho_face + 1
+      integer, parameter :: p_reconstructed_grada_face = p_reconstructed_ChiT_face + 1
+      integer, parameter :: p_reconstructed_opacity_face = p_reconstructed_grada_face + 1
+      integer, parameter :: p_reconstructed_scale_height_face = p_reconstructed_opacity_face + 1
+      integer, parameter :: p_reconstructed_gradr_face = p_reconstructed_scale_height_face + 1
+
+      integer, parameter :: p_rsp_log_erad = p_reconstructed_gradr_face + 1
       integer, parameter :: p_rsp_erad = p_rsp_log_erad + 1
       integer, parameter :: p_rsp_logEt = p_rsp_erad + 1
       integer, parameter :: p_rsp_Et = p_rsp_logEt + 1
@@ -711,7 +722,23 @@
       integer, parameter :: p_flux_limit_R = p_lum_rad_div_L_Edd_sub_fourPrad_div_PchiT + 1
       integer, parameter :: p_flux_limit_lambda = p_flux_limit_R + 1
 
-      integer, parameter :: p_col_id_max = p_flux_limit_lambda
+      integer, parameter :: p_eff_mix_speed = p_flux_limit_lambda + 1
+      integer, parameter :: p_effective_mixing_speed = p_eff_mix_speed + 1
+      integer, parameter :: p_log_eff_mix_speed = p_effective_mixing_speed + 1
+      integer, parameter :: p_log_effective_mixing_speed = p_log_eff_mix_speed + 1
+      integer, parameter :: p_eff_mix_speed_div_csound = p_log_effective_mixing_speed + 1
+      integer, parameter :: p_effective_mixing_speed_div_csound = p_eff_mix_speed_div_csound + 1
+      integer, parameter :: p_eff_mix_speed_div_mlt_vc = p_effective_mixing_speed_div_csound + 1
+      integer, parameter :: p_effective_mixing_speed_div_mlt_vc = p_eff_mix_speed_div_mlt_vc + 1
+      integer, parameter :: p_dt_times_eff_mix_speed_div_mixing_length = p_effective_mixing_speed_div_mlt_vc + 1
+      integer, parameter :: p_dt_times_effective_mixing_speed_div_mixing_length = &
+         p_dt_times_eff_mix_speed_div_mixing_length + 1
+      integer, parameter :: p_log_dt_times_eff_mix_speed_div_mixing_length = &
+         p_dt_times_effective_mixing_speed_div_mixing_length + 1
+      integer, parameter :: p_log_dt_times_effective_mixing_speed_div_mixing_length = &
+         p_log_dt_times_eff_mix_speed_div_mixing_length + 1
+
+      integer, parameter :: p_col_id_max = p_log_dt_times_effective_mixing_speed_div_mixing_length
 
       character (len=maxlen_profile_column_name) :: profile_column_name(p_col_id_max)
       type (integer_dict), pointer :: profile_column_names_dict
@@ -1190,6 +1217,21 @@
          profile_column_name(p_log_conv_vel) = 'log_conv_vel'
          profile_column_name(p_conv_vel_div_csound) = 'conv_vel_div_csound'
          profile_column_name(p_conv_vel_div_L_vel) = 'conv_vel_div_L_vel'
+         profile_column_name(p_eff_mix_speed) = 'eff_mix_speed'
+         profile_column_name(p_effective_mixing_speed) = 'effective_mixing_speed'
+         profile_column_name(p_log_eff_mix_speed) = 'log_eff_mix_speed'
+         profile_column_name(p_log_effective_mixing_speed) = 'log_effective_mixing_speed'
+         profile_column_name(p_eff_mix_speed_div_csound) = 'eff_mix_speed_div_csound'
+         profile_column_name(p_effective_mixing_speed_div_csound) = 'effective_mixing_speed_div_csound'
+         profile_column_name(p_eff_mix_speed_div_mlt_vc) = 'eff_mix_speed_div_mlt_vc'
+         profile_column_name(p_effective_mixing_speed_div_mlt_vc) = 'effective_mixing_speed_div_mlt_vc'
+         profile_column_name(p_dt_times_eff_mix_speed_div_mixing_length) = 'dt_times_eff_mix_speed_div_mixing_length'
+         profile_column_name(p_dt_times_effective_mixing_speed_div_mixing_length) = &
+            'dt_times_effective_mixing_speed_div_mixing_length'
+         profile_column_name(p_log_dt_times_eff_mix_speed_div_mixing_length) = &
+            'log_dt_times_eff_mix_speed_div_mixing_length'
+         profile_column_name(p_log_dt_times_effective_mixing_speed_div_mixing_length) = &
+            'log_dt_times_effective_mixing_speed_div_mixing_length'
 
          profile_column_name(p_mix_type) = 'mix_type'
          profile_column_name(p_mixing_type) = 'mixing_type'
@@ -1277,6 +1319,16 @@
          profile_column_name(p_Lc_div_L) = 'Lc_div_L'
          profile_column_name(p_Lt) = 'Lt'
          profile_column_name(p_Lt_div_L) = 'Lt_div_L'
+         profile_column_name(p_reconstructed_T_face) = 'reconstructed_T_face'
+         profile_column_name(p_reconstructed_rho_face) = 'reconstructed_rho_face'
+         profile_column_name(p_reconstructed_P_face) = 'reconstructed_P_face'
+         profile_column_name(p_reconstructed_Cp_face) = 'reconstructed_Cp_face'
+         profile_column_name(p_reconstructed_ChiRho_face) = 'reconstructed_ChiRho_face'
+         profile_column_name(p_reconstructed_ChiT_face) = 'reconstructed_ChiT_face'
+         profile_column_name(p_reconstructed_grada_face) = 'reconstructed_grada_face'
+         profile_column_name(p_reconstructed_opacity_face) = 'reconstructed_opacity_face'
+         profile_column_name(p_reconstructed_scale_height_face) = 'reconstructed_scale_height_face'
+         profile_column_name(p_reconstructed_gradr_face) = 'reconstructed_gradr_face'
 
          profile_column_name(p_rsp_Et) = 'rsp_Et'
          profile_column_name(p_rsp_logEt) = 'rsp_logEt'

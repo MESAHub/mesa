@@ -426,7 +426,6 @@ def check_profile():
         "o16",
         "pp",
         "cno",
-        "tri_alfa",
     }
 
     print_options(vals_profile_list - vals_profile - known_false_positives)

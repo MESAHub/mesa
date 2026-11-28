@@ -62,6 +62,7 @@
             wrap_opt_time_center_v_m1, wrap_opt_time_center_v_00, wrap_opt_time_center_v_p1
 
       use star_utils, only: &
+           star_get_effective_mixing_speed => get_effective_mixing_speed, &
            star_conv_time_scale => conv_time_scale, &
            star_QHSE_time_scale => QHSE_time_scale, &
            star_eps_nuc_time_scale => eps_nuc_time_scale, &

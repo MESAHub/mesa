@@ -96,8 +96,6 @@
       ! solver debugging
       !solver_check_everything = .true.
 
-      !solver_epsder_struct = 1d-6
-      !solver_epsder_chem = 1d-6
 
       !report_solver_dt_info = .true.
       !report_dX_nuc_drop_dt_limits = .true.

@@ -68,7 +68,7 @@ contains
          b% pg% History_Panels1_num_panels, &
          b% pg% History_Panels1_other_ymin, &
          b% pg% History_Panels1_other_ymax, &
-         b% pg% History_Panels1_yaxis_reversed, &
+         b% pg% History_Panels1_other_yaxis_reversed, &
          b% pg% History_Panels1_other_yaxis_log, &
          b% pg% History_Panels1_other_dymin, &
          b% pg% History_Panels1_points_name, &
@@ -128,7 +128,7 @@ contains
          b% pg% History_Panels2_num_panels, &
          b% pg% History_Panels2_other_ymin, &
          b% pg% History_Panels2_other_ymax, &
-         b% pg% History_Panels2_yaxis_reversed, &
+         b% pg% History_Panels2_other_yaxis_reversed, &
          b% pg% History_Panels2_other_yaxis_log, &
          b% pg% History_Panels2_other_dymin, &
          b% pg% History_Panels2_points_name, &
@@ -188,7 +188,7 @@ contains
          b% pg% History_Panels3_num_panels, &
          b% pg% History_Panels3_other_ymin, &
          b% pg% History_Panels3_other_ymax, &
-         b% pg% History_Panels3_yaxis_reversed, &
+         b% pg% History_Panels3_other_yaxis_reversed, &
          b% pg% History_Panels3_other_yaxis_log, &
          b% pg% History_Panels3_other_dymin, &
          b% pg% History_Panels3_points_name, &
@@ -248,7 +248,7 @@ contains
          b% pg% History_Panels4_num_panels, &
          b% pg% History_Panels4_other_ymin, &
          b% pg% History_Panels4_other_ymax, &
-         b% pg% History_Panels4_yaxis_reversed, &
+         b% pg% History_Panels4_other_yaxis_reversed, &
          b% pg% History_Panels4_other_yaxis_log, &
          b% pg% History_Panels4_other_dymin, &
          b% pg% History_Panels4_points_name, &
@@ -308,7 +308,7 @@ contains
          b% pg% History_Panels5_num_panels, &
          b% pg% History_Panels5_other_ymin, &
          b% pg% History_Panels5_other_ymax, &
-         b% pg% History_Panels5_yaxis_reversed, &
+         b% pg% History_Panels5_other_yaxis_reversed, &
          b% pg% History_Panels5_other_yaxis_log, &
          b% pg% History_Panels5_other_dymin, &
          b% pg% History_Panels5_points_name, &
@@ -368,7 +368,7 @@ contains
          b% pg% History_Panels6_num_panels, &
          b% pg% History_Panels6_other_ymin, &
          b% pg% History_Panels6_other_ymax, &
-         b% pg% History_Panels6_yaxis_reversed, &
+         b% pg% History_Panels6_other_yaxis_reversed, &
          b% pg% History_Panels6_other_yaxis_log, &
          b% pg% History_Panels6_other_dymin, &
          b% pg% History_Panels6_points_name, &
@@ -428,7 +428,7 @@ contains
          b% pg% History_Panels7_num_panels, &
          b% pg% History_Panels7_other_ymin, &
          b% pg% History_Panels7_other_ymax, &
-         b% pg% History_Panels7_yaxis_reversed, &
+         b% pg% History_Panels7_other_yaxis_reversed, &
          b% pg% History_Panels7_other_yaxis_log, &
          b% pg% History_Panels7_other_dymin, &
          b% pg% History_Panels7_points_name, &
@@ -488,7 +488,7 @@ contains
          b% pg% History_Panels8_num_panels, &
          b% pg% History_Panels8_other_ymin, &
          b% pg% History_Panels8_other_ymax, &
-         b% pg% History_Panels8_yaxis_reversed, &
+         b% pg% History_Panels8_other_yaxis_reversed, &
          b% pg% History_Panels8_other_yaxis_log, &
          b% pg% History_Panels8_other_dymin, &
          b% pg% History_Panels8_points_name, &

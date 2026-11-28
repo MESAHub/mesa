@@ -111,30 +111,33 @@ contains
 
    subroutine do1_mlt_eval( &
          s, k, MLT_option, gradL_composition_term, &
+         T_in, P_in, energy_in, opacity_in, rho_in, chiRho_in, chiT_in, Cp_in, &
          gradr_in, grada, scale_height, mixing_length_alpha, &
          mixing_type, gradT, Y_face, mlt_vc, D, Gamma, ierr)
       use chem_def, only: ih1
-      use const_def, only: ln10
+      use const_def, only: ln10, convective_mixing
       use starspots, only: starspot_tweak_gradr
       type (star_info), pointer :: s
       integer, intent(in) :: k
       character (len=*), intent(in) :: MLT_option
-      type(auto_diff_real_star_order1), intent(in) :: gradr_in, grada, scale_height
+      type(auto_diff_real_star_order1), intent(in) :: &
+         T_in, P_in, energy_in, opacity_in, rho_in, chiRho_in, chiT_in, Cp_in, &
+         gradr_in, grada, scale_height
       real(dp), intent(in) :: gradL_composition_term, mixing_length_alpha
       integer, intent(out) :: mixing_type
       type(auto_diff_real_star_order1), intent(out) :: &
          gradT, Y_face, mlt_vc, D, Gamma
       integer, intent(out) :: ierr
 
-      real(dp) :: cgrav, m, XH1, P_theta, L_theta
+      real(dp) :: cgrav, m, XH1, P_theta, L_theta, rho_start
       integer :: iso
       type(auto_diff_real_star_order1) :: gradr, r, L, T, P, opacity, rho, dV, &
-         chiRho, chiT, Cp, rho_start, energy
+         chiRho, chiT, Cp, energy
       include 'formats'
       ierr = 0
 
 
-      P = get_Peos_face(s,k) ! if u_flag, should this be P_face_ad? (time centered in riemann)
+      P = P_in ! if u_flag, should this be P_face_ad? (time centered in riemann)
       if (s% include_mlt_in_velocity_time_centering) then
           ! could be cleaner with a wrapper for time_centered P and L
           if (s% using_velocity_time_centering .and. &
@@ -153,7 +156,11 @@ contains
              L_theta = 1d0
           end if
           L = L_theta*wrap_L_00(s, k) + (1d0 - L_theta)*s% L_start(k)
-          P = P_theta*P + (1d0-P_theta)*s% Peos_face_start(k)
+          if (s% use_face_reconstruction) then
+             P = P_theta*P + (1d0-P_theta)*s% reconstructed_P_face_start(k)
+          else
+             P = P_theta*P + (1d0-P_theta)*s% Peos_face_start(k)
+          end if
           r = wrap_opt_time_center_r_00(s,k)
       else
           L = wrap_L_00(s,k)
@@ -162,15 +169,15 @@ contains
       gradr = gradr_in
       cgrav = s% cgrav(k)
       m = s% m_grav(k)
-      T = get_T_face(s,k)
-      opacity = get_kap_face(s,k)
-      rho = get_rho_face(s,k)
+      T = T_in
+      opacity = opacity_in
+      rho = rho_in
       rho_start = get_rho_start_face(s,k)
-      dV = 1d0/rho - 1d0/rho_start ! both variables are face wrapped.
-      chiRho = get_ChiRho_face(s,k)
-      chiT = get_ChiT_face(s,k)
-      Cp = get_Cp_face(s,k)
-      energy = get_e_face(s,k)
+      dV = 1d0/rho - 1d0/rho_start ! rho_start is fixed during the Newton solve.
+      chiRho = chiRho_in
+      chiT = chiT_in
+      Cp = Cp_in
+      energy = energy_in
       iso = s% dominant_iso_for_thermohaline(k)
       XH1 = s% xa(s% net_iso(ih1),k)
 
@@ -192,6 +199,10 @@ contains
             s% alpha_semiconvection, s% thermohaline_coeff, &
             mixing_type, gradT, Y_face, mlt_vc, D, Gamma, energy, ierr)
       end if
+      if (ierr /= 0) return
+
+      ! Do not use diffusion velocities as MLT/TDC turbulent velocity.
+      if (mixing_type /= convective_mixing) mlt_vc = 0d0
 
    end subroutine do1_mlt_eval
 
@@ -245,7 +256,7 @@ contains
 
       ! Wrap Pturb into P
       if (s% okay_to_set_mlt_vc .and. s% include_mlt_Pturb_in_thermodynamic_gradients .and. k > 0) then
-         mlt_Pturb = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*get_rho_face(s,k)/3d0
+         mlt_Pturb = s% mlt_Pturb_factor*pow2(s% mlt_vc_old(k))*rho/3d0
          Ptot = P + mlt_Pturb
       else
          Ptot = P
@@ -271,7 +282,11 @@ contains
       ! maximum convection velocity.
       if (k > 0) then
          if (s% q(k) <= s% max_conv_vel_div_csound_maxq) then
-             max_conv_vel = s% csound_face(k) * s% max_conv_vel_div_csound
+            if (s% use_face_reconstruction) then
+               max_conv_vel = s% reconstructed_csound_face(k)*s% max_conv_vel_div_csound
+            else
+               max_conv_vel = s% csound_face(k)*s% max_conv_vel_div_csound
+            end if
          else
             max_conv_vel = 1d99
          end if

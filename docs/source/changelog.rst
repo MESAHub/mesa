@@ -23,6 +23,13 @@ For a more in-depth look at the new build system, see :doc:`developing/build-sys
 
 ``Tsurf_factor`` and the associated controls and history column have been removed as they affected nothing. These controls were effectively deprecated after the removal of the black body boundary condition in 21.12.1.
 
+A substantial clean up of old or deprecated controls has been undertaken in
+``star``, ``binary``, PGSTAR, and PGBINARY.
+
+Removed the unused ``RSP_Qvisc_*`` controls for the obsolete ``Qvisc`` form
+(Section 4.2 of |MESA III|). Use ``Pvsc`` instead: ``RSP_cq`` and ``RSP_zsh``
+for RSP, or ``use_Pvsc_art_visc`` for ``v_flag`` hydrodynamics.
+
 .. _New Features main:
 
 New Features
@@ -33,16 +40,134 @@ MESA's documentation now includes a generated :ref:`Test Suite Gallery <tagoverv
 Diffusive overshooting (overmixing) prescriptions now support a
 ``step+exponential`` option, see :ref:`reference/controls:overshoot_scheme`.
 
+White dwarf phase separation now includes an option to use three-component phase diagrams, automatically selected according to the dominant three elements in the crystallizing layer, based on the work of `Castro-Tapia & Cumming (2025) <https://ui.adsabs.harvard.edu/abs/2025ApJ...991...64C>`_. See documentation at :ref:`reference/controls:phase_separation_option` and new test case exercising this capability in an ultramassive white dwarf :doc:`test_suite/wd_o_ne_3_phase`.
+
 MESA no longer stops when reactions for which special rates are set are not in the nuclear network, only a warning is printed. This is intended to make it easier to test various network sizes without having to also change the list of special reactions.
 
 GYRE has been upgraded to 9.1.1, the most recent stable release. Changes since the previous release (8.1) included in MESA can be seen `here <https://github.com/rhdtownsend/gyre/releases>`__.
 
 The `MESA SDK <http://user.astro.wisc.edu/~townsend/static.php?ref=mesasdk>`__ recommended for compiling MESA has been updated to 26.6.1. Although this newer SDK is not required to successfully build MESA, it brings the benefit of restoring the cross-platform bit-for-bit compatibility that MESA once enjoyed (meaning that runs on Linux/Intel, MacOS/Intel and MacOS/ARM give identical results).
 
+Additional controls are available for TDC envelope remeshing:
+
+- ``remesh_for_TDC_pulsations_when_load`` remeshes a model after loading it from a ``.mod`` file.
+- ``TDC_hydro_nz_inner`` adds geometrically spaced zones near the inner boundary.
+- ``TDC_hydro_nz_T_gradient`` adds zones according to the variation in ``logT`` below ``TDC_hydro_T_anchor`` while retaining the mass-based mesh.
+
+PGSTAR HR diagrams can now show labeled lines of constant stellar radius.
+Set ``show_HR_radius_lines = .true.`` in ``&pgstar`` to enable them (default
+``.false.``). See :ref:`reference/pgstar:HR window` and
+`gh-1091 <https://github.com/MESAHub/mesa/pull/1091>`_.
+
+Additional ``pgstar`` plots to visualize residuals of equations:
+- Kippenhahn-style diagram (with mass on the y-axis and model number on the x-axis) colored by ``safe_log10(maxval(abs(s%equ(1:neq, k))))``, which is the logarithm of the absolute value of the biggest residual at cell ``k`` for the *accepted* iteration of MESA's Newton-Raphson solver. The y-axis can be mass, logR, or tau.
+- Time evolution of the maximum residual across mesh points for each structure equation (ignores chemical composition equations). See ``Kipp_residuals_*`` and ``Max_eq_resid_*`` in ``pgstar.defaults``
+
+Substantial work has been done to improve the remapping of rotation profiles
+during mesh adjustments, reducing errors in angular velocity profiles while
+conserving total angular momentum. See
+`gh-1047 <https://github.com/MESAHub/mesa/issues/1047>`_.
+
 .. _Bug Fixes main:
 
 Bug Fixes
 ---------
+
+When ``add_double_points_to_pulse_data`` is enabled, the composition
+gradient used to place double points (see
+:ref:`reference/controls:threshold_grad_mu_for_double_point`) is now
+evaluated from the mean molecular weight of the composition alone,
+``abar/(1 + zbar)``, rather than from ``mu`` (which includes the free
+electrons supplied by the EOS). Previously, partial ionization zones
+could trigger double points where the composition is uniform,
+introducing spurious density discontinuities into exported pulsation
+models; as faces crossed the threshold from one model to the next,
+oscillation frequencies could jump discontinuously. Pulsation models
+with double points may therefore differ from those written by earlier
+versions.
+
+Fixed a regex parsing issue in `shmesa change` that prevented controls like
+`x_ctrl(1)` from being parsed correctly.
+
+The ``colors`` module now checks Hermite-interpolated spectra for unphysical
+fluxes, sets negligible negative undershoots to zero, and falls back to
+trilinear interpolation when necessary. Interpolation also handles atmosphere
+grid boundaries and axes with only one tabulated value more robustly.
+Filter transmission is now zero outside the tabulated passband, preventing
+spurious contributions to synthetic magnitudes and photometric zero-points.
+Bolometric magnitudes now include the bolometric flux zero point, correcting
+their absolute scale independently of the Vega, AB, or ST bandpass system.
+
+The ``colors`` history columns now use the photospheric ``Teff``, ``photosphere_logg``
+and ``photosphere_r`` instead of the outermost-cell ``T(1)``, ``log10(grav(1))`` and
+``R(1)``, so synthetic magnitudes change slightly.
+
+Fixed an issue where the `find0_quadratic` subroutine provided by the `num` module could accidentally divide by 0 when the points used for the quadratic interpolant did not bracket a root.
+
+Incomplete split burns now trigger a stellar retry when they reach
+``burn_steps_hard_limit``.
+
+Fixed ``switch_to_radiative`` zeroing saved ``mlt_vc`` during TDC photo
+restarts and preparation for a new step. Mixing cleanup now preserves
+the velocity until it has been copied to ``mlt_vc_old``.
+
+Fixed: ``gold2_tolerances`` accidentally used ``gold_solver_iters_timestep_limit`` instead of ``gold2_solver_iters_timestep_limit``.
+
+Corrected the Skye ionization energy offset, which was too large by the mean
+mass number ``abar`` when ``Skye_use_ion_offsets = .true.``. The ionization
+energies now use double-precision literals. See
+:ref:`the known bugs entry <skye_ion_offset_normalization_bug>` and
+`gh-1086 <https://github.com/MESAHub/mesa/issues/1086>`_.
+
+Fixed a missing factor in the second derivative of the liquid electron-ion
+screening free energy in the PC EOS, correcting the screening contribution
+to the density derivative of pressure. See
+`gh-1133 <https://github.com/MESAHub/mesa/pull/1133>`_.
+
+Fixed a typo in the OPLIB hydrogen grid that could cause incorrect opacities or interpolation failures at low hydrogen abundance; see `gh-1078 <https://github.com/MESAHub/mesa/pull/1078>`_.
+
+Fixed a bug in the dPrad/dm temperature equation where rotational mixing could
+remove the convective heat flux contribution, and the contribution from
+semiconvection was also omitted.
+
+MESA's profile output columns previously reported ``conv_vel`` as an effective
+speed that could include overshooting, semiconvection, thermohaline mixing,
+rotation, and other contributions to ``D_mix``. This label gave users the false
+sense that ``conv_vel`` was purely the convection velocity from MLT/TDC. This
+has been amended to provide clarity to users. ``conv_vel`` now reports only
+the convective mixing velocity, including predictive mixing. ``mlt_vc`` remains
+the physical convective velocity from MLT/TDC. A new profile column
+``effective_mixing_speed`` (or ``eff_mix_speed``) now reports the effective
+speed from total ``D_mix``.
+
+Removed duplicate treatment of ``n14(a,g)f18(e+nu)o18`` in networks that
+include both the explicit hot CNO reactions and the corresponding approximate
+reaction. See :ref:`the known bugs entry <duplicate_n14ag_rate_bug>` and
+`gh-1056 <https://github.com/MESAHub/mesa/issues/1056>`_.
+
+Fixed the JINA Reaclib lookup for three-to-one reactions to try the reverse
+one-to-three reaction when the forward rate is missing. See
+`gh-1135 <https://github.com/MESAHub/mesa/pull/1135>`_.
+
+Fixed the hydrodynamic drag energy term so that it is only included when
+``v_flag = .true.``. Previously, using ``u_flag`` with a nonzero
+``drag_coefficient`` could inject spurious energy. See :ref:`the known bugs
+entry <drag_energy_u_flag_bug>`.
+
+Important bug fix for ``r26.4.1`` identified by Emily Sandford and Louis Siebenaler: the ``lowT_Freedman11`` opacity option used ``[M/H]`` labels as the metal mass fraction when interpolating in ``Z``, resulting in incorrect opacities. We recommend users who use these low-temperature opacities, such as in planet models, update to the latest MESA version or employ the fixes in :ref:`the known bugs entry <freedman_lowt_z_bug>` and `gh-993 <https://github.com/MESAHub/mesa/pull/993>`_.
+
+Fixed spurious :math:`\log_{10}\kappa = 0` values in Type 1 OPAL/OP opacity
+tables. The preprocessor uses fitting and smoothing routines adapted from
+`Seaton (1993) <https://ui.adsabs.harvard.edu/abs/1993MNRAS.265L..25S/abstract>`_.
+A conditional error in its interpolation branch for missing data affects
+MESA ``r26.4.1`` and all earlier versions. Other codes in the field may also
+be affected if they adopt these same preprocessing routines. We have corrected
+the preprocessor and regenerated the tables. We recommend users update to
+the latest version of MESA or apply the fix described in
+:ref:`the known bugs entry <opal_op_type1_preprocessor_bug>` and
+`gh-1111 <https://github.com/MESAHub/mesa/pull/1111>`_.
+
+The plasmon neutrino cooling rate used a hardcoded prefactor calculated with a Weinberg angle of 0.2319, while all other neutrino cooling processes used calculated prefactors taking the Weinberg angle as input, with default value 0.22290. Thus, modifying the value of the Weinberg angle resulted in changes to neutrino cooling processes except for the plasmon neutrinos. This affects all previous MESA versions, and was found and fixed by user Garv Chauhan, see :ref:`the known bugs entry <plasmon_weinberg_angle_bug>` and `gh-998 <https://github.com/MESAHub/mesa/pull/998>`_. Plasmon neutrinos now use the same Weinberg angle as all other processes and changing its value will affect the corresponding cooling rate. Changes to the plasmon neutrino prefactor for MESA's default Weinberg angle result in small numerical differences for stars where plasmon neutrino cooling is significant.
 
 Fixed a bug where RSP photo restarts did not immediately reconstruct ``s% L``,
 which could leave ``s% L(1)`` with an uninitialized near-zero value and crash
@@ -52,11 +177,44 @@ Fixed a small bug where diffusive overshooting (overmixing) routines did not
 respect changes to the mixing length set by ``other_alpha_mlt``, and used the
 ``mixing_length_alpha`` instead. See `gh-1003 <https://github.com/MESAHub/mesa/pull/1003>`_.
 
-The parameter ``report_max_infall_inside_fe_core`` was ignored in versions r25.12.1 and r26.4.1 and always had it's default value. See `gh-981 https://github.com/MESAHub/mesa/pull/981`_.
+The parameter ``report_max_infall_inside_fe_core`` was ignored in versions r25.12.1 and r26.4.1 and always had it's default value. See `gh-981 <https://github.com/MESAHub/mesa/pull/981>`_.
 
 ``fe_core_infall_limit`` now obeys ``when_to_stop_rtol`` and ``when_to_stop_atol`` again (broken since r11532).
 
+Fixed the OPAL/SCVH blend in metallicity, which could cause discontinuities
+in the EOS at ``Z = 0.04`` with the default blend limits. See
+:ref:`the known bugs entry <opal_scvh_high_z_blend_bug>`.
+
+Corrected swapped derivatives of the HELM/ideal-gas EOS blend weight with
+respect to log density and log temperature. See
+`gh-1134 <https://github.com/MESAHub/mesa/pull/1134>`_.
+
 .. note:: Before releasing a new version of MESA, move `Changes in main` to a new section below with the version number as the title, and add a new `Changes in main` section at the top of the file (see ``changelog_template.rst``).
+
+Other Changes
+-------------
+
+`mesa/binary` now no longer copies the binary history columns into the star history by default. Set `append_to_star_history = .true.` to reenable this feature. All binary history data is still saved to `history_name` defined in section `&binary_controls`.
+
+Improvements and bug fixes in MESA's Newton solver allow it to converge with
+larger timesteps. The default for ``dX_div_X_limit(1)`` has been changed from
+0.9 to 10, allowing larger relative changes in hydrogen abundance at moving
+burning fronts. The helium luminosity timestep limit acts earlier to resolve
+the onset of flashes. The default for ``lgL_He_burn_min`` has been changed
+from 2.5 to -0.5, and the default for ``lgL_He_burn_relative_limit`` from 3 to 5.
+See `gh-1112 <https://github.com/MESAHub/mesa/pull/1112>`_.
+
+Test Suite
+----------
+
+- In ``1M_pre_ms_to_wd``, a run with ``dX_div_X_limit(1) = 50d0`` on the red
+  giant branch reaches the onset of the core helium flash in an order
+  of magnitude fewer timesteps. See `gh-1112 <https://github.com/MESAHub/mesa/pull/1112>`_.
+- ``20M_pre_ms_to_core_collapse`` uses fully implicit burning through core collapse.
+- ``c13_pocket`` counts pulses with third dredge up and starts the pocket
+  calculation at helium shell ignition after an interpulse. The thermal pulse
+  cycle completes in half as many timesteps as in previous MESA versions.
+
 
 Changes in r26.4.1
 ===================

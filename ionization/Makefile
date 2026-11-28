@@ -22,11 +22,11 @@ CHECK_RESULTS_GOLDEN := test/test_output
 
 MODULES := ionization_def.mod ionization_lib.mod
 INSTALL_INCLUDES :=
-EXTRACT_DATA_COMMANDS += install-ionization-data
+EXTRACT_DATA_COMMANDS += ../data/ionization_data/.extract-completed
 
 include $(MAKE_DIR)/Makefile
 
-install-ionization-data:
-	if [ ! -r ../data/ionozation_data ]; then \
-		tar -xJf test/ionization_data.tar.xz -C ../data; \
-	fi
+../data/ionization_data/.extract-completed: test/ionization_data.tar.xz
+	rm -rf ../data/ionization_data
+	tar -xJf test/ionization_data.tar.xz -C ../data
+	touch $@

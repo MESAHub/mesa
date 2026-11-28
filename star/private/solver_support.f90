@@ -181,13 +181,14 @@
 
       end subroutine eval_equations
 
+
       subroutine sizequ(s, nvar, equ_norm, equ_max, k_max, j_max, ierr)  ! equ = residuals
          type (star_info), pointer :: s
          integer, intent(in) :: nvar
          real(dp), intent(out) :: equ_norm, equ_max
          integer, intent(out) :: k_max, j_max, ierr
 
-         integer :: j, k, num_terms, nz, skip_eqn1, skip_eqn2
+         integer :: j, k, num_terms, n, nz, nvar_hydro, skip_eqn1, skip_eqn2, skip_eqn3
          real(dp) :: sumequ, absq
 
          logical :: dbg
@@ -203,36 +204,73 @@
 
          dbg = s% solver_check_everything
 
+         nvar_hydro = min(nvar, s% nvar_hydro)
+
          nz = s% nz
+         n = nz
          num_terms = 0
          sumequ = 0
          skip_eqn1 = 0
          skip_eqn2 = 0
+         skip_eqn3 = 0
          if (s% convergence_ignore_equL_residuals) skip_eqn1 = s% i_equL
          if (s% convergence_ignore_alpha_RTI_residuals) skip_eqn2 = s% i_dalpha_RTI_dt
-         do k = 1, nz
-            do j = 1, nvar
-               if (j == skip_eqn1 .or. j == skip_eqn2) cycle
-               if (is_bad(s% equ(j,k)) .or. is_bad(s% residual_weight(j,k))) then
-                  ierr = 1
-                  return
-               end if
-               num_terms = num_terms + 1
-               absq = abs(s% equ(j,k)*s% residual_weight(j,k))
-               sumequ = sumequ + absq
-               if (absq > equ_max) then
-                  equ_max = absq
-                  j_max = j
-                  k_max = k
-               end if
+         if (s% do_burn .or. s% do_mix) then
+            ! Count each equation once. The loop over all variables replaced the
+            ! structural sum, so a separate composition pass would count those rows twice.
+            num_terms = num_terms + nvar*nz
+            if (skip_eqn1 > 0) num_terms = num_terms - nz
+            if (skip_eqn2 > 0) num_terms = num_terms - nz
+            if (skip_eqn3 > 0) num_terms = num_terms - nz
+            do k = 1, nz
+               do j = 1, nvar
+                  if (j == skip_eqn1 .or. j == skip_eqn2 .or. j == skip_eqn3) cycle
+                  if (is_bad(s% equ(j,k)) .or. is_bad(s% residual_weight(j,k))) then
+                     ierr = 1
+                     return
+                  end if
+                  absq = abs(s% equ(j,k)*s% residual_weight(j,k))
+                  sumequ = sumequ + absq
+                  if (absq > equ_max) then
+                     equ_max = absq
+                     j_max = j
+                     k_max = k
+                  end if
+               end do
             end do
-         end do
-
-         if (num_terms == 0) then
-            ierr = -1
-            return
+         else
+            if (skip_eqn1 == 0 .and. skip_eqn2 == 0) then
+               num_terms = num_terms + nvar_hydro*nz
+            else if (skip_eqn1 > 0 .and. skip_eqn2 > 0) then
+               num_terms = num_terms + (nvar_hydro-2)*nz
+            else
+               num_terms = num_terms + (nvar_hydro-1)*nz
+            end if
+            do k = 1, nz
+               do j = 1, nvar_hydro
+                  if (j == skip_eqn1 .or. j == skip_eqn2) cycle
+                  absq = abs(s% equ(j,k)*s% residual_weight(j,k))
+                  sumequ = sumequ + absq
+                  if (is_bad(sumequ)) then
+                     if (dbg) then
+                        write(*,3) trim(s% nameofequ(j)) // ' sumequ', j, k, sumequ
+                        call mesa_error(__FILE__,__LINE__,'sizeq 1')
+                     end if
+                     ierr = -1
+                     if (s% report_ierr) &
+                        write(*,3) 'bad equ(j,k)*s% residual_weight(j,k) ' // trim(s% nameofequ(j)), &
+                           j, k, s% equ(j,k)*s% residual_weight(j,k)
+                     if (s% stop_for_bad_nums) call mesa_error(__FILE__,__LINE__,'sizeq 2')
+                     return
+                  end if
+                  if (absq > equ_max) then
+                     equ_max = absq
+                     j_max = j
+                     k_max = k
+                  end if
+               end do
+            end do
          end if
-
          equ_norm = sumequ/num_terms
          if (dbg) write(*,4) trim(s% nameofequ(j_max)) // ' sizequ equ_max norm', &
             k_max, s% solver_iter, s% model_number, equ_max, equ_norm
@@ -332,9 +370,7 @@
          max_zone = 0
          max_var = 0
          num_terms = 0
-         num_xa_terms = 0
          sum_corr = 0
-         sum_xa_corr = 0
          max_correction = 0
          max_abs_correction = 0
          x_limit = s% correction_xa_limit
@@ -342,6 +378,9 @@
          found_bad_num = .false.
          report = s% report_ierr
          cell_loop: do k = 1, nz
+            ! Average composition corrections within each cell.
+            num_xa_terms = 0
+            sum_xa_corr = 0
             max_abs_corr_for_k = 0
             max_abs_xa_corr_for_k = 0
 
@@ -1166,6 +1205,10 @@
                   end if
                   if (report) write(*,2) 'bad num w', k, s% w(k)
                end if
+               ! Keep the solver increment consistent with the corrected w.
+               if (s% w(k) /= x(i_w)) then
+                  s% solver_dx(i_w,k) = s% w(k) - xh_start(i_w,k)
+               end if
                s% Hp_face(k) = x(i_Hp)
                if (is_bad_num(s% Hp_face(k))) then
                   s% retry_message = 'bad num for Hp_face'
@@ -1218,9 +1261,10 @@
                   if (report) write(*,2) 'bad num alpha_RTI', k, s% alpha_RTI(k)
                   ierr = -1
                end if
-               if (s% alpha_RTI(k) < 0d0) then
-                  s% alpha_RTI(k) = 0d0
-                  x(i_alpha_RTI) = 0d0
+               ! Use the clipped alpha_RTI in both the solver and time increments.
+               if (s% alpha_RTI(k) /= x(i_alpha_RTI)) then
+                  s% solver_dx(i_alpha_RTI,k) = s% alpha_RTI(k) - xh_start(i_alpha_RTI,k)
+                  s% dxh_alpha_RTI(k) = s% solver_dx(i_alpha_RTI,k)
                end if
             end if
 
@@ -1240,6 +1284,10 @@
                   end if
                   if (report) write(*,2) 'bad num w_div_w_crit_roche', k, s% w_div_w_crit_roche(k)
                   ierr = -1
+               end if
+               ! Keep the solver increment consistent with the clipped rotation fraction.
+               if (s% w_div_w_crit_roche(k) /= x(i_w_div_wc)) then
+                  s% solver_dx(i_w_div_wc,k) = s% w_div_w_crit_roche(k) - xh_start(i_w_div_wc,k)
                end if
             end if
 
@@ -1425,6 +1473,14 @@
             end do
          end if
 
+         if (ierr /= 0) return
+         ! Keep the solver increments consistent with the corrected abundances.
+         do j=1,species
+            if (s% xa(j,k) == s% xa_start(j,k) + s% solver_dx(s% nvar_hydro+j,k)) cycle
+            s% solver_dx(s% nvar_hydro+j,k) = s% xa(j,k) - s% xa_start(j,k)
+            s% xa_sub_xa_start(j,k) = s% solver_dx(s% nvar_hydro+j,k)
+         end do
+
       end subroutine check1_chem
 
 
@@ -1480,6 +1536,7 @@
             vol00 = volp1 + cell_vol
             s% lnR(k) = log(vol00/four_thirds_pi)/3
             dx(s% i_lnR,k) = s% lnR(k) - xh_start(s% i_lnR,k)
+            s% dxh_lnR(k) = dx(s% i_lnR,k)
          end do
          call edit_dlnR_dt_above_k_below_just_added(s, xh_start)
       end subroutine edit_lnR

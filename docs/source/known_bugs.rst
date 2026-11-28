@@ -13,6 +13,142 @@ issue, but it may not be complete.
 r26.4.1
 =======
 
+.. _skye_ion_offset_normalization_bug:
+
+EOS: Skye ionization energy offset normalization
+------------------------------------------------
+
+With ``Skye_use_ion_offsets = .true.`` (the default), the ionization energy
+offset added to Skye's specific free energy was too large by the mean mass
+number ``abar``. The offset aligns the fully ionized energy with the neutral
+ground state used by FreeEOS.
+
+The correct specific offset is
+
+.. math::
+
+   e_{\rm off} = \frac{\mathrm{ev2erg}}{m_u}
+      \sum_i \frac{X_i}{A_i} I_{Z_i},
+
+where :math:`I_{Z_i}` is the total ionization energy in eV for element
+:math:`Z_i`. MESA uses baryon fractions :math:`X_i`, so :math:`X_i/A_i` gives
+ions per baryon. The routine incorrectly normalized these abundances to
+fractions per ion, introducing an extra factor
+:math:`\bar A = 1/\sum_i X_i/A_i` for normalized compositions.
+
+At fixed composition in pure Skye, the offset changes internal energy but
+leaves pressure, entropy, and heat capacities unchanged. It can affect energy
+evolution when composition or EOS blend weights change.
+
+This affects released versions using the Skye ionization offset, including
+``r26.4.1``, and is fixed in the main branch after ``r26.4.1``. To apply the fix
+to an existing release, remove the normalization of ``ya`` in
+``eos/private/ion_offset.f90``. Retain the per-baryon weighting ``xa/A`` and
+the final conversion by ``ev2erg/amu``. Use double-precision literals for the
+ionization energies. See `gh-1086 <https://github.com/MESAHub/mesa/issues/1086>`_.
+
+.. _duplicate_n14ag_rate_bug:
+
+Net: duplicate ``n14(a,g)f18(e+nu)o18`` reaction
+------------------------------------------------
+
+The ``cno_extras_o18_to_mg26.net`` and ``pp_cno_extras_o18_ne22.net``
+networks included both the explicit ``r_n14_ag_f18`` and ``r_f18_wk_o18``
+reactions and the approximate ``rn14ag_to_o18`` reaction. This double counted
+the ``n14(a,g)f18(e+nu)o18`` flow. The
+``cno_extras_o18_to_mg26_plus_fe56.net`` network was also affected because it
+includes ``cno_extras_o18_to_mg26.net``.
+
+This affects released MESA versions from ``r15140`` through ``r26.4.1`` and is
+fixed in the main branch after ``r26.4.1``. As a workaround, remove the
+approximate reaction after the hot CNO and ``o18`` extensions have been added::
+
+   remove_reaction(rn14ag_to_o18)
+
+See `gh-1056 <https://github.com/MESAHub/mesa/issues/1056>`_.
+
+.. _drag_energy_u_flag_bug:
+
+Star: drag energy could be included with ``u_flag``
+---------------------------------------------------
+
+In releases ``r24.03.1`` through ``r26.4.1``, setting ``u_flag = .true.``
+with a nonzero ``drag_coefficient`` and ``use_drag_energy = .true.`` could
+inject spurious energy. The drag energy source was evaluated even though the
+corresponding drag force only applies when ``v_flag = .true.``.
+
+This is fixed in the main branch after ``r26.4.1``. As a workaround, set
+``use_drag_energy = .false.`` when using ``u_flag``.
+
+.. _plasmon_weinberg_angle_bug:
+
+Neu: plasmon neutrino cooling used a hardcoded Weinberg angle
+-------------------------------------------------------------
+
+The plasmon neutrino cooling rate used a hardcoded prefactor calculated with a
+Weinberg angle of 0.2319, while all other neutrino cooling processes used
+calculated prefactors taking the Weinberg angle as input, with default value
+0.22290. Thus, modifying the value of the Weinberg angle resulted in changes to
+neutrino cooling processes except for the plasmon neutrinos.
+
+This affects all released MESA versions through ``r26.4.1`` and was found and
+fixed by user Garv Chauhan in `gh-998 <https://github.com/MESAHub/mesa/pull/998>`_.
+Plasmon neutrinos now use the same Weinberg angle as all other processes, and
+changing its value will affect the corresponding cooling rate. Changes to the plasmon neutrino prefactor for MESA's default Weinberg angle result in small numerical differences for stars where plasmon neutrino cooling is significant.
+
+.. _opal_op_type1_preprocessor_bug:
+
+Kap: OPAL/OP Type 1 opacity table preprocessing
+-----------------------------------------------
+
+The preprocessor uses opacity fitting and smoothing routines adapted from
+`Seaton (1993), MNRAS, 265, L25 <https://ui.adsabs.harvard.edu/abs/1993MNRAS.265L..25S/abstract>`_.
+The error occurs in the interpolation branch for missing data.
+
+The Type 1 OPAL/OP preprocessor could return :math:`\log_{10}\kappa = 0`
+when its interpolation stencil included missing data in the ``X = 0``
+table. It shifted the hydrogen abundance stencil to available data, but
+then treated the unused temperature fallback index ``kmin = 0`` as a
+failure and returned before calculating opacity. The generated tables
+consequently assigned :math:`\kappa = 1\,\mathrm{cm^2\,g^{-1}}` to affected
+points at low temperature and low density.
+
+This affects MESA ``r26.4.1`` and all earlier versions.
+Any tables generated through the same faulty code path can contain these
+values, including tables used elsewhere in the field.
+
+This is fixed after ``r26.4.1``. The fix updates both the preprocessor and
+the distributed tables. See `gh-1111 <https://github.com/MESAHub/mesa/pull/1111>`_.
+To apply the source fix in
+``kap/preprocessor/src/opal_type1.f``,
+change the early return to
+``if ((iadvance == 0) .and. (kmin <= 0)) return`` and use
+``alt(max(1,kmin))`` in the following condition. Regenerate and install the
+opacity tables, then remove the affected opacity caches or use a fresh
+cache directory. A normal MESA installation alone does not regenerate
+these tables.
+
+.. _freedman_lowt_z_bug:
+
+Kap: ``lowT_Freedman11`` used ``[M/H]`` labels as ``Z``
+-------------------------------------------------------
+
+The ``lowT_Freedman11`` opacity option used the Freedman table labels
+``0.01``, ``0.02``, ``0.04``, ``0.10``, ``0.20``, ``0.63``, and ``1.00`` as
+metal mass fractions.  These labels correspond to ``[M/H]`` not
+MESA's metal mass fraction ``Z``.  The opacity routines incorrectly interpolated in ``Z``,
+using the ``[M/H]`` labels as the interpolation grid.
+
+This has been fixed in the main branch after ``r26.4.1``.  The fix updates the
+``lowT_Freedman11`` ``Z`` grid to use the correct corresponding metal mass fractions.
+See `gh-993 <https://github.com/MESAHub/mesa/pull/993>`_.
+
+If applying these fixes to an existing checkout, rerun the opacity preprocessor
+to regenerate the tables; this is not done by a normal MESA install::
+
+   cd $MESA_DIR/kap/preprocessor
+   ./build_data_and_export
+
 .. _overshoot_other_alpha_mlt_bug:
 
 Diffusive overshooting: ``other_alpha_mlt`` ignored
@@ -24,12 +160,31 @@ instead.
 
 This is fixed in `gh-1003 <https://github.com/MESAHub/mesa/pull/1003>`_.
 
+.. _opal_scvh_high_z_blend_bug:
+
+EOS: OPAL/SCVH metallicity blend
+--------------------------------
+
+The blend from OPAL/SCVH to HELM/ideal used incorrect weights between
+``Z_all_OPAL`` and ``Z_all_HELM`` (default values ``0.035`` and ``0.04``).
+In regions using pure OPAL/SCVH, its contribution remained unchanged
+throughout this interval, then dropped to zero at the upper limit.
+
+This could cause discontinuities during stellar evolution. In the model
+reported in `gh-921 <https://github.com/MESAHub/mesa/issues/921>`_, element
+diffusion lowered the surface metallicity through ``Z = 0.04``, causing an
+abrupt change in effective temperature.
+
+The fix corrects the blend weights and their temperature and density
+derivatives so that OPAL/SCVH blends continuously into HELM/ideal across this
+interval. This is fixed after ``r26.4.1``.
+
 .. _report_max_infall_inside_fe_core_bug:
 
 Controls: ``report_max_infall_inside_fe_core`` is ignored
 ---------------------------------------------------------
 
-The parameter ``report_max_infall_inside_fe_core`` was ignored in versions r25.12.1 and r26.4.1 and always had it's default value. See `gh-981 https://github.com/MESAHub/mesa/pull/981`_.
+The parameter ``report_max_infall_inside_fe_core`` was ignored in versions r25.12.1 and r26.4.1 and always had it's default value. See `gh-981 <https://github.com/MESAHub/mesa/pull/981>`_.
 
 r25.12.1
 ========

@@ -378,6 +378,13 @@
          type(auto_diff_real_star_order1), pointer, dimension(:) :: &
             gradT_ad, Y_face_ad, gradr_ad, mlt_vc_ad, grada_face_ad, &
             gradL_ad, scale_height_ad, Lambda_ad, mlt_D_ad, mlt_Gamma_ad
+         logical, pointer :: reconstructed_face_state_valid(:)
+         type(auto_diff_real_star_order1), pointer, dimension(:) :: &
+            reconstructed_T_face_ad, reconstructed_rho_face_ad, reconstructed_P_face_ad, reconstructed_energy_face_ad, &
+            reconstructed_Cp_face_ad, reconstructed_ChiRho_face_ad, reconstructed_ChiT_face_ad, &
+            reconstructed_grada_face_ad, reconstructed_opacity_face_ad, &
+            reconstructed_scale_height_face_ad, reconstructed_gradr_face_ad
+         real(dp), pointer :: reconstructed_csound_face(:)
 
 
          logical, pointer :: fixed_gradr_for_rest_of_solver_iters(:)
@@ -766,7 +773,6 @@
       integer :: neutron_rich_core_k ! boundary is in this cell
 
       ! info about outermost outward moving shock
-      ! excluding locations with q > max_q_for_outer_mach1_location
       real(dp) :: shock_mass ! baryonic (Msun)
       real(dp) :: shock_q
       real(dp) :: shock_radius ! (Rsun)
@@ -813,6 +819,7 @@
          real(dp), pointer :: lnd_start(:) ! (nz)
          real(dp), pointer :: Peos_start(:) ! (nz)
          real(dp), pointer :: Peos_face_start(:) ! (nz)
+         real(dp), pointer :: reconstructed_P_face_start(:) ! (nz)
          real(dp), pointer :: lnPeos_start(:) ! (nz)
          real(dp), pointer :: lnPgas_start(:) ! (nz)
          real(dp), pointer :: lnT_start(:) ! (nz)
@@ -890,7 +897,7 @@
 
       ! misc other stuff
 
-         logical :: doing_finish_load_model, doing_relax, doing_struct_burn_mix, &
+         logical :: doing_finish_load_model, doing_load_restart_photo, doing_relax, doing_struct_burn_mix, &
             RSP_just_set_velocities, &
             have_new_cz_bdy_info, using_gold_tolerances, need_to_setvars, have_new_generation, &
             using_velocity_time_centering, okay_to_set_mixing_info, &
@@ -910,7 +917,7 @@
          real(dp) :: initial_v_center
          real(dp) :: tau_center
          real(dp) :: super_eddington_wind_mdot
-         real(dp) :: min_conv_time_scale, max_conv_time_scale, max_QHSE_time_scale
+         real(dp) :: min_conv_time_scale, max_conv_time_scale
 
          integer :: num_solver_iterations ! for this step
          integer :: num_diffusion_solver_iters

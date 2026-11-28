@@ -3807,7 +3807,7 @@
          call try1_reaclib_3_1(i1, i2, i3, o1, tf, fr, rr, str, ierr)
          if (ierr == 0) return
          ierr = 0
-         call try1_reaclib_3_1(o1, i1, i2, i3, tf, rr, fr, str, ierr)
+         call try1_reaclib_1_3(o1, i1, i2, i3, tf, rr, fr, str, ierr)
          if (ierr /= 0) then
             write(*,*) 'failed in jina_reaclib_3_1 ' // trim(str), tf% T9
             call mesa_error(__FILE__,__LINE__)

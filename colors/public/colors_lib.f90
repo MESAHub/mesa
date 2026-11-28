@@ -78,7 +78,7 @@ contains
 
    integer function alloc_colors_handle_using_inlist(inlist, ierr) result(handle)
       use colors_def, only: Colors_General_Info, do_alloc_colors, colors_is_initialized, get_colors_ptr
-      use colors_ctrls_io, only: read_namelist
+      use colors_ctrls_io, only: read_colors_namelist
       character(len=*), intent(in) :: inlist  ! empty means just use defaults.
       integer, intent(out) :: ierr  ! 0 means AOK.
       type(Colors_General_Info), pointer :: rq
@@ -90,7 +90,7 @@ contains
       end if
       handle = do_alloc_colors(ierr)
       if (ierr /= 0) return
-      call read_namelist(handle, inlist, ierr)
+      call read_colors_namelist(handle, inlist, ierr)
       if (ierr /= 0) return
       call get_colors_ptr(handle, rq, ierr)
       if (ierr /= 0) return

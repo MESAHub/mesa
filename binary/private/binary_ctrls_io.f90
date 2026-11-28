@@ -178,7 +178,6 @@
          !common envelope controls
          CE_alpha, &
          CE_alpha_th, &
-         CE_alpha_core, &
          CE_mass_loss_rate_high, &
          CE_mass_loss_rate_low, &
          CE_rel_rlo_for_detachment, &
@@ -204,6 +203,8 @@
          use_other_rlo_mdot, &
          use_other_check_implicit_rlo, &
          use_other_implicit_function_to_solve, &
+         use_other_e2, &
+         use_other_pgbinary_plots, &
          use_other_tsync, &
          use_other_sync_spin_to_orbit, &
          use_other_mdot_edd, &
@@ -244,12 +245,19 @@
 
          call set_default_binary_controls
          call read_binary_controls(b, inlist, ierr)
+         if (ierr /= 0) return
+
+         if (b% extra_binary_terminal_iounit /= 0) then
+            close(b% extra_binary_terminal_iounit)
+            b% extra_binary_terminal_iounit = 0
+         end if
 
          ! open additional file for binary output
          if (len_trim(b% extra_binary_terminal_output_file) /= 0) then
             open(newunit=b% extra_binary_terminal_iounit, file=trim(b% extra_binary_terminal_output_file), &
                      action='write', status='replace',iostat=ierr)
             if (ierr /= 0) then
+               b% extra_binary_terminal_iounit = 0
                write(*,*) 'failed to open ' // trim(b% extra_binary_terminal_output_file)
                return
             end if
@@ -259,88 +267,54 @@
 
 
       subroutine read_binary_controls(b, filename, ierr)
-         use utils_lib
+         use utils_namelist, only: read_namelist, missing_namelist_error
          type (binary_info), pointer :: b
          character(*), intent(in) :: filename
          integer, intent(out) :: ierr
 
-         call read_binary_controls_file(b, filename, 1, ierr)
+         call read_namelist(filename, read_binary_controls_file, "binary_controls", ierr, missing_namelist_error)
+
+         if (ierr /= 0) return
+
+         call store_binary_controls(b)
 
       end subroutine read_binary_controls
 
+      subroutine read_binary_controls_file(unit, iostat, iomsg, extra_inlists, extra_inlists_mask)
+         use const_def, only: strlen
+         use utils_namelist, only: max_extra_inlists
 
-      recursive subroutine read_binary_controls_file(b, filename, level, ierr)
-         use utils_lib
-         character(*), intent(in) :: filename
-         type (binary_info), pointer :: b
-         integer, intent(in) :: level
-         integer, intent(out) :: ierr
-         logical, dimension(max_extra_inlists) :: read_extra
-         character (len=strlen), dimension(max_extra_inlists) :: extra
-         integer :: unit, i
+         integer, intent(in) :: unit
+         integer, intent(out) :: iostat
+         character(len=strlen), intent(out) :: iomsg
+         character(len=strlen), dimension(max_extra_inlists), intent(out) :: extra_inlists
+         logical, dimension(max_extra_inlists), intent(out) :: extra_inlists_mask
 
-         ierr = 0
+         integer :: i
 
-         if (level >= 10) then
-            write(*,*) 'ERROR: too many levels of nested extra binary controls inlist files'
-            ierr = -1
+         read_extra_binary_controls_inlist(:) = .false.
+
+         read(unit, nml=binary_controls, iostat=iostat, iomsg=iomsg)
+
+         if (iostat /= 0) then
             return
          end if
 
-         if (len_trim(filename) > 0) then
-            open(newunit=unit, file=trim(filename), action='read', delim='quote', status='old', iostat=ierr)
-            if (ierr /= 0) then
-               write(*, *) 'Failed to open binary control namelist file ', trim(filename)
-               return
-            end if
-            read(unit, nml=binary_controls, iostat=ierr)
-            close(unit)
-            if (ierr /= 0) then
-               write(*, *)
-               write(*, *)
-               write(*, *)
-               write(*, *)
-               write(*, '(a)') &
-                  'Failed while trying to read binary control namelist file: ' // trim(filename)
-               write(*, '(a)') &
-                  'Perhaps the following runtime error message will help you find the problem.'
-               write(*, *)
-               open(newunit=unit, file=trim(filename), action='read', delim='quote', status='old', iostat=ierr)
-               read(unit, nml=binary_controls)
-               close(unit)
-               return
-            end if
-         end if
-
-         call store_binary_controls(b, ierr)
-
-         ! recursive calls to read other inlists
          do i=1, max_extra_inlists
-            read_extra(i) = read_extra_binary_controls_inlist(i)
-            read_extra_binary_controls_inlist(i) = .false.
-            extra(i) = extra_binary_controls_inlist_name(i)
-            extra_binary_controls_inlist_name(i) = 'undefined'
-
-            if (read_extra(i)) then
-               call read_binary_controls_file(b, extra(i), level+1, ierr)
-               if (ierr /= 0) return
-            end if
+            extra_inlists(i) = extra_binary_controls_inlist_name(i)
+            extra_inlists_mask(i) = read_extra_binary_controls_inlist(i)
          end do
 
       end subroutine read_binary_controls_file
-
 
       subroutine set_default_binary_controls
          include 'binary_controls.defaults'
       end subroutine set_default_binary_controls
 
 
-      subroutine store_binary_controls(b, ierr)
+      subroutine store_binary_controls(b)
          use utils_lib, only: mkdir
          type (binary_info), pointer :: b
-         integer, intent(out) :: ierr
-
-         ierr = 0
 
          ! specifications for starting model
          b% m1 = m1
@@ -492,7 +466,6 @@
          !common envelope controls
          b% CE_alpha = CE_alpha
          b% CE_alpha_th = CE_alpha_th
-         b% CE_alpha_core = CE_alpha_core
          b% CE_mass_loss_rate_high = CE_mass_loss_rate_high
          b% CE_mass_loss_rate_low = CE_mass_loss_rate_low
          b% CE_rel_rlo_for_detachment = CE_rel_rlo_for_detachment
@@ -518,6 +491,8 @@
          b% use_other_rlo_mdot = use_other_rlo_mdot
          b% use_other_check_implicit_rlo = use_other_check_implicit_rlo
          b% use_other_implicit_function_to_solve = use_other_implicit_function_to_solve
+         b% use_other_e2 = use_other_e2
+         b% use_other_pgbinary_plots = use_other_pgbinary_plots
          b% use_other_tsync = use_other_tsync
          b% use_other_sync_spin_to_orbit = use_other_sync_spin_to_orbit
          b% use_other_mdot_edd = use_other_mdot_edd
@@ -577,10 +552,15 @@
          ! timestep controls
          time_delta_coeff = b% time_delta_coeff
          fm = b% fm
+         fm_hard = b% fm_hard
          fa = b% fa
+         fa_hard = b% fa_hard
          fr = b% fr
+         fr_hard = b% fr_hard
          fj = b% fj
+         fj_hard = b% fj_hard
          fe = b% fe
+         fe_hard = b% fe_hard
          fm_limit = b% fm_limit
          fr_limit = b% fr_limit
          fe_limit = b% fe_limit
@@ -695,7 +675,6 @@
          !common envelope controls
          CE_alpha = b% CE_alpha
          CE_alpha_th = b% CE_alpha_th
-         CE_alpha_core = b% CE_alpha_core
          CE_mass_loss_rate_high = b% CE_mass_loss_rate_high
          CE_mass_loss_rate_low = b% CE_mass_loss_rate_low
          CE_rel_rlo_for_detachment = b% CE_rel_rlo_for_detachment
@@ -704,6 +683,10 @@
          CE_xa_diff_to_terminate = b% CE_xa_diff_to_terminate
          CE_terminate_when_core_overflows = b% CE_terminate_when_core_overflows
          CE_min_period_in_minutes = b% CE_min_period_in_minutes
+         CE_energy_factor_HII_toHI = b% CE_energy_factor_HII_toHI
+         CE_energy_factor_HeII_toHeI = b% CE_energy_factor_HeII_toHeI
+         CE_energy_factor_HeIII_toHeII = b% CE_energy_factor_HeIII_toHeII
+         CE_energy_factor_H2 = b% CE_energy_factor_H2
          CE_fixed_lambda = b% CE_fixed_lambda
 
          ! miscellaneous controls
@@ -717,6 +700,8 @@
          use_other_rlo_mdot = b% use_other_rlo_mdot
          use_other_check_implicit_rlo = b% use_other_check_implicit_rlo
          use_other_implicit_function_to_solve = b% use_other_implicit_function_to_solve
+         use_other_e2 = b% use_other_e2
+         use_other_pgbinary_plots = b% use_other_pgbinary_plots
          use_other_tsync = b% use_other_tsync
          use_other_sync_spin_to_orbit = b% use_other_sync_spin_to_orbit
          use_other_mdot_edd = b% use_other_mdot_edd
@@ -812,7 +797,7 @@
          read(tmp, nml=binary_controls)
 
          ! Add to star
-         call store_binary_controls(b, ierr)
+         call store_binary_controls(b)
          if(ierr/=0) return
 
       end subroutine set_binary_control

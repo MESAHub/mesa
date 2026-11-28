@@ -5,6 +5,8 @@
 
    evolve_both_stars = .false.
 
+   ! pgbinary_flag = .true.
+
 / ! end of binary_job namelist
 
 &binary_controls
@@ -21,3 +23,4 @@
    max_tries_to_achieve = 0
 
 / ! end of binary_controls namelist
+

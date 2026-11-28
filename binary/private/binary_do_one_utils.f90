@@ -94,7 +94,7 @@
       subroutine do_show_binary_terminal_header(b)
          type (binary_info), pointer :: b
          call output_binary_terminal_header(b,terminal_iounit)
-         if (b% extra_binary_terminal_iounit > 0) &
+         if (b% extra_binary_terminal_iounit /= 0) &
             call output_binary_terminal_header(b,b% extra_binary_terminal_iounit)
       end subroutine do_show_binary_terminal_header
 
@@ -126,7 +126,7 @@
       subroutine do_binary_terminal_summary(b)
          type (binary_info), pointer :: b
          call output_binary_terminal_summary(b,terminal_iounit)
-         if (b% extra_binary_terminal_iounit > 0) then
+         if (b% extra_binary_terminal_iounit /= 0) then
             call output_binary_terminal_summary(b,b% extra_binary_terminal_iounit)
             flush(b% extra_binary_terminal_iounit)
          end if
